@@ -1,0 +1,26 @@
+{
+    "format_version": 2,
+    "tooth": "my-mod",
+    "version": "0.0.0",
+    "info": {
+        "name": "My Mod Name",
+        "description": "My Mod Description",
+        "author": "My Name",
+        "tags": [
+            "levilamina",
+            "mod"
+        ]
+    },
+    "asset_url": "My Asset Url",
+    "prerequisites": {
+        "github.com/LiteLDev/LeviLamina": "My LeviLamina Dependency Version"
+    },
+    "files": {
+        "place": [
+            {
+                "src": "my-mod/*",
+                "dest": "plugins/my-mod/"
+            }
+        ]
+    }
+}
