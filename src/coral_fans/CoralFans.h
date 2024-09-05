@@ -2,14 +2,14 @@
 
 #include "ll/api/mod/NativeMod.h"
 
-namespace my_mod {
+namespace coral_fans {
 
-class MyMod {
+class CoralFans {
 
 public:
-    static MyMod& getInstance();
+    static CoralFans& getInstance();
 
-    MyMod(ll::mod::NativeMod& self) : mSelf(self) {}
+    CoralFans(ll::mod::NativeMod& self) : mSelf(self) {}
 
     [[nodiscard]] ll::mod::NativeMod& getSelf() const { return mSelf; }
 
@@ -30,4 +30,4 @@ private:
     ll::mod::NativeMod& mSelf;
 };
 
-} // namespace my_mod
+} // namespace coral_fans

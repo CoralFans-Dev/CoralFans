@@ -1,25 +1,25 @@
 {
     "format_version": 2,
-    "tooth": "my-mod",
+    "tooth": "github.com/CoralFans-Dev/CoralFans",
     "version": "0.0.0",
     "info": {
-        "name": "My Mod Name",
-        "description": "My Mod Description",
-        "author": "My Name",
+        "name": "CoralFans",
+        "description": "CoralFans Mod.",
+        "author": "CoralFans-Dev",
         "tags": [
             "levilamina",
             "mod"
         ]
     },
-    "asset_url": "My Asset Url",
+    "asset_url": "https://github.com/CoralFans-Dev/CoralFans/releases/download/v$(version)/CoralFans-windows-x64.zip",
     "prerequisites": {
-        "github.com/LiteLDev/LeviLamina": "My LeviLamina Dependency Version"
+        "github.com/LiteLDev/LeviLamina": ">=0.13.5 <0.14.0"
     },
     "files": {
         "place": [
             {
-                "src": "my-mod/*",
-                "dest": "plugins/my-mod/"
+                "src": "CoralFans/*",
+                "dest": "plugins/CoralFans/"
             }
         ]
     }

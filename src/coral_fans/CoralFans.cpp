@@ -1,33 +1,33 @@
-#include "mod/MyMod.h"
+#include "coral_fans/CoralFans.h"
 
 #include <memory>
 
 #include "ll/api/mod/RegisterHelper.h"
 
-namespace my_mod {
+namespace coral_fans {
 
-static std::unique_ptr<MyMod> instance;
+static std::unique_ptr<CoralFans> instance;
 
-MyMod& MyMod::getInstance() { return *instance; }
+CoralFans& CoralFans::getInstance() { return *instance; }
 
-bool MyMod::load() {
+bool CoralFans::load() {
     getSelf().getLogger().debug("Loading...");
     // Code for loading the mod goes here.
     return true;
 }
 
-bool MyMod::enable() {
+bool CoralFans::enable() {
     getSelf().getLogger().debug("Enabling...");
     // Code for enabling the mod goes here.
     return true;
 }
 
-bool MyMod::disable() {
+bool CoralFans::disable() {
     getSelf().getLogger().debug("Disabling...");
     // Code for disabling the mod goes here.
     return true;
 }
 
-} // namespace my_mod
+} // namespace coral_fans
 
-LL_REGISTER_MOD(my_mod::MyMod, my_mod::instance);
+LL_REGISTER_MOD(coral_fans::CoralFans, coral_fans::instance);
