@@ -4,6 +4,9 @@
 
 #include "ll/api/mod/RegisterHelper.h"
 
+#include "coral_fans/base/Mod.h"
+#include "coral_fans/commands/Commands.h"
+
 namespace coral_fans {
 
 static std::unique_ptr<CoralFans> instance;
@@ -12,13 +15,20 @@ CoralFans& CoralFans::getInstance() { return *instance; }
 
 bool CoralFans::load() {
     getSelf().getLogger().debug("Loading...");
-    // Code for loading the mod goes here.
+
+    // load Config Database
+    const auto& configDbPath        = getSelf().getDataDir() / "config";
+    coral_fans::mod().getConfigDb() = std::make_unique<ll::data::KeyValueDB>(configDbPath);
+
     return true;
 }
 
 bool CoralFans::enable() {
     getSelf().getLogger().debug("Enabling...");
-    // Code for enabling the mod goes here.
+
+    // register commands
+    coral_fans::commands::registerTickCommand();
+
     return true;
 }
 
