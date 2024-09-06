@@ -28,6 +28,8 @@ bool CoralFans::enable() {
 
     // register commands
     coral_fans::commands::registerTickCommand();
+    coral_fans::commands::registerFuncCommand();
+    coral_fans::commands::registerSelfCommand();
 
     return true;
 }
