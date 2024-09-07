@@ -102,6 +102,10 @@ function pack_mod(target,mod_define)
             os.cp(oripdbfile, pdbfile)
         end
 
+        -- Copy i18n files.
+        local langfile = path.join(os.projectdir(), "src", "lang")
+        os.cp(langfile, path.join(outputdir, "lang"))
+
         formattedmanifest = string_formatter(manifest, mod_define)
         io.writefile(manifestfile,formattedmanifest)
         cprint("${bright green}[mod Packer]: ${reset}mod already generated to " .. outputdir)

@@ -1,0 +1,50 @@
+{
+    "command": {
+        "func": {
+            "description": "Globally controls functions of CoralFans Mod",
+            "forceopen": {
+                "success": "globally set forceopen \"{}\"",
+                "error": "failed to globally set forceopen"
+            },
+            "forceplace": {
+                "success": "globally set forceplace \"{}\"",
+                "error": "failed to globally set forceplace"
+            },
+            "noclip": {
+                "success": "globally set noclip \"{}\"",
+                "error": "failed to globally set noclip"
+            },
+            "droppernocost": {
+                "success": "globally set droppernocost \"{}\"",
+                "error": "failed to globally set droppernocost"
+            },
+            "safeexplode": {
+                "success": "globally set safeexplode \"{}\"",
+                "error": "failed to globally set safeexplode"
+            }
+        },
+        "self": {
+            "description": "Controls functions of CoralFans Mod",
+            "noclip": {
+                "success": "set noclip \"{}\"",
+                "error": "failed to set noclip"
+            }
+        },
+        "tick": {
+            "description": "Controls or queries the tick status of the game",
+            "query": {
+                "output": "{} per tick"
+            },
+            "set": {
+                "output": "set tick {}"
+            },
+            "rate": {
+                "success": "set {} tick(s) per second",
+                "error": "rate must be non negative"
+            },
+            "step": {
+                "output": "step {} tick(s)"
+            }
+        }
+    }
+}

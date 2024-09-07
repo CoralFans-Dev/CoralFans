@@ -2,6 +2,7 @@
 
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
+#include "ll/api/i18n/I18n.h"
 #include "mc/entity/utilities/ActorType.h"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
@@ -19,12 +20,11 @@
 
 namespace coral_fans::commands {
 void registerSelfCommand() {
+    using ll::i18n_literals::operator""_tr;
+
     // reg cmd
-    auto& selfCommand = ll::command::CommandRegistrar::getInstance().getOrCreateCommand(
-        "self",
-        "Controls functions of CoralFans Mod.",
-        CommandPermissionLevel::Any
-    );
+    auto& selfCommand = ll::command::CommandRegistrar::getInstance()
+                            .getOrCreateCommand("self", "command.self.description"_tr(), CommandPermissionLevel::Any);
 
     struct SelfIsOpenParam {
         bool isopen;
@@ -39,8 +39,8 @@ void registerSelfCommand() {
                 std::format("functions.players.{}.noclip", player->getUuid().asString()),
                 (param.isopen & global) ? "true" : "false"
             );
-            if (rst) output.success("set noclip \"{}\"", (param.isopen & global) ? "true" : "false");
-            else output.error("failed to set noclip");
+            if (rst) output.success("command.self.noclip.success"_tr((param.isopen & global) ? "true" : "false"));
+            else output.error("command.self.noclip.error"_tr());
         }
     );
 }
