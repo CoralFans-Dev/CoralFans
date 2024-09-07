@@ -78,5 +78,14 @@ void registerFuncCommand() {
                 output.success("command.func.safeexplode.success"_tr(param.isopen ? "true" : "false"));
             else output.error("command.func.safeexplode.error"_tr());
         });
+
+    // hsa
+    funcCommand.overload<FuncIsOpenParam>().text("hsa").required("isopen").execute(
+        [](CommandOrigin const&, CommandOutput& output, FuncIsOpenParam const& param) {
+            if (coral_fans::mod().getConfigDb()->set("functions.global.hsa", param.isopen ? "true" : "false"))
+                output.success("command.func.hsa.success"_tr(param.isopen ? "true" : "false"));
+            else output.error("command.func.hsa.error"_tr());
+        }
+    );
 }
 } // namespace coral_fans::commands
