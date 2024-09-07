@@ -1,22 +1,13 @@
+#include "coral_fans/base/Macros.h"
 #include "coral_fans/base/Mod.h"
 
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/i18n/I18n.h"
-#include "mc/entity/utilities/ActorType.h"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/server/commands/CommandPermissionLevel.h"
 #include "mc/world/actor/player/Player.h"
-
-
-#define CHECK_PLAYER                                                                                                   \
-    auto* entity = origin.getEntity();                                                                                 \
-    if (entity == nullptr || !entity->isType(ActorType::Player)) {                                                     \
-        output.error("Only players can run this command");                                                             \
-        return;                                                                                                        \
-    }                                                                                                                  \
-    auto* player = static_cast<Player*>(entity);
 
 namespace coral_fans::commands {
 void registerSelfCommand() {
@@ -33,7 +24,7 @@ void registerSelfCommand() {
     // self noclip <bool>
     selfCommand.overload<SelfIsOpenParam>().text("noclip").required("isopen").execute(
         [](CommandOrigin const& origin, CommandOutput& output, SelfIsOpenParam const& param) {
-            CHECK_PLAYER
+            COMMAND_CHECK_PLAYER
             const auto global = coral_fans::mod().getConfigDb()->get("functions.global.noclip") == "true";
             const bool rst    = coral_fans::mod().getConfigDb()->set(
                 std::format("functions.players.{}.noclip", player->getUuid().asString()),
