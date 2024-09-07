@@ -25,6 +25,10 @@
             "hsa": {
                 "success": "globally set hsa \"{}\"",
                 "error": "failed to globally set hsa"
+            },
+            "autotool": {
+                "success": "globally set autotool \"{}\"",
+                "error": "failed to globally set autotool"
             }
         },
         "self": {
@@ -32,6 +36,14 @@
             "noclip": {
                 "success": "set noclip \"{}\"",
                 "error": "failed to set noclip"
+            },
+            "autotool": {
+                "success": "set autotool \"{}\"",
+                "error": "failed to set autotool",
+                "mindamage": {
+                    "success": "set autotool mindamage \"{}\"",
+                    "error": "failed to set autotool mindamage"
+                }
             }
         },
         "tick": {

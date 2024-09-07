@@ -8,6 +8,7 @@
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/server/commands/CommandPermissionLevel.h"
 #include "mc/world/actor/player/Player.h"
+#include <string>
 
 namespace coral_fans::commands {
 void registerSelfCommand() {
@@ -26,13 +27,47 @@ void registerSelfCommand() {
         [](CommandOrigin const& origin, CommandOutput& output, SelfIsOpenParam const& param) {
             COMMAND_CHECK_PLAYER
             const auto global = coral_fans::mod().getConfigDb()->get("functions.global.noclip") == "true";
-            const bool rst    = coral_fans::mod().getConfigDb()->set(
-                std::format("functions.players.{}.noclip", player->getUuid().asString()),
-                (param.isopen & global) ? "true" : "false"
-            );
-            if (rst) output.success("command.self.noclip.success"_tr((param.isopen & global) ? "true" : "false"));
+            if (coral_fans::mod().getConfigDb()->set(
+                    std::format("functions.players.{}.noclip", player->getUuid().asString()),
+                    (param.isopen & global) ? "true" : "false"
+                ))
+                output.success("command.self.noclip.success"_tr((param.isopen & global) ? "true" : "false"));
             else output.error("command.self.noclip.error"_tr());
         }
     );
+
+    // self autotool <bool>
+    selfCommand.overload<SelfIsOpenParam>()
+        .text("autotool")
+        .required("isopen")
+        .execute([](CommandOrigin const& origin, CommandOutput& output, SelfIsOpenParam const& param) {
+            COMMAND_CHECK_PLAYER
+            const auto global = coral_fans::mod().getConfigDb()->get("functions.global.autotool") == "true";
+            if (coral_fans::mod().getConfigDb()->set(
+                    std::format("functions.players.{}.autotool", player->getUuid().asString()),
+                    (param.isopen & global) ? "true" : "false"
+                ))
+                output.success("command.self.autotool.success"_tr((param.isopen & global) ? "true" : "false"));
+            else output.error("command.self.autotool.error"_tr());
+        });
+
+    // self autotool mindamage <int>
+    struct SelfAutoToolMinDamageParam {
+        int mindamage;
+    };
+    selfCommand.overload<SelfAutoToolMinDamageParam>()
+        .text("autotool")
+        .text("mindamage")
+        .required("mindamage")
+        .execute([](CommandOrigin const& origin, CommandOutput& output, SelfAutoToolMinDamageParam const& param) {
+            COMMAND_CHECK_PLAYER
+            auto minDamageString = std::to_string(param.mindamage);
+            if (coral_fans::mod().getConfigDb()->set(
+                    std::format("functions.players.{}.autotool.mindamage", player->getUuid().asString()),
+                    minDamageString
+                ))
+                output.success("command.self.autotool.mindamage.success"_tr(minDamageString));
+            else output.error("command.self.autotool.mindamage.error"_tr());
+        });
 }
 } // namespace coral_fans::commands
