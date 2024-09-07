@@ -21,6 +21,10 @@
             "safeexplode": {
                 "success": "全局设置 safeexplode \"{}\"",
                 "error": "全局设置 safeexplode 失败"
+            },
+            "hsa": {
+                "success": "全局设置 hsa \"{}\"",
+                "error": "全局设置 hsa 失败"
             }
         },
         "self": {
@@ -44,6 +48,12 @@
             },
             "step": {
                 "output": "步进 {} tick(s)"
+            }
+        },
+        "hsa": {
+            "description": "显示HSA",
+            "show": {
+                "output": "设置 showhsa \"{}\""
             }
         }
     }

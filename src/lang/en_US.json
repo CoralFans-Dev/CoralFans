@@ -21,6 +21,10 @@
             "safeexplode": {
                 "success": "globally set safeexplode \"{}\"",
                 "error": "failed to globally set safeexplode"
+            },
+            "hsa": {
+                "success": "globally set hsa \"{}\"",
+                "error": "failed to globally set hsa"
             }
         },
         "self": {
@@ -44,6 +48,12 @@
             },
             "step": {
                 "output": "step {} tick(s)"
+            }
+        },
+        "hsa": {
+            "description": "Show HSA",
+            "show": {
+                "output": "set showhsa \"{}\""
             }
         }
     }

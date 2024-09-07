@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "bsci/GeometryGroup.h"
 #include "ll/api/mod/RegisterHelper.h"
 
 #include "ll/api/Config.h"
@@ -40,6 +41,9 @@ bool CoralFans::load() {
     const auto& configDbPath        = getSelf().getDataDir() / "config";
     coral_fans::mod().getConfigDb() = std::make_unique<ll::data::KeyValueDB>(configDbPath);
 
+    // load GeometryGroup
+    coral_fans::mod().getGeometryGroup() = bsci::GeometryGroup::createDefault();
+
     return true;
 }
 
@@ -50,6 +54,7 @@ bool CoralFans::enable() {
     coral_fans::commands::registerTickCommand();
     coral_fans::commands::registerFuncCommand();
     coral_fans::commands::registerSelfCommand();
+    coral_fans::commands::registerHsaCommand();
 
     return true;
 }

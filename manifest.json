@@ -2,5 +2,11 @@
     "name": "${modName}",
     "entry": "${modFile}",
     "version": "${modVersion}",
-    "type": "native"
+    "type": "native",
+    "author": "CoralFans-Dev",
+    "dependencies": [
+        {
+            "name": "BedrockServerClientInterface"
+        }
+    ]
 }
