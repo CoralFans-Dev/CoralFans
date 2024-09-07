@@ -1,5 +1,6 @@
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
+#include "ll/api/i18n/I18n.h"
 #include "ll/api/service/Bedrock.h"
 // #include "mc/network/packet/LevelEventPacket.h"
 #include "mc/server/commands/CommandOutput.h"
@@ -12,20 +13,21 @@
 
 namespace coral_fans::commands {
 void registerTickCommand() {
+    using ll::i18n_literals::operator""_tr;
+
     // reg cmd
     auto& tickCommand = ll::command::CommandRegistrar::getInstance().getOrCreateCommand(
         "tick",
-        "Controls or queries the tick status of the game.",
+        "command.tick.description"_tr(),
         CommandPermissionLevel::GameDirectors
     );
 
     // tick query
     tickCommand.overload().text("query").execute([](CommandOrigin const&, CommandOutput& output) {
         output.success(
-            "{} per tick",
-            std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(
+            "command.tick.query.output"_tr(std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(
                 ProfilerLite::gProfilerLiteInstance.getServerTickTime()
-            )
+            ))
         );
     });
 
@@ -49,7 +51,7 @@ void registerTickCommand() {
             // LevelEventPacket{LevelEvent::SimTimeStep, origin.getWorldPosition(), pause}.sendToClients();
             auto mc = ll::service::getMinecraft();
             if (mc.has_value()) mc->setSimTimePause(pause);
-            output.success("set tick {}", magic_enum::enum_name(param.tickFreezeType));
+            output.success("command.tick.set.output"_tr(magic_enum::enum_name(param.tickFreezeType)));
         });
 
     // tick rate <float>
@@ -58,11 +60,11 @@ void registerTickCommand() {
     };
     tickCommand.overload<TickRateParam>().text("rate").required("rate").execute(
         [](CommandOrigin const&, CommandOutput& output, TickRateParam const& param) {
-            if (param.rate < 0) output.error("rate must be non negative");
+            if (param.rate < 0) output.error("command.tick.rate.error"_tr());
             // LevelEventPacket{LevelEvent::SimTimeScale, {param.rate / 20}, param.rate > 0}.sendToClients();
             auto mc = ll::service::getMinecraft();
             if (mc.has_value()) mc->setSimTimeScale(param.rate / 20.0f);
-            output.success(" set {} tick(s) per second", param.rate);
+            output.success("command.tick.rate.success"_tr(param.rate));
         }
     );
 
@@ -77,7 +79,7 @@ void registerTickCommand() {
             auto* timer = ll::memory::dAccess<Timer*>(mc.as_ptr(), 0xD8); // this+0xd8
             timer->stepTick(tick);
         }
-        output.success("step {} tick(s)", tick);
+        output.success("command.tick.step.output"_tr(tick));
     };
     struct TickStepParam {
         int time;
