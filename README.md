@@ -27,4 +27,4 @@ PRs accepted.
 
 ## License
 
-GPL v3 License
+AGPL v3 License
