@@ -25,6 +25,10 @@
             "hsa": {
                 "success": "全局设置 hsa \"{}\"",
                 "error": "全局设置 hsa 失败"
+            },
+            "autotool": {
+                "success": "全局设置 autotool \"{}\"",
+                "error": "全局设置 autotool 失败"
             }
         },
         "self": {
@@ -32,6 +36,14 @@
             "noclip": {
                 "success": "设置 noclip \"{}\"",
                 "error": "设置 noclip 失败"
+            },
+            "autotool": {
+                "success": "设置 autotool \"{}\"",
+                "error": "设置 autotool 失败",
+                "mindamage": {
+                    "success": "设置 autotool mindamage \"{}\"",
+                    "error": "设置 autotool mindamage 失败"
+                }
             }
         },
         "tick": {

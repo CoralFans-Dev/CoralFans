@@ -87,5 +87,15 @@ void registerFuncCommand() {
             else output.error("command.func.hsa.error"_tr());
         }
     );
+
+    // autotool
+    funcCommand.overload<FuncIsOpenParam>()
+        .text("autotool")
+        .required("isopen")
+        .execute([](CommandOrigin const&, CommandOutput& output, FuncIsOpenParam const& param) {
+            if (coral_fans::mod().getConfigDb()->set("functions.global.autotool", param.isopen ? "true" : "false"))
+                output.success("command.func.autotool.success"_tr(param.isopen ? "true" : "false"));
+            else output.error("command.func.autotool.error"_tr());
+        });
 }
 } // namespace coral_fans::commands
