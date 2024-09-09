@@ -9,12 +9,15 @@
 
 
 namespace coral_fans::commands {
-void registerHsaCommand() {
+void registerHsaCommand(std::string permission) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
-    auto& funcCommand = ll::command::CommandRegistrar::getInstance()
-                            .getOrCreateCommand("hsa", "command.hsa.description"_tr(), CommandPermissionLevel::Any);
+    auto& funcCommand = ll::command::CommandRegistrar::getInstance().getOrCreateCommand(
+        "hsa",
+        "command.hsa.description"_tr(),
+        magic_enum::enum_cast<CommandPermissionLevel>(permission).value_or(CommandPermissionLevel::GameDirectors)
+    );
 
     struct HsaIsOpenParam {
         bool isopen;
@@ -24,7 +27,9 @@ void registerHsaCommand() {
     funcCommand.overload<HsaIsOpenParam>().text("show").required("isopen").execute(
         [](CommandOrigin const&, CommandOutput& output, HsaIsOpenParam const& param) {
             coral_fans::mod().getHsaManager().show(param.isopen);
-            output.success("command.hsa.show.output"_tr(param.isopen ? "true" : "false"));
+            if (coral_fans::mod().getConfigDb()->set("functions.data.hsa.show", param.isopen ? "true" : "false"))
+                output.success("command.hsa.show.success"_tr(param.isopen ? "true" : "false"));
+            else output.error("command.hsa.show.error"_tr());
         }
     );
 }

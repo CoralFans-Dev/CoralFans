@@ -29,6 +29,10 @@
             "autotool": {
                 "success": "全局设置 autotool \"{}\"",
                 "error": "全局设置 autotool 失败"
+            },
+            "hoppercounter": {
+                "success": "全局设置 hoppercounter \"{}\"",
+                "error": "全局设置 hoppercounter 失败"
             }
         },
         "self": {
@@ -65,7 +69,26 @@
         "hsa": {
             "description": "显示HSA",
             "show": {
-                "output": "设置 showhsa \"{}\""
+                "success": "设置 showhsa \"{}\"",
+                "error": "设置 showhsa 失败"
+            }
+        },
+        "counter": {
+            "description": "漏斗计数器",
+            "print": {
+                "error": "无法获取漏斗计数器频道"
+            },
+            "reset": {
+                "success": "重置漏斗计数器 频道 {}",
+                "error": "重置漏斗计数器 频道 {} 失败"
+            }
+        }
+    },
+    "function": {
+        "hoppercounter": {
+            "info": {
+                "nodata": "没有数据",
+                "introduction": "频道: §l{}§r\n§l{}§r 个物品 (§l{}§r/h) 于 §l{}§r gt (§l{}§rh)\n§l{}§r 个物品 (§l{}§r/h) 于最近一分钟"
             }
         }
     }

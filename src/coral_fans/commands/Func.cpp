@@ -10,14 +10,14 @@
 
 
 namespace coral_fans::commands {
-void registerFuncCommand() {
+void registerFuncCommand(std::string permission) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
     auto& funcCommand = ll::command::CommandRegistrar::getInstance().getOrCreateCommand(
         "func",
         "command.func.description"_tr(),
-        CommandPermissionLevel::GameDirectors
+        magic_enum::enum_cast<CommandPermissionLevel>(permission).value_or(CommandPermissionLevel::GameDirectors)
     );
 
     struct FuncIsOpenParam {
@@ -96,6 +96,17 @@ void registerFuncCommand() {
             if (coral_fans::mod().getConfigDb()->set("functions.global.autotool", param.isopen ? "true" : "false"))
                 output.success("command.func.autotool.success"_tr(param.isopen ? "true" : "false"));
             else output.error("command.func.autotool.error"_tr());
+        });
+
+    // hoppercounter
+    funcCommand.overload<FuncIsOpenParam>()
+        .text("hoppercounter")
+        .required("isopen")
+        .execute([](CommandOrigin const&, CommandOutput& output, FuncIsOpenParam const& param) {
+            coral_fans::mod().getHopperCounterManager().work(param.isopen);
+            if (coral_fans::mod().getConfigDb()->set("functions.global.hoppercounter", param.isopen ? "true" : "false"))
+                output.success("command.func.hoppercounter.success"_tr(param.isopen ? "true" : "false"));
+            else output.error("command.func.hoppercounter.error"_tr());
         });
 }
 } // namespace coral_fans::commands

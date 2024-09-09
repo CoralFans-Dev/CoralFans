@@ -11,12 +11,15 @@
 #include <string>
 
 namespace coral_fans::commands {
-void registerSelfCommand() {
+void registerSelfCommand(std::string permission) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
-    auto& selfCommand = ll::command::CommandRegistrar::getInstance()
-                            .getOrCreateCommand("self", "command.self.description"_tr(), CommandPermissionLevel::Any);
+    auto& selfCommand = ll::command::CommandRegistrar::getInstance().getOrCreateCommand(
+        "self",
+        "command.self.description"_tr(),
+        magic_enum::enum_cast<CommandPermissionLevel>(permission).value_or(CommandPermissionLevel::Any)
+    );
 
     struct SelfIsOpenParam {
         bool isopen;

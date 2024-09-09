@@ -5,3 +5,7 @@
         return;                                                                                                        \
     }                                                                                                                  \
     auto* player = static_cast<Player*>(entity);
+
+#define HOOK_HOPPER_RETURN                                                                                             \
+    origin(slot, item);                                                                                                \
+    return;

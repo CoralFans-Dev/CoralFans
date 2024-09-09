@@ -6,6 +6,11 @@
 
 namespace coral_fans {
 
+void CoralFansMod::init() {
+    this->getHsaManager().show(this->getConfigDb()->get("functions.data.hsa.show") == "true");
+    this->getHopperCounterManager().work(this->getConfigDb()->get("functions.global.hoppercounter") == "true");
+}
+
 bool CoralFansMod::addTask(std::string_view name, unsigned tick, std::function<void()> f) {
     if (this->mTaskMap.find(name) == this->mTaskMap.end()) {
         this->mTaskMap[name] = this->mGameTickScheduler.add<ll::schedule::RepeatTask>(ll::chrono::ticks{tick}, f);
