@@ -42,17 +42,17 @@ void registerCounterCommand(std::string permission) {
                     if (block.getMaterial().isLiquid()) return false;
                     return true;
                 });
-                auto& blockSource = player->getDimension().getBlockSourceFromMainChunkSource();
-                const auto& block = blockSource.getBlock(
-                    hitrst.mBlockPos + utils::facingToBlockPos(blockSource.getBlock(hitrst.mBlockPos).getVariant())
-                );
+                auto& blockSource  = player->getDimension().getBlockSourceFromMainChunkSource();
+                const auto& hopper = blockSource.getBlock(hitrst.mBlockPos);
+                if (utils::removeMinecraftPrefix(hopper.getTypeName()) != "hopper")
+                    return output.error("command.counter.print.error"_tr());
+                const auto& block =
+                    blockSource.getBlock(hitrst.mBlockPos + utils::facingToBlockPos(hopper.getVariant()));
                 auto it = functions::HopperCounterManager::HOPPER_COUNTER_MAP.find(
                     utils::removeMinecraftPrefix(block.getTypeName())
                 );
-                if (it == functions::HopperCounterManager::HOPPER_COUNTER_MAP.end()) {
-                    output.error("command.counter.print.error"_tr());
-                    return;
-                }
+                if (it == functions::HopperCounterManager::HOPPER_COUNTER_MAP.end())
+                    return output.error("command.counter.print.error"_tr());
                 output.success(coral_fans::mod().getHopperCounterManager().getChannel(it->second).info());
             }
         }
@@ -70,17 +70,17 @@ void registerCounterCommand(std::string permission) {
                     if (block.getMaterial().isLiquid()) return false;
                     return true;
                 });
-                auto& blockSource = player->getDimension().getBlockSourceFromMainChunkSource();
-                const auto& block = blockSource.getBlock(
-                    hitrst.mBlockPos + utils::facingToBlockPos(blockSource.getBlock(hitrst.mBlockPos).getVariant())
-                );
+                auto& blockSource  = player->getDimension().getBlockSourceFromMainChunkSource();
+                const auto& hopper = blockSource.getBlock(hitrst.mBlockPos);
+                if (utils::removeMinecraftPrefix(hopper.getTypeName()) != "hopper")
+                    return output.error("command.counter.print.error"_tr());
+                const auto& block =
+                    blockSource.getBlock(hitrst.mBlockPos + utils::facingToBlockPos(hopper.getVariant()));
                 auto it = functions::HopperCounterManager::HOPPER_COUNTER_MAP.find(
                     utils::removeMinecraftPrefix(block.getTypeName())
                 );
-                if (it == functions::HopperCounterManager::HOPPER_COUNTER_MAP.end()) {
-                    output.error("command.counter.reset.error"_tr(it->second));
-                    return;
-                }
+                if (it == functions::HopperCounterManager::HOPPER_COUNTER_MAP.end())
+                    return output.error("command.counter.reset.error"_tr(it->second));
                 coral_fans::mod().getHopperCounterManager().getChannel(it->second).reset();
                 output.success("command.counter.reset.success"_tr(it->second));
             }
