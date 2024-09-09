@@ -29,6 +29,10 @@
             "autotool": {
                 "success": "globally set autotool \"{}\"",
                 "error": "failed to globally set autotool"
+            },
+            "hoppercounter": {
+                "success": "globally set hoppercounter \"{}\"",
+                "error": "failed to globally set hoppercounter"
             }
         },
         "self": {
@@ -65,7 +69,26 @@
         "hsa": {
             "description": "Show HSA",
             "show": {
-                "output": "set showhsa \"{}\""
+                "success": "set showhsa \"{}\"",
+                "error": "failed to set showhsa"
+            }
+        },
+        "counter": {
+            "description": "Hopper counter",
+            "print": {
+                "error": "Cannot get hoppercounter channel"
+            },
+            "reset": {
+                "success": "reset hoppercounter channel {}",
+                "error": "failed to reset hoppercounter channel {}"
+            }
+        }
+    },
+    "function": {
+        "hoppercounter": {
+            "info": {
+                "nodata": "no data",
+                "introduction": "Channel: §l{}§r\n§l{}§r items (§l{}§r/h) in §l{}§r gt (§l{}§rh)\n§l{}§r items (§l{}§r/h) in last 1 min"
             }
         }
     }

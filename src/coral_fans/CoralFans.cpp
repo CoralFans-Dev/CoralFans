@@ -44,6 +44,9 @@ bool CoralFans::load() {
     // load GeometryGroup
     coral_fans::mod().getGeometryGroup() = bsci::GeometryGroup::createDefault();
 
+    // init
+    coral_fans::mod().init();
+
     return true;
 }
 
@@ -51,10 +54,16 @@ bool CoralFans::enable() {
     getSelf().getLogger().debug("Enabling...");
 
     // register commands
-    coral_fans::commands::registerTickCommand();
-    coral_fans::commands::registerFuncCommand();
-    coral_fans::commands::registerSelfCommand();
-    coral_fans::commands::registerHsaCommand();
+    if (coral_fans::mod().getConfig().command.tick.enabled)
+        coral_fans::commands::registerTickCommand(coral_fans::mod().getConfig().command.tick.permission);
+    if (coral_fans::mod().getConfig().command.func.enabled)
+        coral_fans::commands::registerFuncCommand(coral_fans::mod().getConfig().command.func.permission);
+    if (coral_fans::mod().getConfig().command.self.enabled)
+        coral_fans::commands::registerSelfCommand(coral_fans::mod().getConfig().command.self.permission);
+    if (coral_fans::mod().getConfig().command.hsa.enabled)
+        coral_fans::commands::registerHsaCommand(coral_fans::mod().getConfig().command.hsa.permission);
+    if (coral_fans::mod().getConfig().command.counter.enabled)
+        coral_fans::commands::registerCounterCommand(coral_fans::mod().getConfig().command.counter.permission);
 
     return true;
 }
