@@ -47,7 +47,7 @@ void registerCounterCommand(std::string permission) {
                     hitrst.mBlockPos + utils::facingToBlockPos(blockSource.getBlock(hitrst.mBlockPos).getVariant())
                 );
                 auto it = functions::HopperCounterManager::HOPPER_COUNTER_MAP.find(
-                    utils::removeMinecraftPrefix(block.getName())
+                    utils::removeMinecraftPrefix(block.getTypeName())
                 );
                 if (it == functions::HopperCounterManager::HOPPER_COUNTER_MAP.end()) {
                     output.error("command.counter.print.error"_tr());
@@ -75,7 +75,7 @@ void registerCounterCommand(std::string permission) {
                     hitrst.mBlockPos + utils::facingToBlockPos(blockSource.getBlock(hitrst.mBlockPos).getVariant())
                 );
                 auto it = functions::HopperCounterManager::HOPPER_COUNTER_MAP.find(
-                    utils::removeMinecraftPrefix(block.getName())
+                    utils::removeMinecraftPrefix(block.getTypeName())
                 );
                 if (it == functions::HopperCounterManager::HOPPER_COUNTER_MAP.end()) {
                     output.error("command.counter.reset.error"_tr(it->second));

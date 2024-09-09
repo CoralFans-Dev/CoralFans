@@ -10,6 +10,7 @@
 
 #include "coral_fans/base/Mod.h"
 #include "coral_fans/commands/Commands.h"
+#include "coral_fans/functions/Cactus.h"
 
 namespace coral_fans {
 
@@ -65,12 +66,19 @@ bool CoralFans::enable() {
     if (coral_fans::mod().getConfig().command.counter.enabled)
         coral_fans::commands::registerCounterCommand(coral_fans::mod().getConfig().command.counter.permission);
 
+    // register listeners
+    coral_fans::functions::registerCactusListener();
+
     return true;
 }
 
 bool CoralFans::disable() {
     getSelf().getLogger().debug("Disabling...");
-    // Code for disabling the mod goes here.
+
+    // remove listeners
+    for (const auto& listener : coral_fans::mod().getEventListeners())
+        coral_fans::mod().getEventBus()->removeListener(listener);
+
     return true;
 }
 

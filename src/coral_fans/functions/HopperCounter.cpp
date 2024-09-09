@@ -133,7 +133,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     auto& dest =
         ::hopperRegion->getBlock(thisPos + utils::facingToBlockPos(::hopperRegion->getBlock(thisPos).getVariant()));
     // get iterator
-    auto it = HopperCounterManager::HOPPER_COUNTER_MAP.find(utils::removeMinecraftPrefix(dest.getName()));
+    auto it = HopperCounterManager::HOPPER_COUNTER_MAP.find(utils::removeMinecraftPrefix(dest.getTypeName()));
     if (it == HopperCounterManager::HOPPER_COUNTER_MAP.end()) {
         HOOK_HOPPER_RETURN
     }
