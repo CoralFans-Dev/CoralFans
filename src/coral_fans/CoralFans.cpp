@@ -10,7 +10,7 @@
 
 #include "coral_fans/base/Mod.h"
 #include "coral_fans/commands/Commands.h"
-#include "coral_fans/functions/Cactus.h"
+#include "coral_fans/functions/Shortcuts.h"
 
 namespace coral_fans {
 
@@ -65,8 +65,9 @@ bool CoralFans::enable() {
     if (coral_fans::mod().getConfig().command.prof.enabled)
         coral_fans::commands::registerProfCommand(coral_fans::mod().getConfig().command.prof.permission);
 
-    // register listeners
-    coral_fans::functions::registerCactusListener();
+    // register shortcuts
+    coral_fans::functions::registerShortcutsListener();
+    coral_fans::functions::registerShortcutsCommand();
 
     return true;
 }
