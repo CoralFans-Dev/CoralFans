@@ -31,14 +31,13 @@ public:
     HopperCounterManager() {
         for (int i = 0; i < 16; ++i) this->channels.emplace_back(i);
     }
-    inline HopperCounterChannel&              getChannel(int ch) { return this->channels[ch]; }
-    inline std::vector<HopperCounterChannel>& getChannels() { return this->channels; }
-    inline void                               clearAllData() {
+    inline HopperCounterChannel& getChannel(int ch) { return this->channels[ch]; }
+    inline void                  clearAllData() {
         for (auto& ch : this->channels) {
             ch.reset();
         }
     }
-    void work(bool);
+    void tick();
 };
 
 } // namespace coral_fans::functions

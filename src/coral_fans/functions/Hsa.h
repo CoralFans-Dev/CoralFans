@@ -15,7 +15,8 @@ private:
 
 public:
     void drawHsa(LevelChunk::HardcodedSpawningArea);
-    void show(bool);
+    void tick();
+    void remove();
 };
 
 } // namespace coral_fans::functions

@@ -15,6 +15,7 @@ struct CommandStruct {
     CommandConfigStruct self    = {true, "Any"};
     CommandConfigStruct hsa     = {true, "Any"};
     CommandConfigStruct counter = {true, "GameDirectors"};
+    CommandConfigStruct prof    = {true, "Any"};
 };
 
 struct Config {

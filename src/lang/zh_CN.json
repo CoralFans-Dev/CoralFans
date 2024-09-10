@@ -33,6 +33,13 @@
             "hoppercounter": {
                 "success": "全局设置 hoppercounter \"{}\"",
                 "error": "全局设置 hoppercounter 失败"
+            },
+            "maxpt": {
+                "success": "全局设置 maxpt \"{}\"",
+                "error": {
+                    "nonpositive": "maxpt 必须为正整数",
+                    "failed": "全局设置 maxpt 失败"
+                }
             }
         },
         "self": {
@@ -82,6 +89,14 @@
                 "success": "重置漏斗计数器 频道 {}",
                 "error": "重置漏斗计数器 频道 {} 失败"
             }
+        },
+        "prof": {
+            "description": "检查服务器健康程度",
+            "success": "检查开始",
+            "error": {
+                "outofrange": "数字超出限制 (1~1200)",
+                "running": "检查运行中"
+            }
         }
     },
     "function": {
@@ -90,6 +105,16 @@
                 "nodata": "没有数据",
                 "introduction": "频道: §l{}§r\n§l{}§r 个物品 (§l{}§r/h) 于 §l{}§r gt (§l{}§rh)\n§l{}§r 个物品 (§l{}§r/h) 于最近一分钟"
             }
+        }
+    },
+    "translate": {
+        "dimension": {
+            "overworld": "主世界",
+            "nether": "下界",
+            "theend": "末地"
+        },
+        "actorprofiler": {
+            "total": "共计 {} ms\n"
         }
     }
 }

@@ -7,7 +7,7 @@
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/server/commands/CommandPermissionLevel.h"
-
+#include <string>
 
 namespace coral_fans::commands {
 void registerFuncCommand(std::string permission) {
@@ -103,10 +103,22 @@ void registerFuncCommand(std::string permission) {
         .text("hoppercounter")
         .required("isopen")
         .execute([](CommandOrigin const&, CommandOutput& output, FuncIsOpenParam const& param) {
-            coral_fans::mod().getHopperCounterManager().work(param.isopen);
             if (coral_fans::mod().getConfigDb()->set("functions.global.hoppercounter", param.isopen ? "true" : "false"))
                 output.success("command.func.hoppercounter.success"_tr(param.isopen ? "true" : "false"));
             else output.error("command.func.hoppercounter.error"_tr());
         });
+
+    // maxpt <int>
+    struct FuncMaxPtParam {
+        int maxpt;
+    };
+    funcCommand.overload<FuncMaxPtParam>().text("maxpt").required("maxpt").execute(
+        [](CommandOrigin const&, CommandOutput& output, FuncMaxPtParam const& param) {
+            if (param.maxpt <= 0) output.error("command.func.maxpt.error.nonpositive"_tr());
+            if (coral_fans::mod().getConfigDb()->set("functions.global.maxpt", std::to_string(param.maxpt)))
+                output.success("command.func.maxpt.success"_tr(param.maxpt));
+            else output.error("command.func.maxpt.error.failed"_tr());
+        }
+    );
 }
 } // namespace coral_fans::commands
