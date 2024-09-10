@@ -135,7 +135,10 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
         HOOK_HOPPER_RETURN
     }
     // save item info
-    coral_fans::mod().getHopperCounterManager().getChannel(channel).add(item.getName(), item.mCount);
+    coral_fans::mod().getHopperCounterManager().getChannel(channel).add(
+        item.getCustomName().empty() ? item.getName() : item.getCustomName() + " (" + item.getTypeName() + ")",
+        item.mCount
+    );
     // remove item
     origin(slot, ItemStack::EMPTY_ITEM);
 }
