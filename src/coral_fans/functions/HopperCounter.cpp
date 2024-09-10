@@ -18,11 +18,6 @@ namespace {
 
 thread_local BlockSource* hopperRegion;
 
-void hopperCounterLightTick() {
-    if (coral_fans::mod().getConfigDb()->get("functions.global.hoppercounter") == "true")
-        for (auto& channel : coral_fans::mod().getHopperCounterManager().getChannels()) channel.tick();
-}
-
 } // namespace
 
 namespace coral_fans::functions {
@@ -92,12 +87,9 @@ const std::unordered_map<std::string, int> HopperCounterManager::HOPPER_COUNTER_
     {"black_concrete",      15}
 };
 
-void HopperCounterManager::work(bool isOn) {
-    if (isOn) {
-        coral_fans::mod().addTask("hoppercounter", 1, ::hopperCounterLightTick);
-    } else {
-        coral_fans::mod().removeTask("hoppercounter");
-    }
+void HopperCounterManager::tick() {
+    if (coral_fans::mod().getConfigDb()->get("functions.global.hoppercounter") == "true")
+        for (auto& channel : this->channels) channel.tick();
 }
 
 LL_AUTO_TYPE_INSTANCE_HOOK(

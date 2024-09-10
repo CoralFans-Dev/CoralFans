@@ -45,9 +45,6 @@ bool CoralFans::load() {
     // load GeometryGroup
     coral_fans::mod().getGeometryGroup() = bsci::GeometryGroup::createDefault();
 
-    // init
-    coral_fans::mod().init();
-
     return true;
 }
 
@@ -65,6 +62,8 @@ bool CoralFans::enable() {
         coral_fans::commands::registerHsaCommand(coral_fans::mod().getConfig().command.hsa.permission);
     if (coral_fans::mod().getConfig().command.counter.enabled)
         coral_fans::commands::registerCounterCommand(coral_fans::mod().getConfig().command.counter.permission);
+    if (coral_fans::mod().getConfig().command.prof.enabled)
+        coral_fans::commands::registerProfCommand(coral_fans::mod().getConfig().command.prof.permission);
 
     // register listeners
     coral_fans::functions::registerCactusListener();

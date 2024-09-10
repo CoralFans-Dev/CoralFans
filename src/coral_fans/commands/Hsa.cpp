@@ -13,7 +13,7 @@ void registerHsaCommand(std::string permission) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
-    auto& funcCommand = ll::command::CommandRegistrar::getInstance().getOrCreateCommand(
+    auto& hsaCommand = ll::command::CommandRegistrar::getInstance().getOrCreateCommand(
         "hsa",
         "command.hsa.description"_tr(),
         magic_enum::enum_cast<CommandPermissionLevel>(permission).value_or(CommandPermissionLevel::GameDirectors)
@@ -24,9 +24,9 @@ void registerHsaCommand(std::string permission) {
     };
 
     // hsa show <bool>
-    funcCommand.overload<HsaIsOpenParam>().text("show").required("isopen").execute(
+    hsaCommand.overload<HsaIsOpenParam>().text("show").required("isopen").execute(
         [](CommandOrigin const&, CommandOutput& output, HsaIsOpenParam const& param) {
-            coral_fans::mod().getHsaManager().show(param.isopen);
+            if (!param.isopen) coral_fans::mod().getHsaManager().remove();
             if (coral_fans::mod().getConfigDb()->set("functions.data.hsa.show", param.isopen ? "true" : "false"))
                 output.success("command.hsa.show.success"_tr(param.isopen ? "true" : "false"));
             else output.error("command.hsa.show.error"_tr());

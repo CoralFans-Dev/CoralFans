@@ -1,5 +1,6 @@
 #include "coral_fans/functions/Hsa.h"
 #include "coral_fans/base/Mod.h"
+#include "coral_fans/base/Utils.h"
 #include "ll/api/service/Bedrock.h"
 #include "mc/_HeaderOutputPredefine.h"
 #include "mc/deps/core/mce/Color.h"
@@ -16,13 +17,6 @@
 namespace {
 
 static const int radius = 5;
-
-auto blockPosToChunkPos = [](const BlockPos blockPos) {
-    return ChunkPos{
-        (blockPos.x < 0 ? blockPos.x - 15 : blockPos.x) / 16,
-        (blockPos.z < 0 ? blockPos.z - 15 : blockPos.z) / 16
-    };
-};
 
 auto getSpawnAreaFromHSA = [](const BoundingBox& aabb) {
     return AABB{
@@ -56,31 +50,6 @@ auto getHsaColor = [](const HardcodedSpawnAreaType& type) {
     default:
         return mce::Color::WHITE;
         break;
-    }
-};
-
-auto showHsaHeavyTick = []() {
-    auto level = ll::service::getLevel();
-    if (level.has_value()) {
-        // get players
-        level->forEachPlayer([](Player& player) {
-            auto originChunkPos = blockPosToChunkPos(player.getFeetBlockPos());
-            // chunks
-            for (int i = -radius; i <= radius; ++i) {
-                for (int j = -radius; j <= radius; ++j) {
-                    auto chunk = player.getDimension().getChunkSource().getExistingChunk(
-                        ChunkPos{originChunkPos.x + i, originChunkPos.z + j}
-                    );
-                    if (chunk && chunk->isFullyLoaded()) {
-                        // HSAs
-                        for (const auto& hsa : chunk->getSpawningAreas()) {
-                            coral_fans::mod().getHsaManager().drawHsa(hsa);
-                        }
-                    }
-                }
-            }
-            return true;
-        });
     }
 };
 
@@ -135,16 +104,40 @@ void HsaManager::drawHsa(LevelChunk::HardcodedSpawningArea hsa) {
     this->mParticleMap[hsa.aabb] = coral_fans::mod().getGeometryGroup()->merge(ids);
 }
 
-void HsaManager::show(bool showHsa) {
-    if (showHsa) {
-        coral_fans::mod().addTask("hsa", 80, ::showHsaHeavyTick);
-    } else {
-        coral_fans::mod().removeTask("hsa");
-        auto it = this->mParticleMap.begin();
-        while (it != this->mParticleMap.end()) {
-            coral_fans::mod().getGeometryGroup()->remove(it->second);
-            this->mParticleMap.erase(it++);
+void HsaManager::tick() {
+    static int gt;
+    if (gt % 80 == 0) {
+        auto level = ll::service::getLevel();
+        if (level.has_value()) {
+            // get players
+            level->forEachPlayer([&](Player& player) {
+                auto originChunkPos = utils::blockPosToChunkPos(player.getFeetBlockPos());
+                // chunks
+                for (int i = -radius; i <= radius; ++i) {
+                    for (int j = -radius; j <= radius; ++j) {
+                        auto chunk = player.getDimension().getChunkSource().getExistingChunk(
+                            ChunkPos{originChunkPos.x + i, originChunkPos.z + j}
+                        );
+                        if (chunk && chunk->isFullyLoaded()) {
+                            // HSAs
+                            for (const auto& hsa : chunk->getSpawningAreas()) {
+                                this->drawHsa(hsa);
+                            }
+                        }
+                    }
+                }
+                return true;
+            });
         }
+    }
+    gt = (gt + 1) % 80;
+}
+
+void HsaManager::remove() {
+    auto it = this->mParticleMap.begin();
+    while (it != this->mParticleMap.end()) {
+        coral_fans::mod().getGeometryGroup()->remove(it->second);
+        this->mParticleMap.erase(it++);
     }
 }
 

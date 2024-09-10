@@ -5,6 +5,7 @@
 #include "coral_fans/CoralFans.h"
 #include "coral_fans/functions/HopperCounter.h"
 #include "coral_fans/functions/Hsa.h"
+#include "coral_fans/functions/Prof.h"
 #include "ll/api/Logger.h"
 #include "ll/api/data/KeyValueDB.h"
 #include "ll/api/event/EventBus.h"
@@ -24,12 +25,11 @@ private:
     std::unique_ptr<ll::data::KeyValueDB> mConfigDb;
     Config                                mConfig;
     std::unique_ptr<bsci::GeometryGroup>  mGeometryGroup;
-    ll::schedule::GameTickScheduler       mGameTickScheduler;
-    std::unordered_map<std::string_view, std::shared_ptr<ll::schedule::Task<ll::chrono::GameTickClock>>> mTaskMap;
-    functions::HsaManager                                                                                mHsaManager;
-    functions::HopperCounterManager  mHopperCounterManager;
-    ll::event::EventBus*             mEventBus;
-    std::set<ll::event::ListenerPtr> mEventListeners;
+    functions::HsaManager                 mHsaManager;
+    functions::HopperCounterManager       mHopperCounterManager;
+    ll::event::EventBus*                  mEventBus;
+    std::set<ll::event::ListenerPtr>      mEventListeners;
+    functions::Profiler                   mProfiler;
 
 public:
     CoralFansMod() : mEventBus(&ll::event::EventBus::getInstance()) {}
@@ -44,10 +44,11 @@ public:
     inline const ll::Logger&                      getLogger() { return CoralFans::getInstance().getSelf().getLogger(); }
     inline ll::event::EventBus*&                  getEventBus() { return this->mEventBus; }
     inline std::set<ll::event::ListenerPtr>&      getEventListeners() { return this->mEventListeners; }
+    inline functions::Profiler&                   getProfiler() { return this->mProfiler; }
 
 public:
-    bool addTask(std::string_view, unsigned, std::function<void()>);
-    bool removeTask(std::string_view);
+    void lightTick();
+    void heavyTick();
 
 public:
     const std::string VERSION = "0.0.1";

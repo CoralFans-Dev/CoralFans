@@ -33,6 +33,13 @@
             "hoppercounter": {
                 "success": "globally set hoppercounter \"{}\"",
                 "error": "failed to globally set hoppercounter"
+            },
+            "maxpt": {
+                "success": "globally set maxpt \"{}\"",
+                "error": {
+                    "nonpositive": "maxpt must be positive",
+                    "failed": "failed to globally set maxpt"
+                }
             }
         },
         "self": {
@@ -82,6 +89,14 @@
                 "success": "reset hoppercounter channel {}",
                 "error": "failed to reset hoppercounter channel {}"
             }
+        },
+        "prof": {
+            "description": "Check server health",
+            "success": "Profiler start",
+            "error": {
+                "outofrange": "Number out of range (1~1200)",
+                "running": "Profiler running"
+            }
         }
     },
     "function": {
@@ -90,6 +105,16 @@
                 "nodata": "no data",
                 "introduction": "Channel: §l{}§r\n§l{}§r items (§l{}§r/h) in §l{}§r gt (§l{}§rh)\n§l{}§r items (§l{}§r/h) in last 1 min"
             }
+        }
+    },
+    "translate": {
+        "dimension": {
+            "overworld": "Overworld",
+            "nether": "Nether",
+            "theend": "TheEnd"
+        },
+        "actorprofiler": {
+            "total": "Total {} ms\n"
         }
     }
 }
