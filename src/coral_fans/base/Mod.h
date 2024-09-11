@@ -7,6 +7,7 @@
 #include "coral_fans/functions/Hsa.h"
 #include "coral_fans/functions/Prof.h"
 #include "coral_fans/functions/Slime.h"
+#include "coral_fans/functions/Village.h"
 #include "ll/api/Logger.h"
 #include "ll/api/data/KeyValueDB.h"
 #include "ll/api/event/EventBus.h"
@@ -28,6 +29,7 @@ private:
     std::set<ll::event::ListenerPtr>      mEventListeners;
     functions::Profiler                   mProfiler;
     functions::SlimeManager               mSlimeManager;
+    functions::CFVillageManager           mVillageManager;
 
 public:
     CoralFansMod() : mEventBus(&ll::event::EventBus::getInstance()) {}
@@ -44,10 +46,10 @@ public:
     inline std::set<ll::event::ListenerPtr>&      getEventListeners() { return this->mEventListeners; }
     inline functions::Profiler&                   getProfiler() { return this->mProfiler; }
     inline functions::SlimeManager&               getSlimeManager() { return this->mSlimeManager; }
+    inline functions::CFVillageManager&           getVillageManager() { return this->mVillageManager; }
 
 public:
-    void lightTick();
-    void heavyTick();
+    void tick();
 
 public:
     const std::string VERSION = "0.0.1";

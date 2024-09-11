@@ -2,12 +2,8 @@
 
 namespace coral_fans {
 
-void CoralFansMod::lightTick() {
+void CoralFansMod::tick() {
     this->getHopperCounterManager().tick();
-    return;
-}
-
-void CoralFansMod::heavyTick() {
     this->getHsaManager().tick();
     this->getSlimeManager().tick();
 }
