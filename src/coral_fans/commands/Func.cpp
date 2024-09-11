@@ -120,5 +120,14 @@ void registerFuncCommand(std::string permission) {
             else output.error("command.func.maxpt.error.failed"_tr());
         }
     );
+
+    // slime
+    funcCommand.overload<FuncIsOpenParam>().text("slime").required("isopen").execute(
+        [](CommandOrigin const&, CommandOutput& output, FuncIsOpenParam const& param) {
+            if (coral_fans::mod().getConfigDb()->set("functions.global.slime", param.isopen ? "true" : "false"))
+                output.success("command.func.slime.success"_tr(param.isopen ? "true" : "false"));
+            else output.error("command.func.slime.error"_tr());
+        }
+    );
 }
 } // namespace coral_fans::commands

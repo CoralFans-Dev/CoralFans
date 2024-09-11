@@ -64,6 +64,8 @@ bool CoralFans::enable() {
         coral_fans::commands::registerCounterCommand(coral_fans::mod().getConfig().command.counter.permission);
     if (coral_fans::mod().getConfig().command.prof.enabled)
         coral_fans::commands::registerProfCommand(coral_fans::mod().getConfig().command.prof.permission);
+    if (coral_fans::mod().getConfig().command.slime.enabled)
+        coral_fans::commands::registerSlimeCommand(coral_fans::mod().getConfig().command.slime.permission);
 
     // register shortcuts
     coral_fans::functions::registerShortcutsListener();

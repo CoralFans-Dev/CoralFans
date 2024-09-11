@@ -40,6 +40,10 @@
                     "nonpositive": "maxpt 必须为正整数",
                     "failed": "全局设置 maxpt 失败"
                 }
+            },
+            "slime": {
+                "success": "全局设置 slime \"{}\"",
+                "error": "全局设置 slime 失败"
             }
         },
         "self": {
@@ -96,6 +100,13 @@
             "error": {
                 "outofrange": "数字超出限制 (1~1200)",
                 "running": "检查运行中"
+            }
+        },
+        "slime": {
+            "description": "显示史莱姆区块",
+            "show": {
+                "success": "设置 showslime \"{}\"",
+                "error": "设置 showslime 失败"
             }
         }
     },

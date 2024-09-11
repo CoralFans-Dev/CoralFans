@@ -40,6 +40,10 @@
                     "nonpositive": "maxpt must be positive",
                     "failed": "failed to globally set maxpt"
                 }
+            },
+            "slime": {
+                "success": "globally set slime \"{}\"",
+                "error": "failed to globally set slime"
             }
         },
         "self": {
@@ -96,6 +100,13 @@
             "error": {
                 "outofrange": "Number out of range (1~1200)",
                 "running": "Profiler running"
+            }
+        },
+        "slime": {
+            "description": "Show slime chunks",
+            "show": {
+                "success": "set showslime \"{}\"",
+                "error": "failed to set showslime"
             }
         }
     },

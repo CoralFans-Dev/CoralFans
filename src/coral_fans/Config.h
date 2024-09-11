@@ -17,6 +17,7 @@ struct CommandStruct {
     CommandConfigStruct hsa     = {true, "Any"};
     CommandConfigStruct counter = {true, "GameDirectors"};
     CommandConfigStruct prof    = {true, "Any"};
+    CommandConfigStruct slime   = {true, "Any"};
 };
 
 struct Shortcut {
