@@ -14,6 +14,7 @@
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/block/Block.h"
 #include "mc/world/level/material/Material.h"
+#include <unordered_map>
 
 namespace coral_fans::commands {
 
@@ -42,15 +43,19 @@ void registerCounterCommand(std::string permission) {
                     if (block.getMaterial().isLiquid()) return false;
                     return true;
                 });
-                auto& blockSource  = player->getDimension().getBlockSourceFromMainChunkSource();
-                const auto& hopper = blockSource.getBlock(hitrst.mBlockPos);
-                if (utils::removeMinecraftPrefix(hopper.getTypeName()) != "hopper")
-                    return output.error("command.counter.print.error"_tr());
-                const auto& block =
-                    blockSource.getBlock(hitrst.mBlockPos + utils::facingToBlockPos(hopper.getVariant()));
-                auto it = functions::HopperCounterManager::HOPPER_COUNTER_MAP.find(
-                    utils::removeMinecraftPrefix(block.getTypeName())
-                );
+                auto& blockSource = player->getDimension().getBlockSourceFromMainChunkSource();
+                const auto&                                          dest = blockSource.getBlock(hitrst.mBlockPos);
+                std::unordered_map<std::string, int>::const_iterator it;
+                if (utils::removeMinecraftPrefix(dest.getTypeName()) == "hopper") {
+                    const auto& block =
+                        blockSource.getBlock(hitrst.mBlockPos + utils::facingToBlockPos(dest.getVariant()));
+                    it = functions::HopperCounterManager::HOPPER_COUNTER_MAP.find(
+                        utils::removeMinecraftPrefix(block.getTypeName())
+                    );
+                } else
+                    it = functions::HopperCounterManager::HOPPER_COUNTER_MAP.find(
+                        utils::removeMinecraftPrefix(dest.getTypeName())
+                    );
                 if (it == functions::HopperCounterManager::HOPPER_COUNTER_MAP.end())
                     return output.error("command.counter.print.error"_tr());
                 output.success(coral_fans::mod().getHopperCounterManager().getChannel(it->second).info());
@@ -70,15 +75,19 @@ void registerCounterCommand(std::string permission) {
                     if (block.getMaterial().isLiquid()) return false;
                     return true;
                 });
-                auto& blockSource  = player->getDimension().getBlockSourceFromMainChunkSource();
-                const auto& hopper = blockSource.getBlock(hitrst.mBlockPos);
-                if (utils::removeMinecraftPrefix(hopper.getTypeName()) != "hopper")
-                    return output.error("command.counter.print.error"_tr());
-                const auto& block =
-                    blockSource.getBlock(hitrst.mBlockPos + utils::facingToBlockPos(hopper.getVariant()));
-                auto it = functions::HopperCounterManager::HOPPER_COUNTER_MAP.find(
-                    utils::removeMinecraftPrefix(block.getTypeName())
-                );
+                auto& blockSource = player->getDimension().getBlockSourceFromMainChunkSource();
+                const auto&                                          dest = blockSource.getBlock(hitrst.mBlockPos);
+                std::unordered_map<std::string, int>::const_iterator it;
+                if (utils::removeMinecraftPrefix(dest.getTypeName()) == "hopper") {
+                    const auto& block =
+                        blockSource.getBlock(hitrst.mBlockPos + utils::facingToBlockPos(dest.getVariant()));
+                    it = functions::HopperCounterManager::HOPPER_COUNTER_MAP.find(
+                        utils::removeMinecraftPrefix(block.getTypeName())
+                    );
+                } else
+                    it = functions::HopperCounterManager::HOPPER_COUNTER_MAP.find(
+                        utils::removeMinecraftPrefix(dest.getTypeName())
+                    );
                 if (it == functions::HopperCounterManager::HOPPER_COUNTER_MAP.end())
                     return output.error("command.counter.reset.error"_tr(it->second));
                 coral_fans::mod().getHopperCounterManager().getChannel(it->second).reset();

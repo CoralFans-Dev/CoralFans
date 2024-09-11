@@ -61,12 +61,11 @@ void registerShortcutsListener() {
     playerInteractBlockEventListener =
         coral_fans::mod().getEventBus()->emplaceListener<ll::event::player::PlayerInteractBlockEvent>(
             [](ll::event::player::PlayerInteractBlockEvent& event) {
+                if (!::antiShake(event.self(), event.blockPos())) return;
                 bool cancel = false;
                 for (auto& shortcut : coral_fans::mod().getConfig().shortcuts) {
                     if (!shortcut.enable || shortcut.type != "useon" || shortcut.item == "") continue;
-                    if (utils::removeMinecraftPrefix(event.item().getTypeName()) != shortcut.item
-                        || !::antiShake(event.self(), event.blockPos()))
-                        continue;
+                    if (utils::removeMinecraftPrefix(event.item().getTypeName()) != shortcut.item) continue;
                     if (!event.block() || utils::removeMinecraftPrefix(event.block()->getTypeName()) != shortcut.block)
                         continue;
                     auto mc = ll::service::getMinecraft();
@@ -188,7 +187,7 @@ void registerShortcutsListener() {
                 bool        cancel = false;
                 const auto& item   = event.self().getSelectedItem();
                 for (auto& shortcut : coral_fans::mod().getConfig().shortcuts) {
-                    if (!shortcut.enable || shortcut.type != "useon" || shortcut.item == "") continue;
+                    if (!shortcut.enable || shortcut.type != "destroy" || shortcut.item == "") continue;
                     if (utils::removeMinecraftPrefix(item.getTypeName()) != shortcut.item) continue;
                     auto mc = ll::service::getMinecraft();
                     if (mc)
