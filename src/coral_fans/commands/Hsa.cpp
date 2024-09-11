@@ -26,6 +26,8 @@ void registerHsaCommand(std::string permission) {
     // hsa show <bool>
     hsaCommand.overload<HsaIsOpenParam>().text("show").required("isopen").execute(
         [](CommandOrigin const&, CommandOutput& output, HsaIsOpenParam const& param) {
+            if (coral_fans::mod().getConfigDb()->get("functions.global.hsa") != "true")
+                return output.error("command.hsa.show.error"_tr());
             if (!param.isopen) coral_fans::mod().getHsaManager().remove();
             if (coral_fans::mod().getConfigDb()->set("functions.data.hsa.show", param.isopen ? "true" : "false"))
                 output.success("command.hsa.show.success"_tr(param.isopen ? "true" : "false"));
