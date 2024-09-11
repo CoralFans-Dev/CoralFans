@@ -9,7 +9,7 @@ void CoralFansMod::lightTick() {
 
 void CoralFansMod::heavyTick() {
     this->getHsaManager().tick();
-    return;
+    this->getSlimeManager().tick();
 }
 
 CoralFansMod& mod() {
