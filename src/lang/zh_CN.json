@@ -22,10 +22,6 @@
                 "success": "全局设置 safeexplode \"{}\"",
                 "error": "全局设置 safeexplode 失败"
             },
-            "hsa": {
-                "success": "全局设置 hsa \"{}\"",
-                "error": "全局设置 hsa 失败"
-            },
             "autotool": {
                 "success": "全局设置 autotool \"{}\"",
                 "error": "全局设置 autotool 失败"
@@ -40,10 +36,6 @@
                     "nonpositive": "maxpt 必须为正整数",
                     "failed": "全局设置 maxpt 失败"
                 }
-            },
-            "slime": {
-                "success": "全局设置 slime \"{}\"",
-                "error": "全局设置 slime 失败"
             }
         },
         "self": {

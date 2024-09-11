@@ -29,8 +29,6 @@ void registerSlimeCommand(std::string permission) {
     // slime show <bool>
     slimeCommand.overload<SlimeIsOpenParam>().text("show").required("isopen").execute(
         [](CommandOrigin const&, CommandOutput& output, SlimeIsOpenParam const& param) {
-            if (coral_fans::mod().getConfigDb()->get("functions.global.slime") != "true")
-                return output.error("command.slime.show.error"_tr());
             if (!param.isopen) coral_fans::mod().getSlimeManager().remove();
             if (coral_fans::mod().getConfigDb()->set("functions.data.slime.show", param.isopen ? "true" : "false"))
                 output.success("command.slime.show.success"_tr(param.isopen ? "true" : "false"));

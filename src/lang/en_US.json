@@ -22,10 +22,6 @@
                 "success": "globally set safeexplode \"{}\"",
                 "error": "failed to globally set safeexplode"
             },
-            "hsa": {
-                "success": "globally set hsa \"{}\"",
-                "error": "failed to globally set hsa"
-            },
             "autotool": {
                 "success": "globally set autotool \"{}\"",
                 "error": "failed to globally set autotool"
@@ -40,10 +36,6 @@
                     "nonpositive": "maxpt must be positive",
                     "failed": "failed to globally set maxpt"
                 }
-            },
-            "slime": {
-                "success": "globally set slime \"{}\"",
-                "error": "failed to globally set slime"
             }
         },
         "self": {
