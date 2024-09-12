@@ -12,11 +12,13 @@ namespace coral_fans::functions {
 class HsaManager {
 private:
     std::unordered_map<AABB, bsci::GeometryGroup::GeoId> mParticleMap;
+    bool                                                 mShow;
 
 public:
-    void drawHsa(LevelChunk::HardcodedSpawningArea);
-    void tick();
-    void remove();
+    void        drawHsa(LevelChunk::HardcodedSpawningArea);
+    inline void setShow(bool enable) { this->mShow = enable; }
+    void        tick();
+    void        remove();
 };
 
 } // namespace coral_fans::functions

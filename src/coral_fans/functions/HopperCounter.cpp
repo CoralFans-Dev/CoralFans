@@ -32,10 +32,10 @@ std::string HopperCounterChannel::info() {
     using ll::i18n_literals::operator""_tr;
     unsigned long long n = 0;
     for (const auto& i : this->counterList) n += i.second;
-    if (this->gameTick == 0 || n == 0) return "function.hoppercounter.info.nodata"_tr();
+    if (this->gameTick == 0 || n == 0) return "translate.hoppercounter.info.nodata"_tr();
     unsigned long long gtTotal = 0;
     for (const auto& i : this->gtCounter) gtTotal += i.second;
-    auto retstr = "function.hoppercounter.info.introduction"_tr(
+    auto retstr = "translate.hoppercounter.info.introduction"_tr(
         this->channel,
         n,
         static_cast<float>(n) * 1.0f / static_cast<float>(this->gameTick) * 72000,

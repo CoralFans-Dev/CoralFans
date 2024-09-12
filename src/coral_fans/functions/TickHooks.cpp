@@ -26,10 +26,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     auto& mod  = coral_fans::mod();
     auto& prof = mod.getProfiler();
     PROF_TIMER(level, { origin(); })
-    PROF_TIMER(coralfans, {
-        mod.lightTick();
-        mod.heavyTick();
-    })
+    PROF_TIMER(coralfans, { mod.tick(); })
     if (prof.profiling) {
         prof.gameSessionTickTime += (time_level + time_coralfans);
         prof.gameSessionTicksBuffer.push_back(time_level + time_coralfans);
