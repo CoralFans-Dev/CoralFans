@@ -22,10 +22,6 @@
                 "success": "全局设置 safeexplode \"{}\"",
                 "error": "全局设置 safeexplode 失败"
             },
-            "hsa": {
-                "success": "全局设置 hsa \"{}\"",
-                "error": "全局设置 hsa 失败"
-            },
             "autotool": {
                 "success": "全局设置 autotool \"{}\"",
                 "error": "全局设置 autotool 失败"
@@ -40,10 +36,6 @@
                     "nonpositive": "maxpt 必须为正整数",
                     "failed": "全局设置 maxpt 失败"
                 }
-            },
-            "slime": {
-                "success": "全局设置 slime \"{}\"",
-                "error": "全局设置 slime 失败"
             }
         },
         "self": {
@@ -80,8 +72,7 @@
         "hsa": {
             "description": "显示HSA",
             "show": {
-                "success": "设置 showhsa \"{}\"",
-                "error": "设置 showhsa 失败"
+                "output": "设置 显示HSA 为 \"{}\""
             }
         },
         "counter": {
@@ -105,27 +96,40 @@
         "slime": {
             "description": "显示史莱姆区块",
             "show": {
-                "success": "设置 showslime \"{}\"",
-                "error": "设置 showslime 失败"
+                "output": "设置 显示史莱姆区块 为 \"{}\""
+            }
+        },
+        "village": {
+            "description": "获取村庄信息",
+            "show": {
+                "output": "设置 show {} 为 \"{}\""
+            },
+            "dweller": {
+                "noactor": "无法获取指向实体"
             }
         }
     },
-    "function": {
+    "translate": {
         "hoppercounter": {
             "info": {
                 "nodata": "没有数据",
                 "introduction": "频道: §l{}§r\n§l{}§r 个物品 (§l{}§r/h) 于 §l{}§r gt (§l{}§rh)\n§l{}§r 个物品 (§l{}§r/h) 于最近一分钟"
             }
-        }
-    },
-    "translate": {
+        },
         "dimension": {
             "overworld": "主世界",
             "nether": "下界",
             "theend": "末地"
         },
-        "actorprofiler": {
-            "total": "共计 {} ms\n"
+        "profiler": {
+            "normal": "- MSPT: {:.3f} ms TPS: {} Chunks: {}\n- CoralFans: {:.3f} ms\n- 红石系统: {:.3f} ms\n - 信号: {:.3f} ms\n - 增加: {:.3f} ms\n - 更新: {:.3f} ms\n - 删除: {:.3f} ms\n- 区块加（卸）载与村庄: {:.3f} ms\n- 实体系统: {:.3f} ms\n - 区块刻: {:.3f} ms\n  - 方块实体: {:.3f} ms\n  - 随机刻: {:.3f} ms\n  - 计划刻: {:.3f} ms\n",
+            "actor": {
+                "total": "共计 {} ms\n"
+            }
+        },
+        "village": {
+            "cannotget": "无法获取村庄信息",
+            "info": "VID: {}\nUUID: {}\n- 中心: {}\n- 边界: [{}, {}]\n- 半径: {}\n- 居民: {} / {} / {} / {}\n兴趣点: [床, 钟, 工作方块] (§a坐标§r, §b所有者数量§r, §d最大容量§r, §e半径§r, 权重)\n"
         }
     }
 }

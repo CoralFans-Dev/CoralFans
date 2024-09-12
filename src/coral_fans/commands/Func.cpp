@@ -79,15 +79,6 @@ void registerFuncCommand(std::string permission) {
             else output.error("command.func.safeexplode.error"_tr());
         });
 
-    // hsa
-    funcCommand.overload<FuncIsOpenParam>().text("hsa").required("isopen").execute(
-        [](CommandOrigin const&, CommandOutput& output, FuncIsOpenParam const& param) {
-            if (coral_fans::mod().getConfigDb()->set("functions.global.hsa", param.isopen ? "true" : "false"))
-                output.success("command.func.hsa.success"_tr(param.isopen ? "true" : "false"));
-            else output.error("command.func.hsa.error"_tr());
-        }
-    );
-
     // autotool
     funcCommand.overload<FuncIsOpenParam>()
         .text("autotool")
@@ -118,15 +109,6 @@ void registerFuncCommand(std::string permission) {
             if (coral_fans::mod().getConfigDb()->set("functions.global.maxpt", std::to_string(param.maxpt)))
                 output.success("command.func.maxpt.success"_tr(param.maxpt));
             else output.error("command.func.maxpt.error.failed"_tr());
-        }
-    );
-
-    // slime
-    funcCommand.overload<FuncIsOpenParam>().text("slime").required("isopen").execute(
-        [](CommandOrigin const&, CommandOutput& output, FuncIsOpenParam const& param) {
-            if (coral_fans::mod().getConfigDb()->set("functions.global.slime", param.isopen ? "true" : "false"))
-                output.success("command.func.slime.success"_tr(param.isopen ? "true" : "false"));
-            else output.error("command.func.slime.error"_tr());
         }
     );
 }

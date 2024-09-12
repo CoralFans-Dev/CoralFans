@@ -17,8 +17,8 @@ static const int radius = 5;
 namespace coral_fans::functions {
 
 void SlimeManager::tick() {
-    static int gt;
-    if (gt % 80 == 0 && coral_fans::mod().getConfigDb()->get("functions.data.slime.show") == "true") {
+    static int gt = 0;
+    if (gt == 0 && this->mShow) {
         auto level = ll::service::getLevel();
         if (level.has_value()) {
             // get players

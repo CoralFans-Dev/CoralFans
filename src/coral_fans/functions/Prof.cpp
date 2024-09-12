@@ -163,24 +163,12 @@ std::string Profiler::printPendingTicks() const {
 }
 
 std::string Profiler::printBasics() const {
+    using ll::i18n_literals::operator""_tr;
     const double divide = 1000.0 * static_cast<double>(totalRound);
     auto         mean   = [divide](long long time) { return static_cast<double>(time) / divide; };
     auto         mspt   = mean(gameSessionTickTime);
     int          tps    = mspt <= 50 ? 20 : static_cast<int>(1000.0 / mspt);
-    auto         res    = std::format(
-        "- MSPT: {:.3f} ms TPS: {} Chunks: {}\n"
-                   "- CoralFans: {:.3f} ms\n"
-                   "- Redstone: {:.3f} ms\n"
-                   " - Signal: {:.3f} ms\n"
-                   " - Add: {:.3f} ms\n"
-                   " - Update: {:.3f} ms\n"
-                   " - Remove: {:.3f} ms\n"
-                   "- Chunk (un)load & village: {:.3f} ms\n"
-                   "- EntitySystems: {:.3f} ms\n"
-                   " - Chunk tick: {:.3f} ms\n"
-                   "  - BlockEntities: {:.3f} ms\n"
-                   "  - RandomTick: {:.3f} ms\n"
-                   "  - PendingTick: {:.3f} ms\n",
+    auto         res    = "translate.profiler.normal"_tr(
         /*summary*/
         mspt,
         tps,
@@ -236,7 +224,7 @@ std::string Profiler::printActor() const {
             }
         }
     }
-    retstr = "translate.actorprofiler.total"_tr(totalTime) + retstr;
+    retstr = "translate.profiler.actor.total"_tr(totalTime) + retstr;
     return retstr;
 }
 

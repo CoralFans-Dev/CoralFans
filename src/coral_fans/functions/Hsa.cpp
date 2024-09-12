@@ -106,7 +106,7 @@ void HsaManager::drawHsa(LevelChunk::HardcodedSpawningArea hsa) {
 
 void HsaManager::tick() {
     static int gt;
-    if (gt % 80 == 0 && coral_fans::mod().getConfigDb()->get("functions.data.hsa.show") == "true") {
+    if (gt == 0 && this->mShow) {
         auto level = ll::service::getLevel();
         if (level.has_value()) {
             // get players

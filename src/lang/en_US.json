@@ -22,10 +22,6 @@
                 "success": "globally set safeexplode \"{}\"",
                 "error": "failed to globally set safeexplode"
             },
-            "hsa": {
-                "success": "globally set hsa \"{}\"",
-                "error": "failed to globally set hsa"
-            },
             "autotool": {
                 "success": "globally set autotool \"{}\"",
                 "error": "failed to globally set autotool"
@@ -40,10 +36,6 @@
                     "nonpositive": "maxpt must be positive",
                     "failed": "failed to globally set maxpt"
                 }
-            },
-            "slime": {
-                "success": "globally set slime \"{}\"",
-                "error": "failed to globally set slime"
             }
         },
         "self": {
@@ -80,8 +72,7 @@
         "hsa": {
             "description": "Show HSA",
             "show": {
-                "success": "set showhsa \"{}\"",
-                "error": "failed to set showhsa"
+                "output": "set showhsa \"{}\""
             }
         },
         "counter": {
@@ -105,27 +96,40 @@
         "slime": {
             "description": "Show slime chunks",
             "show": {
-                "success": "set showslime \"{}\"",
-                "error": "failed to set showslime"
+                "output": "set showslime \"{}\""
+            }
+        },
+        "village": {
+            "description": "Get village info",
+            "show": {
+                "output": "set show {} \"{}\""
+            },
+            "dweller": {
+                "noactor": "cannot find an Actor"
             }
         }
     },
-    "function": {
+    "translate": {
         "hoppercounter": {
             "info": {
                 "nodata": "no data",
                 "introduction": "Channel: §l{}§r\n§l{}§r items (§l{}§r/h) in §l{}§r gt (§l{}§rh)\n§l{}§r items (§l{}§r/h) in last 1 min"
             }
-        }
-    },
-    "translate": {
+        },
         "dimension": {
             "overworld": "Overworld",
             "nether": "Nether",
             "theend": "TheEnd"
         },
-        "actorprofiler": {
-            "total": "Total {} ms\n"
+        "profiler": {
+            "normal": "- MSPT: {:.3f} ms TPS: {} Chunks: {}\n- CoralFans: {:.3f} ms\n- Redstone: {:.3f} ms\n - Signal: {:.3f} ms\n - Add: {:.3f} ms\n - Update: {:.3f} ms\n - Remove: {:.3f} ms\n- Chunk (un)load & village: {:.3f} ms\n- EntitySystems: {:.3f} ms\n - Chunk tick: {:.3f} ms\n  - BlockEntities: {:.3f} ms\n  - RandomTick: {:.3f} ms\n  - PendingTick: {:.3f} ms\n",
+            "actor": {
+                "total": "Total {} ms\n"
+            }
+        },
+        "village": {
+            "cannotget": "cannot get village info",
+            "info": "VID: {}\nUUID: {}\n- Center: {}\n- Bounds: [{}, {}]\n- Radius: {}\n- Dwellers: {} / {} / {} / {}\nPOIs: [Bed, Alarm, Jobsite] (§aPos§r, §bOwner count§r, §dCapacity§r, §eRadius§r, Weight)\n"
         }
     }
 }

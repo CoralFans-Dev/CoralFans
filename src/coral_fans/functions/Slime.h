@@ -11,10 +11,12 @@ namespace coral_fans::functions {
 class SlimeManager {
 private:
     std::unordered_map<ChunkPos, bsci::GeometryGroup::GeoId> mParticleMap;
+    bool                                                     mShow;
 
 public:
-    void tick();
-    void remove();
+    inline void setShow(bool enable) { this->mShow = enable; }
+    void        tick();
+    void        remove();
 };
 
 } // namespace coral_fans::functions
