@@ -19,6 +19,7 @@ struct CommandStruct {
     CommandConfigStruct prof    = {true, "Any"};
     CommandConfigStruct slime   = {true, "Any"};
     CommandConfigStruct village = {true, "Any"};
+    CommandConfigStruct rotate  = {true, "Any"};
 };
 
 struct Shortcut {

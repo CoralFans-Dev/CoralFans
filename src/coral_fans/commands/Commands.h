@@ -11,4 +11,5 @@ void registerCounterCommand(std::string);
 void registerProfCommand(std::string);
 void registerSlimeCommand(std::string);
 void registerVillageCommand(std::string);
+void registerRotateCommand(std::string);
 } // namespace coral_fans::commands

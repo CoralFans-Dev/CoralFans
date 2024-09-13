@@ -107,6 +107,9 @@
             "dweller": {
                 "noactor": "无法获取指向实体"
             }
+        },
+        "rotate": {
+            "description": "旋转方块"
         }
     },
     "translate": {
