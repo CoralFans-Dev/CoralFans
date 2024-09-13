@@ -107,6 +107,9 @@
             "dweller": {
                 "noactor": "cannot find an Actor"
             }
+        },
+        "rotate": {
+            "description": "Blockrotate"
         }
     },
     "translate": {

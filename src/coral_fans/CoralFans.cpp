@@ -68,6 +68,8 @@ bool CoralFans::enable() {
         coral_fans::commands::registerSlimeCommand(coral_fans::mod().getConfig().command.slime.permission);
     if (coral_fans::mod().getConfig().command.village.enabled)
         coral_fans::commands::registerVillageCommand(coral_fans::mod().getConfig().command.village.permission);
+    if (coral_fans::mod().getConfig().command.rotate.enabled)
+        coral_fans::commands::registerRotateCommand(coral_fans::mod().getConfig().command.rotate.permission);
 
     // register shortcuts
     coral_fans::functions::registerShortcutsListener();
