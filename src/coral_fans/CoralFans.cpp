@@ -10,6 +10,7 @@
 
 #include "coral_fans/base/Mod.h"
 #include "coral_fans/commands/Commands.h"
+#include "coral_fans/functions/ContainerReader.h"
 #include "coral_fans/functions/Shortcuts.h"
 
 namespace coral_fans {
@@ -74,6 +75,9 @@ bool CoralFans::enable() {
     // register shortcuts
     coral_fans::functions::registerShortcutsListener();
     coral_fans::functions::registerShortcutsCommand();
+
+    // register containerreader
+    coral_fans::functions::registerContainerReader();
 
     return true;
 }

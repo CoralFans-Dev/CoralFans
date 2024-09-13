@@ -36,6 +36,10 @@
                     "nonpositive": "maxpt must be positive",
                     "failed": "failed to globally set maxpt"
                 }
+            },
+            "containerreader": {
+                "success": "globally set containerreader \"{}\"",
+                "error": "failed to globally set containerreader"
             }
         },
         "self": {
@@ -51,6 +55,10 @@
                     "success": "set autotool mindamage \"{}\"",
                     "error": "failed to set autotool mindamage"
                 }
+            },
+            "containerreader": {
+                "success": "set containerreader \"{}\"",
+                "error": "failed to set containerreader"
             }
         },
         "tick": {
@@ -133,6 +141,10 @@
         "village": {
             "cannotget": "cannot get village info",
             "info": "VID: {}\nUUID: {}\n- Center: {}\n- Bounds: [{}, {}]\n- Radius: {}\n- Dwellers: {} / {} / {} / {}\nPOIs: [Bed, Alarm, Jobsite] (§aPos§r, §bOwner count§r, §dCapacity§r, §eRadius§r, Weight)\n"
+        },
+        "containerreader": {
+            "null": "Container is null",
+            "info": "{} items in the container: \n"
         }
     }
 }

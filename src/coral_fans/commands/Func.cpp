@@ -111,5 +111,18 @@ void registerFuncCommand(std::string permission) {
             else output.error("command.func.maxpt.error.failed"_tr());
         }
     );
+
+    // containerreader
+    funcCommand.overload<FuncIsOpenParam>()
+        .text("containerreader")
+        .required("isopen")
+        .execute([](CommandOrigin const&, CommandOutput& output, FuncIsOpenParam const& param) {
+            if (coral_fans::mod().getConfigDb()->set(
+                    "functions.global.containerreader",
+                    param.isopen ? "true" : "false"
+                ))
+                output.success("command.func.containerreader.success"_tr(param.isopen ? "true" : "false"));
+            else output.error("command.func.containerreader.error"_tr());
+        });
 }
 } // namespace coral_fans::commands
