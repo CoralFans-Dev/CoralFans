@@ -72,5 +72,20 @@ void registerSelfCommand(std::string permission) {
                 output.success("command.self.autotool.mindamage.success"_tr(minDamageString));
             else output.error("command.self.autotool.mindamage.error"_tr());
         });
+
+    // self containerreader <bool>
+    selfCommand.overload<SelfIsOpenParam>()
+        .text("containerreader")
+        .required("isopen")
+        .execute([](CommandOrigin const& origin, CommandOutput& output, SelfIsOpenParam const& param) {
+            COMMAND_CHECK_PLAYER
+            const auto global = coral_fans::mod().getConfigDb()->get("functions.global.containerreader") == "true";
+            if (coral_fans::mod().getConfigDb()->set(
+                    std::format("functions.players.{}.containerreader", player->getUuid().asString()),
+                    (param.isopen & global) ? "true" : "false"
+                ))
+                output.success("command.self.containerreader.success"_tr((param.isopen & global) ? "true" : "false"));
+            else output.error("command.self.containerreader.error"_tr());
+        });
 }
 } // namespace coral_fans::commands

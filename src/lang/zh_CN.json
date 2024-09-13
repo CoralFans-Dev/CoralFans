@@ -36,6 +36,10 @@
                     "nonpositive": "maxpt 必须为正整数",
                     "failed": "全局设置 maxpt 失败"
                 }
+            },
+            "containerreader": {
+                "success": "全局设置 containerreader \"{}\"",
+                "error": "全局设置 containerreader 失败"
             }
         },
         "self": {
@@ -51,6 +55,10 @@
                     "success": "设置 autotool mindamage \"{}\"",
                     "error": "设置 autotool mindamage 失败"
                 }
+            },
+            "containerreader": {
+                "success": "设置 containerreader \"{}\"",
+                "error": "设置 containerreader 失败"
             }
         },
         "tick": {
@@ -133,6 +141,10 @@
         "village": {
             "cannotget": "无法获取村庄信息",
             "info": "VID: {}\nUUID: {}\n- 中心: {}\n- 边界: [{}, {}]\n- 半径: {}\n- 居民: {} / {} / {} / {}\n兴趣点: [床, 钟, 工作方块] (§a坐标§r, §b所有者数量§r, §d最大容量§r, §e半径§r, 权重)\n"
+        },
+        "containerreader": {
+            "null": "容器为空",
+            "info": "容器内共有 {} 堆物品: \n"
         }
     }
 }
