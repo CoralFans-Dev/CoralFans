@@ -1,0 +1,150 @@
+{
+    "command": {
+        "func": {
+            "description": "全局控制CoralFans Mod的功能",
+            "forceopen": {
+                "success": "全局设置 forceopen \"{}\"",
+                "error": "全局设置 forceopen 失败"
+            },
+            "forceplace": {
+                "success": "全局设置 forceplace \"{}\"",
+                "error": "全局设置 forceplace 失败"
+            },
+            "noclip": {
+                "success": "全局设置 noclip \"{}\"",
+                "error": "全局设置 noclip 失败"
+            },
+            "droppernocost": {
+                "success": "全局设置 droppernocost \"{}\"",
+                "error": "全局设置 droppernocost 失败"
+            },
+            "safeexplode": {
+                "success": "全局设置 safeexplode \"{}\"",
+                "error": "全局设置 safeexplode 失败"
+            },
+            "autotool": {
+                "success": "全局设置 autotool \"{}\"",
+                "error": "全局设置 autotool 失败"
+            },
+            "hoppercounter": {
+                "success": "全局设置 hoppercounter \"{}\"",
+                "error": "全局设置 hoppercounter 失败"
+            },
+            "maxpt": {
+                "success": "全局设置 maxpt \"{}\"",
+                "error": {
+                    "nonpositive": "maxpt 必须为正整数",
+                    "failed": "全局设置 maxpt 失败"
+                }
+            },
+            "containerreader": {
+                "success": "全局设置 containerreader \"{}\"",
+                "error": "全局设置 containerreader 失败"
+            }
+        },
+        "self": {
+            "description": "控制CoralFans Mod的功能",
+            "noclip": {
+                "success": "设置 noclip \"{}\"",
+                "error": "设置 noclip 失败"
+            },
+            "autotool": {
+                "success": "设置 autotool \"{}\"",
+                "error": "设置 autotool 失败",
+                "mindamage": {
+                    "success": "设置 autotool mindamage \"{}\"",
+                    "error": "设置 autotool mindamage 失败"
+                }
+            },
+            "containerreader": {
+                "success": "设置 containerreader \"{}\"",
+                "error": "设置 containerreader 失败"
+            }
+        },
+        "tick": {
+            "description": "控制或查询游戏刻状态",
+            "query": {
+                "output": "{} 每 tick"
+            },
+            "set": {
+                "output": "设置 tick {}"
+            },
+            "rate": {
+                "success": "设置 {} tick(s) 每秒",
+                "error": "速率必须非负"
+            },
+            "step": {
+                "output": "步进 {} tick(s)"
+            }
+        },
+        "hsa": {
+            "description": "显示HSA",
+            "show": {
+                "output": "设置 显示HSA 为 \"{}\""
+            }
+        },
+        "counter": {
+            "description": "漏斗计数器",
+            "print": {
+                "error": "无法获取漏斗计数器频道"
+            },
+            "reset": {
+                "success": "重置漏斗计数器 频道 {}",
+                "error": "重置漏斗计数器 频道 {} 失败"
+            }
+        },
+        "prof": {
+            "description": "检查服务器健康程度",
+            "success": "检查开始",
+            "error": {
+                "outofrange": "数字超出限制 (1~1200)",
+                "running": "检查运行中"
+            }
+        },
+        "slime": {
+            "description": "显示史莱姆区块",
+            "show": {
+                "output": "设置 显示史莱姆区块 为 \"{}\""
+            }
+        },
+        "village": {
+            "description": "获取村庄信息",
+            "show": {
+                "output": "设置 show {} 为 \"{}\""
+            },
+            "dweller": {
+                "noactor": "无法获取指向实体"
+            }
+        },
+        "rotate": {
+            "description": "旋转方块"
+        }
+    },
+    "translate": {
+        "hoppercounter": {
+            "info": {
+                "nodata": "没有数据",
+                "introduction": "频道: §l{}§r\n§l{}§r 个物品 (§l{}§r/h) 于 §l{}§r gt (§l{}§rh)\n§l{}§r 个物品 (§l{}§r/h) 于最近一分钟"
+            }
+        },
+        "dimension": {
+            "overworld": "主世界",
+            "nether": "下界",
+            "theend": "末地"
+        },
+        "profiler": {
+            "normal": "- MSPT: {:.3f} ms TPS: {} Chunks: {}\n- CoralFans: {:.3f} ms\n- 红石系统: {:.3f} ms\n - 信号: {:.3f} ms\n - 增加: {:.3f} ms\n - 更新: {:.3f} ms\n - 删除: {:.3f} ms\n- 区块加（卸）载与村庄: {:.3f} ms\n- 实体系统: {:.3f} ms\n - 区块刻: {:.3f} ms\n  - 方块实体: {:.3f} ms\n  - 随机刻: {:.3f} ms\n  - 计划刻: {:.3f} ms\n",
+            "actor": {
+                "total": "共计 {} ms\n"
+            }
+        },
+        "village": {
+            "cannotget": "无法获取村庄信息",
+            "info": "VID: {}\nUUID: {}\n- 中心: {}\n- 边界: [{}, {}]\n- 半径: {}\n- 居民: {} / {} / {} / {}\n兴趣点: [床, 钟, 工作方块] (§a坐标§r, §b所有者数量§r, §d最大容量§r, §e半径§r, 权重)\n"
+        },
+        "containerreader": {
+            "null": "容器为空",
+            "info": "容器内共有 {} 堆物品: \n"
+        }
+    }
+}

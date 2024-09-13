@@ -1,0 +1,150 @@
+{
+    "command": {
+        "func": {
+            "description": "Globally controls functions of CoralFans Mod",
+            "forceopen": {
+                "success": "globally set forceopen \"{}\"",
+                "error": "failed to globally set forceopen"
+            },
+            "forceplace": {
+                "success": "globally set forceplace \"{}\"",
+                "error": "failed to globally set forceplace"
+            },
+            "noclip": {
+                "success": "globally set noclip \"{}\"",
+                "error": "failed to globally set noclip"
+            },
+            "droppernocost": {
+                "success": "globally set droppernocost \"{}\"",
+                "error": "failed to globally set droppernocost"
+            },
+            "safeexplode": {
+                "success": "globally set safeexplode \"{}\"",
+                "error": "failed to globally set safeexplode"
+            },
+            "autotool": {
+                "success": "globally set autotool \"{}\"",
+                "error": "failed to globally set autotool"
+            },
+            "hoppercounter": {
+                "success": "globally set hoppercounter \"{}\"",
+                "error": "failed to globally set hoppercounter"
+            },
+            "maxpt": {
+                "success": "globally set maxpt \"{}\"",
+                "error": {
+                    "nonpositive": "maxpt must be positive",
+                    "failed": "failed to globally set maxpt"
+                }
+            },
+            "containerreader": {
+                "success": "globally set containerreader \"{}\"",
+                "error": "failed to globally set containerreader"
+            }
+        },
+        "self": {
+            "description": "Controls functions of CoralFans Mod",
+            "noclip": {
+                "success": "set noclip \"{}\"",
+                "error": "failed to set noclip"
+            },
+            "autotool": {
+                "success": "set autotool \"{}\"",
+                "error": "failed to set autotool",
+                "mindamage": {
+                    "success": "set autotool mindamage \"{}\"",
+                    "error": "failed to set autotool mindamage"
+                }
+            },
+            "containerreader": {
+                "success": "set containerreader \"{}\"",
+                "error": "failed to set containerreader"
+            }
+        },
+        "tick": {
+            "description": "Controls or queries the tick status of the game",
+            "query": {
+                "output": "{} per tick"
+            },
+            "set": {
+                "output": "set tick {}"
+            },
+            "rate": {
+                "success": "set {} tick(s) per second",
+                "error": "rate must be non negative"
+            },
+            "step": {
+                "output": "step {} tick(s)"
+            }
+        },
+        "hsa": {
+            "description": "Show HSA",
+            "show": {
+                "output": "set showhsa \"{}\""
+            }
+        },
+        "counter": {
+            "description": "Hopper counter",
+            "print": {
+                "error": "Cannot get hoppercounter channel"
+            },
+            "reset": {
+                "success": "reset hoppercounter channel {}",
+                "error": "failed to reset hoppercounter channel {}"
+            }
+        },
+        "prof": {
+            "description": "Check server health",
+            "success": "Profiler start",
+            "error": {
+                "outofrange": "Number out of range (1~1200)",
+                "running": "Profiler running"
+            }
+        },
+        "slime": {
+            "description": "Show slime chunks",
+            "show": {
+                "output": "set showslime \"{}\""
+            }
+        },
+        "village": {
+            "description": "Get village info",
+            "show": {
+                "output": "set show {} \"{}\""
+            },
+            "dweller": {
+                "noactor": "cannot find an Actor"
+            }
+        },
+        "rotate": {
+            "description": "Blockrotate"
+        }
+    },
+    "translate": {
+        "hoppercounter": {
+            "info": {
+                "nodata": "no data",
+                "introduction": "Channel: §l{}§r\n§l{}§r items (§l{}§r/h) in §l{}§r gt (§l{}§rh)\n§l{}§r items (§l{}§r/h) in last 1 min"
+            }
+        },
+        "dimension": {
+            "overworld": "Overworld",
+            "nether": "Nether",
+            "theend": "TheEnd"
+        },
+        "profiler": {
+            "normal": "- MSPT: {:.3f} ms TPS: {} Chunks: {}\n- CoralFans: {:.3f} ms\n- Redstone: {:.3f} ms\n - Signal: {:.3f} ms\n - Add: {:.3f} ms\n - Update: {:.3f} ms\n - Remove: {:.3f} ms\n- Chunk (un)load & village: {:.3f} ms\n- EntitySystems: {:.3f} ms\n - Chunk tick: {:.3f} ms\n  - BlockEntities: {:.3f} ms\n  - RandomTick: {:.3f} ms\n  - PendingTick: {:.3f} ms\n",
+            "actor": {
+                "total": "Total {} ms\n"
+            }
+        },
+        "village": {
+            "cannotget": "cannot get village info",
+            "info": "VID: {}\nUUID: {}\n- Center: {}\n- Bounds: [{}, {}]\n- Radius: {}\n- Dwellers: {} / {} / {} / {}\nPOIs: [Bed, Alarm, Jobsite] (§aPos§r, §bOwner count§r, §dCapacity§r, §eRadius§r, Weight)\n"
+        },
+        "containerreader": {
+            "null": "Container is null",
+            "info": "{} items in the container: \n"
+        }
+    }
+}
