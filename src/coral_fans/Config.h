@@ -40,6 +40,7 @@ struct Config {
 
     CommandStruct         command;
     std::vector<Shortcut> shortcuts = {
+  /* hoppercounter */
         {true,  "useon",   "cactus", "white_concrete",      "",  "",          "",              false, {"counter print"}                                  },
         {true,  "useon",   "cactus", "orange_concrete",     "",  "",          "",              false, {"counter print"}                                  },
         {true,  "useon",   "cactus", "magenta_concrete",    "",  "",          "",              false, {"counter print"}                                  },
@@ -56,6 +57,10 @@ struct Config {
         {true,  "useon",   "cactus", "green_concrete",      "",  "",          "",              false, {"counter print"}                                  },
         {true,  "useon",   "cactus", "red_concrete",        "",  "",          "",              false, {"counter print"}                                  },
         {true,  "useon",   "cactus", "black_concrete",      "",  "",          "",              false, {"counter print"}                                  },
+ /* blockrotate */
+        {true,  "use",     "cactus", "",                    "",  "",          "",              true,  {"rotate"}                                         },
+        {true,  "command", "",       "",                    "r", "rotate",    "Any",           false, {"rotate"}                                         },
+ /* fastcommand */
         {false, "command", "",       "",                    "c", "creative",  "GameDirectors", false, {"gamemode creative"}                              },
         {false, "command", "",       "",                    "s", "spectator", "GameDirectors", false, {"gamemode spectator"}                             },
         {false,
