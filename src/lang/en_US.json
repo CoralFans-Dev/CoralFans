@@ -118,6 +118,9 @@
         },
         "rotate": {
             "description": "Blockrotate"
+        },
+        "data": {
+            "description": "Get data of blocks and entities"
         }
     },
     "translate": {
@@ -145,6 +148,19 @@
         "containerreader": {
             "null": "Container is null",
             "info": "{} items in the container: \n"
+        },
+        "data": {
+            "info": {
+                "block": "- §bPos: §a{}§r\n- §bName: §a{}§r\n- §bTypeName: §a{}§r\n- §bID: §a{}§r\n- §bRTID: §a{}§r\n- §bVariant: §a{}§r\n- §bCanInstanceTick: §a{}§r\n- §bHasBlockEntity: §a{}§r\n- §bIsSolid: §a{}§r\n- §bMaterial:§r\n - §bMotion: §a{}§r\n - §bTopSolid: §a{}§r\n - §bIsSolid: §a{}§r\n - §bIsSolidBlocking: §a{}§r\n - §bTranslucency: §a{}§r",
+                "entity": "- §bNameTag: §a{}§r\n- §bTypeName: §a{}§r\n- §bUID: §a{}§r\n- §bPos: §a{}§r\n- §bDeltaPos: §a{}§r\n- §bAABB: §a{}§r\n- §bSurface: §a{}§r\n"
+            },
+            "error": {
+                "noblockentity": "No BlockEntity",
+                "nullentity": "Entity is null",
+                "cannotparse": "Cannot parse path",
+                "notanarray": "Not an array",
+                "geterror": "Get error"
+            }
         }
     }
 }

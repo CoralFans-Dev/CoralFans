@@ -20,6 +20,7 @@ struct CommandStruct {
     CommandConfigStruct slime   = {true, "Any"};
     CommandConfigStruct village = {true, "Any"};
     CommandConfigStruct rotate  = {true, "Any"};
+    CommandConfigStruct data    = {true, "Any"};
 };
 
 struct Shortcut {
@@ -35,7 +36,7 @@ struct Shortcut {
 };
 
 struct Config {
-    int         version    = 1;
+    int         version    = 2;
     std::string locateName = "zh_CN";
 
     CommandStruct         command;

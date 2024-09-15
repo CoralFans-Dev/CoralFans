@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "bsci/GeometryGroup.h"
+
 #include "ll/api/mod/RegisterHelper.h"
 
 #include "ll/api/Config.h"
@@ -53,6 +54,7 @@ bool CoralFans::enable() {
     getSelf().getLogger().debug("Enabling...");
 
     // register commands
+    coral_fans::commands::registerCoralfansCommand();
     if (coral_fans::mod().getConfig().command.tick.enabled)
         coral_fans::commands::registerTickCommand(coral_fans::mod().getConfig().command.tick.permission);
     if (coral_fans::mod().getConfig().command.func.enabled)
@@ -71,6 +73,8 @@ bool CoralFans::enable() {
         coral_fans::commands::registerVillageCommand(coral_fans::mod().getConfig().command.village.permission);
     if (coral_fans::mod().getConfig().command.rotate.enabled)
         coral_fans::commands::registerRotateCommand(coral_fans::mod().getConfig().command.rotate.permission);
+    if (coral_fans::mod().getConfig().command.data.enabled)
+        coral_fans::commands::registerDataCommand(coral_fans::mod().getConfig().command.data.permission);
 
     // register shortcuts
     coral_fans::functions::registerShortcutsListener();

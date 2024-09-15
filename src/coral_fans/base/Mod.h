@@ -52,7 +52,7 @@ public:
     void tick();
 
 public:
-    const std::string VERSION = "0.0.1";
+    const std::string VERSION = "0.0.2";
 };
 
 CoralFansMod& mod();
