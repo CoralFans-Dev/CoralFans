@@ -5,7 +5,6 @@
 #include "ll/api/command/runtime/ParamKind.h"
 #include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
-#include "magic_enum.hpp"
 #include "mc/server/commands/CommandPermissionLevel.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/level/BlockPos.h"
@@ -15,15 +14,12 @@
 
 namespace coral_fans::commands {
 
-void registerDataCommand(std::string permission) {
+void registerDataCommand(CommandPermissionLevel permission) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
-    auto& dataCommand = ll::command::CommandRegistrar::getInstance().getOrCreateCommand(
-        "data",
-        "command.data.description"_tr(),
-        magic_enum::enum_cast<CommandPermissionLevel>(permission).value_or(CommandPermissionLevel::Any)
-    );
+    auto& dataCommand = ll::command::CommandRegistrar::getInstance()
+                            .getOrCreateCommand("data", "command.data.description"_tr(), permission);
 
     ll::command::CommandRegistrar::getInstance().tryRegisterEnum(
         "blockNbtType",

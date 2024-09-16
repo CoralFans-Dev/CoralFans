@@ -26,4 +26,4 @@
     auto newBlock         = Block::tryGetFromRegistry(newTag);                                                         \
     if (!newBlock) return;                                                                                             \
     blockSource.setBlock(blockPos, newBlock, 3, nullptr, nullptr);                                                     \
-    return;\
+    return;

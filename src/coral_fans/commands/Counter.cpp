@@ -6,7 +6,6 @@
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/command/Optional.h"
 #include "ll/api/i18n/I18n.h"
-#include "magic_enum.hpp"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/server/commands/CommandPermissionLevel.h"
@@ -18,15 +17,12 @@
 
 namespace coral_fans::commands {
 
-void registerCounterCommand(std::string permission) {
+void registerCounterCommand(CommandPermissionLevel permission) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
-    auto& counterCommand = ll::command::CommandRegistrar::getInstance().getOrCreateCommand(
-        "counter",
-        "command.counter.description"_tr(),
-        magic_enum::enum_cast<CommandPermissionLevel>(permission).value_or(CommandPermissionLevel::GameDirectors)
-    );
+    auto& counterCommand = ll::command::CommandRegistrar::getInstance()
+                               .getOrCreateCommand("counter", "command.counter.description"_tr(), permission);
 
     struct CounterChannelParam {
         ll::command::Optional<int> channel;

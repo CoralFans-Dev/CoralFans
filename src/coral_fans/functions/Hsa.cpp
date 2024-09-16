@@ -63,45 +63,34 @@ void HsaManager::drawHsa(LevelChunk::HardcodedSpawningArea hsa) {
     int        dim   = hsa.type == HardcodedSpawnAreaType::NetherFortress ? 1 : 0;
     mce::Color color = ::getHsaColor(hsa.type);
     auto       aabb  = ::getSpawnAreaFromHSA(hsa.aabb);
+    auto&      mod   = coral_fans::mod();
     auto       ids   = std::array{
-        coral_fans::mod()
-            .getGeometryGroup()
+        mod.getGeometryGroup()
             ->line(dim, {aabb.min.x, aabb.min.y, aabb.min.z}, {aabb.min.x, aabb.min.y, aabb.max.z}, color),
-        coral_fans::mod()
-            .getGeometryGroup()
+        mod.getGeometryGroup()
             ->line(dim, {aabb.min.x, aabb.min.y, aabb.min.z}, {aabb.max.x, aabb.min.y, aabb.min.z}, color),
-        coral_fans::mod()
-            .getGeometryGroup()
+        mod.getGeometryGroup()
             ->line(dim, {aabb.min.x, aabb.min.y, aabb.max.z}, {aabb.max.x, aabb.min.y, aabb.max.z}, color),
-        coral_fans::mod()
-            .getGeometryGroup()
+        mod.getGeometryGroup()
             ->line(dim, {aabb.max.x, aabb.min.y, aabb.min.z}, {aabb.max.x, aabb.min.y, aabb.max.z}, color),
-        coral_fans::mod()
-            .getGeometryGroup()
+        mod.getGeometryGroup()
             ->line(dim, {aabb.max.x, aabb.max.y, aabb.max.z}, {aabb.min.x, aabb.max.y, aabb.max.z}, color),
-        coral_fans::mod()
-            .getGeometryGroup()
+        mod.getGeometryGroup()
             ->line(dim, {aabb.max.x, aabb.max.y, aabb.max.z}, {aabb.max.x, aabb.max.y, aabb.min.z}, color),
-        coral_fans::mod()
-            .getGeometryGroup()
+        mod.getGeometryGroup()
             ->line(dim, {aabb.min.x, aabb.max.y, aabb.min.z}, {aabb.min.x, aabb.max.y, aabb.max.z}, color),
-        coral_fans::mod()
-            .getGeometryGroup()
+        mod.getGeometryGroup()
             ->line(dim, {aabb.min.x, aabb.max.y, aabb.min.z}, {aabb.max.x, aabb.max.y, aabb.min.z}, color),
-        coral_fans::mod()
-            .getGeometryGroup()
+        mod.getGeometryGroup()
             ->line(dim, {aabb.max.x, aabb.max.y, aabb.max.z}, {aabb.max.x, aabb.min.y, aabb.max.z}, color),
-        coral_fans::mod()
-            .getGeometryGroup()
+        mod.getGeometryGroup()
             ->line(dim, {aabb.min.x, aabb.max.y, aabb.max.z}, {aabb.min.x, aabb.min.y, aabb.max.z}, color),
-        coral_fans::mod()
-            .getGeometryGroup()
+        mod.getGeometryGroup()
             ->line(dim, {aabb.max.x, aabb.max.y, aabb.min.z}, {aabb.max.x, aabb.min.y, aabb.min.z}, color),
-        coral_fans::mod()
-            .getGeometryGroup()
+        mod.getGeometryGroup()
             ->line(dim, {aabb.min.x, aabb.min.y, aabb.min.z}, {aabb.min.x, aabb.max.y, aabb.min.z}, mce::Color::WHITE)
     };
-    this->mParticleMap[hsa.aabb] = coral_fans::mod().getGeometryGroup()->merge(ids);
+    this->mParticleMap[hsa.aabb] = mod.getGeometryGroup()->merge(ids);
 }
 
 void HsaManager::tick() {

@@ -9,11 +9,9 @@
 #include "ll/api/event/player/PlayerUseItemEvent.h"
 #include "ll/api/service/Bedrock.h"
 #include "ll/api/utils/StringUtils.h"
-#include "magic_enum.hpp"
 #include "mc/server/ServerPlayer.h"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
-#include "mc/server/commands/CommandPermissionLevel.h"
 #include "mc/server/commands/MinecraftCommands.h"
 #include "mc/server/commands/PlayerCommandOrigin.h"
 #include "mc/world/Minecraft.h"
@@ -233,12 +231,8 @@ void registerShortcutsListener() {
 void registerShortcutsCommand() {
     for (auto& shortcut : coral_fans::mod().getConfig().shortcuts) {
         if (!shortcut.enable || shortcut.type != "command" || shortcut.command == "") continue;
-        auto& cmd = ll::command::CommandRegistrar::getInstance().getOrCreateCommand(
-            shortcut.command,
-            shortcut.description,
-            magic_enum::enum_cast<CommandPermissionLevel>(shortcut.permission)
-                .value_or(CommandPermissionLevel::GameDirectors)
-        );
+        auto& cmd = ll::command::CommandRegistrar::getInstance()
+                        .getOrCreateCommand(shortcut.command, shortcut.description, shortcut.permission);
         cmd.overload().execute([&](CommandOrigin const& origin, CommandOutput& output) {
             COMMAND_CHECK_PLAYER
             auto mc = ll::service::getMinecraft();
