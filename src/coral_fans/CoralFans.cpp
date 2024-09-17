@@ -25,15 +25,21 @@ bool CoralFans::load() {
     auto&       mod    = coral_fans::mod();
 
     // load config
-    const auto& configFilePath = getSelf().getConfigDir() / "config.json";
-    if (!ll::config::loadConfig(mod.getConfig(), configFilePath)) {
-        logger.warn("Cannot load configurations from {}", configFilePath);
-        logger.info("Saving default configurations");
-        if (!ll::config::saveConfig(mod.getConfig(), configFilePath)) {
-            logger.error("Cannot save default configurations to {}", configFilePath);
-            return false;
+    try {
+        const auto& configFilePath = getSelf().getConfigDir() / "config.json";
+        if (!ll::config::loadConfig(mod.getConfig(), configFilePath)) {
+            logger.warn("Cannot load configurations from {}", configFilePath);
+            logger.info("Saving default configurations");
+            if (!ll::config::saveConfig(mod.getConfig(), configFilePath)) {
+                logger.error("Cannot save default configurations to {}", configFilePath);
+                return false;
+            }
         }
+    } catch (...) {
+        logger.error("Failed to load config.json. Please check the file!");
+        return false;
     }
+
 
     // load i18n
     logger.debug("Loading I18n");
