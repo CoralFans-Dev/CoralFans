@@ -1,5 +1,12 @@
 #pragma once
 
+#include "coral_fans/base/Mod.h"
+
+#include "ll/api/chrono/GameChrono.h"
+#include "ll/api/schedule/Scheduler.h"
+
+#include "ll/api/schedule/Task.h"
+#include "mc/deps/core/mce/Color.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/ChunkPos.h"
 
@@ -34,13 +41,21 @@ inline BlockPos facingToBlockPos(int facing) {
     }
 };
 
-inline ChunkPos blockPosToChunkPos(const BlockPos& blockPos) {
+inline ChunkPos blockPosToChunkPos(BlockPos const& blockPos) {
     return ChunkPos{
         (blockPos.x < 0 ? blockPos.x - 15 : blockPos.x) / 16,
         (blockPos.z < 0 ? blockPos.z - 15 : blockPos.z) / 16
     };
 }
 
-inline std::string removeMinecraftPrefix(const std::string& s) { return s.find("minecraft:") == 0 ? s.substr(10) : s; }
+inline std::string removeMinecraftPrefix(std::string const& s) { return s.find("minecraft:") == 0 ? s.substr(10) : s; }
+
+inline void shortHighligntBlock(int dimid, BlockPos const& blockPos, mce::Color const& color, int time) {
+    auto& mod = coral_fans::mod();
+    auto  s   = mod.getGeometryGroup()->box(dimid, {blockPos, blockPos + BlockPos::ONE}, color);
+    mod.getTickScheduler().add<ll::schedule::DelayTask>(ll::chrono::ticks(time), [&, s] {
+        mod.getGeometryGroup()->remove(s);
+    });
+}
 
 } // namespace coral_fans::utils

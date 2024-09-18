@@ -47,7 +47,7 @@ namespace coral_fans::functions {
 void registerContainerReader() {
     ll::event::ListenerPtr evListener;
     auto&                  mod = coral_fans::mod();
-    evListener                 = mod.getEventBus()->emplaceListener<ll::event::PlayerInteractBlockEvent>(
+    evListener                 = mod.getEventBus().emplaceListener<ll::event::PlayerInteractBlockEvent>(
         [&](ll::event::PlayerInteractBlockEvent& ev) {
             if (mod.getConfigDb()->get(
                     std::format("functions.players.{}.containerreader", ev.self().getUuid().asString())

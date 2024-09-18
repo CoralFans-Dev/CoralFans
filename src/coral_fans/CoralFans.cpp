@@ -99,7 +99,10 @@ bool CoralFans::disable() {
     auto& mod = coral_fans::mod();
 
     // remove listeners
-    for (const auto& listener : mod.getEventListeners()) mod.getEventBus()->removeListener(listener);
+    for (const auto& listener : mod.getEventListeners()) mod.getEventBus().removeListener(listener);
+
+    // remove tasks
+    mod.getTickScheduler().clear();
 
     return true;
 }

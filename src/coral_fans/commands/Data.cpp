@@ -21,16 +21,6 @@ void registerDataCommand(CommandPermissionLevel permission) {
     auto& dataCommand = ll::command::CommandRegistrar::getInstance()
                             .getOrCreateCommand("data", "command.data.description"_tr(), permission);
 
-    ll::command::CommandRegistrar::getInstance().tryRegisterEnum(
-        "blockNbtType",
-        {
-            {"block",       0},
-            {"blockentity", 1},
-        },
-        Bedrock::type_id<CommandRegistry, std::pair<std::string,uint64>>(),
-        &CommandRegistry::parse<std::pair<std::string,uint64>>
-    );
-
     // block [blockPos: x y z]
     dataCommand.runtimeOverload()
         .text("block")
@@ -45,6 +35,15 @@ void registerDataCommand(CommandPermissionLevel permission) {
         });
 
     // block nbt <block|blockentity> [path]
+    ll::command::CommandRegistrar::getInstance().tryRegisterEnum(
+        "blockNbtType",
+        {
+            {"block",       0},
+            {"blockentity", 1},
+        },
+        Bedrock::type_id<CommandRegistry, std::pair<std::string,uint64>>(),
+        &CommandRegistry::parse<std::pair<std::string,uint64>>
+    );
     dataCommand.runtimeOverload()
         .text("block")
         .text("nbt")
@@ -109,6 +108,37 @@ void registerDataCommand(CommandPermissionLevel permission) {
             std::string path;
             /* if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>(); */
             auto rst = functions::getEntityNbt(player->traceRay(5.25f, true, false).getEntity(), path);
+            if (rst.second) output.success(rst.first);
+            else output.error(rst.first);
+        });
+
+    // redstone <signal|info|chunk|conn> [blockPos: x y z]
+    ll::command::CommandRegistrar::getInstance().tryRegisterEnum(
+        "redstoneType",
+        {
+            {"chunk", 0},
+            {"signal", 1},
+            {"info", 2},
+            {"conn", 3},
+        },
+        Bedrock::type_id<CommandRegistry, std::pair<std::string,uint64>>(),
+        &CommandRegistry::parse<std::pair<std::string,uint64>>
+    );
+    dataCommand.runtimeOverload()
+        .text("redstone")
+        .required("redstoneType", ll::command::ParamKind::Enum, "redstoneType")
+        .optional("blockPos", ll::command::ParamKind::BlockPos)
+        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            COMMAND_CHECK_PLAYER
+            BlockPos blockPos;
+            if (self["blockPos"].has_value())
+                blockPos = self["blockPos"].get<ll::command::ParamKind::BlockPos>().getBlockPos(player->getPosition());
+            else blockPos = player->traceRay(5.25f, false, true).mBlockPos;
+            auto rst = functions::showRedstoneComponentsInfo(
+                player->getDimension(),
+                blockPos,
+                self["redstoneType"].get<ll::command::ParamKind::Enum>().second
+            );
             if (rst.second) output.success(rst.first);
             else output.error(rst.first);
         });

@@ -57,7 +57,7 @@ void registerShortcutsListener() {
     // useon
     ll::event::ListenerPtr playerInteractBlockEventListener;
     playerInteractBlockEventListener =
-        coral_fans::mod().getEventBus()->emplaceListener<ll::event::player::PlayerInteractBlockEvent>(
+        coral_fans::mod().getEventBus().emplaceListener<ll::event::player::PlayerInteractBlockEvent>(
             [](ll::event::player::PlayerInteractBlockEvent& event) {
                 if (!::antiShake(event.self(), event.blockPos())) return;
                 bool cancel = false;
@@ -127,60 +127,57 @@ void registerShortcutsListener() {
     coral_fans::mod().getEventListeners().emplace(playerInteractBlockEventListener);
     // use
     ll::event::ListenerPtr playerUseItemEventListener;
-    playerUseItemEventListener =
-        coral_fans::mod().getEventBus()->emplaceListener<ll::event::player::PlayerUseItemEvent>(
-            [](ll::event::player::PlayerUseItemEvent& event) {
-                bool cancel = false;
-                for (auto& shortcut : coral_fans::mod().getConfig().shortcuts) {
-                    if (!shortcut.enable || shortcut.type != "use" || shortcut.item == "") continue;
-                    if (utils::removeMinecraftPrefix(event.item().getTypeName()) != shortcut.item) continue;
-                    auto mc = ll::service::getMinecraft();
-                    if (mc)
-                        for (auto& action : shortcut.actions) {
-                            auto command =
-                                ll::string_utils::replaceAll(action, "{selfname}", event.self().getRealName());
-                            command = ll::string_utils::replaceAll(
-                                command,
-                                "{selfx}",
-                                std::to_string(event.self().getPosition().x)
-                            );
-                            command = ll::string_utils::replaceAll(
-                                command,
-                                "{selfy}",
-                                std::to_string(event.self().getPosition().y)
-                            );
-                            command = ll::string_utils::replaceAll(
-                                command,
-                                "{selfz}",
-                                std::to_string(event.self().getPosition().z)
-                            );
-                            command = ll::string_utils::replaceAll(
-                                command,
-                                "{itemname}",
-                                event.item().getCustomName().empty() ? event.item().getName()
-                                                                     : event.item().getCustomName()
-                            );
-                            command = ll::string_utils::replaceAll(
-                                command,
-                                "{itemaux}",
-                                std::to_string(event.item().getAuxValue())
-                            );
-                            CommandContext context = CommandContext(
-                                command,
-                                std::make_unique<PlayerCommandOrigin>(PlayerCommandOrigin(event.self()))
-                            );
-                            mc->getCommands().executeCommand(context);
-                        }
-                    cancel |= shortcut.prevent;
-                }
-                if (cancel) event.cancel();
+    playerUseItemEventListener = coral_fans::mod().getEventBus().emplaceListener<ll::event::player::PlayerUseItemEvent>(
+        [](ll::event::player::PlayerUseItemEvent& event) {
+            bool cancel = false;
+            for (auto& shortcut : coral_fans::mod().getConfig().shortcuts) {
+                if (!shortcut.enable || shortcut.type != "use" || shortcut.item == "") continue;
+                if (utils::removeMinecraftPrefix(event.item().getTypeName()) != shortcut.item) continue;
+                auto mc = ll::service::getMinecraft();
+                if (mc)
+                    for (auto& action : shortcut.actions) {
+                        auto command = ll::string_utils::replaceAll(action, "{selfname}", event.self().getRealName());
+                        command      = ll::string_utils::replaceAll(
+                            command,
+                            "{selfx}",
+                            std::to_string(event.self().getPosition().x)
+                        );
+                        command = ll::string_utils::replaceAll(
+                            command,
+                            "{selfy}",
+                            std::to_string(event.self().getPosition().y)
+                        );
+                        command = ll::string_utils::replaceAll(
+                            command,
+                            "{selfz}",
+                            std::to_string(event.self().getPosition().z)
+                        );
+                        command = ll::string_utils::replaceAll(
+                            command,
+                            "{itemname}",
+                            event.item().getCustomName().empty() ? event.item().getName() : event.item().getCustomName()
+                        );
+                        command = ll::string_utils::replaceAll(
+                            command,
+                            "{itemaux}",
+                            std::to_string(event.item().getAuxValue())
+                        );
+                        CommandContext context = CommandContext(
+                            command,
+                            std::make_unique<PlayerCommandOrigin>(PlayerCommandOrigin(event.self()))
+                        );
+                        mc->getCommands().executeCommand(context);
+                    }
+                cancel |= shortcut.prevent;
             }
-        );
+            if (cancel) event.cancel();
+        }
+    );
     coral_fans::mod().getEventListeners().emplace(playerUseItemEventListener);
     // destroy
     ll::event::ListenerPtr playerDestroyBlockEventListener;
     playerInteractBlockEventListener =
-        coral_fans::mod().getEventBus()->emplaceListener<ll::event::player::PlayerDestroyBlockEvent>(
+        coral_fans::mod().getEventBus().emplaceListener<ll::event::player::PlayerDestroyBlockEvent>(
             [](ll::event::player::PlayerDestroyBlockEvent& event) {
                 bool        cancel = false;
                 const auto& item   = event.self().getSelectedItem();

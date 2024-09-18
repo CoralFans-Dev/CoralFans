@@ -1,5 +1,8 @@
+#include "coral_fans/base/Utils.h"
 #include "ll/api/i18n/I18n.h"
 // #include "ll/api/utils/StringUtils.h"
+#include "magic_enum.hpp"
+#include "mc/deps/core/mce/Color.h"
 #include "mc/nbt/CompoundTag.h"
 #include "mc/nbt/CompoundTagVariant.h"
 #include "mc/nbt/Tag.h"
@@ -8,8 +11,10 @@
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/block/Block.h"
 #include "mc/world/level/block/actor/BlockActor.h"
+#include "mc/world/level/dimension/Dimension.h"
 #include "mc/world/level/material/Material.h"
 #include "mc/world/phys/AABB.h"
+#include "mc/world/redstone/circuit/CircuitSystem.h"
 
 #include <string>
 // #include <vector>
@@ -77,6 +82,9 @@ std::pair<std::string, bool> getBlockNbt(uint64 type, BlockSource& blockSource, 
     if (path.empty()) return {tag->toSnbt(SnbtFormat::PrettyChatPrint), true};
     else {
         /*
+        // has bug
+        // cannot get items from a ListTag
+        // e.g. Item[0].Block -> wrong message!
         std::vector<::PathNode> nodes;
         if (!parsePath(path, nodes)) return {"translate.data.error.cannotparse"_tr(), false};
         try {
@@ -125,6 +133,62 @@ std::pair<std::string, bool> getEntityNbt(Actor* actor, std::string path) {
     actor->save(*tag);
     if (path.empty()) return {tag->toSnbt(SnbtFormat::PrettyChatPrint), true};
     else return {"", true};
+}
+
+std::pair<std::string, bool> showRedstoneComponentsInfo(Dimension& dimension, BlockPos& pos, uint64 type) {
+    auto& circuitSys = dimension.getCircuitSystem();
+    auto& graph      = circuitSys.mSceneGraph;
+    if (type == 0) {
+        // chunk
+        auto     chunkPos = utils::blockPosToChunkPos(pos);
+        BlockPos chunkBlockPos{chunkPos.x * 16, 0, chunkPos.z * 16};
+        auto     iter = graph.mActiveComponentsPerChunk.find(chunkBlockPos);
+        if (iter != graph.mActiveComponentsPerChunk.end())
+            for (auto& c : iter->second.mComponents)
+                utils::shortHighligntBlock(dimension.mId, c.mPos, mce::Color::CYAN, 80);
+        return {"", true};
+    }
+    using ll::i18n_literals::operator""_tr;
+    auto* component = graph.getBaseComponent(pos);
+    if (!component) return {"translate.data.error.nocircuitcomponent"_tr(), false};
+    if (type == 1) {
+        // signal
+        std::string retstr = "translate.data.info.redstone.signal.title"_tr(component->getStrength());
+        for (auto& source : component->mSources.mComponents)
+            retstr += "translate.data.info.redstone.signal.info"_tr(
+                source.mPos.toString(),
+                source.mDampening,
+                source.mDirectlyPowered ? "true" : "false",
+                source.mComponent->getStrength()
+            );
+        return {retstr, true};
+    }
+    if (type == 2) {
+        // info
+        return {
+            "translate.data.info.redstone.info"_tr(
+                component->getStrength(),
+                component->isSecondaryPowered() ? "true" : "false",
+                component->canConsumerPower() ? "true" : "false",
+                component->canStopPower() ? "true" : "false",
+                component->isHalfPulse() ? "true" : "false",
+                magic_enum::enum_name(component->mDirection)
+            ),
+            true
+        };
+    }
+    if (type == 3) {
+        // conn
+        utils::shortHighligntBlock(dimension.mId, pos, mce::Color::GREEN, 80); // highlight self
+        auto it = graph.mPowerAssociationMap.find(pos);
+        if (it != graph.mPowerAssociationMap.end())
+            for (auto& c : it->second.mComponents)
+                utils::shortHighligntBlock(dimension.mId, c.mPos, mce::Color::YELLOW, 80); // highlight children
+        for (auto& source : component->mSources.mComponents)
+            utils::shortHighligntBlock(dimension.mId, source.mPos, mce::Color::RED, 80); // highlight parents
+        return {"", true};
+    }
+    return {"", false};
 }
 
 } // namespace coral_fans::functions
