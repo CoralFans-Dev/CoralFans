@@ -8,19 +8,14 @@
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/world/actor/player/Player.h"
 
-#include <string>
-
 namespace coral_fans::commands {
 
-void registerSlimeCommand(std::string permission) {
+void registerSlimeCommand(CommandPermissionLevel permission) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
-    auto& slimeCommand = ll::command::CommandRegistrar::getInstance().getOrCreateCommand(
-        "slime",
-        "command.slime.description"_tr(),
-        magic_enum::enum_cast<CommandPermissionLevel>(permission).value_or(CommandPermissionLevel::GameDirectors)
-    );
+    auto& slimeCommand = ll::command::CommandRegistrar::getInstance()
+                             .getOrCreateCommand("slime", "command.slime.description"_tr(), permission);
 
     struct SlimeIsOpenParam {
         bool isopen;

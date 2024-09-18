@@ -118,6 +118,9 @@
         },
         "rotate": {
             "description": "旋转方块"
+        },
+        "data": {
+            "description": "获取方块或实体数据"
         }
     },
     "translate": {
@@ -145,6 +148,27 @@
         "containerreader": {
             "null": "容器为空",
             "info": "容器内共有 {} 堆物品: \n"
+        },
+        "data": {
+            "info": {
+                "block": "- §b位置: §a{}§r\n- §b名称: §a{}§r\n- §b类型名: §a{}§r\n- §bID: §a{}§r\n- §bRTID: §a{}§r\n- §b特殊值: §a{}§r\n- §bCanInstanceTick: §a{}§r\n- §bHasBlockEntity: §a{}§r\n- §bIsSolid: §a{}§r\n- §b材质:§r\n - §bMotion: §a{}§r\n - §bTopSolid: §a{}§r\n - §bIsSolid: §a{}§r\n - §bIsSolidBlocking: §a{}§r\n - §bTranslucency: §a{}§r",
+                "entity": "- §bNameTag: §a{}§r\n- §bTypeName: §a{}§r\n- §bUID: §a{}§r\n- §bPos: §a{}§r\n- §bDeltaPos: §a{}§r\n- §bAABB: §a{}§r\n- §bSurface: §a{}§r\n",
+                "redstone": {
+                    "signal": {
+                        "title": "信号: {}",
+                        "info": "\n - 位置: {} 衰减: {} 直供: {} 信号: {}"
+                    },
+                    "info": "§b强度: §a{}§r\n§bSecondaryPowered: §a{}§r\n§bCanConsumePower: §a{}§r\n§bCanStopPower: §a{}§r\n§bIsHalfPulse: §a{}§r\n§bDirection: §a{}§r"
+                }
+            },
+            "error": {
+                "noblockentity": "无方块实体",
+                "nullentity": "无法获取指向实体",
+                "nocircuitcomponent": "无电路元件",
+                "cannotparse": "无法解析path",
+                "notanarray": "对象不是一个array",
+                "geterror": "获取错误"
+            }
         }
     }
 }

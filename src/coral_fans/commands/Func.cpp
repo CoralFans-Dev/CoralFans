@@ -3,22 +3,18 @@
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/i18n/I18n.h"
-#include "magic_enum.hpp"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/server/commands/CommandPermissionLevel.h"
 #include <string>
 
 namespace coral_fans::commands {
-void registerFuncCommand(std::string permission) {
+void registerFuncCommand(CommandPermissionLevel permission) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
-    auto& funcCommand = ll::command::CommandRegistrar::getInstance().getOrCreateCommand(
-        "func",
-        "command.func.description"_tr(),
-        magic_enum::enum_cast<CommandPermissionLevel>(permission).value_or(CommandPermissionLevel::GameDirectors)
-    );
+    auto& funcCommand = ll::command::CommandRegistrar::getInstance()
+                            .getOrCreateCommand("func", "command.func.description"_tr(), permission);
 
     struct FuncIsOpenParam {
         bool isopen;

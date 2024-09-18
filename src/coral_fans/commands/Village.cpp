@@ -5,7 +5,6 @@
 #include "ll/api/command/runtime/ParamKind.h"
 #include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
-#include "magic_enum.hpp"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/world/actor/Actor.h"
@@ -13,15 +12,12 @@
 
 namespace coral_fans::commands {
 
-void registerVillageCommand(std::string permission) {
+void registerVillageCommand(CommandPermissionLevel permission) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
-    auto& villageCommand = ll::command::CommandRegistrar::getInstance().getOrCreateCommand(
-        "village",
-        "command.village.description"_tr(),
-        magic_enum::enum_cast<CommandPermissionLevel>(permission).value_or(CommandPermissionLevel::GameDirectors)
-    );
+    auto& villageCommand = ll::command::CommandRegistrar::getInstance()
+                               .getOrCreateCommand("village", "command.village.description"_tr(), permission);
 
     // village show <bounds|raid|spawn|center|poi|bind> <bool>
     enum class VillageShowType : int { bounds, raid, spawn, center, poi, bind };

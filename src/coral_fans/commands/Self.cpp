@@ -8,18 +8,14 @@
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/server/commands/CommandPermissionLevel.h"
 #include "mc/world/actor/player/Player.h"
-#include <string>
 
 namespace coral_fans::commands {
-void registerSelfCommand(std::string permission) {
+void registerSelfCommand(CommandPermissionLevel permission) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
-    auto& selfCommand = ll::command::CommandRegistrar::getInstance().getOrCreateCommand(
-        "self",
-        "command.self.description"_tr(),
-        magic_enum::enum_cast<CommandPermissionLevel>(permission).value_or(CommandPermissionLevel::Any)
-    );
+    auto& selfCommand = ll::command::CommandRegistrar::getInstance()
+                            .getOrCreateCommand("self", "command.self.description"_tr(), permission);
 
     struct SelfIsOpenParam {
         bool isopen;

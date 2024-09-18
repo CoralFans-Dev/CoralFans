@@ -1,25 +1,27 @@
 #pragma once
 
+#include "mc/server/commands/CommandPermissionLevel.h"
 #include <string>
 #include <vector>
 
 namespace coral_fans {
 
 struct CommandConfigStruct {
-    bool        enabled;
-    std::string permission;
+    bool                   enabled;
+    CommandPermissionLevel permission;
 };
 
 struct CommandStruct {
-    CommandConfigStruct tick    = {true, "GameDirectors"};
-    CommandConfigStruct func    = {true, "GameDirectors"};
-    CommandConfigStruct self    = {true, "Any"};
-    CommandConfigStruct hsa     = {true, "Any"};
-    CommandConfigStruct counter = {true, "GameDirectors"};
-    CommandConfigStruct prof    = {true, "Any"};
-    CommandConfigStruct slime   = {true, "Any"};
-    CommandConfigStruct village = {true, "Any"};
-    CommandConfigStruct rotate  = {true, "Any"};
+    CommandConfigStruct tick    = {true, CommandPermissionLevel::GameDirectors};
+    CommandConfigStruct func    = {true, CommandPermissionLevel::GameDirectors};
+    CommandConfigStruct self    = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct hsa     = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct counter = {true, CommandPermissionLevel::GameDirectors};
+    CommandConfigStruct prof    = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct slime   = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct village = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct rotate  = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct data    = {true, CommandPermissionLevel::Any};
 };
 
 struct Shortcut {
@@ -29,45 +31,63 @@ struct Shortcut {
     std::string              block;
     std::string              command;
     std::string              description;
-    std::string              permission;
+    CommandPermissionLevel   permission;
     bool                     prevent;
     std::vector<std::string> actions;
 };
 
 struct Config {
-    int         version    = 1;
+    int         version    = 2;
     std::string locateName = "zh_CN";
 
     CommandStruct         command;
     std::vector<Shortcut> shortcuts = {
   /* hoppercounter */
-        {true,  "useon",   "cactus", "white_concrete",      "",  "",          "",              false, {"counter print"}                                  },
-        {true,  "useon",   "cactus", "orange_concrete",     "",  "",          "",              false, {"counter print"}                                  },
-        {true,  "useon",   "cactus", "magenta_concrete",    "",  "",          "",              false, {"counter print"}                                  },
-        {true,  "useon",   "cactus", "light_blue_concrete", "",  "",          "",              false, {"counter print"}                                  },
-        {true,  "useon",   "cactus", "yellow_concrete",     "",  "",          "",              false, {"counter print"}                                  },
-        {true,  "useon",   "cactus", "lime_concrete",       "",  "",          "",              false, {"counter print"}                                  },
-        {true,  "useon",   "cactus", "pink_concrete",       "",  "",          "",              false, {"counter print"}                                  },
-        {true,  "useon",   "cactus", "gray_concrete",       "",  "",          "",              false, {"counter print"}                                  },
-        {true,  "useon",   "cactus", "light_gray_concrete", "",  "",          "",              false, {"counter print"}                                  },
-        {true,  "useon",   "cactus", "cyan_concrete",       "",  "",          "",              false, {"counter print"}                                  },
-        {true,  "useon",   "cactus", "purple_concrete",     "",  "",          "",              false, {"counter print"}                                  },
-        {true,  "useon",   "cactus", "blue_concrete",       "",  "",          "",              false, {"counter print"}                                  },
-        {true,  "useon",   "cactus", "brown_concrete",      "",  "",          "",              false, {"counter print"}                                  },
-        {true,  "useon",   "cactus", "green_concrete",      "",  "",          "",              false, {"counter print"}                                  },
-        {true,  "useon",   "cactus", "red_concrete",        "",  "",          "",              false, {"counter print"}                                  },
-        {true,  "useon",   "cactus", "black_concrete",      "",  "",          "",              false, {"counter print"}                                  },
+        {.enable = true, .type = "useon", .item = "cactus", .block = "white_concrete", .actions = {"counter print"}},
+        {.enable = true, .type = "useon", .item = "cactus", .block = "orange_concrete", .actions = {"counter print"}},
+        {.enable = true, .type = "useon", .item = "cactus", .block = "magenta_concrete", .actions = {"counter print"}},
+        {.enable = true, .type = "useon", .item = "cactus", .block = "light_blue_concrete", .actions = {"counter print"}
+        },
+        {.enable = true, .type = "useon", .item = "cactus", .block = "yellow_concrete", .actions = {"counter print"}},
+        {.enable = true, .type = "useon", .item = "cactus", .block = "lime_concrete", .actions = {"counter print"}},
+        {.enable = true, .type = "useon", .item = "cactus", .block = "pink_concrete", .actions = {"counter print"}},
+        {.enable = true, .type = "useon", .item = "cactus", .block = "gray_concrete", .actions = {"counter print"}},
+        {.enable = true, .type = "useon", .item = "cactus", .block = "light_gray_concrete", .actions = {"counter print"}
+        },
+        {.enable = true, .type = "useon", .item = "cactus", .block = "cyan_concrete", .actions = {"counter print"}},
+        {.enable = true, .type = "useon", .item = "cactus", .block = "purple_concrete", .actions = {"counter print"}},
+        {.enable = true, .type = "useon", .item = "cactus", .block = "blue_concrete", .actions = {"counter print"}},
+        {.enable = true, .type = "useon", .item = "cactus", .block = "brown_concrete", .actions = {"counter print"}},
+        {.enable = true, .type = "useon", .item = "cactus", .block = "green_concrete", .actions = {"counter print"}},
+        {.enable = true, .type = "useon", .item = "cactus", .block = "red_concrete", .actions = {"counter print"}},
+        {.enable = true, .type = "useon", .item = "cactus", .block = "black_concrete", .actions = {"counter print"}},
  /* blockrotate */
-        {true,  "use",     "cactus", "",                    "",  "",          "",              true,  {"rotate"}                                         },
-        {true,  "command", "",       "",                    "r", "rotate",    "Any",           false, {"rotate"}                                         },
+        {.enable = true, .type = "use", .item = "cactus", .prevent = true, .actions = {"rotate"}},
+        {.enable      = true,
+         .type        = "command",
+         .command     = "r",
+         .description = "rotate",
+         .permission  = CommandPermissionLevel::Any,
+         .actions     = {"rotate"}},
  /* fastcommand */
-        {false, "command", "",       "",                    "c", "creative",  "GameDirectors", false, {"gamemode creative"}                              },
-        {false, "command", "",       "",                    "s", "spectator", "GameDirectors", false, {"gamemode spectator"}                             },
-        {false,
-         "command",        "",
-         "",                                                "q",
-         "suicide",                                                           "GameDirectors",
-         false,                                                                                       {"gamemode adventure", "kill", "gamemode creative"}}
+        {.enable      = false,
+         .type        = "command",
+         .command     = "c",
+         .description = "creative",
+         .permission  = CommandPermissionLevel::GameDirectors,
+         .actions     = {"gamemode creative"}},
+        {.enable      = false,
+         .type        = "command",
+         .command     = "s",
+         .description = "spectator",
+         .permission  = CommandPermissionLevel::GameDirectors,
+         .actions     = {"gamemode spectator"}},
+        {.enable      = false,
+         .type        = "command",
+         .command     = "q",
+         .description = "suicide",
+         .permission  = CommandPermissionLevel::GameDirectors,
+         .actions     = {"gamemode adventure", "kill", "gamemode creative"}}
     };
 };
 

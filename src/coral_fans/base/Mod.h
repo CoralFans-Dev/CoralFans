@@ -12,6 +12,7 @@
 #include "ll/api/data/KeyValueDB.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/event/ListenerBase.h"
+#include "ll/api/schedule/Scheduler.h"
 #include <memory>
 #include <set>
 
@@ -25,15 +26,11 @@ private:
     std::unique_ptr<bsci::GeometryGroup>  mGeometryGroup;
     functions::HsaManager                 mHsaManager;
     functions::HopperCounterManager       mHopperCounterManager;
-    ll::event::EventBus*                  mEventBus;
     std::set<ll::event::ListenerPtr>      mEventListeners;
     functions::Profiler                   mProfiler;
     functions::SlimeManager               mSlimeManager;
     functions::CFVillageManager           mVillageManager;
-
-public:
-    CoralFansMod() : mEventBus(&ll::event::EventBus::getInstance()) {}
-    void init();
+    ll::schedule::GameTickScheduler       mTickScheduler;
 
 public:
     inline std::unique_ptr<ll::data::KeyValueDB>& getConfigDb() { return this->mConfigDb; }
@@ -42,17 +39,18 @@ public:
     inline functions::HsaManager&                 getHsaManager() { return this->mHsaManager; }
     inline functions::HopperCounterManager&       getHopperCounterManager() { return this->mHopperCounterManager; }
     inline const ll::Logger&                      getLogger() { return CoralFans::getInstance().getSelf().getLogger(); }
-    inline ll::event::EventBus*&                  getEventBus() { return this->mEventBus; }
+    inline ll::event::EventBus&                   getEventBus() { return ll::event::EventBus::getInstance(); }
     inline std::set<ll::event::ListenerPtr>&      getEventListeners() { return this->mEventListeners; }
     inline functions::Profiler&                   getProfiler() { return this->mProfiler; }
     inline functions::SlimeManager&               getSlimeManager() { return this->mSlimeManager; }
     inline functions::CFVillageManager&           getVillageManager() { return this->mVillageManager; }
+    inline ll::schedule::GameTickScheduler&       getTickScheduler() { return this->mTickScheduler; }
 
 public:
     void tick();
 
 public:
-    const std::string VERSION = "0.0.1";
+    const std::string VERSION = "0.0.2";
 };
 
 CoralFansMod& mod();

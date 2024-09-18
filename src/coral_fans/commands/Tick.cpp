@@ -12,15 +12,12 @@
 #include "magic_enum.hpp"
 
 namespace coral_fans::commands {
-void registerTickCommand(std::string permission) {
+void registerTickCommand(CommandPermissionLevel permission) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
-    auto& tickCommand = ll::command::CommandRegistrar::getInstance().getOrCreateCommand(
-        "tick",
-        "command.tick.description"_tr(),
-        magic_enum::enum_cast<CommandPermissionLevel>(permission).value_or(CommandPermissionLevel::GameDirectors)
-    );
+    auto& tickCommand = ll::command::CommandRegistrar::getInstance()
+                            .getOrCreateCommand("tick", "command.tick.description"_tr(), permission);
 
     // tick query
     tickCommand.overload().text("query").execute([](CommandOrigin const&, CommandOutput& output) {

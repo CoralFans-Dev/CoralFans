@@ -9,15 +9,12 @@
 
 
 namespace coral_fans::commands {
-void registerHsaCommand(std::string permission) {
+void registerHsaCommand(CommandPermissionLevel permission) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
-    auto& hsaCommand = ll::command::CommandRegistrar::getInstance().getOrCreateCommand(
-        "hsa",
-        "command.hsa.description"_tr(),
-        magic_enum::enum_cast<CommandPermissionLevel>(permission).value_or(CommandPermissionLevel::GameDirectors)
-    );
+    auto& hsaCommand = ll::command::CommandRegistrar::getInstance()
+                           .getOrCreateCommand("hsa", "command.hsa.description"_tr(), permission);
 
     struct HsaIsOpenParam {
         bool isopen;
