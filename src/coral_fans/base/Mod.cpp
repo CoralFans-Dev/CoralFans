@@ -8,6 +8,7 @@ void CoralFansMod::tick() {
     this->getSlimeManager().tick();         // heavy 80
     this->getVillageManager().lightTick();  // light 20
     this->getVillageManager().heavyTick();  // heavy 40
+    this->mHudHelper.tick();                // light 20
 }
 
 CoralFansMod& mod() {

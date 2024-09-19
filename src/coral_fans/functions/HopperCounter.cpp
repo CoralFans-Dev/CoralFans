@@ -92,6 +92,19 @@ void HopperCounterManager::tick() {
         for (auto& channel : this->channels) channel.tick();
 }
 
+int HopperCounterManager::getViewChannel(BlockSource& blockSource, HitResult hitrst) {
+    const auto&                                          dest = blockSource.getBlock(hitrst.mBlockPos);
+    std::unordered_map<std::string, int>::const_iterator it;
+    if (utils::removeMinecraftPrefix(dest.getTypeName()) == "hopper") {
+        const auto& block = blockSource.getBlock(hitrst.mBlockPos + utils::facingToBlockPos(dest.getVariant()));
+        it =
+            functions::HopperCounterManager::HOPPER_COUNTER_MAP.find(utils::removeMinecraftPrefix(block.getTypeName()));
+    } else
+        it = functions::HopperCounterManager::HOPPER_COUNTER_MAP.find(utils::removeMinecraftPrefix(dest.getTypeName()));
+    if (it != functions::HopperCounterManager::HOPPER_COUNTER_MAP.end()) return it->second;
+    else return -1;
+}
+
 LL_AUTO_TYPE_INSTANCE_HOOK(
     CoralFansFunctionsHopperCounterHook1,
     ll::memory::HookPriority::Normal,

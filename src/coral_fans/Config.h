@@ -22,6 +22,7 @@ struct CommandStruct {
     CommandConfigStruct village = {true, CommandPermissionLevel::Any};
     CommandConfigStruct rotate  = {true, CommandPermissionLevel::Any};
     CommandConfigStruct data    = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct cfhud   = {true, CommandPermissionLevel::Any};
 };
 
 struct Shortcut {
