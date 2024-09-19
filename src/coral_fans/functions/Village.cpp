@@ -264,7 +264,7 @@ std::pair<std::string, bool> CFVillageManager::getVillagerInfo(ActorUniqueID aui
         auto dwellerPoiMap = ::getDwellerPoiMap(v.second.first);
         auto it            = dwellerPoiMap.find(auid);
         if (it != dwellerPoiMap.end()) {
-            retstr += std::format("VID: {} Head: {}", v.first, it == dwellerPoiMap.begin() ? "true" : "false");
+            retstr += "VID: " + std::to_string(v.first);
             for (int i = 0; i < 3; i++) {
                 const auto& poi = it->second[i].lock();
                 if (poi)
