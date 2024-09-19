@@ -83,6 +83,8 @@ bool CoralFans::enable() {
         coral_fans::commands::registerRotateCommand(mod.getConfig().command.rotate.permission);
     if (mod.getConfig().command.data.enabled)
         coral_fans::commands::registerDataCommand(mod.getConfig().command.data.permission);
+    if (mod.getConfig().command.cfhud.enabled)
+        coral_fans::commands::registerCfhudCommand(mod.getConfig().command.cfhud.permission);
 
     // register shortcuts
     coral_fans::functions::registerShortcutsListener();

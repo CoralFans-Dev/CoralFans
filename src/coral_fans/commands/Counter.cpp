@@ -1,7 +1,7 @@
 #include "coral_fans/base/Macros.h"
 #include "coral_fans/base/Mod.h"
-#include "coral_fans/base/Utils.h"
 
+#include "coral_fans/functions/HopperCounter.h"
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/command/Optional.h"
@@ -13,7 +13,6 @@
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/block/Block.h"
 #include "mc/world/level/material/Material.h"
-#include <unordered_map>
 
 namespace coral_fans::commands {
 
@@ -39,22 +38,10 @@ void registerCounterCommand(CommandPermissionLevel permission) {
                     if (block.getMaterial().isLiquid()) return false;
                     return true;
                 });
-                auto& blockSource = player->getDimension().getBlockSourceFromMainChunkSource();
-                const auto&                                          dest = blockSource.getBlock(hitrst.mBlockPos);
-                std::unordered_map<std::string, int>::const_iterator it;
-                if (utils::removeMinecraftPrefix(dest.getTypeName()) == "hopper") {
-                    const auto& block =
-                        blockSource.getBlock(hitrst.mBlockPos + utils::facingToBlockPos(dest.getVariant()));
-                    it = functions::HopperCounterManager::HOPPER_COUNTER_MAP.find(
-                        utils::removeMinecraftPrefix(block.getTypeName())
-                    );
-                } else
-                    it = functions::HopperCounterManager::HOPPER_COUNTER_MAP.find(
-                        utils::removeMinecraftPrefix(dest.getTypeName())
-                    );
-                if (it == functions::HopperCounterManager::HOPPER_COUNTER_MAP.end())
-                    return output.error("command.counter.print.error"_tr());
-                output.success(coral_fans::mod().getHopperCounterManager().getChannel(it->second).info());
+                auto& blockSource = player->getDimensionBlockSource();
+                int   ch          = functions::HopperCounterManager::getViewChannel(blockSource, hitrst);
+                if (ch == -1) return output.error("command.counter.print.error"_tr());
+                output.success(coral_fans::mod().getHopperCounterManager().getChannel(ch).info());
             }
         }
     );
@@ -71,23 +58,11 @@ void registerCounterCommand(CommandPermissionLevel permission) {
                     if (block.getMaterial().isLiquid()) return false;
                     return true;
                 });
-                auto& blockSource = player->getDimension().getBlockSourceFromMainChunkSource();
-                const auto&                                          dest = blockSource.getBlock(hitrst.mBlockPos);
-                std::unordered_map<std::string, int>::const_iterator it;
-                if (utils::removeMinecraftPrefix(dest.getTypeName()) == "hopper") {
-                    const auto& block =
-                        blockSource.getBlock(hitrst.mBlockPos + utils::facingToBlockPos(dest.getVariant()));
-                    it = functions::HopperCounterManager::HOPPER_COUNTER_MAP.find(
-                        utils::removeMinecraftPrefix(block.getTypeName())
-                    );
-                } else
-                    it = functions::HopperCounterManager::HOPPER_COUNTER_MAP.find(
-                        utils::removeMinecraftPrefix(dest.getTypeName())
-                    );
-                if (it == functions::HopperCounterManager::HOPPER_COUNTER_MAP.end())
-                    return output.error("command.counter.reset.error"_tr(it->second));
-                coral_fans::mod().getHopperCounterManager().getChannel(it->second).reset();
-                output.success("command.counter.reset.success"_tr(it->second));
+                auto& blockSource = player->getDimensionBlockSource();
+                int   ch          = functions::HopperCounterManager::getViewChannel(blockSource, hitrst);
+                if (ch == -1) return output.error("command.counter.reset.error"_tr(ch));
+                coral_fans::mod().getHopperCounterManager().getChannel(ch).reset();
+                output.success("command.counter.reset.success"_tr(ch));
             }
         }
     );

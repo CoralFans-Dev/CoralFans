@@ -121,6 +121,14 @@
         },
         "data": {
             "description": "获取方块或实体数据"
+        },
+        "cfhud": {
+            "description": "设置HUD显示信息",
+            "success": "设置成功",
+            "error": {
+                "geterror": "获取配置错误",
+                "seterror": "设置配置错误"
+            }
         }
     },
     "translate": {
@@ -169,6 +177,9 @@
                 "notanarray": "对象不是一个array",
                 "geterror": "获取错误"
             }
+        },
+        "cfhud": {
+            "base": "Tick: {}\n位置: {}\n视角: {}\n区块: {}\n方块: {} 亮度: {}\n速度: {:.4f} ({:.2f} {:.2f} {:.2f})\n群系: {}\n"
         }
     }
 }

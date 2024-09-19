@@ -121,6 +121,14 @@
         },
         "data": {
             "description": "Get data of blocks and entities"
+        },
+        "cfhud": {
+            "description": "Set HUD info",
+            "success": "Success",
+            "error": {
+                "geterror": "Failed to get config",
+                "seterror": "Failed to set config"
+            }
         }
     },
     "translate": {
@@ -169,6 +177,9 @@
                 "notanarray": "Not an array",
                 "geterror": "Get error"
             }
+        },
+        "cfhud": {
+            "base": "Tick: {}\nPos: {}\nView: {}\nChunk: {}\nBlock: {} Light: {}\nSpeed: {:.4f} ({:.2f} {:.2f} {:.2f})\nBiome: {}\n"
         }
     }
 }

@@ -5,6 +5,7 @@
 #include "coral_fans/CoralFans.h"
 #include "coral_fans/functions/HopperCounter.h"
 #include "coral_fans/functions/Hsa.h"
+#include "coral_fans/functions/Hud.h"
 #include "coral_fans/functions/Prof.h"
 #include "coral_fans/functions/Slime.h"
 #include "coral_fans/functions/Village.h"
@@ -31,6 +32,7 @@ private:
     functions::SlimeManager               mSlimeManager;
     functions::CFVillageManager           mVillageManager;
     ll::schedule::GameTickScheduler       mTickScheduler;
+    functions::HudHelper                  mHudHelper;
 
 public:
     inline std::unique_ptr<ll::data::KeyValueDB>& getConfigDb() { return this->mConfigDb; }
