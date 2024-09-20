@@ -129,6 +129,9 @@
                 "geterror": "获取配置错误",
                 "seterror": "设置配置错误"
             }
+        },
+        "sp": {
+            "description": "假人"
         }
     },
     "translate": {

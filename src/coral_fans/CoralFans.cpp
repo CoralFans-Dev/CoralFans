@@ -85,6 +85,8 @@ bool CoralFans::enable() {
         coral_fans::commands::registerDataCommand(mod.getConfig().command.data.permission);
     if (mod.getConfig().command.cfhud.enabled)
         coral_fans::commands::registerCfhudCommand(mod.getConfig().command.cfhud.permission);
+    if (mod.getConfig().command.sp.enabled)
+        coral_fans::commands::registerSpCommand(mod.getConfig().command.sp.permission);
 
     // register shortcuts
     coral_fans::functions::registerShortcutsListener();

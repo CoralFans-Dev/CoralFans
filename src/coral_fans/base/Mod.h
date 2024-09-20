@@ -7,6 +7,7 @@
 #include "coral_fans/functions/Hsa.h"
 #include "coral_fans/functions/Hud.h"
 #include "coral_fans/functions/Prof.h"
+#include "coral_fans/functions/SimPlayer.h"
 #include "coral_fans/functions/Slime.h"
 #include "coral_fans/functions/Village.h"
 #include "ll/api/Logger.h"
@@ -33,6 +34,7 @@ private:
     functions::CFVillageManager           mVillageManager;
     ll::schedule::GameTickScheduler       mTickScheduler;
     functions::HudHelper                  mHudHelper;
+    functions::SimPlayerManager           mSimPlayerManager;
 
 public:
     inline std::unique_ptr<ll::data::KeyValueDB>& getConfigDb() { return this->mConfigDb; }
@@ -47,6 +49,7 @@ public:
     inline functions::SlimeManager&               getSlimeManager() { return this->mSlimeManager; }
     inline functions::CFVillageManager&           getVillageManager() { return this->mVillageManager; }
     inline ll::schedule::GameTickScheduler&       getTickScheduler() { return this->mTickScheduler; }
+    inline functions::SimPlayerManager&           getSimPlayerManager() { return this->mSimPlayerManager; }
 
 public:
     void tick();

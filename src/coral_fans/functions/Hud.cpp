@@ -13,17 +13,18 @@
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/biome/Biome.h"
+#include <algorithm>
 
 namespace coral_fans::functions {
 
 void HudHelper::tick() {
     using ll::i18n_literals::operator""_tr;
     static int gt;
+    auto&      mod = coral_fans::mod();
     if (gt == 1) { // delay 1 tick to get village info
         auto level = ll::service::getLevel();
         if (level) {
             level->forEachPlayer([&](Player& player) {
-                auto& mod = coral_fans::mod();
                 if (mod.getConfigDb()->get("functions.players." + player.getUuid().asString() + ".cfhud.show")
                     != "true")
                     return true;
@@ -92,7 +93,7 @@ void HudHelper::tick() {
             });
         }
     }
-    gt = (gt + 1) % 20;
+    gt = (gt + 1) % std::max(2, mod.getConfig().cfhudRefreshTime);
 }
 
 } // namespace coral_fans::functions

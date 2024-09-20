@@ -129,6 +129,9 @@
                 "geterror": "Failed to get config",
                 "seterror": "Failed to set config"
             }
+        },
+        "sp": {
+            "description": "SimPlayer"
         }
     },
     "translate": {

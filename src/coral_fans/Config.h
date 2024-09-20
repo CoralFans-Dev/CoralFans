@@ -23,6 +23,7 @@ struct CommandStruct {
     CommandConfigStruct rotate  = {true, CommandPermissionLevel::Any};
     CommandConfigStruct data    = {true, CommandPermissionLevel::Any};
     CommandConfigStruct cfhud   = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct sp      = {true, CommandPermissionLevel::GameDirectors};
 };
 
 struct Shortcut {
@@ -37,9 +38,20 @@ struct Shortcut {
     std::vector<std::string> actions;
 };
 
+struct SimPlayerStruct {
+    std::string namePrefix  = "SIM-";
+    std::string namePostfix = "";
+    int         maxOnline   = 15;
+    int         maxOwn      = 3;
+};
+
 struct Config {
     int         version    = 2;
     std::string locateName = "zh_CN";
+
+    int cfhudRefreshTime = 20;
+
+    SimPlayerStruct simPlayer;
 
     CommandStruct         command;
     std::vector<Shortcut> shortcuts = {
