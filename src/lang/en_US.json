@@ -40,6 +40,10 @@
             "containerreader": {
                 "success": "globally set containerreader \"{}\"",
                 "error": "failed to globally set containerreader"
+            },
+            "autototem": {
+                "success": "globally set autototem \"{}\"",
+                "error": "failed to globally set autototem"
             }
         },
         "self": {
@@ -59,6 +63,10 @@
             "containerreader": {
                 "success": "set containerreader \"{}\"",
                 "error": "failed to set containerreader"
+            },
+            "autototem": {
+                "success": "set autototem \"{}\"",
+                "error": "failed to set autototem"
             }
         },
         "tick": {

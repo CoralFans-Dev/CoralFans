@@ -142,6 +142,16 @@ void registerDataCommand(CommandPermissionLevel permission) {
             if (rst.second) output.success(rst.first);
             else output.error(rst.first);
         });
+
+    // item nbt
+    dataCommand.runtimeOverload().text("item").text("nbt").execute(
+        [](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const&) {
+            COMMAND_CHECK_PLAYER
+            auto rst = functions::getItemNbt(player->getSelectedItem());
+            if (rst.second) output.success(rst.first);
+            else output.error(rst.first);
+        }
+    );
 }
 
 } // namespace coral_fans::commands

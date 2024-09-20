@@ -1,4 +1,5 @@
 #include "coral_fans/base/Mod.h"
+#include "coral_fans/base/Utils.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/Container.h"
 #include "mc/world/actor/player/Player.h"
@@ -39,15 +40,6 @@ int searchBestToolInInv(Container& inv, int currentSlot, const Block& block, con
     return curInfo.slot;
 }
 
-void swapItemInContainer(Container& container, int slot1, int slot2) {
-    auto i1 = container.getItem(slot1).clone();
-    auto i2 = container.getItem(slot2).clone();
-    container.removeItem(slot1, 64);
-    container.removeItem(slot2, 64);
-    container.setItem(slot1, i2);
-    container.setItem(slot2, i1);
-}
-
 } // namespace
 
 namespace coral_fans::functions {
@@ -77,7 +69,8 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
         if (bestSlot <= 8) {
             player.setSelectedSlot(bestSlot);
         } else {
-            ::swapItemInContainer(player.getInventory(), currentSlot, bestSlot);
+            utils::swapItemInContainer(&player, currentSlot, bestSlot);
+            player.refreshInventory();
         }
     }
     origin(player, blockPos, block, unk_char);
