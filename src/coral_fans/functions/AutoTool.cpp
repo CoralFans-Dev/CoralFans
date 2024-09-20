@@ -12,15 +12,16 @@
 namespace {
 
 struct ToolInfo {
-    float speed;
+    float value;
     int   slot;
     short remainDamage;
 };
 
-int searchBestToolInInv(Container& inv, int currentSlot, const Block& block, const int minDamage) {
+int searchBestToolInInv(Container& inv, int currentSlot, const Block* block, const int minDamage, bool weapon) {
+    if (!weapon && !block) return currentSlot;
     auto&    currentItem = inv.getItem(currentSlot);
     ToolInfo curInfo{
-        currentItem.getDestroySpeed(block),
+        weapon ? currentItem.getAttackDamage() : currentItem.getDestroySpeed(*block),
         currentSlot,
         currentItem.getMaxDamage() - currentItem.getDamageValue()
     };
@@ -28,12 +29,12 @@ int searchBestToolInInv(Container& inv, int currentSlot, const Block& block, con
     for (int i = 0; i < size; ++i) {
         auto& item = inv.getItem(i);
         if (item.mCount != 0) {
-            float speed        = item.getDestroySpeed(block);
+            float value        = weapon ? item.getAttackDamage() : item.getDestroySpeed(*block);
             short remainDamage = item.getMaxDamage() - item.getDamageValue();
             // skip low remainDamage tools
             if (remainDamage <= minDamage) continue;
-            if (speed >= curInfo.speed) {
-                curInfo = {speed, i, remainDamage};
+            if (value >= curInfo.value) {
+                curInfo = {value, i, remainDamage};
             }
         }
     }
@@ -45,7 +46,7 @@ int searchBestToolInInv(Container& inv, int currentSlot, const Block& block, con
 namespace coral_fans::functions {
 
 LL_AUTO_TYPE_INSTANCE_HOOK(
-    CoralFansTweakersAutoToolHook,
+    CoralFansTweakersAutoToolHook1,
     ll::memory::HookPriority::Normal,
     BlockEventCoordinator,
     &BlockEventCoordinator::sendBlockDestructionStarted,
@@ -65,7 +66,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
                           .getConfigDb()
                           ->get(std::format("functions.players.{}.autotool.mindamage", player.getUuid().asString()))
                           .value_or("1"));
-        int bestSlot = ::searchBestToolInInv(player.getInventory(), currentSlot, block, minDamage);
+        int bestSlot = ::searchBestToolInInv(player.getInventory(), currentSlot, &block, minDamage, false);
         if (bestSlot <= 8) {
             player.setSelectedSlot(bestSlot);
         } else {
@@ -74,6 +75,35 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
         }
     }
     origin(player, blockPos, block, unk_char);
+}
+
+LL_AUTO_TYPE_INSTANCE_HOOK(
+    CoralFansTweakersAutoToolHook2,
+    ll::memory::HookPriority::Normal,
+    Player,
+    "?attack@Player@@UEAA_NAEAVActor@@AEBW4ActorDamageCause@@@Z",
+    bool,
+    Actor&                    actor,
+    const ::ActorDamageCause& cause
+) {
+    if (coral_fans::mod().getConfigDb()->get("functions.global.autotool") == "true"
+        && coral_fans::mod().getConfigDb()->get(std::format("functions.players.{}.autotool", this->getUuid().asString())
+           ) == "true") {
+        int currentSlot = this->getSelectedItemSlot();
+        int minDamage =
+            std::stoi(coral_fans::mod()
+                          .getConfigDb()
+                          ->get(std::format("functions.players.{}.autotool.mindamage", this->getUuid().asString()))
+                          .value_or("1"));
+        int bestSlot = ::searchBestToolInInv(this->getInventory(), currentSlot, nullptr, minDamage, true);
+        if (bestSlot <= 8) {
+            this->setSelectedSlot(bestSlot);
+        } else {
+            utils::swapItemInContainer(this, currentSlot, bestSlot);
+            this->refreshInventory();
+        }
+    }
+    return origin(actor, cause);
 }
 
 } // namespace coral_fans::functions
