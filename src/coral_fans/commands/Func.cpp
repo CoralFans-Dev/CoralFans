@@ -120,5 +120,25 @@ void registerFuncCommand(CommandPermissionLevel permission) {
                 output.success("command.func.containerreader.success"_tr(param.isopen ? "true" : "false"));
             else output.error("command.func.containerreader.error"_tr());
         });
+
+    // autototem
+    funcCommand.overload<FuncIsOpenParam>()
+        .text("autototem")
+        .required("isopen")
+        .execute([](CommandOrigin const&, CommandOutput& output, FuncIsOpenParam const& param) {
+            if (coral_fans::mod().getConfigDb()->set("functions.global.autototem", param.isopen ? "true" : "false"))
+                output.success("command.func.autototem.success"_tr(param.isopen ? "true" : "false"));
+            else output.error("command.func.autototem.error"_tr());
+        });
+
+    // autoitem
+    funcCommand.overload<FuncIsOpenParam>()
+        .text("autoitem")
+        .required("isopen")
+        .execute([](CommandOrigin const&, CommandOutput& output, FuncIsOpenParam const& param) {
+            if (coral_fans::mod().getConfigDb()->set("functions.global.autoitem", param.isopen ? "true" : "false"))
+                output.success("command.func.autoitem.success"_tr(param.isopen ? "true" : "false"));
+            else output.error("command.func.autoitem.error"_tr());
+        });
 }
 } // namespace coral_fans::commands

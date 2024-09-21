@@ -7,6 +7,7 @@
 #include "mc/nbt/CompoundTagVariant.h"
 #include "mc/nbt/Tag.h"
 #include "mc/world/actor/Actor.h"
+#include "mc/world/item/registry/ItemStack.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/block/Block.h"
@@ -189,6 +190,13 @@ std::pair<std::string, bool> showRedstoneComponentsInfo(Dimension& dimension, Bl
         return {"", true};
     }
     return {"", false};
+}
+
+std::pair<std::string, bool> getItemNbt(ItemStack const& item) {
+    using ll::i18n_literals::operator""_tr;
+    auto tag = item.save();
+    if (tag) return {tag->toSnbt(SnbtFormat::PrettyChatPrint), true};
+    else return {"translate.data.error.geterror"_tr(), false};
 }
 
 } // namespace coral_fans::functions

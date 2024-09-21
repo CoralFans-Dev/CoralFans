@@ -40,6 +40,14 @@
             "containerreader": {
                 "success": "全局设置 containerreader \"{}\"",
                 "error": "全局设置 containerreader 失败"
+            },
+            "autototem": {
+                "success": "全局设置 autototem \"{}\"",
+                "error": "全局设置 autototem 失败"
+            },
+            "autoitem": {
+                "success": "全局设置 autoitem \"{}\"",
+                "error": "全局设置 autoitem 失败"
             }
         },
         "self": {
@@ -59,6 +67,14 @@
             "containerreader": {
                 "success": "设置 containerreader \"{}\"",
                 "error": "设置 containerreader 失败"
+            },
+            "autototem": {
+                "success": "设置 autototem \"{}\"",
+                "error": "设置 autototem 失败"
+            },
+            "autoitem": {
+                "success": "设置 autoitem \"{}\"",
+                "error": "设置 autoitem 失败"
             }
         },
         "tick": {
