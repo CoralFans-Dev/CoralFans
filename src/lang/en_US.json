@@ -44,6 +44,10 @@
             "autototem": {
                 "success": "globally set autototem \"{}\"",
                 "error": "failed to globally set autototem"
+            },
+            "autoitem": {
+                "success": "globally set autoitem \"{}\"",
+                "error": "failed to globally set autoitem"
             }
         },
         "self": {
@@ -67,6 +71,10 @@
             "autototem": {
                 "success": "set autototem \"{}\"",
                 "error": "failed to set autototem"
+            },
+            "autoitem": {
+                "success": "set autoitem \"{}\"",
+                "error": "failed to set autoitem"
             }
         },
         "tick": {

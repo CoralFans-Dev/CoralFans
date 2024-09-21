@@ -16,14 +16,15 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 ) {
     if (coral_fans::mod().getConfigDb()->get("functions.players." + this->getUuid().asString() + ".autototem")
         == "true") {
-        auto& inv  = this->getInventory();
-        int   size = inv.getContainerSize();
+        auto& inv   = this->getInventory();
+        int   size  = inv.getContainerSize();
+        auto  totem = ItemStack{"totem_of_undying", 1};
         for (int i = 0; i < size; ++i) {
             auto& item = inv.getItem(i);
             if (item.mCount != 0) {
                 if (utils::removeMinecraftPrefix(item.getTypeName()).ends_with("_shulker_box")) {
                     auto tag = item.save();
-                    auto rst = utils::getItemFromShulkerBox(std::move(tag), "totem_of_undying");
+                    auto rst = utils::getItemFromShulkerBox(std::move(tag), totem);
                     if (rst) {
                         inv.setItem(i, ItemStack::fromTag(rst->first));
                         this->refreshInventory();
@@ -31,7 +32,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
                     }
                 }
                 if (i == this->getSelectedItemSlot()) continue;
-                if (utils::removeMinecraftPrefix(item.getTypeName()) == "totem_of_undying") {
+                if (item.matchesItem(totem)) {
                     inv.setItem(i, ItemStack::EMPTY_ITEM);
                     this->refreshInventory();
                     return false;
