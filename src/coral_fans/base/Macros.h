@@ -25,5 +25,6 @@
     newTag["states"][tag] = tagType(next->second);                                                                     \
     auto newBlock         = Block::tryGetFromRegistry(newTag);                                                         \
     if (!newBlock) return;                                                                                             \
+    blockSource.setBlock(blockPos, Block::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);                   \
     blockSource.setBlock(blockPos, newBlock, 3, nullptr, nullptr);                                                     \
     return;
