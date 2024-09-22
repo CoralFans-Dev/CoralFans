@@ -80,8 +80,12 @@ inline void swapItemInContainer(Player* player, int slot1, int slot2) {
     }
 }
 
-inline std::optional<std::pair<CompoundTag, CompoundTag>>
-getItemFromShulkerBox(std::unique_ptr<CompoundTag> tag, ItemStack& itemStack, bool replace = false, int minCount = 0) {
+inline std::optional<std::pair<CompoundTag, CompoundTag>> getItemFromShulkerBox(
+    std::unique_ptr<CompoundTag> tag,
+    ItemStack const&             itemStack,
+    bool                         replace  = false,
+    int                          minCount = 0
+) {
     if (tag && (*tag)["Name"].is_string() && (*tag)["Name"].get<StringTag>().ends_with("_shulker_box")
         && (*tag).contains("tag")) {
         auto list = (*tag)["tag"]["Items"].get<ListTag>();
