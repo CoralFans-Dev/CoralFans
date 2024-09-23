@@ -31,61 +31,86 @@ void registerDataCommand(CommandPermissionLevel permission) {
             if (self["blockPos"].has_value())
                 blockPos = self["blockPos"].get<ll::command::ParamKind::BlockPos>().getBlockPos(player->getPosition());
             else blockPos = player->traceRay(5.25f, false, true).mBlockPos;
-            output.success(functions::getBlockData(blockPos, player->getDimensionBlockSource().getBlock(blockPos)));
+            output.success(functions::getBlockData(player->getDimensionBlockSource(), blockPos));
         });
 
-    // block nbt <block|blockentity> [path]
-    ll::command::CommandRegistrar::getInstance().tryRegisterEnum(
-        "blockNbtType",
-        {
-            {"block",       0},
-            {"blockentity", 1},
-        },
-        Bedrock::type_id<CommandRegistry, std::pair<std::string,uint64>>(),
-        &CommandRegistry::parse<std::pair<std::string,uint64>>
-    );
+    // block nbt [path]
     dataCommand.runtimeOverload()
         .text("block")
         .text("nbt")
-        .required("blockNbtType", ll::command::ParamKind::Enum, "blockNbtType")
-        /* .optional("path", ll::command::ParamKind::String) */
+        .optional("path", ll::command::ParamKind::String)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             COMMAND_CHECK_PLAYER
             BlockPos    blockPos = player->traceRay(5.25f, false, true).mBlockPos;
             std::string path;
-            /* if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>(); */
-            auto rst = functions::getBlockNbt(
-                self["blockNbtType"].get<ll::command::ParamKind::Enum>().second,
-                player->getDimensionBlockSource(),
-                blockPos,
-                path
-            );
+            if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>();
+            auto rst = functions::getBlockNbt(0, player->getDimensionBlockSource(), blockPos, path);
             if (rst.second) output.success(rst.first);
             else output.error(rst.first);
         });
 
+    // blockentity nbt [path]
+    dataCommand.runtimeOverload()
+        .text("blockentity")
+        .text("nbt")
+        .optional("path", ll::command::ParamKind::String)
+        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            COMMAND_CHECK_PLAYER
+            BlockPos    blockPos = player->traceRay(5.25f, false, true).mBlockPos;
+            std::string path;
+            if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>();
+            auto rst = functions::getBlockNbt(1, player->getDimensionBlockSource(), blockPos, path);
+            if (rst.second) output.success(rst.first);
+            else output.error(rst.first);
+        });
 
-    // block <blockPos: x y z> <block|blockentity> nbt [path]
+    // block <blockPos: x y z> nbt [path]
     dataCommand.runtimeOverload()
         .text("block")
         .required("blockPos", ll::command::ParamKind::BlockPos)
         .text("nbt")
-        .required("blockNbtType", ll::command::ParamKind::Enum, "blockNbtType")
-        /* .optional("path", ll::command::ParamKind::String) */
+        .optional("path", ll::command::ParamKind::String)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             COMMAND_CHECK_PLAYER
             BlockPos blockPos =
                 self["blockPos"].get<ll::command::ParamKind::BlockPos>().getBlockPos(player->getPosition());
             std::string path;
-            /* if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>(); */
-            auto rst = functions::getBlockNbt(
-                self["blockNbtType"].get<ll::command::ParamKind::Enum>().second,
-                player->getDimensionBlockSource(),
-                blockPos,
-                path
-            );
+            if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>();
+            auto rst = functions::getBlockNbt(0, player->getDimensionBlockSource(), blockPos, path);
             if (rst.second) output.success(rst.first);
             else output.error(rst.first);
+        });
+
+    // blockentity <blockPos: x y z> nbt [path]
+    dataCommand.runtimeOverload()
+        .text("blockentity")
+        .required("blockPos", ll::command::ParamKind::BlockPos)
+        .text("nbt")
+        .optional("path", ll::command::ParamKind::String)
+        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            COMMAND_CHECK_PLAYER
+            BlockPos blockPos =
+                self["blockPos"].get<ll::command::ParamKind::BlockPos>().getBlockPos(player->getPosition());
+            std::string path;
+            if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>();
+            auto rst = functions::getBlockNbt(1, player->getDimensionBlockSource(), blockPos, path);
+            if (rst.second) output.success(rst.first);
+            else output.error(rst.first);
+        });
+
+    // blockentity highlight [radius: int] [time: int]
+    dataCommand.runtimeOverload()
+        .text("blockentity")
+        .text("highlight")
+        .optional("radius", ll::command::ParamKind::Int)
+        .optional("time", ll::command::ParamKind::Int)
+        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            COMMAND_CHECK_PLAYER
+            int radius = 16;
+            if (self["radius"].has_value()) radius = self["radius"].get<ll::command::ParamKind::Int>();
+            int time = 20;
+            if (self["time"].has_value()) time = self["time"].get<ll::command::ParamKind::Int>();
+            functions::highlightBlockEntity(player, radius, time);
         });
 
     // entity
@@ -102,11 +127,11 @@ void registerDataCommand(CommandPermissionLevel permission) {
     dataCommand.runtimeOverload()
         .text("entity")
         .text("nbt")
-        /* .optional("path", ll::command::ParamKind::String) */
-        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& /* self */) {
+        .optional("path", ll::command::ParamKind::String)
+        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             COMMAND_CHECK_PLAYER
             std::string path;
-            /* if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>(); */
+            if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>();
             auto rst = functions::getEntityNbt(player->traceRay(5.25f, true, false).getEntity(), path);
             if (rst.second) output.success(rst.first);
             else output.error(rst.first);
@@ -143,15 +168,19 @@ void registerDataCommand(CommandPermissionLevel permission) {
             else output.error(rst.first);
         });
 
-    // item nbt
-    dataCommand.runtimeOverload().text("item").text("nbt").execute(
-        [](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const&) {
+    // item nbt [path]
+    dataCommand.runtimeOverload()
+        .text("item")
+        .text("nbt")
+        .optional("path", ll::command::ParamKind::String)
+        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             COMMAND_CHECK_PLAYER
-            auto rst = functions::getItemNbt(player->getSelectedItem());
+            std::string path;
+            if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>();
+            auto rst = functions::getItemNbt(player->getSelectedItem(), path);
             if (rst.second) output.success(rst.first);
             else output.error(rst.first);
-        }
-    );
+        });
 }
 
 } // namespace coral_fans::commands
