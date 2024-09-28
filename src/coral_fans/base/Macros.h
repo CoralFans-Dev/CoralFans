@@ -27,3 +27,19 @@
     if (!newBlock) return;                                                                                             \
     blockSource.setBlock(blockPos, newBlock, 3, nullptr, nullptr);                                                     \
     return;
+
+#define COMMAND_SIMPLAYER_CHECKPERMLIST                                                                                \
+    auto& mod  = coral_fans::mod();                                                                                    \
+    auto  uuid = player->getUuid().asString();                                                                         \
+    switch (mod.getConfig().simPlayer.listType) {                                                                      \
+    case config::ListType::disabled:                                                                                   \
+        break;                                                                                                         \
+    case config::ListType::blacklist:                                                                                  \
+        if (mod.getConfig().simPlayer.list.find(uuid) != mod.getConfig().simPlayer.list.end())                         \
+            return output.error("command.sp.error.permissiondenied"_tr());                                             \
+        break;                                                                                                         \
+    case config::ListType::whitelist:                                                                                  \
+        if (mod.getConfig().simPlayer.list.find(uuid) == mod.getConfig().simPlayer.list.end())                         \
+            return output.error("command.sp.error.permissiondenied"_tr());                                             \
+        break;                                                                                                         \
+    }

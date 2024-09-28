@@ -76,7 +76,8 @@ std::pair<std::string, bool> getBlockNbt(uint64 type, BlockSource& blockSource, 
     const auto&                  block = blockSource.getBlock(blockPos);
     if (type == 0) *tag = block.getSerializationId();
     if (type == 1) {
-        if (block.hasBlockEntity()) blockSource.getBlockEntity(blockPos)->save(*tag);
+        auto blockEntity = blockSource.getBlockEntity(blockPos);
+        if (blockEntity) blockEntity->save(*tag);
         else return {"translate.data.error.noblockentity"_tr(), false};
     }
     if (path.empty()) return {tag->toSnbt(SnbtFormat::PrettyChatPrint), true};

@@ -9,6 +9,7 @@ add_requires(
     "levilamina",
     "bsci"
 )
+add_requires("boost", {configs = {all = true}})
 
 if not has_config("vs_runtime") then
     set_runtimes("MD")
@@ -31,7 +32,8 @@ target("CoralFans") -- Change this to your mod name.
     add_includedirs("src")
     add_packages(
         "levilamina",
-        "bsci"
+        "bsci",
+        "boost"
     )
     add_shflags("/DELAYLOAD:bedrock_server.dll") -- To use symbols provided by SymbolProvider.
     set_exceptions("none") -- To avoid conflicts with /EHa.

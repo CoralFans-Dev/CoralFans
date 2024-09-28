@@ -52,7 +52,7 @@ void swapItemInContainer(Container& container, int slot1, int slot2) {
 
 namespace coral_fans::functions {
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     CoralFansTweakersAutoToolHook,
     ll::memory::HookPriority::Normal,
     BlockEventCoordinator,
@@ -81,6 +81,11 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
         }
     }
     origin(player, blockPos, block, unk_char);
+}
+
+void hookTweakersAutoTool(bool hook) {
+    if (hook) CoralFansTweakersAutoToolHook::hook();
+    else CoralFansTweakersAutoToolHook::unhook();
 }
 
 } // namespace coral_fans::functions

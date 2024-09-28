@@ -15,6 +15,7 @@
 #include "ll/api/event/EventBus.h"
 #include "ll/api/event/ListenerBase.h"
 #include "ll/api/schedule/Scheduler.h"
+#include "mc/dataloadhelper/DefaultDataLoadHelper.h"
 #include <memory>
 #include <set>
 
@@ -24,7 +25,7 @@ namespace coral_fans {
 class CoralFansMod {
 private:
     std::unique_ptr<ll::data::KeyValueDB> mConfigDb;
-    Config                                mConfig;
+    config::Config                        mConfig;
     std::unique_ptr<bsci::GeometryGroup>  mGeometryGroup;
     functions::HsaManager                 mHsaManager;
     functions::HopperCounterManager       mHopperCounterManager;
@@ -35,10 +36,11 @@ private:
     ll::schedule::GameTickScheduler       mTickScheduler;
     functions::HudHelper                  mHudHelper;
     functions::SimPlayerManager           mSimPlayerManager;
+    DefaultDataLoadHelper*                mDefaultDataLoadHelper;
 
 public:
     inline std::unique_ptr<ll::data::KeyValueDB>& getConfigDb() { return this->mConfigDb; }
-    inline Config&                                getConfig() { return this->mConfig; }
+    inline config::Config&                        getConfig() { return this->mConfig; }
     inline std::unique_ptr<bsci::GeometryGroup>&  getGeometryGroup() { return this->mGeometryGroup; }
     inline functions::HsaManager&                 getHsaManager() { return this->mHsaManager; }
     inline functions::HopperCounterManager&       getHopperCounterManager() { return this->mHopperCounterManager; }
@@ -50,6 +52,7 @@ public:
     inline functions::CFVillageManager&           getVillageManager() { return this->mVillageManager; }
     inline ll::schedule::GameTickScheduler&       getTickScheduler() { return this->mTickScheduler; }
     inline functions::SimPlayerManager&           getSimPlayerManager() { return this->mSimPlayerManager; }
+    inline DefaultDataLoadHelper*&                getDefaultDataLoadHelper() { return this->mDefaultDataLoadHelper; }
 
 public:
     void tick();

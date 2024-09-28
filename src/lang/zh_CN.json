@@ -131,7 +131,12 @@
             }
         },
         "sp": {
-            "description": "假人"
+            "description": "假人",
+            "success": "操作成功",
+            "error": {
+                "toomanyobj": "对象过多",
+                "permissiondenied": "权限拒绝"
+            }
         }
     },
     "translate": {
@@ -183,6 +188,27 @@
         },
         "cfhud": {
             "base": "Tick: {}\n位置: {}\n视角: {}\n区块: {}\n方块: {} 亮度: {}\n速度: {:.4f} ({:.2f} {:.2f} {:.2f})\n群系: {}\n"
+        },
+        "simplayer": {
+            "success": "操作成功",
+            "error": {
+                "maxspawn": "生成过太多假人，请重启服务器",
+                "exist": "已存在",
+                "toomanyonline": "在线假人过多",
+                "toomanyown": "拥有假人过多",
+                "toomanygroup": "存在组过多",
+                "cannotcreate": "无法创建假人",
+                "notfound": "找不到对象",
+                "permissiondenied": "权限拒绝",
+                "rmself": "无法从列表中删除你自身",
+                "statuserror": "状态异常",
+                "notempty": "假人物品栏非空"
+            },
+            "info": {
+                "online": "在线: {}",
+                "simplayer": "\n- 名称: {}\n - XUID: {}\n - 所有者UUID: {}\n - 状态: {}\n - 组: {}",
+                "group": "- 名称: {}\n - 管理员: {}\n - 假人: {}\n"
+            }
         }
     }
 }

@@ -285,7 +285,7 @@ std::pair<std::string, bool> CFVillageManager::getVillagerInfo(ActorUniqueID aui
 }
 
 // hook village tick
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     CoralFansVillageTickHook,
     ll::memory::HookPriority::Normal,
     Village,
@@ -296,6 +296,11 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 ) {
     coral_fans::mod().getVillageManager().insertVillage(this, region.getDimensionId());
     origin(tick, region);
+}
+
+void hookVillage(bool hook) {
+    if (hook) CoralFansVillageTickHook::hook();
+    else CoralFansVillageTickHook::unhook();
 }
 
 } // namespace coral_fans::functions

@@ -16,7 +16,7 @@
 namespace coral_fans::functions {
 
 // main game tick
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     CoralFansTickLevelTickHook,
     ll::memory::HookPriority::Normal,
     Level,
@@ -39,7 +39,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 }
 
 // LevelChunk tick
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     CoralFansTickLevelChunkTickHook,
     ll::memory::HookPriority::Normal,
     LevelChunk,
@@ -59,7 +59,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 }
 
 // LevelChunk tickBlocks
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     CoralFansTickLevelChunkTickBlocksHook,
     ll::memory::HookPriority::Normal,
     LevelChunk,
@@ -75,7 +75,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 }
 
 // LevelChunk tickBlockEntities
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     CoralFansTickLevelChunkTickBlockEntitiesHook,
     ll::memory::HookPriority::Normal,
     LevelChunk,
@@ -91,7 +91,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 }
 
 // BlockTickingQueue tickPendingTicks
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     CoralFansTickBlockTickingQueueTickPendingTicksHook,
     ll::memory::HookPriority::Normal,
     BlockTickingQueue,
@@ -125,7 +125,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 }
 
 // Dimension tick
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     CoralFansTickDimensionTickHook,
     ll::memory::HookPriority::Normal,
     Dimension,
@@ -140,7 +140,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 }
 
 // EntitySystems tick
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     CoralFansTickEntitySystemsTickHook,
     ll::memory::HookPriority::Normal,
     EntitySystems,
@@ -159,7 +159,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 
 // signal update
 // Dimension tickRedstone
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     CoralFansTickDimensionTickRedstoneHook,
     ll::memory::HookPriority::Normal,
     Dimension,
@@ -175,7 +175,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 
 // pending add
 // CircuitSceneGraph processPendingAdds
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     CoralFansTickCircuitSceneGraphProcessPendingAddsHook,
     ll::memory::HookPriority::Normal,
     CircuitSceneGraph,
@@ -191,7 +191,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 
 // pending update
 // CircuitSceneGraph processPendingUpdates
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     CoralFansTickCircuitSceneGraphProcessPendingUpdatesHook,
     ll::memory::HookPriority::Normal,
     CircuitSceneGraph,
@@ -208,7 +208,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 
 // pending remove
 // CircuitSceneGraph removeComponent
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     CoralFansTickCircuitSceneGraphRemoveComponentHook,
     ll::memory::HookPriority::Normal,
     CircuitSceneGraph,
@@ -226,7 +226,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 // redstone stuff end
 
 // Actor tick
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     CoralFansTickActorTickHook,
     ll::memory::HookPriority::Normal,
     Actor,
@@ -245,6 +245,36 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
                              .count);
         return res;
     } else return origin(region);
+}
+
+void hookTick(bool hook) {
+    if (hook) {
+        CoralFansTickLevelTickHook::hook();
+        CoralFansTickLevelChunkTickHook::hook();
+        CoralFansTickLevelChunkTickBlocksHook::hook();
+        CoralFansTickLevelChunkTickBlockEntitiesHook::hook();
+        CoralFansTickBlockTickingQueueTickPendingTicksHook::hook();
+        CoralFansTickDimensionTickHook::hook();
+        CoralFansTickEntitySystemsTickHook::hook();
+        CoralFansTickDimensionTickRedstoneHook::hook();
+        CoralFansTickCircuitSceneGraphProcessPendingAddsHook::hook();
+        CoralFansTickCircuitSceneGraphProcessPendingUpdatesHook::hook();
+        CoralFansTickCircuitSceneGraphRemoveComponentHook::hook();
+        CoralFansTickActorTickHook::hook();
+    } else {
+        CoralFansTickLevelTickHook::unhook();
+        CoralFansTickLevelChunkTickHook::unhook();
+        CoralFansTickLevelChunkTickBlocksHook::unhook();
+        CoralFansTickLevelChunkTickBlockEntitiesHook::unhook();
+        CoralFansTickBlockTickingQueueTickPendingTicksHook::unhook();
+        CoralFansTickDimensionTickHook::unhook();
+        CoralFansTickEntitySystemsTickHook::unhook();
+        CoralFansTickDimensionTickRedstoneHook::unhook();
+        CoralFansTickCircuitSceneGraphProcessPendingAddsHook::unhook();
+        CoralFansTickCircuitSceneGraphProcessPendingUpdatesHook::unhook();
+        CoralFansTickCircuitSceneGraphRemoveComponentHook::unhook();
+        CoralFansTickActorTickHook::unhook();
+    }
 }
 
 } // namespace coral_fans::functions

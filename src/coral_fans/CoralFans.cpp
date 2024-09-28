@@ -4,6 +4,8 @@
 
 #include "bsci/GeometryGroup.h"
 
+#include "coral_fans/functions/HookRegister.h"
+#include "ll/api/memory/Memory.h"
 #include "ll/api/mod/RegisterHelper.h"
 
 #include "ll/api/Config.h"
@@ -40,7 +42,6 @@ bool CoralFans::load() {
         return false;
     }
 
-
     // load i18n
     logger.debug("Loading I18n");
     ll::i18n::load(getSelf().getLangDir());
@@ -58,42 +59,48 @@ bool CoralFans::load() {
 }
 
 bool CoralFans::enable() {
-    getSelf().getLogger().debug("Enabling...");
+    const auto& logger = getSelf().getLogger();
+    logger.debug("Enabling...");
     auto& mod = coral_fans::mod();
 
+    // get DefaultDataLoadHelper
+    mod.getDefaultDataLoadHelper() =
+        static_cast<DefaultDataLoadHelper*>(ll::memory::resolveSymbol("??_7DefaultDataLoadHelper@@6B@"));
+    if (!mod.getDefaultDataLoadHelper()) {
+        logger.error("Cannot get DefaultDataLoadHelper from symbol.");
+        return false;
+    }
+
+    // register hooks
+    functions::hookAll(true);
+
     // register commands
-    coral_fans::commands::registerCoralfansCommand();
-    if (mod.getConfig().command.tick.enabled)
-        coral_fans::commands::registerTickCommand(mod.getConfig().command.tick.permission);
-    if (mod.getConfig().command.func.enabled)
-        coral_fans::commands::registerFuncCommand(mod.getConfig().command.func.permission);
-    if (mod.getConfig().command.self.enabled)
-        coral_fans::commands::registerSelfCommand(mod.getConfig().command.self.permission);
-    if (mod.getConfig().command.hsa.enabled)
-        coral_fans::commands::registerHsaCommand(mod.getConfig().command.hsa.permission);
+    commands::registerCoralfansCommand();
+    if (mod.getConfig().command.tick.enabled) commands::registerTickCommand(mod.getConfig().command.tick.permission);
+    if (mod.getConfig().command.func.enabled) commands::registerFuncCommand(mod.getConfig().command.func.permission);
+    if (mod.getConfig().command.self.enabled) commands::registerSelfCommand(mod.getConfig().command.self.permission);
+    if (mod.getConfig().command.hsa.enabled) commands::registerHsaCommand(mod.getConfig().command.hsa.permission);
     if (mod.getConfig().command.counter.enabled)
-        coral_fans::commands::registerCounterCommand(mod.getConfig().command.counter.permission);
-    if (mod.getConfig().command.prof.enabled)
-        coral_fans::commands::registerProfCommand(mod.getConfig().command.prof.permission);
-    if (mod.getConfig().command.slime.enabled)
-        coral_fans::commands::registerSlimeCommand(mod.getConfig().command.slime.permission);
+        commands::registerCounterCommand(mod.getConfig().command.counter.permission);
+    if (mod.getConfig().command.prof.enabled) commands::registerProfCommand(mod.getConfig().command.prof.permission);
+    if (mod.getConfig().command.slime.enabled) commands::registerSlimeCommand(mod.getConfig().command.slime.permission);
     if (mod.getConfig().command.village.enabled)
-        coral_fans::commands::registerVillageCommand(mod.getConfig().command.village.permission);
+        commands::registerVillageCommand(mod.getConfig().command.village.permission);
     if (mod.getConfig().command.rotate.enabled)
-        coral_fans::commands::registerRotateCommand(mod.getConfig().command.rotate.permission);
-    if (mod.getConfig().command.data.enabled)
-        coral_fans::commands::registerDataCommand(mod.getConfig().command.data.permission);
-    if (mod.getConfig().command.cfhud.enabled)
-        coral_fans::commands::registerCfhudCommand(mod.getConfig().command.cfhud.permission);
-    if (mod.getConfig().command.sp.enabled)
-        coral_fans::commands::registerSpCommand(mod.getConfig().command.sp.permission);
+        commands::registerRotateCommand(mod.getConfig().command.rotate.permission);
+    if (mod.getConfig().command.data.enabled) commands::registerDataCommand(mod.getConfig().command.data.permission);
+    if (mod.getConfig().command.cfhud.enabled) commands::registerCfhudCommand(mod.getConfig().command.cfhud.permission);
+    if (mod.getConfig().command.sp.enabled) commands::registerSpCommand(mod.getConfig().command.sp.permission);
 
     // register shortcuts
-    coral_fans::functions::registerShortcutsListener();
-    coral_fans::functions::registerShortcutsCommand();
+    functions::registerShortcutsListener();
+    functions::registerShortcutsCommand();
 
     // register containerreader
-    coral_fans::functions::registerContainerReader();
+    functions::registerContainerReader();
+
+    // load simplayer data
+    mod.getSimPlayerManager().load();
 
     return true;
 }
@@ -107,6 +114,9 @@ bool CoralFans::disable() {
 
     // remove tasks
     mod.getTickScheduler().clear();
+
+    // remove hooks
+    functions::hookAll(false);
 
     return true;
 }
