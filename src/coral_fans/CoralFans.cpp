@@ -4,7 +4,6 @@
 
 #include "bsci/GeometryGroup.h"
 
-#include "coral_fans/functions/HookRegister.h"
 #include "ll/api/memory/Memory.h"
 #include "ll/api/mod/RegisterHelper.h"
 
@@ -14,6 +13,7 @@
 #include "coral_fans/base/Mod.h"
 #include "coral_fans/commands/Commands.h"
 #include "coral_fans/functions/ContainerReader.h"
+#include "coral_fans/functions/HookRegister.h"
 #include "coral_fans/functions/Shortcuts.h"
 
 namespace coral_fans {
@@ -113,7 +113,7 @@ bool CoralFans::disable() {
     for (const auto& listener : mod.getEventListeners()) mod.getEventBus().removeListener(listener);
 
     // remove tasks
-    mod.getTickScheduler().clear();
+    mod.getScheduler().clear();
 
     // remove hooks
     functions::hookAll(false);

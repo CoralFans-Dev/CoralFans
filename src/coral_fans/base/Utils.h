@@ -2,10 +2,6 @@
 
 #include "coral_fans/base/Mod.h"
 
-#include "ll/api/chrono/GameChrono.h"
-#include "ll/api/schedule/Scheduler.h"
-
-#include "ll/api/schedule/Task.h"
 #include "mc/deps/core/mce/Color.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/ChunkPos.h"
@@ -53,8 +49,9 @@ inline std::string removeMinecraftPrefix(std::string const& s) { return s.find("
 inline void shortHighligntBlock(int dimid, BlockPos const& blockPos, mce::Color const& color, int time) {
     auto& mod = coral_fans::mod();
     auto  s   = mod.getGeometryGroup()->box(dimid, {blockPos, blockPos + BlockPos::ONE}, color);
-    mod.getTickScheduler().add<ll::schedule::DelayTask>(ll::chrono::ticks(time), [&, s] {
+    mod.getScheduler().add(time, [&, s] {
         mod.getGeometryGroup()->remove(s);
+        return false;
     });
 }
 
