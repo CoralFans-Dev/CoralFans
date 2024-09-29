@@ -112,11 +112,11 @@ bool CoralFans::disable() {
     // remove listeners
     for (const auto& listener : mod.getEventListeners()) mod.getEventBus().removeListener(listener);
 
-    // remove tasks
-    mod.getScheduler().clear();
-
     // remove hooks
     functions::hookAll(false);
+
+    // remove tasks
+    mod.getScheduler().clear();
 
     return true;
 }
