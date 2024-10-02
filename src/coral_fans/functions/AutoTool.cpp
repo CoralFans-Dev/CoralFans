@@ -1,4 +1,5 @@
 #include "coral_fans/base/Mod.h"
+#include "coral_fans/base/Utils.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/Container.h"
 #include "mc/world/actor/player/Player.h"
@@ -11,15 +12,16 @@
 namespace {
 
 struct ToolInfo {
-    float speed;
+    float value;
     int   slot;
     short remainDamage;
 };
 
-int searchBestToolInInv(Container& inv, int currentSlot, const Block& block, const int minDamage) {
+int searchBestToolInInv(Container& inv, int currentSlot, const Block* block, const int minDamage, bool weapon) {
+    if (!weapon && !block) return currentSlot;
     auto&    currentItem = inv.getItem(currentSlot);
     ToolInfo curInfo{
-        currentItem.getDestroySpeed(block),
+        weapon ? currentItem.getAttackDamage() : currentItem.getDestroySpeed(*block),
         currentSlot,
         currentItem.getMaxDamage() - currentItem.getDamageValue()
     };
@@ -27,33 +29,24 @@ int searchBestToolInInv(Container& inv, int currentSlot, const Block& block, con
     for (int i = 0; i < size; ++i) {
         auto& item = inv.getItem(i);
         if (item.mCount != 0) {
-            float speed        = item.getDestroySpeed(block);
+            float value        = weapon ? item.getAttackDamage() : item.getDestroySpeed(*block);
             short remainDamage = item.getMaxDamage() - item.getDamageValue();
             // skip low remainDamage tools
             if (remainDamage <= minDamage) continue;
-            if (speed >= curInfo.speed) {
-                curInfo = {speed, i, remainDamage};
+            if (value >= curInfo.value) {
+                curInfo = {value, i, remainDamage};
             }
         }
     }
     return curInfo.slot;
 }
 
-void swapItemInContainer(Container& container, int slot1, int slot2) {
-    auto i1 = container.getItem(slot1).clone();
-    auto i2 = container.getItem(slot2).clone();
-    container.removeItem(slot1, 64);
-    container.removeItem(slot2, 64);
-    container.setItem(slot1, i2);
-    container.setItem(slot2, i1);
-}
-
 } // namespace
 
 namespace coral_fans::functions {
 
-LL_TYPE_INSTANCE_HOOK(
-    CoralFansTweakersAutoToolHook,
+LL_AUTO_TYPE_INSTANCE_HOOK(
+    CoralFansTweakersAutoToolHook1,
     ll::memory::HookPriority::Normal,
     BlockEventCoordinator,
     &BlockEventCoordinator::sendBlockDestructionStarted,
@@ -73,19 +66,54 @@ LL_TYPE_INSTANCE_HOOK(
                           .getConfigDb()
                           ->get(std::format("functions.players.{}.autotool.mindamage", player.getUuid().asString()))
                           .value_or("1"));
-        int bestSlot = ::searchBestToolInInv(player.getInventory(), currentSlot, block, minDamage);
+        int bestSlot = ::searchBestToolInInv(player.getInventory(), currentSlot, &block, minDamage, false);
         if (bestSlot <= 8) {
             player.setSelectedSlot(bestSlot);
         } else {
-            ::swapItemInContainer(player.getInventory(), currentSlot, bestSlot);
+            utils::swapItemInContainer(&player, currentSlot, bestSlot);
+            player.refreshInventory();
         }
     }
     origin(player, blockPos, block, unk_char);
 }
 
+LL_AUTO_TYPE_INSTANCE_HOOK(
+    CoralFansTweakersAutoToolHook2,
+    ll::memory::HookPriority::Normal,
+    Player,
+    "?attack@Player@@UEAA_NAEAVActor@@AEBW4ActorDamageCause@@@Z",
+    bool,
+    Actor&                    actor,
+    const ::ActorDamageCause& cause
+) {
+    if (coral_fans::mod().getConfigDb()->get("functions.global.autotool") == "true"
+        && coral_fans::mod().getConfigDb()->get(std::format("functions.players.{}.autotool", this->getUuid().asString())
+           ) == "true") {
+        int currentSlot = this->getSelectedItemSlot();
+        int minDamage =
+            std::stoi(coral_fans::mod()
+                          .getConfigDb()
+                          ->get(std::format("functions.players.{}.autotool.mindamage", this->getUuid().asString()))
+                          .value_or("1"));
+        int bestSlot = ::searchBestToolInInv(this->getInventory(), currentSlot, nullptr, minDamage, true);
+        if (bestSlot <= 8) {
+            this->setSelectedSlot(bestSlot);
+        } else {
+            utils::swapItemInContainer(this, currentSlot, bestSlot);
+            this->refreshInventory();
+        }
+    }
+    return origin(actor, cause);
+}
+
 void hookTweakersAutoTool(bool hook) {
-    if (hook) CoralFansTweakersAutoToolHook::hook();
-    else CoralFansTweakersAutoToolHook::unhook();
+    if (hook) {
+        CoralFansTweakersAutoToolHook1::hook();
+        CoralFansTweakersAutoToolHook2::hook();
+    } else {
+        CoralFansTweakersAutoToolHook1::unhook();
+        CoralFansTweakersAutoToolHook2::unhook();
+    }
 }
 
 } // namespace coral_fans::functions

@@ -1,12 +1,14 @@
 #include "coral_fans/base/Utils.h"
 #include "ll/api/i18n/I18n.h"
-// #include "ll/api/utils/StringUtils.h"
+#include "ll/api/utils/StringUtils.h"
 #include "magic_enum.hpp"
 #include "mc/deps/core/mce/Color.h"
 #include "mc/nbt/CompoundTag.h"
 #include "mc/nbt/CompoundTagVariant.h"
+#include "mc/nbt/ListTag.h"
 #include "mc/nbt/Tag.h"
 #include "mc/world/actor/Actor.h"
+#include "mc/world/item/registry/ItemStack.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/block/Block.h"
@@ -17,9 +19,8 @@
 #include "mc/world/redstone/circuit/CircuitSystem.h"
 
 #include <string>
-// #include <vector>
+#include <vector>
 
-/*
 namespace {
 
 struct PathNode {
@@ -44,14 +45,40 @@ bool parsePath(std::string path, std::vector<PathNode>& vec) {
     return true;
 }
 
+std::pair<std::string, bool> getNbtFromTag(CompoundTag const tag, std::string path) {
+    using ll::i18n_literals::operator""_tr;
+    std::vector<PathNode>           nodes;
+    std::vector<CompoundTagVariant> tags;
+    if (!parsePath(path, nodes)) return {"translate.data.error.cannotparse"_tr(), false};
+    try {
+        tags.emplace_back(tag[nodes[0].id]);
+        if (nodes[0].useIndex) {
+            if (tags.back().is_array() && tags.back().get<ListTag>().getCompound(nodes[0].index))
+                tags.emplace_back(*(tags.back().get<ListTag>().getCompound(nodes[0].index)));
+            else return {"translate.data.error.notanarray"_tr(), false};
+        }
+        for (unsigned long long i = 1; i < nodes.size(); ++i) {
+            tags.emplace_back(tags.back()[nodes[i].id]);
+            if (nodes[i].useIndex) {
+                if (tags.back().is_array() && tags.back().get<ListTag>().getCompound(nodes[i].index))
+                    tags.emplace_back(*(tags.back().get<ListTag>().getCompound(nodes[i].index)));
+                else return {"translate.data.error.notanarray"_tr(), false};
+            }
+        }
+        return {tags.back().toSnbt(SnbtFormat::PrettyChatPrint), true};
+    } catch (...) {
+        return {"translate.data.error.geterror"_tr(), false};
+    }
+}
+
 } // namespace
-*/
 
 namespace coral_fans::functions {
 
-std::string getBlockData(BlockPos blockPos, Block const& block) {
+std::string getBlockData(BlockSource& blockSource, BlockPos blockPos) {
     using ll::i18n_literals::operator""_tr;
-    const auto& m = block.getMaterial();
+    const auto& block = blockSource.getBlock(blockPos);
+    const auto& m     = block.getMaterial();
     return "translate.data.info.block"_tr(
         blockPos.toString(),
         block.buildDescriptionName(),
@@ -62,6 +89,7 @@ std::string getBlockData(BlockPos blockPos, Block const& block) {
         block.canInstatick(),
         block.hasBlockEntity(),
         block.isSolid(),
+        block.hasComparatorSignal() ? std::to_string(block.getComparatorSignal(blockSource, blockPos, 0)) : "-",
         m.getBlocksMotion(),
         m.isTopSolid(false, false),
         m.isSolid(),
@@ -81,33 +109,7 @@ std::pair<std::string, bool> getBlockNbt(uint64 type, BlockSource& blockSource, 
         else return {"translate.data.error.noblockentity"_tr(), false};
     }
     if (path.empty()) return {tag->toSnbt(SnbtFormat::PrettyChatPrint), true};
-    else {
-        /*
-        // has bug
-        // cannot get items from a ListTag
-        // e.g. Item[0].Block -> wrong message!
-        std::vector<::PathNode> nodes;
-        if (!parsePath(path, nodes)) return {"translate.data.error.cannotparse"_tr(), false};
-        try {
-            CompoundTagVariant tagVariant = (*tag)[nodes[0].id];
-            if (nodes[0].useIndex) {
-                if (tagVariant.is_array()) tagVariant = tagVariant[nodes[0].index];
-                else return {"translate.data.error.notanarray"_tr(), false};
-            }
-            for (unsigned long long i = 1; i < nodes.size(); ++i) {
-                tagVariant = tagVariant[nodes[i].id];
-                if (nodes[i].useIndex) {
-                    if (tagVariant.is_array()) tagVariant = tagVariant[nodes[i].index];
-                    else return {"translate.data.error.notanarray"_tr(), false};
-                }
-            }
-            return {tagVariant.toSnbt(), true};
-        } catch (...) {
-            return {"translate.data.error.geterror"_tr(), false};
-        }
-        */
-        return {"", true};
-    }
+    else return getNbtFromTag(*tag, path);
 }
 
 std::pair<std::string, bool> getEntityData(Actor* actor) {
@@ -133,7 +135,7 @@ std::pair<std::string, bool> getEntityNbt(Actor* actor, std::string path) {
     std::unique_ptr<CompoundTag> tag = std::make_unique<CompoundTag>();
     actor->save(*tag);
     if (path.empty()) return {tag->toSnbt(SnbtFormat::PrettyChatPrint), true};
-    else return {"", true};
+    else return getNbtFromTag(*tag, path);
 }
 
 std::pair<std::string, bool> showRedstoneComponentsInfo(Dimension& dimension, BlockPos& pos, uint64 type) {
@@ -166,6 +168,8 @@ std::pair<std::string, bool> showRedstoneComponentsInfo(Dimension& dimension, Bl
     }
     if (type == 2) {
         // info
+        auto& blockSource = dimension.getBlockSourceFromMainChunkSource();
+        auto& block       = blockSource.getBlock(pos);
         return {
             "translate.data.info.redstone.info"_tr(
                 component->getStrength(),
@@ -173,7 +177,8 @@ std::pair<std::string, bool> showRedstoneComponentsInfo(Dimension& dimension, Bl
                 component->canConsumerPower() ? "true" : "false",
                 component->canStopPower() ? "true" : "false",
                 component->isHalfPulse() ? "true" : "false",
-                magic_enum::enum_name(component->mDirection)
+                magic_enum::enum_name(component->mDirection),
+                block.hasComparatorSignal() ? std::to_string(block.getComparatorSignal(blockSource, pos, 0)) : "-"
             ),
             true
         };
@@ -190,6 +195,42 @@ std::pair<std::string, bool> showRedstoneComponentsInfo(Dimension& dimension, Bl
         return {"", true};
     }
     return {"", false};
+}
+
+std::pair<std::string, bool> getItemNbt(ItemStack const& item, std::string path) {
+    using ll::i18n_literals::operator""_tr;
+    auto tag = item.save();
+    if (path.empty()) {
+        if (tag) return {tag->toSnbt(SnbtFormat::PrettyChatPrint), true};
+        else return {"translate.data.error.geterror"_tr(), false};
+    } else return getNbtFromTag(*tag, path);
+}
+
+void highlightBlockEntity(Player* player, int radius, int time) {
+    if (player) {
+        int               dimid  = player->getDimensionId();
+        auto              origin = player->getPosition();
+        Vec3              offset{radius, radius, radius};
+        static int        colorindex = 0;
+        static std::array colors{
+            mce::Color::BLACK,
+            mce::Color::BLUE,
+            mce::Color::CYAN,
+            mce::Color::GREEN,
+            mce::Color::GREY,
+            mce::Color::MINECOIN_GOLD,
+            mce::Color::ORANGE,
+            mce::Color::PINK,
+            mce::Color::PURPLE,
+            mce::Color::REBECCA_PURPLE,
+            mce::Color::RED,
+            mce::Color::WHITE,
+            mce::Color::YELLOW
+        };
+        for (auto blockActor : player->getDimensionBlockSource().fetchBlockEntities({origin - offset, origin + offset}))
+            if (blockActor) utils::shortHighligntBlock(dimid, blockActor->getPosition(), colors[colorindex], time);
+        colorindex = (colorindex + 1) % 13;
+    }
 }
 
 } // namespace coral_fans::functions

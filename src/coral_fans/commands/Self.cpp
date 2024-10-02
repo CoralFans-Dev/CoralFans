@@ -83,5 +83,35 @@ void registerSelfCommand(CommandPermissionLevel permission) {
                 output.success("command.self.containerreader.success"_tr((param.isopen & global) ? "true" : "false"));
             else output.error("command.self.containerreader.error"_tr());
         });
+
+    // self autototem <bool>
+    selfCommand.overload<SelfIsOpenParam>()
+        .text("autototem")
+        .required("isopen")
+        .execute([](CommandOrigin const& origin, CommandOutput& output, SelfIsOpenParam const& param) {
+            COMMAND_CHECK_PLAYER
+            const auto global = coral_fans::mod().getConfigDb()->get("functions.global.autototem") == "true";
+            if (coral_fans::mod().getConfigDb()->set(
+                    std::format("functions.players.{}.autototem", player->getUuid().asString()),
+                    (param.isopen & global) ? "true" : "false"
+                ))
+                output.success("command.self.autototem.success"_tr((param.isopen & global) ? "true" : "false"));
+            else output.error("command.self.autototem.error"_tr());
+        });
+
+    // self autoitem <bool>
+    selfCommand.overload<SelfIsOpenParam>()
+        .text("autoitem")
+        .required("isopen")
+        .execute([](CommandOrigin const& origin, CommandOutput& output, SelfIsOpenParam const& param) {
+            COMMAND_CHECK_PLAYER
+            const auto global = coral_fans::mod().getConfigDb()->get("functions.global.autoitem") == "true";
+            if (coral_fans::mod().getConfigDb()->set(
+                    std::format("functions.players.{}.autoitem", player->getUuid().asString()),
+                    (param.isopen & global) ? "true" : "false"
+                ))
+                output.success("command.self.autoitem.success"_tr((param.isopen & global) ? "true" : "false"));
+            else output.error("command.self.autoitem.error"_tr());
+        });
 }
 } // namespace coral_fans::commands
