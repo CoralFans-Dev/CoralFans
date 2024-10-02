@@ -202,7 +202,9 @@
                 "permissiondenied": "权限拒绝",
                 "rmself": "无法从列表中删除你自身",
                 "statuserror": "状态异常",
-                "notempty": "假人物品栏非空"
+                "notempty": "假人物品栏非空",
+                "nonpositive": "时间间隔必须为正整数",
+                "nonfree": "假人忙"
             },
             "info": {
                 "online": "在线: {}",

@@ -49,7 +49,7 @@ inline std::string removeMinecraftPrefix(std::string const& s) { return s.find("
 inline void shortHighligntBlock(int dimid, BlockPos const& blockPos, mce::Color const& color, int time) {
     auto& mod = coral_fans::mod();
     auto  s   = mod.getGeometryGroup()->box(dimid, {blockPos, blockPos + BlockPos::ONE}, color);
-    mod.getScheduler().add(time, [&, s] {
+    mod.getScheduler().add(time, [&, s](unsigned long long) {
         mod.getGeometryGroup()->remove(s);
         return false;
     });

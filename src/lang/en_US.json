@@ -202,7 +202,9 @@
                 "permissiondenied": "Permission Denied",
                 "rmself": "Cannot remove yourself from list",
                 "statuserror": "Status error",
-                "notempty": "SimPlayer Inventory not empty"
+                "notempty": "SimPlayer Inventory not empty",
+                "nonpositive": "interval must be positive",
+                "nonfree": "SimPlayer Busy"
             },
             "info": {
                 "online": "Online: {}",

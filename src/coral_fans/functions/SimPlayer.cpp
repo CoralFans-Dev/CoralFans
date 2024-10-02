@@ -1,5 +1,6 @@
 #include "coral_fans/functions/SimPlayer.h"
 #include "coral_fans/CoralFans.h"
+#include "coral_fans/base/Macros.h"
 #include "coral_fans/base/Mod.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/i18n/I18n.h"
@@ -20,6 +21,7 @@
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/item/registry/ItemStack.h"
 #include "mc/world/level/Level.h"
+#include "mc/world/level/LevelStorageManager.h"
 #include <boost/algorithm/string/join.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
@@ -387,6 +389,8 @@ SimPlayerManager::spawnSimPlayer(Player* player, std::string const& name, Vec3 c
         );
         spIt->second.status    = SimPlayerStatus::Alive;
         spIt->second.simPlayer = simPlayer;
+        spIt->second.scheduler = this->mScheduler;
+        spIt->second.taskid    = 0;
     } else {
         auto* simPlayer = SimulatedPlayer::create(
             spname,
@@ -399,7 +403,7 @@ SimPlayerManager::spawnSimPlayer(Player* player, std::string const& name, Vec3 c
         simPlayer->setPlayerGameType(player->getPlayerGameType());
         simPlayer->teleport(pos, player->getDimensionId(), rot);
         // add to map
-        SimPlayerInfo info{
+        const auto& info = SimPlayerInfo{
             spname,
             "-" + std::to_string(std::hash<std::string>()(spname)),
             player->getUuid().asString(),
@@ -412,8 +416,10 @@ SimPlayerManager::spawnSimPlayer(Player* player, std::string const& name, Vec3 c
             rot.x,
             rot.y,
             std::string{magic_enum::enum_name(player->getPlayerGameType())},
-            true,
-            simPlayer
+            sputils::emptyInv(simPlayer),
+            simPlayer,
+            this->mScheduler,
+            0
         };
         this->mNameSimPlayerMap[spname] = info;
         this->mOwnerNameMap[player->getUuid().asString()].emplace(spname);
@@ -468,6 +474,7 @@ SimPlayerManager::despawnSimPlayer(Player* player, std::string const& spname, bo
             it->second.offlineRotY     = it->second.simPlayer->getRotation().y;
             it->second.offlineGameType = magic_enum::enum_name(it->second.simPlayer->getPlayerGameType());
             it->second.offlineEmptyInv = sputils::emptyInv(it->second.simPlayer);
+            it->second.stop();
             it->second.simPlayer->simulateDisconnect();
             it->second.simPlayer = nullptr;
         };
@@ -581,6 +588,14 @@ void SimPlayerManager::setDead(std::string const& spname) {
     it->second.status = SimPlayerStatus::Dead;
 }
 
+SP_DEF(Stop, stop)
+SP_DEF_WA(Sneaking, sneaking, bool)
+SP_DEF_WA(Swimming, swimming, bool)
+SP_DEF_TASK(Attack, attack)
+SP_DEF_TASK_WA(Chat, chat, std::string const&)
+SP_DEF_TASK(Destroy, destroy)
+SP_DEF(DropSelectedItem, dropSelectedItem)
+
 LL_TYPE_INSTANCE_HOOK(
     CoralFansSimPlayerDieEventHook,
     ll::memory::HookPriority::Normal,
@@ -610,13 +625,29 @@ LL_TYPE_INSTANCE_HOOK(
     return origin();
 }
 
+LL_TYPE_INSTANCE_HOOK(
+    CoralFansSimPlayerDataSaveHook,
+    ll::memory::HookPriority::Normal,
+    LevelStorageManager,
+    &LevelStorageManager::saveGameData,
+    void,
+    std::chrono::steady_clock::time_point unknown
+) {
+    auto& mod = coral_fans::mod();
+    mod.getLogger().debug("call LevelStorageManager::saveGameData");
+    mod.getSimPlayerManager().save();
+    origin(unknown);
+}
+
 void hookSimPlayer(bool hook) {
     if (hook) {
         CoralFansSimPlayerDieEventHook::hook();
         CoralFansSimPlayerServerStopSaveHook::hook();
+        CoralFansSimPlayerDataSaveHook::hook();
     } else {
         CoralFansSimPlayerDieEventHook::unhook();
         CoralFansSimPlayerServerStopSaveHook::unhook();
+        CoralFansSimPlayerDataSaveHook::unhook();
     }
 }
 

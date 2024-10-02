@@ -7,7 +7,8 @@ add_repositories("liteldev-repo https://github.com/LiteLDev/xmake-repo.git")
 -- please note that you should add bdslibrary yourself if using dev version
 add_requires(
     "levilamina",
-    "bsci"
+    "bsci",
+    "lua 5.4.7"
 )
 add_requires("boost", {configs = {all = true}})
 
@@ -33,7 +34,8 @@ target("CoralFans") -- Change this to your mod name.
     add_packages(
         "levilamina",
         "bsci",
-        "boost"
+        "boost",
+        "lua"
     )
     add_shflags("/DELAYLOAD:bedrock_server.dll") -- To use symbols provided by SymbolProvider.
     set_exceptions("none") -- To avoid conflicts with /EHa.
