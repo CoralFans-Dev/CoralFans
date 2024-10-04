@@ -2,13 +2,22 @@
 
 #include "coral_fans/base/Macros.h"
 #include "coral_fans/base/TimeWheel.h"
+#include "coral_fans/base/Utils.h"
+#include "ll/api/service/Bedrock.h"
+#include "mc/entity/utilities/ActorEquipment.h"
 #include "mc/external/scripting/gametest/ScriptNavigationResult.h"
 #include "mc/math/Vec2.h"
 #include "mc/math/Vec3.h"
 #include "mc/scripting/modules/minecraft/ScriptFacing.h"
 #include "mc/server/SimulatedPlayer.h"
+#include "mc/server/commands/CommandContext.h"
+#include "mc/server/commands/MinecraftCommands.h"
+#include "mc/server/commands/PlayerCommandOrigin.h"
 #include "mc/server/sim/LookDuration.h"
+#include "mc/world/Minecraft.h"
+#include "mc/world/SimpleContainer.h"
 #include "mc/world/attribute/AttributeInstance.h"
+#include "mc/world/item/registry/ItemStack.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/phys/HitResultType.h"
 #include <boost/serialization/access.hpp>
@@ -111,10 +120,94 @@ public:
             else return false;
         }
         inline bool dropSelectedItem() { return simPlayer->simulateDropSelectedItem(); }
+        inline bool dropInv() {
+            bool rst = true;
+            if (simPlayer->getSelectedItem() != ItemStack::EMPTY_ITEM) rst &= simPlayer->simulateDropSelectedItem();
+            int   sel  = simPlayer->getSelectedItemSlot();
+            auto& inv  = simPlayer->getInventory();
+            int   size = inv.getContainerSize();
+            for (int i = 0; i < size; ++i) {
+                if (i == sel || inv.getItem(i) == ItemStack::EMPTY_ITEM) continue;
+                utils::swapItemInContainer(simPlayer, sel, i);
+                rst &= simPlayer->simulateDropSelectedItem();
+            }
+            return rst;
+        }
+        inline void swap(Player* player) {
+            // get data
+            auto&      spInv     = simPlayer->getInventory();
+            const auto spOffhand = simPlayer->getOffhandSlot();
+            auto&      spArmor   = ActorEquipment::getArmorContainer(simPlayer->getEntityContext());
+            auto&      pInv      = player->getInventory();
+            const auto pOffhand  = player->getOffhandSlot();
+            auto&      pArmor    = ActorEquipment::getArmorContainer(player->getEntityContext());
+            auto       spEnder   = simPlayer->getEnderChestContainer();
+            auto       pEnder    = player->getEnderChestContainer();
+            // swap offhand
+            player->setOffhandSlot(spOffhand);
+            simPlayer->setOffhandSlot(pOffhand);
+            // swap inv
+            int spInvSize = spInv.getContainerSize();
+            if (spInvSize == pInv.getContainerSize())
+                for (int i = 0; i < spInvSize; ++i) {
+                    const auto spItem = spInv.getItem(i);
+                    const auto pItem  = pInv.getItem(i);
+                    spInv.setItem(i, pItem);
+                    pInv.setItem(i, spItem);
+                }
+            // swap armor
+            int spArmorSize = spArmor.getContainerSize();
+            if (spArmorSize == pArmor.getContainerSize())
+                for (int i = 0; i < spArmorSize; ++i) {
+                    const auto spItem = spArmor.getItem(i);
+                    const auto pItem  = pArmor.getItem(i);
+                    spArmor.setItem(i, pItem);
+                    pArmor.setItem(i, spItem);
+                }
+            // swap enderchest
+            int spEnderSize = spEnder->getContainerSize();
+            if (spEnder.has_value() && pEnder.has_value() && spEnderSize == pEnder->getContainerSize())
+                for (int i = 0; i < spEnderSize; ++i) {
+                    const auto spItem = spEnder->getItem(i);
+                    const auto pItem  = pEnder->getItem(i);
+                    spEnder->setItem(i, pItem);
+                    pEnder->setItem(i, spItem);
+                }
+            // refresh
+            player->refreshInventory();
+        }
+        inline bool runCmd(std::string const& cmd) {
+            CommandContext ctx(cmd, std::make_unique<PlayerCommandOrigin>(PlayerCommandOrigin(*simPlayer)));
+            auto           mc = ll::service::getMinecraft();
+            if (mc) {
+                auto rst = mc->getCommands().executeCommand(ctx);
+                return rst.isSuccess();
+            }
+            return false;
+        }
+        inline bool select(int id) {
+            auto& inv  = simPlayer->getInventory();
+            int   size = inv.getContainerSize();
+            int   sel  = simPlayer->getSelectedItemSlot();
+            for (int i = 0; i < size; ++i) {
+                if (i == sel) continue;
+                if (inv.getItem(i).getId() == id) {
+                    utils::swapItemInContainer(simPlayer, sel, i);
+                    return true;
+                }
+            }
+            return false;
+        }
         inline bool interact() { return simPlayer->simulateInteract(); }
         inline bool jump() { return simPlayer->simulateJump(); }
-        inline bool useItemInSlot(int slot) { return simPlayer->simulateUseItemInSlot(slot); }
-        inline void startBuildInSlot(int slot) { simPlayer->simulateStartBuildInSlot(slot); }
+        inline void useItem(int delay) {
+            simPlayer->simulateUseItemInSlot(simPlayer->getSelectedItemSlot());
+            taskid = scheduler->add(delay, [sp = this->simPlayer](unsigned long long) {
+                if (sp) sp->simulateStopUsingItem();
+                return false;
+            });
+        }
+        inline void startBuild() { simPlayer->simulateStartBuildInSlot(simPlayer->getSelectedItemSlot()); }
         inline void lookAt(Vec3 const& pos) { simPlayer->simulateLookAt(pos, ::sim::LookDuration{}); }
         inline void moveTo(Vec3 const& pos) { simPlayer->simulateMoveToLocation(pos, 4.3f, true); }
         inline void navigateTo(Vec3 const& pos) { simPlayer->simulateNavigateToLocation(pos, 4.3f); }
@@ -221,6 +314,17 @@ public:
     SP_REG_DEF(Chat, std::string const&, int, int)
     SP_REG_DEF(Destroy, int, int)
     SP_REG_DEF(DropSelectedItem)
+    SP_REG_DEF(DropInv)
+    std::pair<std::string, bool> simPlayerSwap(Player*, std::string const&);
+    SP_REG_DEF(RunCmd, std::string const&, int, int)
+    SP_REG_DEF(Select, int)
+    SP_REG_DEF(Interact, int, int)
+    SP_REG_DEF(Jump, int, int)
+    SP_REG_DEF(Use, int, int, int)
+    SP_REG_DEF(Build, int, int)
+    SP_REG_DEF(LookAt, Vec3 const&)
+    SP_REG_DEF(MoveTo, Vec3 const&)
+    SP_REG_DEF(NavTo, Vec3 const&)
 };
 
 } // namespace coral_fans::functions

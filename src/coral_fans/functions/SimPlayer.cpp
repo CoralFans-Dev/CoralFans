@@ -11,6 +11,7 @@
 #include "mc/deps/core/mce/UUID.h"
 #include "mc/entity/utilities/ActorEquipment.h"
 #include "mc/enums/GameType.h"
+#include "mc/math/Vec3.h"
 #include "mc/nbt/CompoundTag.h"
 #include "mc/nbt/Tag.h"
 #include "mc/server/ServerInstance.h"
@@ -539,7 +540,8 @@ std::pair<std::string, bool> SimPlayerManager::rmGroup(Player* player, std::stri
     if (adminIt->second.find(player->getUuid().asString()) == adminIt->second.end())
         return {"translate.simplayer.error.permissiondenied"_tr(), false};
     // run
-    for (auto const& v : it->second) this->rmSimPlayer(player, v, true);
+    while (!this->mGroupNameMap.find(gname)->second.empty())
+        this->rmSimPlayer(player, *(this->mGroupNameMap.find(gname)->second.begin()), true);
     // return
     return {"translate.simplayer.success"_tr(), true};
 }
@@ -595,6 +597,29 @@ SP_DEF_TASK(Attack, attack)
 SP_DEF_TASK_WA(Chat, chat, std::string const&)
 SP_DEF_TASK(Destroy, destroy)
 SP_DEF(DropSelectedItem, dropSelectedItem)
+SP_DEF(DropInv, dropInv)
+std::pair<std::string, bool> SimPlayerManager::simPlayerSwap(Player* player, std::string const& spname) {
+    using ll::i18n_literals::operator""_tr;
+    auto uuid = player->getUuid();
+    auto it   = this->mNameSimPlayerMap.find(spname);
+    if (it == this->mNameSimPlayerMap.end()) return {"translate.simplayer.error.notfound"_tr(), false};
+    if (player->getCommandPermissionLevel() >= coral_fans::mod().getConfig().simPlayer.adminPermission
+        || uuid == it->second.ownerUuid) {
+        if (it->second.status != SimPlayerStatus::Alive) return {"translate.simplayer.error.statuserror"_tr(), false};
+        if (it->second.simPlayer) it->second.swap(player);
+        return {"translate.simplayer.success"_tr(), true};
+    }
+    return {"translate.simplayer.error.permissiondenied"_tr(), false};
+}
+SP_DEF_TASK_WA(RunCmd, runCmd, std::string const&)
+SP_DEF_WA(Select, select, int)
+SP_DEF_TASK(Interact, interact)
+SP_DEF_TASK(Jump, jump)
+SP_DEF_TASK_WA(Use, useItem, int)
+SP_DEF_TASK(Build, startBuild)
+SP_DEF_WA(LookAt, lookAt, Vec3 const&)
+SP_DEF_WA(MoveTo, moveTo, Vec3 const&)
+SP_DEF_WA(NavTo, navigateTo, Vec3 const&)
 
 LL_TYPE_INSTANCE_HOOK(
     CoralFansSimPlayerDieEventHook,

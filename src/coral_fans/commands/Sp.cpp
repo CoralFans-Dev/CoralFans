@@ -9,6 +9,7 @@
 #include "ll/api/i18n/I18n.h"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
+#include "mc/world/phys/HitResultType.h"
 #include <functional>
 #include <memory>
 #include <span>
@@ -452,14 +453,14 @@ void registerSpCommand(CommandPermissionLevel permission) {
         }
     );
 
-    std::array<std::pair<std::string, ll::command::ParamKind::Kind>, 1> chatArg{
+    std::array<std::pair<std::string, ll::command::ParamKind::Kind>, 1> msgArg{
         std::make_pair("message", ll::command::ParamKind::RawText)
     };
 
     ::regSubCmd(
         spCommand,
         "chat",
-        chatArg,
+        msgArg,
         taskArg,
         [](Player* player, ll::command::RuntimeCommand const& self) {
             return coral_fans::mod().getSimPlayerManager().simPlayerChat(
@@ -522,6 +523,312 @@ void registerSpCommand(CommandPermissionLevel permission) {
             return coral_fans::mod().getSimPlayerManager().groupDropSelectedItem(
                 player,
                 self["name"].get<ll::command::ParamKind::SoftEnum>()
+            );
+        }
+    );
+
+    ::regSubCmd(
+        spCommand,
+        "dropinv",
+        {},
+        {},
+        [](Player* player, ll::command::RuntimeCommand const& self) {
+            return coral_fans::mod().getSimPlayerManager().simPlayerDropInv(
+                player,
+                self["name"].get<ll::command::ParamKind::SoftEnum>(),
+                false
+            );
+        },
+        [](Player* player, ll::command::RuntimeCommand const& self) {
+            return coral_fans::mod().getSimPlayerManager().groupDropInv(
+                player,
+                self["name"].get<ll::command::ParamKind::SoftEnum>()
+            );
+        }
+    );
+
+    spCommand.runtimeOverload()
+        .text("p")
+        .required("name", ll::command::ParamKind::SoftEnum, "spname")
+        .text("swap")
+        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            COMMAND_CHECK_PLAYER
+            COMMAND_SIMPLAYER_CHECKPERMLIST
+            auto rst = coral_fans::mod().getSimPlayerManager().simPlayerSwap(
+                player,
+                self["name"].get<ll::command::ParamKind::SoftEnum>()
+            );
+            if (rst.second) output.success(rst.first);
+            else output.error(rst.first);
+        });
+
+    std::array<std::pair<std::string, ll::command::ParamKind::Kind>, 1> strArg{
+        std::make_pair("str", ll::command::ParamKind::String)
+    };
+
+    ::regSubCmd(
+        spCommand,
+        "runcmd",
+        strArg,
+        taskArg,
+        [](Player* player, ll::command::RuntimeCommand const& self) {
+            return coral_fans::mod().getSimPlayerManager().simPlayerRunCmd(
+                player,
+                self["name"].get<ll::command::ParamKind::SoftEnum>(),
+                false,
+                self["str"].get<ll::command::ParamKind::String>(),
+                self["interval"].has_value() ? self["interval"].get<ll::command::ParamKind::Int>() : 20,
+                self["times"].has_value() ? self["times"].get<ll::command::ParamKind::Int>() : 1
+            );
+        },
+        [](Player* player, ll::command::RuntimeCommand const& self) {
+            return coral_fans::mod().getSimPlayerManager().groupRunCmd(
+                player,
+                self["name"].get<ll::command::ParamKind::SoftEnum>(),
+                self["str"].get<ll::command::ParamKind::String>(),
+                self["interval"].has_value() ? self["interval"].get<ll::command::ParamKind::Int>() : 20,
+                self["times"].has_value() ? self["times"].get<ll::command::ParamKind::Int>() : 1
+            );
+        }
+    );
+
+    std::array<std::pair<std::string, ll::command::ParamKind::Kind>, 1> itemArg{
+        std::make_pair("item", ll::command::ParamKind::Item)
+    };
+
+    ::regSubCmd(
+        spCommand,
+        "select",
+        itemArg,
+        {},
+        [](Player* player, ll::command::RuntimeCommand const& self) {
+            return coral_fans::mod().getSimPlayerManager().simPlayerSelect(
+                player,
+                self["name"].get<ll::command::ParamKind::SoftEnum>(),
+                false,
+                self["item"].get<ll::command::ParamKind::Item>().getId()
+            );
+        },
+        [](Player* player, ll::command::RuntimeCommand const& self) {
+            return coral_fans::mod().getSimPlayerManager().groupSelect(
+                player,
+                self["name"].get<ll::command::ParamKind::SoftEnum>(),
+                self["item"].get<ll::command::ParamKind::Item>().getId()
+            );
+        }
+    );
+
+    ::regSubCmd(
+        spCommand,
+        "interact",
+        {},
+        taskArg,
+        [](Player* player, ll::command::RuntimeCommand const& self) {
+            return coral_fans::mod().getSimPlayerManager().simPlayerInteract(
+                player,
+                self["name"].get<ll::command::ParamKind::SoftEnum>(),
+                false,
+                self["interval"].has_value() ? self["interval"].get<ll::command::ParamKind::Int>() : 20,
+                self["times"].has_value() ? self["times"].get<ll::command::ParamKind::Int>() : 1
+            );
+        },
+        [](Player* player, ll::command::RuntimeCommand const& self) {
+            return coral_fans::mod().getSimPlayerManager().groupInteract(
+                player,
+                self["name"].get<ll::command::ParamKind::SoftEnum>(),
+                self["interval"].has_value() ? self["interval"].get<ll::command::ParamKind::Int>() : 20,
+                self["times"].has_value() ? self["times"].get<ll::command::ParamKind::Int>() : 1
+            );
+        }
+    );
+
+    ::regSubCmd(
+        spCommand,
+        "jump",
+        {},
+        taskArg,
+        [](Player* player, ll::command::RuntimeCommand const& self) {
+            return coral_fans::mod().getSimPlayerManager().simPlayerJump(
+                player,
+                self["name"].get<ll::command::ParamKind::SoftEnum>(),
+                false,
+                self["interval"].has_value() ? self["interval"].get<ll::command::ParamKind::Int>() : 20,
+                self["times"].has_value() ? self["times"].get<ll::command::ParamKind::Int>() : 1
+            );
+        },
+        [](Player* player, ll::command::RuntimeCommand const& self) {
+            return coral_fans::mod().getSimPlayerManager().groupJump(
+                player,
+                self["name"].get<ll::command::ParamKind::SoftEnum>(),
+                self["interval"].has_value() ? self["interval"].get<ll::command::ParamKind::Int>() : 20,
+                self["times"].has_value() ? self["times"].get<ll::command::ParamKind::Int>() : 1
+            );
+        }
+    );
+
+    std::array<std::pair<std::string, ll::command::ParamKind::Kind>, 3> useTaskArg{
+        std::make_pair("tick", ll::command::ParamKind::Int),
+        std::make_pair("interval", ll::command::ParamKind::Int),
+        std::make_pair("times", ll::command::ParamKind::Int)
+    };
+
+    ::regSubCmd(
+        spCommand,
+        "use",
+        {},
+        useTaskArg,
+        [](Player* player, ll::command::RuntimeCommand const& self) {
+            return coral_fans::mod().getSimPlayerManager().simPlayerUse(
+                player,
+                self["name"].get<ll::command::ParamKind::SoftEnum>(),
+                false,
+                self["tick"].has_value() ? self["tick"].get<ll::command::ParamKind::Int>() : 40,
+                self["interval"].has_value() ? self["interval"].get<ll::command::ParamKind::Int>() : 20,
+                self["times"].has_value() ? self["times"].get<ll::command::ParamKind::Int>() : 1
+            );
+        },
+        [](Player* player, ll::command::RuntimeCommand const& self) {
+            return coral_fans::mod().getSimPlayerManager().groupUse(
+                player,
+                self["name"].get<ll::command::ParamKind::SoftEnum>(),
+                self["tick"].has_value() ? self["tick"].get<ll::command::ParamKind::Int>() : 40,
+                self["interval"].has_value() ? self["interval"].get<ll::command::ParamKind::Int>() : 20,
+                self["times"].has_value() ? self["times"].get<ll::command::ParamKind::Int>() : 1
+            );
+        }
+    );
+
+    ::regSubCmd(
+        spCommand,
+        "build",
+        {},
+        taskArg,
+        [](Player* player, ll::command::RuntimeCommand const& self) {
+            return coral_fans::mod().getSimPlayerManager().simPlayerBuild(
+                player,
+                self["name"].get<ll::command::ParamKind::SoftEnum>(),
+                false,
+                self["interval"].has_value() ? self["interval"].get<ll::command::ParamKind::Int>() : 20,
+                self["times"].has_value() ? self["times"].get<ll::command::ParamKind::Int>() : 1
+            );
+        },
+        [](Player* player, ll::command::RuntimeCommand const& self) {
+            return coral_fans::mod().getSimPlayerManager().groupBuild(
+                player,
+                self["name"].get<ll::command::ParamKind::SoftEnum>(),
+                self["interval"].has_value() ? self["interval"].get<ll::command::ParamKind::Int>() : 20,
+                self["times"].has_value() ? self["times"].get<ll::command::ParamKind::Int>() : 1
+            );
+        }
+    );
+
+    std::array<std::pair<std::string, ll::command::ParamKind::Kind>, 1> posArg{
+        std::make_pair("pos", ll::command::ParamKind::Vec3)
+    };
+
+    ::regSubCmd(
+        spCommand,
+        "lookat",
+        {},
+        posArg,
+        [](Player* player, ll::command::RuntimeCommand const& self) {
+            Vec3 pos;
+            if (self["pos"].has_value())
+                pos = self["pos"].get<ll::command::ParamKind::Vec3>().getPosition(player->getFeetPos());
+            else {
+                const auto& hit = player->traceRay(5.25f);
+                if (hit.mType == HitResultType::Entity) pos = hit.getEntity()->getPosition();
+                else if (hit.mType == HitResultType::Tile) pos = hit.mPos;
+                else pos = player->getPosition();
+            }
+            return coral_fans::mod()
+                .getSimPlayerManager()
+                .simPlayerLookAt(player, self["name"].get<ll::command::ParamKind::SoftEnum>(), false, pos);
+        },
+        [](Player* player, ll::command::RuntimeCommand const& self) {
+            Vec3 pos;
+            if (self["pos"].has_value())
+                pos = self["pos"].get<ll::command::ParamKind::Vec3>().getPosition(player->getFeetPos());
+            else {
+                const auto& hit = player->traceRay(5.25f);
+                if (hit.mType == HitResultType::Entity) pos = hit.getEntity()->getPosition();
+                else if (hit.mType == HitResultType::Tile) pos = hit.mPos;
+                else pos = player->getPosition();
+            }
+            return coral_fans::mod().getSimPlayerManager().groupLookAt(
+                player,
+                self["name"].get<ll::command::ParamKind::SoftEnum>(),
+                pos
+            );
+        }
+    );
+
+    ::regSubCmd(
+        spCommand,
+        "moveto",
+        {},
+        posArg,
+        [](Player* player, ll::command::RuntimeCommand const& self) {
+            Vec3 pos;
+            if (self["pos"].has_value())
+                pos = self["pos"].get<ll::command::ParamKind::Vec3>().getPosition(player->getFeetPos());
+            else {
+                const auto& hit = player->traceRay(5.25f, false, true);
+                if (hit) pos = hit.mPos;
+                else pos = player->getFeetPos();
+            }
+            return coral_fans::mod()
+                .getSimPlayerManager()
+                .simPlayerMoveTo(player, self["name"].get<ll::command::ParamKind::SoftEnum>(), false, pos);
+        },
+        [](Player* player, ll::command::RuntimeCommand const& self) {
+            Vec3 pos;
+            if (self["pos"].has_value())
+                pos = self["pos"].get<ll::command::ParamKind::Vec3>().getPosition(player->getFeetPos());
+            else {
+                const auto& hit = player->traceRay(5.25f, false, true);
+                if (hit) pos = hit.mPos;
+                else pos = player->getFeetPos();
+            }
+            return coral_fans::mod().getSimPlayerManager().groupMoveTo(
+                player,
+                self["name"].get<ll::command::ParamKind::SoftEnum>(),
+                pos
+            );
+        }
+    );
+
+    ::regSubCmd(
+        spCommand,
+        "navto",
+        {},
+        posArg,
+        [](Player* player, ll::command::RuntimeCommand const& self) {
+            Vec3 pos;
+            if (self["pos"].has_value())
+                pos = self["pos"].get<ll::command::ParamKind::Vec3>().getPosition(player->getFeetPos());
+            else {
+                const auto& hit = player->traceRay(5.25f, false, true);
+                if (hit) pos = hit.mPos;
+                else pos = player->getFeetPos();
+            }
+            return coral_fans::mod()
+                .getSimPlayerManager()
+                .simPlayerNavTo(player, self["name"].get<ll::command::ParamKind::SoftEnum>(), false, pos);
+        },
+        [](Player* player, ll::command::RuntimeCommand const& self) {
+            Vec3 pos;
+            if (self["pos"].has_value())
+                pos = self["pos"].get<ll::command::ParamKind::Vec3>().getPosition(player->getFeetPos());
+            else {
+                const auto& hit = player->traceRay(5.25f, false, true);
+                if (hit) pos = hit.mPos;
+                else pos = player->getFeetPos();
+            }
+            return coral_fans::mod().getSimPlayerManager().groupNavTo(
+                player,
+                self["name"].get<ll::command::ParamKind::SoftEnum>(),
+                pos
             );
         }
     );
