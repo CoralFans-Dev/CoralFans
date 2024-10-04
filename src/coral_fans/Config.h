@@ -2,9 +2,10 @@
 
 #include "mc/server/commands/CommandPermissionLevel.h"
 #include <string>
+#include <unordered_set>
 #include <vector>
 
-namespace coral_fans {
+namespace coral_fans::config {
 
 struct CommandConfigStruct {
     bool                   enabled;
@@ -23,6 +24,7 @@ struct CommandStruct {
     CommandConfigStruct rotate  = {true, CommandPermissionLevel::Any};
     CommandConfigStruct data    = {true, CommandPermissionLevel::Any};
     CommandConfigStruct cfhud   = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct sp      = {true, CommandPermissionLevel::Any};
 };
 
 struct Shortcut {
@@ -37,9 +39,27 @@ struct Shortcut {
     std::vector<std::string> actions;
 };
 
+enum class ListType : int { disabled, blacklist, whitelist };
+
+struct SimPlayerStruct {
+    std::string                     namePrefix      = "SIM-";
+    std::string                     namePostfix     = "";
+    unsigned long long              maxOnline       = 16;
+    unsigned long long              maxOwn          = 4;
+    unsigned long long              maxGroup        = 8;
+    unsigned long long              maxSpawnCount   = 128;
+    CommandPermissionLevel          adminPermission = CommandPermissionLevel::GameDirectors;
+    ListType                        listType        = ListType::disabled;
+    std::unordered_set<std::string> list;
+};
+
 struct Config {
     int         version    = 2;
     std::string locateName = "zh_CN";
+
+    int cfhudRefreshTime = 20;
+
+    SimPlayerStruct simPlayer;
 
     CommandStruct         command;
     std::vector<Shortcut> shortcuts = {
@@ -92,4 +112,4 @@ struct Config {
     };
 };
 
-} // namespace coral_fans
+} // namespace coral_fans::config

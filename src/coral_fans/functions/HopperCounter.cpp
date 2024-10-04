@@ -105,7 +105,7 @@ int HopperCounterManager::getViewChannel(BlockSource& blockSource, HitResult hit
     else return -1;
 }
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     CoralFansFunctionsHopperCounterHook1,
     ll::memory::HookPriority::Normal,
     HopperBlockActor,
@@ -117,7 +117,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     origin(region);
 }
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     CoralFansFunctionsHopperCounterHook2,
     ll::memory::HookPriority::Normal,
     HopperBlockActor,
@@ -154,6 +154,16 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     );
     // remove item
     origin(slot, ItemStack::EMPTY_ITEM);
+}
+
+void hookFunctionsHopperCounter(bool hook) {
+    if (hook) {
+        CoralFansFunctionsHopperCounterHook1::hook();
+        CoralFansFunctionsHopperCounterHook2::hook();
+    } else {
+        CoralFansFunctionsHopperCounterHook1::unhook();
+        CoralFansFunctionsHopperCounterHook2::unhook();
+    }
 }
 
 } // namespace coral_fans::functions

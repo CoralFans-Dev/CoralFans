@@ -10,7 +10,7 @@
 
 namespace coral_fans::functions {
 // force open
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     CoralFansTweakersForceOpenHook,
     ll::memory::HookPriority::Normal,
     ChestBlockActor,
@@ -23,7 +23,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 }
 
 // force place
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     CoralFansTweakersForcePlaceHook,
     ll::memory::HookPriority::Normal,
     BlockSource,
@@ -43,7 +43,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 }
 
 // noclip
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     CoralFansTweakersNoClipHook,
     ll::memory::HookPriority::Normal,
     ServerPlayer,
@@ -59,7 +59,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 }
 
 // droppernocost
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     CoralFansTweakersDropperNoCostHook,
     ll::memory::HookPriority::Normal,
     Container,
@@ -72,7 +72,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 }
 
 // safeexplode
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     CoralFansTweakersSafeExplodeHook,
     ll::memory::HookPriority::Normal,
     Explosion,
@@ -82,4 +82,21 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     if (coral_fans::mod().getConfigDb()->get("functions.global.safeexplode") != "true") return origin();
     else return false;
 }
+
+void hookTweakers(bool hook) {
+    if (hook) {
+        CoralFansTweakersForceOpenHook::hook();
+        CoralFansTweakersForcePlaceHook::hook();
+        CoralFansTweakersNoClipHook::hook();
+        CoralFansTweakersDropperNoCostHook::hook();
+        CoralFansTweakersSafeExplodeHook::hook();
+    } else {
+        CoralFansTweakersForceOpenHook::unhook();
+        CoralFansTweakersForcePlaceHook::unhook();
+        CoralFansTweakersNoClipHook::unhook();
+        CoralFansTweakersDropperNoCostHook::unhook();
+        CoralFansTweakersSafeExplodeHook::unhook();
+    }
+}
+
 } // namespace coral_fans::functions

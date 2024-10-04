@@ -106,4 +106,14 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     return origin(actor, cause);
 }
 
+void hookTweakersAutoTool(bool hook) {
+    if (hook) {
+        CoralFansTweakersAutoToolHook1::hook();
+        CoralFansTweakersAutoToolHook2::hook();
+    } else {
+        CoralFansTweakersAutoToolHook1::unhook();
+        CoralFansTweakersAutoToolHook2::unhook();
+    }
+}
+
 } // namespace coral_fans::functions

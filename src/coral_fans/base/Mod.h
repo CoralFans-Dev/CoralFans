@@ -3,27 +3,28 @@
 #include "bsci/GeometryGroup.h"
 #include "coral_fans/Config.h"
 #include "coral_fans/CoralFans.h"
+#include "coral_fans/base/TimeWheel.h"
 #include "coral_fans/functions/HopperCounter.h"
 #include "coral_fans/functions/Hsa.h"
 #include "coral_fans/functions/Hud.h"
 #include "coral_fans/functions/Prof.h"
+#include "coral_fans/functions/SimPlayer.h"
 #include "coral_fans/functions/Slime.h"
 #include "coral_fans/functions/Village.h"
 #include "ll/api/Logger.h"
 #include "ll/api/data/KeyValueDB.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/event/ListenerBase.h"
-#include "ll/api/schedule/Scheduler.h"
+#include "mc/dataloadhelper/DefaultDataLoadHelper.h"
 #include <memory>
 #include <set>
-
 
 namespace coral_fans {
 
 class CoralFansMod {
 private:
     std::unique_ptr<ll::data::KeyValueDB> mConfigDb;
-    Config                                mConfig;
+    config::Config                        mConfig;
     std::unique_ptr<bsci::GeometryGroup>  mGeometryGroup;
     functions::HsaManager                 mHsaManager;
     functions::HopperCounterManager       mHopperCounterManager;
@@ -31,12 +32,17 @@ private:
     functions::Profiler                   mProfiler;
     functions::SlimeManager               mSlimeManager;
     functions::CFVillageManager           mVillageManager;
-    ll::schedule::GameTickScheduler       mTickScheduler;
+    timewheel::TimeWheel                  mScheduler;
     functions::HudHelper                  mHudHelper;
+    functions::SimPlayerManager           mSimPlayerManager;
+    DefaultDataLoadHelper*                mDefaultDataLoadHelper;
+
+public:
+    CoralFansMod() : mScheduler(1200) {}
 
 public:
     inline std::unique_ptr<ll::data::KeyValueDB>& getConfigDb() { return this->mConfigDb; }
-    inline Config&                                getConfig() { return this->mConfig; }
+    inline config::Config&                        getConfig() { return this->mConfig; }
     inline std::unique_ptr<bsci::GeometryGroup>&  getGeometryGroup() { return this->mGeometryGroup; }
     inline functions::HsaManager&                 getHsaManager() { return this->mHsaManager; }
     inline functions::HopperCounterManager&       getHopperCounterManager() { return this->mHopperCounterManager; }
@@ -46,7 +52,9 @@ public:
     inline functions::Profiler&                   getProfiler() { return this->mProfiler; }
     inline functions::SlimeManager&               getSlimeManager() { return this->mSlimeManager; }
     inline functions::CFVillageManager&           getVillageManager() { return this->mVillageManager; }
-    inline ll::schedule::GameTickScheduler&       getTickScheduler() { return this->mTickScheduler; }
+    inline timewheel::TimeWheel&                  getScheduler() { return this->mScheduler; }
+    inline functions::SimPlayerManager&           getSimPlayerManager() { return this->mSimPlayerManager; }
+    inline DefaultDataLoadHelper*&                getDefaultDataLoadHelper() { return this->mDefaultDataLoadHelper; }
 
 public:
     void tick();
