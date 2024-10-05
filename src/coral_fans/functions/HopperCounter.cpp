@@ -93,6 +93,7 @@ void HopperCounterManager::tick() {
 }
 
 int HopperCounterManager::getViewChannel(BlockSource& blockSource, HitResult hitrst) {
+    if (!hitrst) return -1;
     const auto&                                          dest = blockSource.getBlock(hitrst.mBlockPos);
     std::unordered_map<std::string, int>::const_iterator it;
     if (utils::removeMinecraftPrefix(dest.getTypeName()) == "hopper") {

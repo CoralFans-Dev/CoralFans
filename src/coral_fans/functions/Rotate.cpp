@@ -8,6 +8,7 @@
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/block/Block.h"
+#include "mc/world/level/block/actor/BlockActor.h"
 
 #include <string>
 #include <unordered_map>

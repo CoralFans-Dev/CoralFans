@@ -105,14 +105,14 @@ public:
             }
         }
         inline bool attack() {
-            const auto& hit = simPlayer->traceRay(5.25f);
-            if (hit.mType == HitResultType::Entity) return simPlayer->simulateAttack(hit.getEntity());
+            const auto& hit = simPlayer->traceRay(5.25f, true, false);
+            if (hit) return simPlayer->simulateAttack(hit.getEntity());
             else return false;
         }
         inline void chat(std::string const& msg) { simPlayer->simulateChat(msg); }
         inline bool destroy() {
-            const auto& hit = simPlayer->traceRay(5.25f);
-            if (hit.mType == HitResultType::Tile)
+            const auto& hit = simPlayer->traceRay(5.25f, false, true);
+            if (hit)
                 return simPlayer->simulateDestroyBlock(
                     hit.mBlockPos,
                     static_cast<ScriptModuleMinecraft::ScriptFacing>(hit.mFacing)

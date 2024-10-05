@@ -25,9 +25,19 @@
     newTag["states"][tag] = tagType(next->second);                                                                     \
     auto newBlock         = Block::tryGetFromRegistry(newTag);                                                         \
     if (!newBlock) return;                                                                                             \
-    blockSource.setBlock(blockPos, Block::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);                   \
-    blockSource.setBlock(blockPos, newBlock, 3, nullptr, nullptr);                                                     \
-    return;
+    BlockActor* blockEntity = blockSource.getBlockEntity(blockPos);                                                    \
+    if (blockEntity) {                                                                                                 \
+        std::unique_ptr<CompoundTag> blockEntityTag = std::make_unique<CompoundTag>();                                 \
+        blockEntity->save(*blockEntityTag);                                                                            \
+        blockSource.removeBlockEntity(blockPos);                                                                       \
+        blockSource.setBlock(blockPos, Block::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);               \
+        blockSource.setBlock(blockPos, newBlock, 3, BlockActor::create(*blockEntityTag), nullptr, nullptr);            \
+        return;                                                                                                        \
+    } else {                                                                                                           \
+        blockSource.setBlock(blockPos, Block::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);               \
+        blockSource.setBlock(blockPos, newBlock, 3, nullptr, nullptr);                                                 \
+        return;                                                                                                        \
+    }
 
 #define COMMAND_SIMPLAYER_CHECKPERMLIST                                                                                \
     auto& mod  = coral_fans::mod();                                                                                    \

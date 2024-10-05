@@ -1,10 +1,12 @@
 #pragma once
 
+#include "ll/api/base/StdInt.h"
 #include "mc/world/level/ChunkPos.h"
 
 #include <deque>
 #include <map>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace coral_fans::functions {
@@ -81,8 +83,9 @@ struct EntityInfo {
 };
 
 struct Profiler {
-    enum class Type : int { normal, entity, chunk, pt };
-    Profiler::Type                                        type         = Type::normal;
+    enum Type : uint64 { normal, entity, chunk, pt };
+    static std::vector<std::pair<std::string, uint64>>    TypeVec;
+    uint64                                                type         = Type::normal;
     bool                                                  profiling    = false;
     long long                                             totalRound   = 100;
     long long                                             currentRound = 0;
@@ -101,8 +104,8 @@ struct Profiler {
     std::string printPendingTicks() const;
     std::string printBasics() const;
     std::string printActor() const;
-    void        reset(Profiler::Type type);
-    void        start(long long round, Profiler::Type type = Type::normal);
+    void        reset(uint64);
+    void        start(long long, uint64 = Type::normal);
     void        stop();
 };
 

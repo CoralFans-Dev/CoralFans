@@ -106,18 +106,16 @@ LL_TYPE_INSTANCE_HOOK(
     auto& prof = coral_fans::mod().getProfiler();
     if (prof.profiling) {
         bool res;
-        /*
-        // 0xC0000005
-        // also tried offset 16 40
-        auto* queue = (std::vector<BlockTickingQueue::BlockTick>*)((char*)this + 64);
-        if (queue->empty()) {
-            auto tickData                   = (*queue)[0].mData;
+        // from
+        // https://github.com/glibcxx/figure_hack/blob/f74b0badc2a2397f811282a3cdda3725f7e13c55/src/figure_hack/Function/PendingTickVisualization.cpp#L56
+        auto mNextTickQueue = ll::memory::dAccess<std::vector<BlockTickingQueue::BlockTick>>(this, 16);
+        if (!mNextTickQueue.empty()) {
+            auto tickData                   = mNextTickQueue.front().mData;
             auto chunkPos                   = utils::blockPosToChunkPos(tickData.mPos);
             auto dimId                      = static_cast<int>(region.getDimensionId());
             auto current                    = prof.ptCounter[dimId][chunkPos];
-            prof.ptCounter[dimId][chunkPos] = std::max(current, queue->size());
+            prof.ptCounter[dimId][chunkPos] = std::max(current, mNextTickQueue.size());
         }
-        */
         PROF_TIMER(chunk_pt, { res = origin(region, until, max, instaTick_); })
         prof.chunkInfo.pendingTickTime += time_chunk_pt;
         return res;

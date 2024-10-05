@@ -29,8 +29,12 @@ void registerDataCommand(CommandPermissionLevel permission) {
             COMMAND_CHECK_PLAYER
             BlockPos blockPos;
             if (self["blockPos"].has_value())
-                blockPos = self["blockPos"].get<ll::command::ParamKind::BlockPos>().getBlockPos(player->getPosition());
-            else blockPos = player->traceRay(5.25f, false, true).mBlockPos;
+                blockPos = self["blockPos"].get<ll::command::ParamKind::BlockPos>().getBlockPos(player->getFeetPos());
+            else {
+                const auto& hitrst = player->traceRay(5.25f, false, true);
+                if (!hitrst) return output.error("command.data.error"_tr());
+                blockPos = hitrst.mBlockPos;
+            }
             output.success(functions::getBlockData(player->getDimensionBlockSource(), blockPos));
         });
 
@@ -41,7 +45,9 @@ void registerDataCommand(CommandPermissionLevel permission) {
         .optional("path", ll::command::ParamKind::String)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             COMMAND_CHECK_PLAYER
-            BlockPos    blockPos = player->traceRay(5.25f, false, true).mBlockPos;
+            const auto& hitrst = player->traceRay(5.25f, false, true);
+            if (!hitrst) return output.error("command.data.error"_tr());
+            BlockPos    blockPos = hitrst.mBlockPos;
             std::string path;
             if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>();
             auto rst = functions::getBlockNbt(0, player->getDimensionBlockSource(), blockPos, path);
@@ -56,7 +62,9 @@ void registerDataCommand(CommandPermissionLevel permission) {
         .optional("path", ll::command::ParamKind::String)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             COMMAND_CHECK_PLAYER
-            BlockPos    blockPos = player->traceRay(5.25f, false, true).mBlockPos;
+            const auto& hitrst = player->traceRay(5.25f, false, true);
+            if (!hitrst) return output.error("command.data.error"_tr());
+            BlockPos    blockPos = hitrst.mBlockPos;
             std::string path;
             if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>();
             auto rst = functions::getBlockNbt(1, player->getDimensionBlockSource(), blockPos, path);
@@ -73,7 +81,7 @@ void registerDataCommand(CommandPermissionLevel permission) {
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             COMMAND_CHECK_PLAYER
             BlockPos blockPos =
-                self["blockPos"].get<ll::command::ParamKind::BlockPos>().getBlockPos(player->getPosition());
+                self["blockPos"].get<ll::command::ParamKind::BlockPos>().getBlockPos(player->getFeetPos());
             std::string path;
             if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>();
             auto rst = functions::getBlockNbt(0, player->getDimensionBlockSource(), blockPos, path);
@@ -90,7 +98,7 @@ void registerDataCommand(CommandPermissionLevel permission) {
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             COMMAND_CHECK_PLAYER
             BlockPos blockPos =
-                self["blockPos"].get<ll::command::ParamKind::BlockPos>().getBlockPos(player->getPosition());
+                self["blockPos"].get<ll::command::ParamKind::BlockPos>().getBlockPos(player->getFeetPos());
             std::string path;
             if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>();
             auto rst = functions::getBlockNbt(1, player->getDimensionBlockSource(), blockPos, path);
@@ -117,7 +125,9 @@ void registerDataCommand(CommandPermissionLevel permission) {
     dataCommand.runtimeOverload().text("entity").execute(
         [](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const&) {
             COMMAND_CHECK_PLAYER
-            auto rst = functions::getEntityData(player->traceRay(5.25f, true, false).getEntity());
+            const auto& hitrst = player->traceRay(5.25f, true, false);
+            if (!hitrst) return output.error("command.data.error"_tr());
+            auto rst = functions::getEntityData(hitrst.getEntity());
             if (rst.second) output.success(rst.first);
             else output.error(rst.first);
         }
@@ -132,7 +142,9 @@ void registerDataCommand(CommandPermissionLevel permission) {
             COMMAND_CHECK_PLAYER
             std::string path;
             if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>();
-            auto rst = functions::getEntityNbt(player->traceRay(5.25f, true, false).getEntity(), path);
+            const auto& hitrst = player->traceRay(5.25f, true, false);
+            if (!hitrst) return output.error("command.data.error"_tr());
+            auto rst = functions::getEntityNbt(hitrst.getEntity(), path);
             if (rst.second) output.success(rst.first);
             else output.error(rst.first);
         });
@@ -157,8 +169,12 @@ void registerDataCommand(CommandPermissionLevel permission) {
             COMMAND_CHECK_PLAYER
             BlockPos blockPos;
             if (self["blockPos"].has_value())
-                blockPos = self["blockPos"].get<ll::command::ParamKind::BlockPos>().getBlockPos(player->getPosition());
-            else blockPos = player->traceRay(5.25f, false, true).mBlockPos;
+                blockPos = self["blockPos"].get<ll::command::ParamKind::BlockPos>().getBlockPos(player->getFeetPos());
+            else {
+                const auto& hitrst = player->traceRay(5.25f, false, true);
+                if (!hitrst) return output.error("command.data.error"_tr());
+                blockPos = hitrst.mBlockPos;
+            }
             auto rst = functions::showRedstoneComponentsInfo(
                 player->getDimension(),
                 blockPos,
@@ -180,6 +196,21 @@ void registerDataCommand(CommandPermissionLevel permission) {
             auto rst = functions::getItemNbt(player->getSelectedItem(), path);
             if (rst.second) output.success(rst.first);
             else output.error(rst.first);
+        });
+
+    // player <player: Player> uuid
+    dataCommand.runtimeOverload()
+        .text("player")
+        .required("player", ll::command::ParamKind::Actor)
+        .text("uuid")
+        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            const auto actors = self["player"].get<ll::command::ParamKind::Actor>().results(origin);
+            for (const auto& i : actors) {
+                if (i && i->isType(ActorType::Player)) {
+                    Player* pl = static_cast<Player*>(i);
+                    output.success("{} = {}", pl->getRealName(), pl->getUuid().asString());
+                }
+            }
         });
 }
 
