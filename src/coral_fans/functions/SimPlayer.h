@@ -19,7 +19,6 @@
 #include "mc/world/attribute/AttributeInstance.h"
 #include "mc/world/item/registry/ItemStack.h"
 #include "mc/world/level/BlockPos.h"
-#include "mc/world/phys/HitResultType.h"
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/unordered_map.hpp>
