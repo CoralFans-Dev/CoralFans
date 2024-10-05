@@ -197,6 +197,21 @@ void registerDataCommand(CommandPermissionLevel permission) {
             if (rst.second) output.success(rst.first);
             else output.error(rst.first);
         });
+
+    // player <player: Player> uuid
+    dataCommand.runtimeOverload()
+        .text("player")
+        .required("player", ll::command::ParamKind::Actor)
+        .text("uuid")
+        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            const auto actors = self["player"].get<ll::command::ParamKind::Actor>().results(origin);
+            for (const auto& i : actors) {
+                if (i && i->isType(ActorType::Player)) {
+                    Player* pl = static_cast<Player*>(i);
+                    output.success("{} = {}", pl->getRealName(), pl->getUuid().asString());
+                }
+            }
+        });
 }
 
 } // namespace coral_fans::commands
