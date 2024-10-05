@@ -13,7 +13,9 @@
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/biome/Biome.h"
+#include "mc/world/phys/HitResultType.h"
 #include <algorithm>
+#include <string>
 
 namespace coral_fans::functions {
 
@@ -58,8 +60,11 @@ void HudHelper::tick() {
                         player.getPosition().toString(),
                         player.getViewVector(1.0f).toString(),
                         utils::blockPosToChunkPos(player.getFeetBlockPos()).toString(),
-                        hitrst.mBlockPos.toString(),
-                        blockSource.getRawBrightness(hitrst.mBlockPos + BlockPos{0, 1, 0}, true, true).value,
+                        hitrst.mType == HitResultType::Tile ? hitrst.mBlockPos.toString() : "-",
+                        hitrst.mType == HitResultType::Tile ? std::to_string(
+                            blockSource.getRawBrightness(hitrst.mBlockPos + BlockPos{0, 1, 0}, true, true).value
+                        )
+                                                                    : "-",
                         delta.length() * 20,
                         delta.x * 20,
                         delta.y * 20,
@@ -68,14 +73,18 @@ void HudHelper::tick() {
                     );
                 }
                 if (hud & (1 << HudHelper::HudType::redstone)) {
-                    auto rst  = showRedstoneComponentsInfo(player.getDimension(), hitrst.mBlockPos, 2);
-                    msg      += rst.first + "\n";
+                    if (hitrst.mType == HitResultType::Tile) {
+                        auto rst  = showRedstoneComponentsInfo(player.getDimension(), hitrst.mBlockPos, 2);
+                        msg      += rst.first + "\n";
+                    }
                 }
                 if (hud & (1 << HudHelper::HudType::village)) {
-                    auto* entity = hitrst.getEntity();
-                    if (entity) {
-                        auto rst  = mod.getVillageManager().getVillagerInfo(entity->getOrCreateUniqueID());
-                        msg      += rst.first + "\n";
+                    if (hitrst.mType == HitResultType::Entity) {
+                        auto* entity = hitrst.getEntity();
+                        if (entity) {
+                            auto rst  = mod.getVillageManager().getVillagerInfo(entity->getOrCreateUniqueID());
+                            msg      += rst.first + "\n";
+                        }
                     }
                 }
                 if (hud & (1 << HudHelper::HudType::hopper)) {

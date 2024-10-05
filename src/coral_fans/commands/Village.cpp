@@ -74,8 +74,9 @@ void registerVillageCommand(CommandPermissionLevel permission) {
     // village dweller
     villageCommand.overload().text("dweller").execute([](CommandOrigin const& origin, CommandOutput& output) {
         COMMAND_CHECK_PLAYER
-        auto  hitrst = player->traceRay(5.25f, true, false);
-        auto* actor  = hitrst.getEntity();
+        auto hitrst = player->traceRay(5.25f, true, false);
+        if (!hitrst) return output.error("command.village.dweller.noactor"_tr());
+        auto* actor = hitrst.getEntity();
         if (!actor) return output.error("command.village.dweller.noactor"_tr());
         else {
             auto rst = coral_fans::mod().getVillageManager().getVillagerInfo(actor->getOrCreateUniqueID());

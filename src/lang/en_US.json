@@ -136,7 +136,8 @@
             "description": "Blockrotate"
         },
         "data": {
-            "description": "Get data of blocks and entities"
+            "description": "Get data of blocks and entities",
+            "error": "cannot get target"
         },
         "cfhud": {
             "description": "Set HUD info",

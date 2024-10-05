@@ -136,7 +136,8 @@
             "description": "旋转方块"
         },
         "data": {
-            "description": "获取方块或实体数据"
+            "description": "获取方块或实体数据",
+            "error": "无法获取目标"
         },
         "cfhud": {
             "description": "设置HUD显示信息",

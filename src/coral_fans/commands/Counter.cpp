@@ -34,10 +34,11 @@ void registerCounterCommand(CommandPermissionLevel permission) {
                 output.success(coral_fans::mod().getHopperCounterManager().getChannel(param.channel).info());
             } else {
                 COMMAND_CHECK_PLAYER
-                auto  hitrst = player->traceRay(5.25f, false, true, [](BlockSource const&, Block const& block, bool) {
+                auto hitrst = player->traceRay(5.25f, false, true, [](BlockSource const&, Block const& block, bool) {
                     if (block.getMaterial().isLiquid()) return false;
                     return true;
                 });
+                if (!hitrst) return output.error("command.counter.print.error"_tr());
                 auto& blockSource = player->getDimensionBlockSource();
                 int   ch          = functions::HopperCounterManager::getViewChannel(blockSource, hitrst);
                 if (ch == -1) return output.error("command.counter.print.error"_tr());
@@ -54,10 +55,11 @@ void registerCounterCommand(CommandPermissionLevel permission) {
                 output.success("command.counter.reset.success"_tr(param.channel.value()));
             } else {
                 COMMAND_CHECK_PLAYER
-                auto  hitrst = player->traceRay(5.25f, false, true, [](BlockSource const&, Block const& block, bool) {
+                auto hitrst = player->traceRay(5.25f, false, true, [](BlockSource const&, Block const& block, bool) {
                     if (block.getMaterial().isLiquid()) return false;
                     return true;
                 });
+                if (!hitrst) return output.error("command.counter.print.error"_tr());
                 auto& blockSource = player->getDimensionBlockSource();
                 int   ch          = functions::HopperCounterManager::getViewChannel(blockSource, hitrst);
                 if (ch == -1) return output.error("command.counter.reset.error"_tr(ch));

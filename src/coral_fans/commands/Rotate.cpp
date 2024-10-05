@@ -20,6 +20,7 @@ void registerRotateCommand(CommandPermissionLevel permission) {
     rotateCommand.overload().execute([](CommandOrigin const& origin, CommandOutput& output) {
         COMMAND_CHECK_PLAYER
         auto hitrst = player->traceRay(5.25f, false, true);
+        if (!hitrst) return;
         functions::rotateBlock(player, hitrst.mBlockPos);
     });
 }
