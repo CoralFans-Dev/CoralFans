@@ -3,6 +3,9 @@
 
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
+#include "ll/api/command/runtime/ParamKind.h"
+#include "ll/api/command/runtime/RuntimeCommand.h"
+#include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
@@ -17,50 +20,46 @@ void registerSelfCommand(CommandPermissionLevel permission) {
     auto& selfCommand = ll::command::CommandRegistrar::getInstance()
                             .getOrCreateCommand("self", "command.self.description"_tr(), permission);
 
-    struct SelfIsOpenParam {
-        bool isopen;
-    };
-
     // self noclip <bool>
-    selfCommand.overload<SelfIsOpenParam>().text("noclip").required("isopen").execute(
-        [](CommandOrigin const& origin, CommandOutput& output, SelfIsOpenParam const& param) {
+    selfCommand.runtimeOverload()
+        .text("noclip")
+        .required("isopen", ll::command::ParamKind::Bool)
+        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             COMMAND_CHECK_PLAYER
+            bool       isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
             const auto global = coral_fans::mod().getConfigDb()->get("functions.global.noclip") == "true";
             if (coral_fans::mod().getConfigDb()->set(
                     std::format("functions.players.{}.noclip", player->getUuid().asString()),
-                    (param.isopen & global) ? "true" : "false"
+                    (isopen & global) ? "true" : "false"
                 ))
-                output.success("command.self.noclip.success"_tr((param.isopen & global) ? "true" : "false"));
+                output.success("command.self.noclip.success"_tr((isopen & global) ? "true" : "false"));
             else output.error("command.self.noclip.error"_tr());
-        }
-    );
+        });
 
     // self autotool <bool>
-    selfCommand.overload<SelfIsOpenParam>()
+    selfCommand.runtimeOverload()
         .text("autotool")
-        .required("isopen")
-        .execute([](CommandOrigin const& origin, CommandOutput& output, SelfIsOpenParam const& param) {
+        .required("isopen", ll::command::ParamKind::Bool)
+        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             COMMAND_CHECK_PLAYER
+            bool       isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
             const auto global = coral_fans::mod().getConfigDb()->get("functions.global.autotool") == "true";
             if (coral_fans::mod().getConfigDb()->set(
                     std::format("functions.players.{}.autotool", player->getUuid().asString()),
-                    (param.isopen & global) ? "true" : "false"
+                    (isopen & global) ? "true" : "false"
                 ))
-                output.success("command.self.autotool.success"_tr((param.isopen & global) ? "true" : "false"));
+                output.success("command.self.autotool.success"_tr((isopen & global) ? "true" : "false"));
             else output.error("command.self.autotool.error"_tr());
         });
 
     // self autotool mindamage <int>
-    struct SelfAutoToolMinDamageParam {
-        int mindamage;
-    };
-    selfCommand.overload<SelfAutoToolMinDamageParam>()
+    selfCommand.runtimeOverload()
         .text("autotool")
         .text("mindamage")
-        .required("mindamage")
-        .execute([](CommandOrigin const& origin, CommandOutput& output, SelfAutoToolMinDamageParam const& param) {
+        .required("mindamage", ll::command::ParamKind::Int)
+        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             COMMAND_CHECK_PLAYER
-            auto minDamageString = std::to_string(param.mindamage);
+            auto minDamageString = std::to_string(self["mindamage"].get<ll::command::ParamKind::Int>());
             if (coral_fans::mod().getConfigDb()->set(
                     std::format("functions.players.{}.autotool.mindamage", player->getUuid().asString()),
                     minDamageString
@@ -70,47 +69,50 @@ void registerSelfCommand(CommandPermissionLevel permission) {
         });
 
     // self containerreader <bool>
-    selfCommand.overload<SelfIsOpenParam>()
+    selfCommand.runtimeOverload()
         .text("containerreader")
-        .required("isopen")
-        .execute([](CommandOrigin const& origin, CommandOutput& output, SelfIsOpenParam const& param) {
+        .required("isopen", ll::command::ParamKind::Bool)
+        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             COMMAND_CHECK_PLAYER
+            bool       isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
             const auto global = coral_fans::mod().getConfigDb()->get("functions.global.containerreader") == "true";
             if (coral_fans::mod().getConfigDb()->set(
                     std::format("functions.players.{}.containerreader", player->getUuid().asString()),
-                    (param.isopen & global) ? "true" : "false"
+                    (isopen & global) ? "true" : "false"
                 ))
-                output.success("command.self.containerreader.success"_tr((param.isopen & global) ? "true" : "false"));
+                output.success("command.self.containerreader.success"_tr((isopen & global) ? "true" : "false"));
             else output.error("command.self.containerreader.error"_tr());
         });
 
     // self autototem <bool>
-    selfCommand.overload<SelfIsOpenParam>()
+    selfCommand.runtimeOverload()
         .text("autototem")
-        .required("isopen")
-        .execute([](CommandOrigin const& origin, CommandOutput& output, SelfIsOpenParam const& param) {
+        .required("isopen", ll::command::ParamKind::Bool)
+        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             COMMAND_CHECK_PLAYER
+            bool       isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
             const auto global = coral_fans::mod().getConfigDb()->get("functions.global.autototem") == "true";
             if (coral_fans::mod().getConfigDb()->set(
                     std::format("functions.players.{}.autototem", player->getUuid().asString()),
-                    (param.isopen & global) ? "true" : "false"
+                    (isopen & global) ? "true" : "false"
                 ))
-                output.success("command.self.autototem.success"_tr((param.isopen & global) ? "true" : "false"));
+                output.success("command.self.autototem.success"_tr((isopen & global) ? "true" : "false"));
             else output.error("command.self.autototem.error"_tr());
         });
 
     // self autoitem <bool>
-    selfCommand.overload<SelfIsOpenParam>()
+    selfCommand.runtimeOverload()
         .text("autoitem")
-        .required("isopen")
-        .execute([](CommandOrigin const& origin, CommandOutput& output, SelfIsOpenParam const& param) {
+        .required("isopen", ll::command::ParamKind::Bool)
+        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             COMMAND_CHECK_PLAYER
+            bool       isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
             const auto global = coral_fans::mod().getConfigDb()->get("functions.global.autoitem") == "true";
             if (coral_fans::mod().getConfigDb()->set(
                     std::format("functions.players.{}.autoitem", player->getUuid().asString()),
-                    (param.isopen & global) ? "true" : "false"
+                    (isopen & global) ? "true" : "false"
                 ))
-                output.success("command.self.autoitem.success"_tr((param.isopen & global) ? "true" : "false"));
+                output.success("command.self.autoitem.success"_tr((isopen & global) ? "true" : "false"));
             else output.error("command.self.autoitem.error"_tr());
         });
 }

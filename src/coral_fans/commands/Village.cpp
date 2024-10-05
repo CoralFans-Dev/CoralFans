@@ -3,6 +3,7 @@
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/command/runtime/ParamKind.h"
+#include "ll/api/command/runtime/RuntimeCommand.h"
 #include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
 #include "mc/server/commands/CommandOrigin.h"
@@ -20,38 +21,53 @@ void registerVillageCommand(CommandPermissionLevel permission) {
                                .getOrCreateCommand("village", "command.village.description"_tr(), permission);
 
     // village show <bounds|raid|spawn|center|poi|bind> <bool>
-    enum class VillageShowType : int { bounds, raid, spawn, center, poi, bind };
-    struct VillageShowParam {
-        VillageShowType type;
-        bool            enable;
-    };
-    villageCommand.overload<VillageShowParam>().text("show").required("type").required("enable").execute(
-        [](CommandOrigin const&, CommandOutput& output, VillageShowParam const& param) {
-            switch (param.type) {
-            case VillageShowType::bounds:
-                coral_fans::mod().getVillageManager().setShowBounds(param.enable);
+    ll::command::CommandRegistrar::getInstance().tryRegisterEnum(
+        "villageShowType",
+        {
+            {"bounds", 0},
+            {"raid", 1},
+            {"spawn", 2},
+            {"center", 3},
+            {"poi", 4},
+            {"bind", 5}
+        },
+        Bedrock::type_id<CommandRegistry, std::pair<std::string,uint64>>(),
+        &CommandRegistry::parse<std::pair<std::string,uint64>>
+    );
+    villageCommand.runtimeOverload()
+        .text("show")
+        .required("type", ll::command::ParamKind::Enum, "villageShowType")
+        .required("enable", ll::command::ParamKind::Bool)
+        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            switch (self["type"].get<ll::command::ParamKind::Enum>().second) {
+            case 0:
+                coral_fans::mod().getVillageManager().setShowBounds(self["enable"].get<ll::command::ParamKind::Bool>());
                 break;
-            case VillageShowType::raid:
-                coral_fans::mod().getVillageManager().setShowRaidBounds(param.enable);
+            case 1:
+                coral_fans::mod().getVillageManager().setShowRaidBounds(
+                    self["enable"].get<ll::command::ParamKind::Bool>()
+                );
                 break;
-            case VillageShowType::spawn:
-                coral_fans::mod().getVillageManager().setShowIronSpawn(param.enable);
+            case 2:
+                coral_fans::mod().getVillageManager().setShowIronSpawn(self["enable"].get<ll::command::ParamKind::Bool>(
+                ));
                 break;
-            case VillageShowType::center:
-                coral_fans::mod().getVillageManager().setShowCenter(param.enable);
+            case 3:
+                coral_fans::mod().getVillageManager().setShowCenter(self["enable"].get<ll::command::ParamKind::Bool>());
                 break;
-            case VillageShowType::poi:
-                coral_fans::mod().getVillageManager().setShowPoiQuery(param.enable);
+            case 4:
+                coral_fans::mod().getVillageManager().setShowPoiQuery(self["enable"].get<ll::command::ParamKind::Bool>()
+                );
                 break;
-            case VillageShowType::bind:
-                coral_fans::mod().getVillageManager().setShowBind(param.enable);
+            case 5:
+                coral_fans::mod().getVillageManager().setShowBind(self["enable"].get<ll::command::ParamKind::Bool>());
                 break;
             }
-            output.success(
-                "command.village.show.output"_tr(magic_enum::enum_name(param.type), param.enable ? "true" : "false")
-            );
-        }
-    );
+            output.success("command.village.show.output"_tr(
+                self["type"].get<ll::command::ParamKind::Enum>().first,
+                self["enable"].get<ll::command::ParamKind::Bool>() ? "true" : "false"
+            ));
+        });
 
     // village list
     villageCommand.overload().text("list").execute([](CommandOrigin const&, CommandOutput& output) {

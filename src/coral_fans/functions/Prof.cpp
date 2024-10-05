@@ -10,6 +10,13 @@
 
 namespace coral_fans::functions {
 
+std::vector<std::pair<std::string, uint64>> Profiler::TypeVec = {
+    {"normal", Type::normal},
+    {"entity", Type::entity},
+    {"chunk",  Type::chunk },
+    {"pt",     Type::pt    }
+};
+
 // from trapdoor-ll
 
 long long MSPTInfo::mean() const {
@@ -59,7 +66,7 @@ long long MSPTInfo::max() const {
 
 double micro_to_mill(long long v) { return static_cast<double>(v) / 1000.0; }
 
-void Profiler::reset(Profiler::Type t) {
+void Profiler::reset(uint64 t) {
     this->type = t;
     this->redstoneInfo.reset();
     this->chunkInfo.reset();
@@ -71,7 +78,7 @@ void Profiler::reset(Profiler::Type t) {
     for (auto& pt : this->ptCounter) pt.clear();
 }
 
-void Profiler::start(long long round, Profiler::Type t) {
+void Profiler::start(long long round, uint64 t) {
     this->reset(t);
     this->profiling    = true;
     this->currentRound = 0;

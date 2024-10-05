@@ -3,6 +3,7 @@
 #include "coral_fans/base/Utils.h"
 #include "coral_fans/functions/Data.h"
 #include "coral_fans/functions/HopperCounter.h"
+#include "ll/api/base/StdInt.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/service/Bedrock.h"
 #include "magic_enum.hpp"
@@ -18,6 +19,14 @@
 #include <string>
 
 namespace coral_fans::functions {
+
+std::vector<std::pair<std::string, uint64>> HudHelper::HudTypeVec = {
+    {"mspt",     HudType::mspt    },
+    {"base",     HudType::base    },
+    {"redstone", HudType::redstone},
+    {"village",  HudType::village },
+    {"hopper",   HudType::hopper  }
+};
 
 void HudHelper::tick() {
     using ll::i18n_literals::operator""_tr;

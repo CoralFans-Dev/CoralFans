@@ -1,5 +1,8 @@
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
+#include "ll/api/command/runtime/ParamKind.h"
+#include "ll/api/command/runtime/RuntimeCommand.h"
+#include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/service/Bedrock.h"
 // #include "mc/network/packet/LevelEventPacket.h"
@@ -8,8 +11,6 @@
 #include "mc/util/ProfilerLite.h"
 #include "mc/util/Timer.h"
 #include "mc/world/Minecraft.h"
-
-#include "magic_enum.hpp"
 
 namespace coral_fans::commands {
 void registerTickCommand(CommandPermissionLevel permission) {
@@ -29,41 +30,46 @@ void registerTickCommand(CommandPermissionLevel permission) {
     });
 
     // tick freeze|reset
-    enum class TickFreezeType { reset = 0, freeze = 1 };
-    struct TickFreezeParam {
-        TickFreezeType tickFreezeType;
-    };
-    tickCommand.overload<TickFreezeParam>()
-        .required("tickFreezeType")
-        .execute([&](CommandOrigin const&, CommandOutput& output, TickFreezeParam const& param) {
-            bool pause = false;
-            switch (param.tickFreezeType) {
-            case TickFreezeType::freeze:
+    ll::command::CommandRegistrar::getInstance().tryRegisterEnum(
+        "tickFreezeType",
+        {
+            {"reset", 0},
+            {"freeze", 1}
+        },
+        Bedrock::type_id<CommandRegistry, std::pair<std::string,uint64>>(),
+        &CommandRegistry::parse<std::pair<std::string,uint64>>
+    );
+    tickCommand.runtimeOverload()
+        .required("tickFreezeType", ll::command::ParamKind::Enum, "tickFreezeType")
+        .execute([&](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            bool       pause = false;
+            const auto val   = self["tickFreezeType"].get<ll::command::ParamKind::Enum>();
+            switch (val.second) {
+            case 1:
                 pause = true;
                 break;
-            case TickFreezeType::reset:
+            case 0:
                 pause = false;
                 break;
             }
             // LevelEventPacket{LevelEvent::SimTimeStep, origin.getWorldPosition(), pause}.sendToClients();
             auto mc = ll::service::getMinecraft();
             if (mc.has_value()) mc->setSimTimePause(pause);
-            output.success("command.tick.set.output"_tr(magic_enum::enum_name(param.tickFreezeType)));
+            output.success("command.tick.set.output"_tr(val.first));
         });
 
     // tick rate <float>
-    struct TickRateParam {
-        float rate;
-    };
-    tickCommand.overload<TickRateParam>().text("rate").required("rate").execute(
-        [](CommandOrigin const&, CommandOutput& output, TickRateParam const& param) {
-            if (param.rate < 0) output.error("command.tick.rate.error"_tr());
-            // LevelEventPacket{LevelEvent::SimTimeScale, {param.rate / 20}, param.rate > 0}.sendToClients();
+    tickCommand.runtimeOverload()
+        .text("rate")
+        .required("rate", ll::command::ParamKind::Float)
+        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            float rate = self["rate"].get<ll::command::ParamKind::Float>();
+            if (rate < 0) output.error("command.tick.rate.error"_tr());
+            // LevelEventPacket{LevelEvent::SimTimeScale, {rate / 20}, rate > 0}.sendToClients();
             auto mc = ll::service::getMinecraft();
-            if (mc.has_value()) mc->setSimTimeScale(param.rate / 20.0f);
-            output.success("command.tick.rate.success"_tr(param.rate));
-        }
-    );
+            if (mc.has_value()) mc->setSimTimeScale(rate / 20.0f);
+            output.success("command.tick.rate.success"_tr(rate));
+        });
 
     // tick step <int>
     static auto stepFn = [](CommandOutput& output, int tick) {
@@ -78,24 +84,32 @@ void registerTickCommand(CommandPermissionLevel permission) {
         }
         output.success("command.tick.step.output"_tr(tick));
     };
-    struct TickStepParam {
-        int time;
-    };
-    tickCommand.overload<TickStepParam>().text("step").required("time").execute(
-        [&](CommandOrigin const&, CommandOutput& output, TickStepParam const& param) { stepFn(output, param.time); }
-    );
-    tickCommand.overload<TickStepParam>().text("step").required("time").postfix("t").execute(
-        [&](CommandOrigin const&, CommandOutput& output, TickStepParam const& param) { stepFn(output, param.time); }
-    );
-    tickCommand.overload<TickStepParam>().text("step").required("time").postfix("s").execute(
-        [&](CommandOrigin const&, CommandOutput& output, TickStepParam const& param) {
-            stepFn(output, param.time * 20);
-        }
-    );
-    tickCommand.overload<TickStepParam>().text("step").required("time").postfix("d").execute(
-        [&](CommandOrigin const&, CommandOutput& output, TickStepParam const& param) {
-            stepFn(output, param.time * 24000);
-        }
-    );
+    tickCommand.runtimeOverload()
+        .text("step")
+        .required("time", ll::command::ParamKind::Int)
+        .execute([&](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            stepFn(output, self["time"].get<ll::command::ParamKind::Int>());
+        });
+    tickCommand.runtimeOverload()
+        .text("step")
+        .required("time", ll::command::ParamKind::Int)
+        .postfix("t")
+        .execute([&](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            stepFn(output, self["time"].get<ll::command::ParamKind::Int>());
+        });
+    tickCommand.runtimeOverload()
+        .text("step")
+        .required("time", ll::command::ParamKind::Int)
+        .postfix("s")
+        .execute([&](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            stepFn(output, self["time"].get<ll::command::ParamKind::Int>() * 20);
+        });
+    tickCommand.runtimeOverload()
+        .text("step")
+        .required("time", ll::command::ParamKind::Int)
+        .postfix("d")
+        .execute([&](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            stepFn(output, self["time"].get<ll::command::ParamKind::Int>() * 24000);
+        });
 }
 } // namespace coral_fans::commands
