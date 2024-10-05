@@ -17,6 +17,9 @@ void registerCoralfansCommand() {
     // version
     command.overload().text("version").execute([](CommandOrigin const&, CommandOutput& output) {
         output.success(coral_fans::mod().VERSION);
+#ifdef COMMITID
+        output.success("Commit ID: {}", COMMITID);
+#endif
     });
 }
 
