@@ -2,6 +2,9 @@
 
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
+#include "ll/api/command/runtime/ParamKind.h"
+#include "ll/api/command/runtime/RuntimeCommand.h"
+#include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
@@ -16,129 +19,147 @@ void registerFuncCommand(CommandPermissionLevel permission) {
     auto& funcCommand = ll::command::CommandRegistrar::getInstance()
                             .getOrCreateCommand("func", "command.func.description"_tr(), permission);
 
-    struct FuncIsOpenParam {
-        bool isopen;
-    };
-
     // func forceopen <bool>
-    funcCommand.overload<FuncIsOpenParam>()
+    funcCommand.runtimeOverload()
         .text("forceopen")
-        .required("isopen")
-        .execute([](CommandOrigin const&, CommandOutput& output, FuncIsOpenParam const& param) {
-            if (coral_fans::mod().getConfigDb()->set("functions.global.forceopen", param.isopen ? "true" : "false"))
-                output.success("command.func.forceopen.success"_tr(param.isopen ? "true" : "false"));
+        .required("isopen", ll::command::ParamKind::Bool)
+        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
+            if (coral_fans::mod().getConfigDb()->set("functions.global.forceopen", isopen ? "true" : "false"))
+                output.success("command.func.forceopen.success"_tr(isopen ? "true" : "false"));
             else output.error("command.func.forceopen.error"_tr());
         });
 
     // func forceplace normal|entity|all
-    struct FuncForcePlaceTypeParam {
-        enum ForcePlaceType : int { normal, entity, all } forceplacetype;
-    };
-    funcCommand.overload<FuncForcePlaceTypeParam>()
+    ll::command::CommandRegistrar::getInstance().tryRegisterEnum(
+        "forceplaceLevel",
+        {
+            {"normal", 0},
+            {"entity", 1},
+            {"all", 2}
+        },
+        Bedrock::type_id<CommandRegistry, std::pair<std::string,uint64>>(),
+        &CommandRegistry::parse<std::pair<std::string,uint64>>
+    );
+    funcCommand.runtimeOverload()
         .text("forceplace")
-        .required("forceplacetype")
-        .execute([](CommandOrigin const&, CommandOutput& output, FuncForcePlaceTypeParam const& param) {
-            if (coral_fans::mod().getConfigDb()->set(
-                    "functions.global.forceplace",
-                    magic_enum::enum_name(param.forceplacetype)
-                ))
-                output.success("command.func.forceplace.success"_tr(magic_enum::enum_name(param.forceplacetype)));
+        .required("level", ll::command::ParamKind::Enum, "forceplaceLevel")
+        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            const auto val = self["level"].get<ll::command::ParamKind::Enum>();
+            if (coral_fans::mod().getConfigDb()->set("functions.global.forceplace", val.first))
+                output.success("command.func.forceplace.success"_tr(val.first));
             else output.error("command.func.forceplace.error"_tr());
         });
 
     // func noclip <bool>
-    funcCommand.overload<FuncIsOpenParam>().text("noclip").required("isopen").execute(
-        [](CommandOrigin const&, CommandOutput& output, FuncIsOpenParam const& param) {
-            if (coral_fans::mod().getConfigDb()->set("functions.global.noclip", param.isopen ? "true" : "false"))
-                output.success("command.func.noclip.success"_tr(param.isopen ? "true" : "false"));
+    funcCommand.runtimeOverload()
+        .text("noclip")
+        .required("isopen", ll::command::ParamKind::Bool)
+        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
+            if (coral_fans::mod().getConfigDb()->set("functions.global.noclip", isopen ? "true" : "false"))
+                output.success("command.func.noclip.success"_tr(isopen ? "true" : "false"));
             else output.error("command.func.noclip.error"_tr());
-        }
-    );
+        });
 
     // func droppernocost <bool>
-    funcCommand.overload<FuncIsOpenParam>()
+    funcCommand.runtimeOverload()
         .text("droppernocost")
-        .required("isopen")
-        .execute([](CommandOrigin const&, CommandOutput& output, FuncIsOpenParam const& param) {
-            if (coral_fans::mod().getConfigDb()->set("functions.global.droppernocost", param.isopen ? "true" : "false"))
-                output.success("command.func.droppernocost.success"_tr(param.isopen ? "true" : "false"));
+        .required("isopen", ll::command::ParamKind::Bool)
+        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
+            if (coral_fans::mod().getConfigDb()->set("functions.global.droppernocost", isopen ? "true" : "false"))
+                output.success("command.func.droppernocost.success"_tr(isopen ? "true" : "false"));
             else output.error("command.func.droppernocost.error"_tr());
         });
 
     // safeexplode
-    funcCommand.overload<FuncIsOpenParam>()
+    funcCommand.runtimeOverload()
         .text("safeexplode")
-        .required("isopen")
-        .execute([](CommandOrigin const&, CommandOutput& output, FuncIsOpenParam const& param) {
-            if (coral_fans::mod().getConfigDb()->set("functions.global.safeexplode", param.isopen ? "true" : "false"))
-                output.success("command.func.safeexplode.success"_tr(param.isopen ? "true" : "false"));
+        .required("isopen", ll::command::ParamKind::Bool)
+        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
+            if (coral_fans::mod().getConfigDb()->set("functions.global.safeexplode", isopen ? "true" : "false"))
+                output.success("command.func.safeexplode.success"_tr(isopen ? "true" : "false"));
             else output.error("command.func.safeexplode.error"_tr());
         });
 
     // autotool
-    funcCommand.overload<FuncIsOpenParam>()
+    funcCommand.runtimeOverload()
         .text("autotool")
-        .required("isopen")
-        .execute([](CommandOrigin const&, CommandOutput& output, FuncIsOpenParam const& param) {
-            if (coral_fans::mod().getConfigDb()->set("functions.global.autotool", param.isopen ? "true" : "false"))
-                output.success("command.func.autotool.success"_tr(param.isopen ? "true" : "false"));
+        .required("isopen", ll::command::ParamKind::Bool)
+        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
+            if (coral_fans::mod().getConfigDb()->set("functions.global.autotool", isopen ? "true" : "false"))
+                output.success("command.func.autotool.success"_tr(isopen ? "true" : "false"));
             else output.error("command.func.autotool.error"_tr());
         });
 
     // hoppercounter
-    funcCommand.overload<FuncIsOpenParam>()
+    funcCommand.runtimeOverload()
         .text("hoppercounter")
-        .required("isopen")
-        .execute([](CommandOrigin const&, CommandOutput& output, FuncIsOpenParam const& param) {
-            if (coral_fans::mod().getConfigDb()->set("functions.global.hoppercounter", param.isopen ? "true" : "false"))
-                output.success("command.func.hoppercounter.success"_tr(param.isopen ? "true" : "false"));
+        .required("isopen", ll::command::ParamKind::Bool)
+        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
+            if (coral_fans::mod().getConfigDb()->set("functions.global.hoppercounter", isopen ? "true" : "false"))
+                output.success("command.func.hoppercounter.success"_tr(isopen ? "true" : "false"));
             else output.error("command.func.hoppercounter.error"_tr());
         });
 
     // maxpt <int>
-    struct FuncMaxPtParam {
-        int maxpt;
-    };
-    funcCommand.overload<FuncMaxPtParam>().text("maxpt").required("maxpt").execute(
-        [](CommandOrigin const&, CommandOutput& output, FuncMaxPtParam const& param) {
-            if (param.maxpt <= 0) output.error("command.func.maxpt.error.nonpositive"_tr());
-            if (coral_fans::mod().getConfigDb()->set("functions.global.maxpt", std::to_string(param.maxpt)))
-                output.success("command.func.maxpt.success"_tr(param.maxpt));
+    funcCommand.runtimeOverload()
+        .text("maxpt")
+        .required("maxpt", ll::command::ParamKind::Int)
+        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            int maxpt = self["maxpt"].get<ll::command::ParamKind::Int>();
+            if (maxpt <= 0) output.error("command.func.maxpt.error.nonpositive"_tr());
+            if (coral_fans::mod().getConfigDb()->set("functions.global.maxpt", std::to_string(maxpt)))
+                output.success("command.func.maxpt.success"_tr(maxpt));
             else output.error("command.func.maxpt.error.failed"_tr());
-        }
-    );
+        });
 
     // containerreader
-    funcCommand.overload<FuncIsOpenParam>()
+    funcCommand.runtimeOverload()
         .text("containerreader")
-        .required("isopen")
-        .execute([](CommandOrigin const&, CommandOutput& output, FuncIsOpenParam const& param) {
-            if (coral_fans::mod().getConfigDb()->set(
-                    "functions.global.containerreader",
-                    param.isopen ? "true" : "false"
-                ))
-                output.success("command.func.containerreader.success"_tr(param.isopen ? "true" : "false"));
+        .required("isopen", ll::command::ParamKind::Bool)
+        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
+            if (coral_fans::mod().getConfigDb()->set("functions.global.containerreader", isopen ? "true" : "false"))
+                output.success("command.func.containerreader.success"_tr(isopen ? "true" : "false"));
             else output.error("command.func.containerreader.error"_tr());
         });
 
     // autototem
-    funcCommand.overload<FuncIsOpenParam>()
+    funcCommand.runtimeOverload()
         .text("autototem")
-        .required("isopen")
-        .execute([](CommandOrigin const&, CommandOutput& output, FuncIsOpenParam const& param) {
-            if (coral_fans::mod().getConfigDb()->set("functions.global.autototem", param.isopen ? "true" : "false"))
-                output.success("command.func.autototem.success"_tr(param.isopen ? "true" : "false"));
+        .required("isopen", ll::command::ParamKind::Bool)
+        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
+            if (coral_fans::mod().getConfigDb()->set("functions.global.autototem", isopen ? "true" : "false"))
+                output.success("command.func.autototem.success"_tr(isopen ? "true" : "false"));
             else output.error("command.func.autototem.error"_tr());
         });
 
     // autoitem
-    funcCommand.overload<FuncIsOpenParam>()
+    funcCommand.runtimeOverload()
         .text("autoitem")
-        .required("isopen")
-        .execute([](CommandOrigin const&, CommandOutput& output, FuncIsOpenParam const& param) {
-            if (coral_fans::mod().getConfigDb()->set("functions.global.autoitem", param.isopen ? "true" : "false"))
-                output.success("command.func.autoitem.success"_tr(param.isopen ? "true" : "false"));
+        .required("isopen", ll::command::ParamKind::Bool)
+        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
+            if (coral_fans::mod().getConfigDb()->set("functions.global.autoitem", isopen ? "true" : "false"))
+                output.success("command.func.autoitem.success"_tr(isopen ? "true" : "false"));
             else output.error("command.func.autoitem.error"_tr());
+        });
+
+    // fastdrop
+    funcCommand.runtimeOverload()
+        .text("fastdrop")
+        .required("isopen", ll::command::ParamKind::Bool)
+        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
+            if (coral_fans::mod().getConfigDb()->set("functions.global.fastdrop", isopen ? "true" : "false"))
+                output.success("command.func.fastdrop.success"_tr(isopen ? "true" : "false"));
+            else output.error("command.func.fastdrop.error"_tr());
         });
 }
 } // namespace coral_fans::commands

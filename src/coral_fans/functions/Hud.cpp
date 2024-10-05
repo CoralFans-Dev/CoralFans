@@ -3,6 +3,7 @@
 #include "coral_fans/base/Utils.h"
 #include "coral_fans/functions/Data.h"
 #include "coral_fans/functions/HopperCounter.h"
+#include "ll/api/base/StdInt.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/service/Bedrock.h"
 #include "magic_enum.hpp"
@@ -13,9 +14,20 @@
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/biome/Biome.h"
+#include "mc/world/phys/HitResultType.h"
 #include <algorithm>
+#include <string>
 
 namespace coral_fans::functions {
+
+std::vector<std::pair<std::string, uint64>> HudHelper::HudTypeVec = {
+    {"mspt",     HudType::mspt    },
+    {"base",     HudType::base    },
+    {"redstone", HudType::redstone},
+    {"village",  HudType::village },
+    {"hopper",   HudType::hopper  },
+    {"block",    HudType::block   }
+};
 
 void HudHelper::tick() {
     using ll::i18n_literals::operator""_tr;
@@ -58,8 +70,11 @@ void HudHelper::tick() {
                         player.getPosition().toString(),
                         player.getViewVector(1.0f).toString(),
                         utils::blockPosToChunkPos(player.getFeetBlockPos()).toString(),
-                        hitrst.mBlockPos.toString(),
-                        blockSource.getRawBrightness(hitrst.mBlockPos + BlockPos{0, 1, 0}, true, true).value,
+                        hitrst.mType == HitResultType::Tile ? hitrst.mBlockPos.toString() : "-",
+                        hitrst.mType == HitResultType::Tile ? std::to_string(
+                            blockSource.getRawBrightness(hitrst.mBlockPos + BlockPos{0, 1, 0}, true, true).value
+                        )
+                                                                    : "-",
                         delta.length() * 20,
                         delta.x * 20,
                         delta.y * 20,
@@ -68,19 +83,29 @@ void HudHelper::tick() {
                     );
                 }
                 if (hud & (1 << HudHelper::HudType::redstone)) {
-                    auto rst  = showRedstoneComponentsInfo(player.getDimension(), hitrst.mBlockPos, 2);
-                    msg      += rst.first + "\n";
+                    if (hitrst.mType == HitResultType::Tile) {
+                        auto rst  = showRedstoneComponentsInfo(player.getDimension(), hitrst.mBlockPos, 2);
+                        msg      += rst.first + "\n";
+                    }
                 }
                 if (hud & (1 << HudHelper::HudType::village)) {
-                    auto* entity = hitrst.getEntity();
-                    if (entity) {
-                        auto rst  = mod.getVillageManager().getVillagerInfo(entity->getOrCreateUniqueID());
-                        msg      += rst.first + "\n";
+                    if (hitrst.mType == HitResultType::Entity) {
+                        auto* entity = hitrst.getEntity();
+                        if (entity) {
+                            auto rst  = mod.getVillageManager().getVillagerInfo(entity->getOrCreateUniqueID());
+                            msg      += rst.first + "\n";
+                        }
                     }
                 }
                 if (hud & (1 << HudHelper::HudType::hopper)) {
                     int ch = HopperCounterManager::getViewChannel(blockSource, hitrst);
                     if (ch != -1) msg += mod.getHopperCounterManager().getChannel(ch).info() + "\n";
+                }
+                if (hud & (1 << HudHelper::HudType::block)) {
+                    if (hitrst.mType == HitResultType::Tile) {
+                        auto rst  = getBlockData(blockSource, hitrst.mBlockPos);
+                        msg      += rst + "\n";
+                    }
                 }
                 if (msg.ends_with('\n')) msg = msg.substr(0, msg.length() - 1);
                 if (!msg.empty()) {
