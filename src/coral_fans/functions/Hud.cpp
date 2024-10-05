@@ -25,7 +25,8 @@ std::vector<std::pair<std::string, uint64>> HudHelper::HudTypeVec = {
     {"base",     HudType::base    },
     {"redstone", HudType::redstone},
     {"village",  HudType::village },
-    {"hopper",   HudType::hopper  }
+    {"hopper",   HudType::hopper  },
+    {"block",    HudType::block   }
 };
 
 void HudHelper::tick() {
@@ -99,6 +100,12 @@ void HudHelper::tick() {
                 if (hud & (1 << HudHelper::HudType::hopper)) {
                     int ch = HopperCounterManager::getViewChannel(blockSource, hitrst);
                     if (ch != -1) msg += mod.getHopperCounterManager().getChannel(ch).info() + "\n";
+                }
+                if (hud & (1 << HudHelper::HudType::block)) {
+                    if (hitrst.mType == HitResultType::Tile) {
+                        auto rst  = getBlockData(blockSource, hitrst.mBlockPos);
+                        msg      += rst + "\n";
+                    }
                 }
                 if (msg.ends_with('\n')) msg = msg.substr(0, msg.length() - 1);
                 if (!msg.empty()) {
