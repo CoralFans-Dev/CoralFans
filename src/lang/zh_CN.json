@@ -48,6 +48,10 @@
             "autoitem": {
                 "success": "全局设置 autoitem \"{}\"",
                 "error": "全局设置 autoitem 失败"
+            },
+            "fastdrop": {
+                "success": "全局设置 fastdrop \"{}\"",
+                "error": "全局设置 fastdrop 失败"
             }
         },
         "self": {
@@ -75,6 +79,10 @@
             "autoitem": {
                 "success": "设置 autoitem \"{}\"",
                 "error": "设置 autoitem 失败"
+            },
+            "fastdrop": {
+                "success": "设置 fastdrop \"{}\"",
+                "error": "设置 fastdrop 失败"
             }
         },
         "tick": {

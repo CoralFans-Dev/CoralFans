@@ -150,5 +150,16 @@ void registerFuncCommand(CommandPermissionLevel permission) {
                 output.success("command.func.autoitem.success"_tr(isopen ? "true" : "false"));
             else output.error("command.func.autoitem.error"_tr());
         });
+
+    // fastdrop
+    funcCommand.runtimeOverload()
+        .text("fastdrop")
+        .required("isopen", ll::command::ParamKind::Bool)
+        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
+            if (coral_fans::mod().getConfigDb()->set("functions.global.fastdrop", isopen ? "true" : "false"))
+                output.success("command.func.fastdrop.success"_tr(isopen ? "true" : "false"));
+            else output.error("command.func.fastdrop.error"_tr());
+        });
 }
 } // namespace coral_fans::commands

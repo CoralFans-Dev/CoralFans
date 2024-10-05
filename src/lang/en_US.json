@@ -48,6 +48,10 @@
             "autoitem": {
                 "success": "globally set autoitem \"{}\"",
                 "error": "failed to globally set autoitem"
+            },
+            "fastdrop": {
+                "success": "globally set fastdrop \"{}\"",
+                "error": "failed to globally set fastdrop"
             }
         },
         "self": {
@@ -75,6 +79,10 @@
             "autoitem": {
                 "success": "set autoitem \"{}\"",
                 "error": "failed to set autoitem"
+            },
+            "fastdrop": {
+                "success": "set fastdrop \"{}\"",
+                "error": "failed to set fastdrop"
             }
         },
         "tick": {

@@ -115,5 +115,21 @@ void registerSelfCommand(CommandPermissionLevel permission) {
                 output.success("command.self.autoitem.success"_tr((isopen & global) ? "true" : "false"));
             else output.error("command.self.autoitem.error"_tr());
         });
+
+    // self fastdrop <bool>
+    selfCommand.runtimeOverload()
+        .text("fastdrop")
+        .required("isopen", ll::command::ParamKind::Bool)
+        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            COMMAND_CHECK_PLAYER
+            bool       isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
+            const auto global = coral_fans::mod().getConfigDb()->get("functions.global.fastdrop") == "true";
+            if (coral_fans::mod().getConfigDb()->set(
+                    std::format("functions.players.{}.fastdrop", player->getUuid().asString()),
+                    (isopen & global) ? "true" : "false"
+                ))
+                output.success("command.self.fastdrop.success"_tr((isopen & global) ? "true" : "false"));
+            else output.error("command.self.fastdrop.error"_tr());
+        });
 }
 } // namespace coral_fans::commands
