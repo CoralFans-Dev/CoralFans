@@ -162,6 +162,20 @@
                 "toomanyobj": "Too many objects",
                 "permissiondenied": "Permission Denied"
             }
+        },
+        "log": {
+            "description": "Log info",
+            "error": {
+                "nulllevel": "Null Level",
+                "nopt": "no pendingTick"
+            },
+            "success": {
+                "pt": {
+                    "title": "[{}] chunk {} has {} pendingTicks ->",
+                    "remove": " {}: removed",
+                    "info": " {}: tick time {}, priority {}, {}"
+                }
+            }
         }
     },
     "translate": {

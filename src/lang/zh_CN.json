@@ -162,6 +162,20 @@
                 "toomanyobj": "对象过多",
                 "permissiondenied": "权限拒绝"
             }
+        },
+        "log": {
+            "description": "打印信息",
+            "error": {
+                "nulllevel": "空的Level值",
+                "nopt": "无计划刻"
+            },
+            "success": {
+                "pt": {
+                    "title": "[{}] 区块 {} 有 {} 个计划刻 ->",
+                    "remove": " {}: 删除",
+                    "info": " {}: tick time {}, 优先级 {}, {}"
+                }
+            }
         }
     },
     "translate": {
