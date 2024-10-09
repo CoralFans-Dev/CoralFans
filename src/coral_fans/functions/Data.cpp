@@ -1,11 +1,9 @@
 #include "coral_fans/base/Utils.h"
 #include "ll/api/i18n/I18n.h"
-#include "ll/api/utils/StringUtils.h"
 #include "magic_enum.hpp"
 #include "mc/deps/core/mce/Color.h"
 #include "mc/nbt/CompoundTag.h"
 #include "mc/nbt/CompoundTagVariant.h"
-#include "mc/nbt/ListTag.h"
 #include "mc/nbt/Tag.h"
 #include "mc/world/actor/Actor.h"
 #include "mc/world/item/registry/ItemStack.h"
@@ -19,59 +17,6 @@
 #include "mc/world/redstone/circuit/CircuitSystem.h"
 
 #include <string>
-#include <vector>
-
-namespace {
-
-struct PathNode {
-    std::string id;
-    int         index;
-    bool        useIndex;
-};
-
-bool parsePath(std::string path, std::vector<PathNode>& vec) {
-    for (auto key : ll::string_utils::splitByPattern(path, ".")) {
-        if (key.ends_with(']')) try {
-                vec.emplace_back(PathNode{
-                    std::string{key.substr(0, key.find('['))},
-                    std::stoi(std::string{key.substr(key.find('[') + 1, key.length() - key.find('[') - 2)}),
-                    true
-                });
-            } catch (...) {
-                return false;
-            }
-        else vec.emplace_back(PathNode{std::string{key}, 0, false});
-    }
-    return true;
-}
-
-std::pair<std::string, bool> getNbtFromTag(CompoundTag const tag, std::string path) {
-    using ll::i18n_literals::operator""_tr;
-    std::vector<PathNode>           nodes;
-    std::vector<CompoundTagVariant> tags;
-    if (!parsePath(path, nodes)) return {"translate.data.error.cannotparse"_tr(), false};
-    try {
-        tags.emplace_back(tag[nodes[0].id]);
-        if (nodes[0].useIndex) {
-            if (tags.back().is_array() && tags.back().get<ListTag>().getCompound(nodes[0].index))
-                tags.emplace_back(*(tags.back().get<ListTag>().getCompound(nodes[0].index)));
-            else return {"translate.data.error.notanarray"_tr(), false};
-        }
-        for (unsigned long long i = 1; i < nodes.size(); ++i) {
-            tags.emplace_back(tags.back()[nodes[i].id]);
-            if (nodes[i].useIndex) {
-                if (tags.back().is_array() && tags.back().get<ListTag>().getCompound(nodes[i].index))
-                    tags.emplace_back(*(tags.back().get<ListTag>().getCompound(nodes[i].index)));
-                else return {"translate.data.error.notanarray"_tr(), false};
-            }
-        }
-        return {tags.back().toSnbt(SnbtFormat::PrettyChatPrint), true};
-    } catch (...) {
-        return {"translate.data.error.geterror"_tr(), false};
-    }
-}
-
-} // namespace
 
 namespace coral_fans::functions {
 
@@ -109,7 +54,7 @@ std::pair<std::string, bool> getBlockNbt(uint64 type, BlockSource& blockSource, 
         else return {"translate.data.error.noblockentity"_tr(), false};
     }
     if (path.empty()) return {tag->toSnbt(SnbtFormat::PrettyChatPrint), true};
-    else return getNbtFromTag(*tag, path);
+    else return utils::getNbtFromTag(*tag, path);
 }
 
 std::pair<std::string, bool> getEntityData(Actor* actor) {
@@ -135,7 +80,7 @@ std::pair<std::string, bool> getEntityNbt(Actor* actor, std::string path) {
     std::unique_ptr<CompoundTag> tag = std::make_unique<CompoundTag>();
     actor->save(*tag);
     if (path.empty()) return {tag->toSnbt(SnbtFormat::PrettyChatPrint), true};
-    else return getNbtFromTag(*tag, path);
+    else return utils::getNbtFromTag(*tag, path);
 }
 
 std::pair<std::string, bool> showRedstoneComponentsInfo(Dimension& dimension, BlockPos& pos, uint64 type) {
@@ -203,7 +148,7 @@ std::pair<std::string, bool> getItemNbt(ItemStack const& item, std::string path)
     if (path.empty()) {
         if (tag) return {tag->toSnbt(SnbtFormat::PrettyChatPrint), true};
         else return {"translate.data.error.geterror"_tr(), false};
-    } else return getNbtFromTag(*tag, path);
+    } else return utils::getNbtFromTag(*tag, path);
 }
 
 void highlightBlockEntity(Player* player, int radius, int time) {

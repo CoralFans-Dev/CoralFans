@@ -14,8 +14,7 @@
 
 namespace coral_fans::utils {
 
-
-BlockPos facingToBlockPos(int facing);
+std::pair<std::string, bool> getNbtFromTag(CompoundTag const, std::string const&);
 
 ChunkPos blockPosToChunkPos(BlockPos const& blockPos);
 
