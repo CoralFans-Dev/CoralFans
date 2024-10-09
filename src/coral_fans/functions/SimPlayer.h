@@ -19,6 +19,7 @@
 #include "mc/world/attribute/AttributeInstance.h"
 #include "mc/world/item/registry/ItemStack.h"
 #include "mc/world/level/BlockPos.h"
+#include "mc/world/phys/HitResultType.h"
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/string.hpp>
 #include <boost/serialization/unordered_map.hpp>
@@ -56,6 +57,7 @@ public:
         SimulatedPlayer*                      simPlayer;
         std::shared_ptr<timewheel::TimeWheel> scheduler;
         unsigned long long                    taskid;
+        unsigned long long                    scriptid;
         // serialization
         template <typename Archive>
         void serialize(Archive& ar, const unsigned int version) {
@@ -88,28 +90,28 @@ public:
         inline bool        sneaking(bool enable) {
             return enable ? simPlayer->simulateSneaking() : simPlayer->simulateStopSneaking();
         }
-        inline void swimming(bool enable) {
+        void swimming(bool enable) {
             if (enable) {
                 simPlayer->startSwimming();
-                scheduler->add(1, [*this](unsigned long long) {
-                    if (simPlayer) simPlayer->startSwimming();
+                taskid = scheduler->add(1, [sp = this->simPlayer](unsigned long long) {
+                    if (sp) sp->startSwimming();
                     return false;
                 });
             } else {
                 simPlayer->stopSwimming();
-                scheduler->add(1, [*this](unsigned long long) {
-                    if (simPlayer) simPlayer->stopSwimming();
+                taskid = scheduler->add(1, [sp = this->simPlayer](unsigned long long) {
+                    if (sp) sp->stopSwimming();
                     return false;
                 });
             }
         }
-        inline bool attack() {
+        bool attack() {
             const auto& hit = simPlayer->traceRay(5.25f, true, false);
             if (hit) return simPlayer->simulateAttack(hit.getEntity());
             else return false;
         }
         inline void chat(std::string const& msg) { simPlayer->simulateChat(msg); }
-        inline bool destroy() {
+        bool        destroy() {
             const auto& hit = simPlayer->traceRay(5.25f, false, true);
             if (hit)
                 return simPlayer->simulateDestroyBlock(
@@ -119,7 +121,7 @@ public:
             else return false;
         }
         inline bool dropSelectedItem() { return simPlayer->simulateDropSelectedItem(); }
-        inline bool dropInv() {
+        bool        dropInv() {
             bool rst = true;
             if (simPlayer->getSelectedItem() != ItemStack::EMPTY_ITEM) rst &= simPlayer->simulateDropSelectedItem();
             int   sel  = simPlayer->getSelectedItemSlot();
@@ -128,11 +130,11 @@ public:
             for (int i = 0; i < size; ++i) {
                 if (i == sel || inv.getItem(i) == ItemStack::EMPTY_ITEM) continue;
                 utils::swapItemInContainer(simPlayer, sel, i);
-                rst &= simPlayer->simulateDropSelectedItem();
+                rst &= dropSelectedItem();
             }
             return rst;
         }
-        inline void swap(Player* player) {
+        void swap(Player* player) {
             // get data
             auto&      spInv     = simPlayer->getInventory();
             const auto spOffhand = simPlayer->getOffhandSlot();
@@ -175,7 +177,7 @@ public:
             // refresh
             player->refreshInventory();
         }
-        inline bool runCmd(std::string const& cmd) {
+        bool runCmd(std::string const& cmd) {
             CommandContext ctx(cmd, std::make_unique<PlayerCommandOrigin>(PlayerCommandOrigin(*simPlayer)));
             auto           mc = ll::service::getMinecraft();
             if (mc) {
@@ -184,22 +186,50 @@ public:
             }
             return false;
         }
-        inline bool select(int id) {
+        std::pair<BlockPos, bool> getBlockPosFromView() {
+            const auto& hit = simPlayer->traceRay(5.25f, false, true);
+            return {hit.mBlockPos, hit.mType == HitResultType::Tile};
+        }
+        int searchInInvWithId(int id, int start = 0) {
             auto& inv  = simPlayer->getInventory();
             int   size = inv.getContainerSize();
-            int   sel  = simPlayer->getSelectedItemSlot();
-            for (int i = 0; i < size; ++i) {
-                if (i == sel) continue;
-                if (inv.getItem(i).getId() == id) {
-                    utils::swapItemInContainer(simPlayer, sel, i);
-                    return true;
-                }
+            for (int i = start; i < size; ++i) {
+                if (inv.getItem(i).getId() == id) return i;
             }
-            return false;
+            return -1;
+        }
+        int searchInInvWithName(std::string const& itemName, int start = 0) {
+            auto& inv  = simPlayer->getInventory();
+            int   size = inv.getContainerSize();
+            for (int i = start; i < size; ++i) {
+                const auto& it         = inv.getItem(i);
+                const auto& customName = it.getCustomName();
+                if ((customName.empty() ? it.getName() : customName) == itemName) return i;
+            }
+            return -1;
+        }
+        bool selectSlot(int slot) {
+            int maxslot = simPlayer->getInventory().getContainerSize();
+            if (slot < 0 || slot >= maxslot) return false;
+            int sel = simPlayer->getSelectedItemSlot();
+            utils::swapItemInContainer(simPlayer, sel, slot);
+            return true;
+        }
+        bool select(int id) {
+            int sel    = simPlayer->getSelectedItemSlot();
+            int target = searchInInvWithId(id);
+            if (target == sel) target = searchInInvWithId(id, sel + 1);
+            if (target == -1) return false;
+            utils::swapItemInContainer(simPlayer, sel, target);
+            return true;
+        }
+        const ItemStack& getItemFromInv(int slot) {
+            auto& inv = simPlayer->getInventory();
+            return inv.getItem(slot);
         }
         inline bool interact() { return simPlayer->simulateInteract(); }
         inline bool jump() { return simPlayer->simulateJump(); }
-        inline void useItem(int delay) {
+        void        useItem(int delay) {
             simPlayer->simulateUseItemInSlot(simPlayer->getSelectedItemSlot());
             taskid = scheduler->add(delay, [sp = this->simPlayer](unsigned long long) {
                 if (sp) sp->simulateStopUsingItem();
@@ -210,23 +240,37 @@ public:
         inline void lookAt(Vec3 const& pos) { simPlayer->simulateLookAt(pos, ::sim::LookDuration{}); }
         inline void moveTo(Vec3 const& pos) { simPlayer->simulateMoveToLocation(pos, 4.3f, true); }
         inline void navigateTo(Vec3 const& pos) { simPlayer->simulateNavigateToLocation(pos, 4.3f); }
-        inline void cancel() { scheduler->cancel(taskid); }
-        inline bool isFree() {
+        inline void cancelTask() { scheduler->cancel(taskid); }
+        inline void cancelScript() { scheduler->cancel(scriptid); }
+        bool        isTaskFree() {
             if (scheduler->isRunning(taskid)) return false;
             else {
                 taskid = 0;
                 return true;
             }
         }
-        inline void stop() {
+        bool isScriptFree() {
+            if (scheduler->isRunning(scriptid)) return false;
+            else {
+                scriptid = 0;
+                return true;
+            }
+        }
+        inline bool isFree() { return isTaskFree() && isScriptFree(); }
+        void        stopAction() {
             simPlayer->simulateStopBuild();
             simPlayer->simulateStopDestroyingBlock();
             simPlayer->simulateStopFlying();
             simPlayer->simulateStopInteracting();
             simPlayer->simulateStopMoving();
             simPlayer->simulateStopUsingItem();
-            if (scheduler->isRunning(taskid)) cancel();
+            if (scheduler->isRunning(taskid)) cancelTask();
             taskid = 0;
+        }
+        void stop() {
+            stopAction();
+            if (scheduler->isRunning(scriptid)) cancelScript();
+            scriptid = 0;
         }
     };
 
@@ -324,6 +368,7 @@ public:
     SP_REG_DEF(LookAt, Vec3 const&)
     SP_REG_DEF(MoveTo, Vec3 const&)
     SP_REG_DEF(NavTo, Vec3 const&)
+    SP_REG_DEF(Script, std::string const&, int)
 };
 
 } // namespace coral_fans::functions

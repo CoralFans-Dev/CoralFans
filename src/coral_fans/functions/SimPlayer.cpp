@@ -2,6 +2,7 @@
 #include "coral_fans/CoralFans.h"
 #include "coral_fans/base/Macros.h"
 #include "coral_fans/base/Mod.h"
+#include "coral_fans/functions/SpLuaApi.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/memory/Hook.h"
@@ -33,6 +34,8 @@
 #include <string>
 #include <unordered_set>
 #include <utility>
+
+namespace coral_fans::functions {
 
 namespace sputils {
 
@@ -75,8 +78,6 @@ bool emptyInv(SimulatedPlayer* sp) {
 
 } // namespace sputils
 
-namespace coral_fans::functions {
-
 void SimPlayerManager::refreshSoftEnum() {
     std::vector<std::string> spvals;
     std::vector<std::string> gvals;
@@ -89,7 +90,7 @@ void SimPlayerManager::refreshSoftEnum() {
 void SimPlayerManager::save() {
     try {
         const auto& logger  = coral_fans::mod().getLogger();
-        const auto& dataDir = CoralFans::getInstance().getSelf().getDataDir() / "simplayer";
+        const auto& dataDir = CoralFans::getInstance().getSelf().getDataDir() / "simplayer" / "data";
         // rebuild dir
         std::filesystem::remove_all(dataDir);
         std::filesystem::create_directories(dataDir);
@@ -128,8 +129,9 @@ void SimPlayerManager::save() {
 
 void SimPlayerManager::load() {
     try {
+        std::filesystem::create_directories(CoralFans::getInstance().getSelf().getDataDir() / "simplayer" / "scripts");
         const auto& logger  = coral_fans::mod().getLogger();
-        const auto& dataDir = CoralFans::getInstance().getSelf().getDataDir() / "simplayer";
+        const auto& dataDir = CoralFans::getInstance().getSelf().getDataDir() / "simplayer" / "data";
         // check: exist
         if (!std::filesystem::exists(dataDir)) {
             logger.debug("Failed to load SimPlayer Data: not exist");
@@ -420,6 +422,7 @@ SimPlayerManager::spawnSimPlayer(Player* player, std::string const& name, Vec3 c
             sputils::emptyInv(simPlayer),
             simPlayer,
             this->mScheduler,
+            0,
             0
         };
         this->mNameSimPlayerMap[spname] = info;
@@ -620,6 +623,39 @@ SP_DEF_TASK(Build, startBuild)
 SP_DEF_WA(LookAt, lookAt, Vec3 const&)
 SP_DEF_WA(MoveTo, moveTo, Vec3 const&)
 SP_DEF_WA(NavTo, navigateTo, Vec3 const&)
+std::pair<std::string, bool> SimPlayerManager::simPlayerScript(
+    Player*            player,
+    std::string const& spname,
+    bool               noCheck,
+    std::string const& arg,
+    int                interval
+) {
+    using ll::i18n_literals::operator""_tr;
+    auto uuid = player->getUuid();
+    auto it   = this->mNameSimPlayerMap.find(spname);
+    if (it == this->mNameSimPlayerMap.end()) return {"translate.simplayer.error.notfound"_tr(), false};
+    if (player->getCommandPermissionLevel() >= coral_fans::mod().getConfig().simPlayer.adminPermission || noCheck
+        || uuid == it->second.ownerUuid) {
+        if (it->second.status != SimPlayerStatus::Alive) return {"translate.simplayer.error.statuserror"_tr(), false};
+        if (!it->second.isFree()) return {"translate.simplayer.error.nonfree"_tr(), false};
+        // run script
+        if (it->second.simPlayer) return sputils::lua_api::execLuaScript(arg, interval, it->second);
+        return {"translate.simplayer.success"_tr(), true};
+    }
+    return {"translate.simplayer.error.permissiondenied"_tr(), false};
+}
+std::pair<std::string, bool>
+SimPlayerManager::groupScript(Player* player, std::string const& gname, std::string const& arg, int interval) {
+    using ll::i18n_literals::operator""_tr;
+    auto adminIt = this->mGroupAdminMap.find(gname);
+    auto it      = this->mGroupNameMap.find(gname);
+    if (it == this->mGroupNameMap.end() || adminIt == this->mGroupAdminMap.end())
+        return {"translate.simplayer.error.notfound"_tr(), false};
+    if (adminIt->second.find(player->getUuid().asString()) == adminIt->second.end())
+        return {"translate.simplayer.error.permissiondenied"_tr(), false};
+    for (auto const& v : it->second) this->simPlayerScript(player, v, true, arg, interval);
+    return {"translate.simplayer.success"_tr(), true};
+}
 
 LL_TYPE_INSTANCE_HOOK(
     CoralFansSimPlayerDieEventHook,

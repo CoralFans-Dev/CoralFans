@@ -832,6 +832,37 @@ void registerSpCommand(CommandPermissionLevel permission) {
             );
         }
     );
+
+    std::array<std::pair<std::string, ll::command::ParamKind::Kind>, 1> intervalArg{
+        std::make_pair("interval", ll::command::ParamKind::Int)
+    };
+    std::array<std::pair<std::string, ll::command::ParamKind::Kind>, 1> pathArg{
+        std::make_pair("path", ll::command::ParamKind::FilePath)
+    };
+
+    ::regSubCmd(
+        spCommand,
+        "script",
+        pathArg,
+        intervalArg,
+        [](Player* player, ll::command::RuntimeCommand const& self) {
+            return coral_fans::mod().getSimPlayerManager().simPlayerScript(
+                player,
+                self["name"].get<ll::command::ParamKind::SoftEnum>(),
+                false,
+                self["path"].get<ll::command::ParamKind::FilePath>().getText(),
+                self["interval"].has_value() ? self["interval"].get<ll::command::ParamKind::Int>() : 20
+            );
+        },
+        [](Player* player, ll::command::RuntimeCommand const& self) {
+            return coral_fans::mod().getSimPlayerManager().groupScript(
+                player,
+                self["name"].get<ll::command::ParamKind::SoftEnum>(),
+                self["path"].get<ll::command::ParamKind::FilePath>().getText(),
+                self["interval"].has_value() ? self["interval"].get<ll::command::ParamKind::Int>() : 20
+            );
+        }
+    );
 }
 
 } // namespace coral_fans::commands

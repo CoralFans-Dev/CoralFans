@@ -51,6 +51,7 @@ struct SimPlayerStruct {
     CommandPermissionLevel          adminPermission = CommandPermissionLevel::GameDirectors;
     ListType                        listType        = ListType::disabled;
     std::unordered_set<std::string> list;
+    std::string                     luaPreload = "";
 };
 
 struct Config {

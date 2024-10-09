@@ -2,6 +2,7 @@
 
 #include "coral_fans/base/Mod.h"
 
+#include "ll/api/i18n/I18n.h"
 #include "mc/deps/core/mce/Color.h"
 #include "mc/nbt/ByteTag.h"
 #include "mc/nbt/CompoundTag.h"
@@ -19,32 +20,57 @@
 
 namespace coral_fans::utils {
 
+namespace {
 
-BlockPos facingToBlockPos(int facing) {
-    switch (facing) {
-    case 0:
-        return BlockPos{0, -1, 0};
-        break;
-    case 1:
-        return BlockPos{0, +1, 0};
-        break;
-    case 2:
-        return BlockPos{0, 0, -1};
-        break;
-    case 3:
-        return BlockPos{0, 0, +1};
-        break;
-    case 4:
-        return BlockPos{-1, 0, 0};
-        break;
-    case 5:
-        return BlockPos{+1, 0, 0};
-        break;
-    default:
-        return BlockPos{0, 0, 0};
-        break;
-    }
+struct PathNode {
+    std::string id;
+    int         index;
+    bool        useIndex;
 };
+
+bool parsePath(std::string const& path, std::vector<PathNode>& vec) {
+    for (auto key : ll::string_utils::splitByPattern(path, ".")) {
+        if (key.ends_with(']')) try {
+                vec.emplace_back(PathNode{
+                    std::string{key.substr(0, key.find('['))},
+                    std::stoi(std::string{key.substr(key.find('[') + 1, key.length() - key.find('[') - 2)}),
+                    true
+                });
+            } catch (...) {
+                return false;
+            }
+        else vec.emplace_back(PathNode{std::string{key}, 0, false});
+    }
+    return true;
+}
+
+} // namespace
+
+std::pair<std::string, bool> getNbtFromTag(CompoundTag const tag, std::string const& path) {
+    using ll::i18n_literals::operator""_tr;
+    std::vector<PathNode>           nodes;
+    std::vector<CompoundTagVariant> tags;
+    if (!parsePath(path, nodes)) return {"translate.data.error.cannotparse"_tr(), false};
+    try {
+        tags.emplace_back(tag[nodes[0].id]);
+        if (nodes[0].useIndex) {
+            if (tags.back().is_array() && tags.back().get<ListTag>().getCompound(nodes[0].index))
+                tags.emplace_back(*(tags.back().get<ListTag>().getCompound(nodes[0].index)));
+            else return {"translate.data.error.notanarray"_tr(), false};
+        }
+        for (unsigned long long i = 1; i < nodes.size(); ++i) {
+            tags.emplace_back(tags.back()[nodes[i].id]);
+            if (nodes[i].useIndex) {
+                if (tags.back().is_array() && tags.back().get<ListTag>().getCompound(nodes[i].index))
+                    tags.emplace_back(*(tags.back().get<ListTag>().getCompound(nodes[i].index)));
+                else return {"translate.data.error.notanarray"_tr(), false};
+            }
+        }
+        return {tags.back().toSnbt(SnbtFormat::PrettyChatPrint), true};
+    } catch (...) {
+        return {"translate.data.error.geterror"_tr(), false};
+    }
+}
 
 ChunkPos blockPosToChunkPos(BlockPos const& blockPos) {
     return ChunkPos{

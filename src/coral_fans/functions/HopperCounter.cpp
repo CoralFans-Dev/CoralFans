@@ -2,6 +2,7 @@
 #include "coral_fans/base/Macros.h"
 #include "coral_fans/base/Mod.h"
 #include "coral_fans/base/Utils.h"
+#include "ll/api/base/StdInt.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/memory/Hook.h"
 #include "ll/api/memory/Memory.h"
@@ -97,7 +98,7 @@ int HopperCounterManager::getViewChannel(BlockSource& blockSource, HitResult hit
     const auto&                                          dest = blockSource.getBlock(hitrst.mBlockPos);
     std::unordered_map<std::string, int>::const_iterator it;
     if (utils::removeMinecraftPrefix(dest.getTypeName()) == "hopper") {
-        const auto& block = blockSource.getBlock(hitrst.mBlockPos + utils::facingToBlockPos(dest.getVariant()));
+        const auto& block = blockSource.getBlock(hitrst.mBlockPos.neighbor((uchar)dest.getVariant()));
         it =
             functions::HopperCounterManager::HOPPER_COUNTER_MAP.find(utils::removeMinecraftPrefix(block.getTypeName()));
     } else
@@ -136,8 +137,7 @@ LL_TYPE_INSTANCE_HOOK(
     // get dest block
     auto& blockActor = ll::memory::dAccess<BlockActor>(this, -200); // magic number!
     auto& thisPos    = blockActor.getPosition();
-    auto& dest =
-        ::hopperRegion->getBlock(thisPos + utils::facingToBlockPos(::hopperRegion->getBlock(thisPos).getVariant()));
+    auto& dest = ::hopperRegion->getBlock(thisPos.neighbor((uchar)(::hopperRegion->getBlock(thisPos).getVariant())));
     // get iterator
     auto it = HopperCounterManager::HOPPER_COUNTER_MAP.find(utils::removeMinecraftPrefix(dest.getTypeName()));
     if (it == HopperCounterManager::HOPPER_COUNTER_MAP.end()) {
