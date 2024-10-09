@@ -25,6 +25,7 @@ struct CommandStruct {
     CommandConfigStruct data    = {true, CommandPermissionLevel::Any};
     CommandConfigStruct cfhud   = {true, CommandPermissionLevel::Any};
     CommandConfigStruct sp      = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct log     = {true, CommandPermissionLevel::Any};
 };
 
 struct Shortcut {
