@@ -522,7 +522,7 @@ std::pair<std::string, bool> SimPlayerManager::rmSimPlayer(Player* player, std::
         if (!it->second.offlineEmptyInv) return {"translate.simplayer.error.notempty"_tr(), false};
         // remove
         std::filesystem::remove_all(CoralFans::getInstance().getSelf().getDataDir() / "simplayer" / it->second.xuid);
-        for (const auto& i : it->second.groups) this->mGroupNameMap[i].erase(it->first);
+        for (const auto& i : it->second.groups) this->mGroupNameMap[i].erase(spname);
         this->mOwnerNameMap[it->second.ownerUuid].erase(it->first);
         this->mNameSimPlayerMap.erase(it);
         this->refreshSoftEnum();
@@ -543,8 +543,8 @@ std::pair<std::string, bool> SimPlayerManager::rmGroup(Player* player, std::stri
     if (adminIt->second.find(player->getUuid().asString()) == adminIt->second.end())
         return {"translate.simplayer.error.permissiondenied"_tr(), false};
     // run
-    while (!this->mGroupNameMap.find(gname)->second.empty())
-        this->rmSimPlayer(player, *(this->mGroupNameMap.find(gname)->second.begin()), true);
+    auto set = this->mGroupNameMap[gname];
+    for (const auto& i : set) this->rmSimPlayer(player, i, true);
     // return
     return {"translate.simplayer.success"_tr(), true};
 }
