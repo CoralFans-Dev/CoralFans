@@ -142,11 +142,11 @@ void registerSpCommand(CommandPermissionLevel permission) {
             else output.error(rst.first);
         });
 
-    // sp g <name: string> add <simplayer: string>
+    // sp g <name: string> addsp <simplayer: string>
     spCommand.runtimeOverload()
         .text("g")
         .required("name", ll::command::ParamKind::SoftEnum, "gname")
-        .text("add")
+        .text("addsp")
         .required("simplayer", ll::command::ParamKind::SoftEnum, "spname")
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             COMMAND_CHECK_PLAYER
@@ -160,11 +160,11 @@ void registerSpCommand(CommandPermissionLevel permission) {
             else output.error(rst.first);
         });
 
-    // sp g <name: string> rm <simplayer: string>
+    // sp g <name: string> rmsp <simplayer: string>
     spCommand.runtimeOverload()
         .text("g")
         .required("name", ll::command::ParamKind::SoftEnum, "gname")
-        .text("rm")
+        .text("rmsp")
         .required("simplayer", ll::command::ParamKind::SoftEnum, "spname")
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             COMMAND_CHECK_PLAYER
