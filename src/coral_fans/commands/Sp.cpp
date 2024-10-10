@@ -453,21 +453,21 @@ void registerSpCommand(CommandPermissionLevel permission) {
         }
     );
 
-    std::array<std::pair<std::string, ll::command::ParamKind::Kind>, 1> msgArg{
-        std::make_pair("message", ll::command::ParamKind::RawText)
+    std::array<std::pair<std::string, ll::command::ParamKind::Kind>, 1> strArg{
+        std::make_pair("str", ll::command::ParamKind::String)
     };
 
     ::regSubCmd(
         spCommand,
         "chat",
-        msgArg,
+        strArg,
         taskArg,
         [](Player* player, ll::command::RuntimeCommand const& self) {
             return coral_fans::mod().getSimPlayerManager().simPlayerChat(
                 player,
                 self["name"].get<ll::command::ParamKind::SoftEnum>(),
                 false,
-                self["message"].get<ll::command::ParamKind::RawText>().getText(),
+                self["message"].get<ll::command::ParamKind::String>(),
                 self["interval"].has_value() ? self["interval"].get<ll::command::ParamKind::Int>() : 20,
                 self["times"].has_value() ? self["times"].get<ll::command::ParamKind::Int>() : 1
             );
@@ -476,7 +476,7 @@ void registerSpCommand(CommandPermissionLevel permission) {
             return coral_fans::mod().getSimPlayerManager().groupChat(
                 player,
                 self["name"].get<ll::command::ParamKind::SoftEnum>(),
-                self["message"].get<ll::command::ParamKind::RawText>().getText(),
+                self["message"].get<ll::command::ParamKind::String>(),
                 self["interval"].has_value() ? self["interval"].get<ll::command::ParamKind::Int>() : 20,
                 self["times"].has_value() ? self["times"].get<ll::command::ParamKind::Int>() : 1
             );
@@ -561,10 +561,6 @@ void registerSpCommand(CommandPermissionLevel permission) {
             if (rst.second) output.success(rst.first);
             else output.error(rst.first);
         });
-
-    std::array<std::pair<std::string, ll::command::ParamKind::Kind>, 1> strArg{
-        std::make_pair("str", ll::command::ParamKind::String)
-    };
 
     ::regSubCmd(
         spCommand,
