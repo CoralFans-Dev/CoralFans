@@ -100,57 +100,56 @@ void CFVillageManager::heavyTick() {
     static int gt = 0;
     if (gt == 1) { // delay 1 tick
         this->clearParticle();
+        auto& mod = coral_fans::mod();
         for (auto kv : this->mVidVillageMap) {
             if (!kv.second.first) continue;
             if (this->mShowBounds) {
                 auto ids = std::array{
                     this->mParticleId,
-                    coral_fans::mod().getGeometryGroup()->box(kv.second.second, kv.second.first->getBounds())
+                    mod.getGeometryGroup()->box(kv.second.second, kv.second.first->getBounds())
                 };
-                this->mParticleId = coral_fans::mod().getGeometryGroup()->merge(ids);
+                this->mParticleId = mod.getGeometryGroup()->merge(ids);
             }
             if (this->mShowRaidBounds) {
                 auto ids = std::array{
                     this->mParticleId,
-                    coral_fans::mod()
-                        .getGeometryGroup()
-                        ->box(kv.second.second, kv.second.first->getRaidBounds(), mce::Color::ORANGE)
+                    mod.getGeometryGroup()->box(kv.second.second, kv.second.first->getRaidBounds(), mce::Color::ORANGE)
                 };
-                this->mParticleId = coral_fans::mod().getGeometryGroup()->merge(ids);
+                this->mParticleId = mod.getGeometryGroup()->merge(ids);
             }
             if (this->mShowIronSpawn) {
                 auto ids = std::array{
                     this->mParticleId,
-                    coral_fans::mod().getGeometryGroup()->box(
+                    mod.getGeometryGroup()->box(
                         kv.second.second,
                         {kv.second.first->getCenter() - Vec3{8, 6, 8}, kv.second.first->getCenter() + Vec3{9, 7, 9}},
                         mce::Color::BLUE
                     )
                 };
-                this->mParticleId = coral_fans::mod().getGeometryGroup()->merge(ids);
+                this->mParticleId = mod.getGeometryGroup()->merge(ids);
             }
             if (this->mShowCenter) {
                 auto ids = std::array{
                     this->mParticleId,
-                    coral_fans::mod().getGeometryGroup()->box(
+                    mod.getGeometryGroup()->box(
                         kv.second.second,
                         {kv.second.first->getCenter(), kv.second.first->getCenter() + Vec3{1, 1, 1}},
                         mce::Color::RED
                     )
                 };
-                this->mParticleId = coral_fans::mod().getGeometryGroup()->merge(ids);
+                this->mParticleId = mod.getGeometryGroup()->merge(ids);
             }
             if (this->mShowPoiQuery) {
                 auto ids = std::array{
                     this->mParticleId,
-                    coral_fans::mod().getGeometryGroup()->box(
+                    mod.getGeometryGroup()->box(
                         kv.second.second,
                         {kv.second.first->getBounds().min - Vec3{64, 64, 64},
                                         kv.second.first->getBounds().max + Vec3{64, 64, 64}},
                         mce::Color::PINK
                     )
                 };
-                this->mParticleId = coral_fans::mod().getGeometryGroup()->merge(ids);
+                this->mParticleId = mod.getGeometryGroup()->merge(ids);
             }
             if (this->mShowBind) {
                 auto level = ll::service::getLevel();
@@ -164,7 +163,7 @@ void CFVillageManager::heavyTick() {
                             for (int i = 0; i < 3; i++) {
                                 const auto& poi = item.second[i].lock();
                                 if (poi) {
-                                    ids.emplace_back(coral_fans::mod().getGeometryGroup()->line(
+                                    ids.emplace_back(mod.getGeometryGroup()->line(
                                         villager->getDimensionId(),
                                         villager->getHeadPos(),
                                         poi->getPosition().center(),
@@ -174,7 +173,7 @@ void CFVillageManager::heavyTick() {
                             }
                         }
                     }
-                    this->mParticleId = coral_fans::mod().getGeometryGroup()->merge(ids);
+                    this->mParticleId = mod.getGeometryGroup()->merge(ids);
                 }
             }
         }
@@ -286,7 +285,7 @@ std::pair<std::string, bool> CFVillageManager::getVillagerInfo(ActorUniqueID aui
 }
 
 // hook village tick
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     CoralFansVillageTickHook,
     ll::memory::HookPriority::Normal,
     Village,
@@ -297,6 +296,11 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 ) {
     coral_fans::mod().getVillageManager().insertVillage(this, region.getDimensionId());
     origin(tick, region);
+}
+
+void hookVillage(bool hook) {
+    if (hook) CoralFansVillageTickHook::hook();
+    else CoralFansVillageTickHook::unhook();
 }
 
 } // namespace coral_fans::functions

@@ -1,15 +1,20 @@
 #pragma once
 
-#include <string>
+#include "mc/server/commands/CommandPermissionLevel.h"
 
 namespace coral_fans::commands {
-void registerTickCommand(std::string);
-void registerFuncCommand(std::string);
-void registerSelfCommand(std::string);
-void registerHsaCommand(std::string);
-void registerCounterCommand(std::string);
-void registerProfCommand(std::string);
-void registerSlimeCommand(std::string);
-void registerVillageCommand(std::string);
-void registerRotateCommand(std::string);
+void registerCoralfansCommand();
+void registerTickCommand(CommandPermissionLevel);
+void registerFuncCommand(CommandPermissionLevel);
+void registerSelfCommand(CommandPermissionLevel);
+void registerHsaCommand(CommandPermissionLevel);
+void registerCounterCommand(CommandPermissionLevel);
+void registerProfCommand(CommandPermissionLevel);
+void registerSlimeCommand(CommandPermissionLevel);
+void registerVillageCommand(CommandPermissionLevel);
+void registerRotateCommand(CommandPermissionLevel);
+void registerDataCommand(CommandPermissionLevel);
+void registerCfhudCommand(CommandPermissionLevel);
+void registerSpCommand(CommandPermissionLevel);
+void registerLogCommand(CommandPermissionLevel);
 } // namespace coral_fans::commands

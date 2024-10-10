@@ -4,36 +4,31 @@
 
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
+#include "ll/api/command/runtime/RuntimeCommand.h"
+#include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/world/actor/player/Player.h"
 
-#include <string>
-
 namespace coral_fans::commands {
 
-void registerSlimeCommand(std::string permission) {
+void registerSlimeCommand(CommandPermissionLevel permission) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
-    auto& slimeCommand = ll::command::CommandRegistrar::getInstance().getOrCreateCommand(
-        "slime",
-        "command.slime.description"_tr(),
-        magic_enum::enum_cast<CommandPermissionLevel>(permission).value_or(CommandPermissionLevel::GameDirectors)
-    );
-
-    struct SlimeIsOpenParam {
-        bool isopen;
-    };
+    auto& slimeCommand = ll::command::CommandRegistrar::getInstance()
+                             .getOrCreateCommand("slime", "command.slime.description"_tr(), permission);
 
     // slime show <bool>
-    slimeCommand.overload<SlimeIsOpenParam>().text("show").required("isopen").execute(
-        [](CommandOrigin const&, CommandOutput& output, SlimeIsOpenParam const& param) {
-            if (!param.isopen) coral_fans::mod().getSlimeManager().remove();
-            coral_fans::mod().getSlimeManager().setShow(param.isopen);
-            output.success("command.slime.show.output"_tr(param.isopen ? "true" : "false"));
-        }
-    );
+    slimeCommand.runtimeOverload()
+        .text("show")
+        .required("isopen", ll::command::ParamKind::Bool)
+        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
+            if (!isopen) coral_fans::mod().getSlimeManager().remove();
+            coral_fans::mod().getSlimeManager().setShow(isopen);
+            output.success("command.slime.show.output"_tr(isopen ? "true" : "false"));
+        });
 
     // slime check
     slimeCommand.overload().text("check").execute([](CommandOrigin const& origin, CommandOutput& output) {

@@ -7,8 +7,10 @@ add_repositories("liteldev-repo https://github.com/LiteLDev/xmake-repo.git")
 -- please note that you should add bdslibrary yourself if using dev version
 add_requires(
     "levilamina",
-    "bsci"
+    "bsci",
+    "lua 5.4.7"
 )
+add_requires("boost", {configs = {all = true}})
 
 if not has_config("vs_runtime") then
     set_runtimes("MD")
@@ -27,11 +29,14 @@ target("CoralFans") -- Change this to your mod name.
         "/w45204"
     )
     add_defines("NOMINMAX", "UNICODE")
+    add_defines("COMMITID=\"$(shell git rev-parse HEAD)\"")
     add_files("src/**.cpp")
     add_includedirs("src")
     add_packages(
         "levilamina",
-        "bsci"
+        "bsci",
+        "boost",
+        "lua"
     )
     add_shflags("/DELAYLOAD:bedrock_server.dll") -- To use symbols provided by SymbolProvider.
     set_exceptions("none") -- To avoid conflicts with /EHa.

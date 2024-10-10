@@ -40,6 +40,18 @@
             "containerreader": {
                 "success": "全局设置 containerreader \"{}\"",
                 "error": "全局设置 containerreader 失败"
+            },
+            "autototem": {
+                "success": "全局设置 autototem \"{}\"",
+                "error": "全局设置 autototem 失败"
+            },
+            "autoitem": {
+                "success": "全局设置 autoitem \"{}\"",
+                "error": "全局设置 autoitem 失败"
+            },
+            "fastdrop": {
+                "success": "全局设置 fastdrop \"{}\"",
+                "error": "全局设置 fastdrop 失败"
             }
         },
         "self": {
@@ -59,6 +71,18 @@
             "containerreader": {
                 "success": "设置 containerreader \"{}\"",
                 "error": "设置 containerreader 失败"
+            },
+            "autototem": {
+                "success": "设置 autototem \"{}\"",
+                "error": "设置 autototem 失败"
+            },
+            "autoitem": {
+                "success": "设置 autoitem \"{}\"",
+                "error": "设置 autoitem 失败"
+            },
+            "fastdrop": {
+                "success": "设置 fastdrop \"{}\"",
+                "error": "设置 fastdrop 失败"
             }
         },
         "tick": {
@@ -118,6 +142,40 @@
         },
         "rotate": {
             "description": "旋转方块"
+        },
+        "data": {
+            "description": "获取方块或实体数据",
+            "error": "无法获取目标"
+        },
+        "cfhud": {
+            "description": "设置HUD显示信息",
+            "success": "设置成功",
+            "error": {
+                "geterror": "获取配置错误",
+                "seterror": "设置配置错误"
+            }
+        },
+        "sp": {
+            "description": "假人",
+            "success": "操作成功",
+            "error": {
+                "toomanyobj": "对象过多",
+                "permissiondenied": "权限拒绝"
+            }
+        },
+        "log": {
+            "description": "打印信息",
+            "error": {
+                "nulllevel": "空的Level值",
+                "nopt": "无计划刻"
+            },
+            "success": {
+                "pt": {
+                    "title": "[{}] 区块 {} 有 {} 个计划刻 ->",
+                    "remove": " {}: 删除",
+                    "info": " {}: tick time {}, 优先级 {}, {}"
+                }
+            }
         }
     },
     "translate": {
@@ -145,6 +203,53 @@
         "containerreader": {
             "null": "容器为空",
             "info": "容器内共有 {} 堆物品: \n"
+        },
+        "data": {
+            "info": {
+                "block": "- §b位置: §a{}§r\n- §b名称: §a{}§r\n- §b类型名: §a{}§r\n- §bID: §a{}§r\n- §bRTID: §a{}§r\n- §b特殊值: §a{}§r\n- §bCanInstanceTick: §a{}§r\n- §bHasBlockEntity: §a{}§r\n- §bIsSolid: §a{}§r\n- §b比较器输出: §a{}§r\n- §b材质:§r\n - §bMotion: §a{}§r\n - §bTopSolid: §a{}§r\n - §bIsSolid: §a{}§r\n - §bIsSolidBlocking: §a{}§r\n - §bTranslucency: §a{}§r",
+                "entity": "- §bNameTag: §a{}§r\n- §bTypeName: §a{}§r\n- §bUID: §a{}§r\n- §bPos: §a{}§r\n- §bDeltaPos: §a{}§r\n- §bAABB: §a{}§r\n- §bSurface: §a{}§r\n",
+                "redstone": {
+                    "signal": {
+                        "title": "信号: {}",
+                        "info": "\n - 位置: {} 衰减: {} 直供: {} 信号: {}"
+                    },
+                    "info": "§b强度: §a{}§r\n§bSecondaryPowered: §a{}§r\n§bCanConsumePower: §a{}§r\n§bCanStopPower: §a{}§r\n§bIsHalfPulse: §a{}§r\n§bDirection: §a{}§r\n§b比较器输出: §a{}§r"
+                }
+            },
+            "error": {
+                "noblockentity": "无方块实体",
+                "nullentity": "无法获取指向实体",
+                "nocircuitcomponent": "无电路元件",
+                "cannotparse": "无法解析path",
+                "notanarray": "对象不是一个array",
+                "geterror": "获取错误"
+            }
+        },
+        "cfhud": {
+            "base": "Tick: {}\n位置: {}\n视角: {}\n区块: {}\n方块: {} 亮度: {}\n速度: {:.4f} ({:.2f} {:.2f} {:.2f})\n群系: {}\n"
+        },
+        "simplayer": {
+            "success": "操作成功",
+            "error": {
+                "maxspawn": "生成过太多假人，请重启服务器",
+                "exist": "已存在",
+                "toomanyonline": "在线假人过多",
+                "toomanyown": "拥有假人过多",
+                "toomanygroup": "存在组过多",
+                "cannotcreate": "无法创建假人",
+                "notfound": "找不到对象",
+                "permissiondenied": "权限拒绝",
+                "rmself": "无法从列表中删除你自身",
+                "statuserror": "状态异常",
+                "notempty": "假人物品栏非空",
+                "nonpositive": "时间间隔必须为正整数",
+                "nonfree": "假人忙"
+            },
+            "info": {
+                "online": "在线: {}",
+                "simplayer": "\n- 名称: {}\n - XUID: {}\n - 所有者UUID: {}\n - 状态: {}\n - 组: {}",
+                "group": "- 名称: {}\n - 管理员: {}\n - 假人: {}\n"
+            }
         }
     }
 }

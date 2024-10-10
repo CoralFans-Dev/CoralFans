@@ -1,5 +1,7 @@
 #pragma once
 
+#include "mc/world/level/BlockSource.h"
+#include "mc/world/phys/HitResult.h"
 #include <map>
 #include <string>
 #include <unordered_map>
@@ -37,7 +39,8 @@ public:
             ch.reset();
         }
     }
-    void tick();
+    void       tick();
+    static int getViewChannel(BlockSource&, HitResult);
 };
 
 } // namespace coral_fans::functions

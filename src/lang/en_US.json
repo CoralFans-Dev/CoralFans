@@ -40,6 +40,18 @@
             "containerreader": {
                 "success": "globally set containerreader \"{}\"",
                 "error": "failed to globally set containerreader"
+            },
+            "autototem": {
+                "success": "globally set autototem \"{}\"",
+                "error": "failed to globally set autototem"
+            },
+            "autoitem": {
+                "success": "globally set autoitem \"{}\"",
+                "error": "failed to globally set autoitem"
+            },
+            "fastdrop": {
+                "success": "globally set fastdrop \"{}\"",
+                "error": "failed to globally set fastdrop"
             }
         },
         "self": {
@@ -59,6 +71,18 @@
             "containerreader": {
                 "success": "set containerreader \"{}\"",
                 "error": "failed to set containerreader"
+            },
+            "autototem": {
+                "success": "set autototem \"{}\"",
+                "error": "failed to set autototem"
+            },
+            "autoitem": {
+                "success": "set autoitem \"{}\"",
+                "error": "failed to set autoitem"
+            },
+            "fastdrop": {
+                "success": "set fastdrop \"{}\"",
+                "error": "failed to set fastdrop"
             }
         },
         "tick": {
@@ -118,6 +142,40 @@
         },
         "rotate": {
             "description": "Blockrotate"
+        },
+        "data": {
+            "description": "Get data of blocks and entities",
+            "error": "cannot get target"
+        },
+        "cfhud": {
+            "description": "Set HUD info",
+            "success": "Success",
+            "error": {
+                "geterror": "Failed to get config",
+                "seterror": "Failed to set config"
+            }
+        },
+        "sp": {
+            "description": "SimPlayer",
+            "success": "Success",
+            "error": {
+                "toomanyobj": "Too many objects",
+                "permissiondenied": "Permission Denied"
+            }
+        },
+        "log": {
+            "description": "Log info",
+            "error": {
+                "nulllevel": "Null Level",
+                "nopt": "no pendingTick"
+            },
+            "success": {
+                "pt": {
+                    "title": "[{}] chunk {} has {} pendingTicks ->",
+                    "remove": " {}: removed",
+                    "info": " {}: tick time {}, priority {}, {}"
+                }
+            }
         }
     },
     "translate": {
@@ -145,6 +203,53 @@
         "containerreader": {
             "null": "Container is null",
             "info": "{} items in the container: \n"
+        },
+        "data": {
+            "info": {
+                "block": "- §bPos: §a{}§r\n- §bName: §a{}§r\n- §bTypeName: §a{}§r\n- §bID: §a{}§r\n- §bRTID: §a{}§r\n- §bVariant: §a{}§r\n- §bCanInstanceTick: §a{}§r\n- §bHasBlockEntity: §a{}§r\n- §bIsSolid: §a{}§r\n- §bComparatorSignal: §a{}§r\n- §bMaterial:§r\n - §bMotion: §a{}§r\n - §bTopSolid: §a{}§r\n - §bIsSolid: §a{}§r\n - §bIsSolidBlocking: §a{}§r\n - §bTranslucency: §a{}§r",
+                "entity": "- §bNameTag: §a{}§r\n- §bTypeName: §a{}§r\n- §bUID: §a{}§r\n- §bPos: §a{}§r\n- §bDeltaPos: §a{}§r\n- §bAABB: §a{}§r\n- §bSurface: §a{}§r\n",
+                "redstone": {
+                    "signal": {
+                        "title": "Signal: {}",
+                        "info": "\n - Pos: {} Dampening: {} DirectlyPowered: {} Signal: {}"
+                    },
+                    "info": "§bStrength: §a{}§r\n§bSecondaryPowered: §a{}§r\n§bCanConsumePower: §a{}§r\n§bCanStopPower: §a{}§r\n§bIsHalfPulse: §a{}§r\n§bDirection: §a{}§r\n§bComparatorSignal: §a{}§r"
+                }
+            },
+            "error": {
+                "noblockentity": "No BlockEntity",
+                "nullentity": "Entity is null",
+                "nocircuitcomponent": "No circuit component",
+                "cannotparse": "Cannot parse path",
+                "notanarray": "Not an array",
+                "geterror": "Get error"
+            }
+        },
+        "cfhud": {
+            "base": "Tick: {}\nPos: {}\nView: {}\nChunk: {}\nBlock: {} Light: {}\nSpeed: {:.4f} ({:.2f} {:.2f} {:.2f})\nBiome: {}\n"
+        },
+        "simplayer": {
+            "success": "Success",
+            "error": {
+                "maxspawn": "Spawned too many SimPlayer. Please restart the server.",
+                "exist": "Already exists",
+                "toomanyonline": "Too many SimPlayers online",
+                "toomanyown": "You own too many SimPlayers",
+                "toomanygroup": "Too many groups",
+                "cannotcreate": "Cannot create SimPlayer",
+                "notfound": "Not found",
+                "permissiondenied": "Permission Denied",
+                "rmself": "Cannot remove yourself from list",
+                "statuserror": "Status error",
+                "notempty": "SimPlayer Inventory not empty",
+                "nonpositive": "interval must be positive",
+                "nonfree": "SimPlayer Busy"
+            },
+            "info": {
+                "online": "Online: {}",
+                "simplayer": "\n- Name: {}\n - XUID: {}\n - OwnerUUID: {}\n - Status: {}\n - Group: {}",
+                "group": "- Name: {}\n - Admin: {}\n - SimPlayer: {}\n"
+            }
         }
     }
 }
