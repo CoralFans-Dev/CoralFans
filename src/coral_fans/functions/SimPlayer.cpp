@@ -30,6 +30,7 @@
 #include <exception>
 #include <filesystem>
 #include <fstream>
+#include <ios>
 #include <memory>
 #include <string>
 #include <unordered_set>
@@ -41,11 +42,10 @@ namespace sputils {
 
 bool saveSpNbt(SimulatedPlayer* sp, std::filesystem::path basePath) {
     if (!sp) return false;
-    std::filesystem::create_directories(basePath);
     auto tag = std::make_unique<CompoundTag>();
     if (!sp->save(*tag)) return false;
     if (!tag) return false;
-    std::ofstream f(basePath / "nbt");
+    std::ofstream f(basePath / "nbt", std::ios_base::out | std::ios_base::trunc);
     if (!f.is_open()) return false;
     f << tag->toSnbt(SnbtFormat::Minimize);
     f.close();
@@ -92,7 +92,6 @@ void SimPlayerManager::save() {
         const auto& logger  = coral_fans::mod().getLogger();
         const auto& dataDir = CoralFans::getInstance().getSelf().getDataDir() / "simplayer" / "data";
         // rebuild dir
-        std::filesystem::remove_all(dataDir);
         std::filesystem::create_directories(dataDir);
         // for each simplayer
         for (auto& [name, sp] : this->mNameSimPlayerMap) {
@@ -109,12 +108,13 @@ void SimPlayerManager::save() {
             sp.offlineGameType   = magic_enum::enum_name(sp.simPlayer->getPlayerGameType());
             sp.offlineEmptyInv   = sputils::emptyInv(sp.simPlayer);
             const auto& basePath = dataDir / sp.xuid;
+            std::filesystem::create_directories(basePath);
             // save inventory
             if (!sputils::saveSpNbt(sp.simPlayer, basePath))
                 logger.error("Failed to save SimPlayer ({}) NBT: cannot save data to {}", name, basePath);
         }
         // save self
-        std::ofstream file(dataDir / "SimPlayerManager");
+        std::ofstream file(dataDir / "SimPlayerManager", std::ios_base::out | std::ios_base::trunc);
         if (!file.is_open()) {
             logger.error("Failed to save SimPlayerManager: cannot open {}", dataDir / "SimPlayerManager");
             return;
