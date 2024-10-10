@@ -17,7 +17,7 @@
 #include "mc/nbt/Tag.h"
 #include "mc/server/ServerInstance.h"
 #include "mc/server/SimulatedPlayer.h"
-#include "mc/server/common/DedicatedServer.h"
+#include "mc/server/common/commands/StopCommand.h"
 #include "mc/world/Minecraft.h"
 #include "mc/world/SimpleContainer.h"
 #include "mc/world/actor/player/Player.h"
@@ -522,7 +522,7 @@ std::pair<std::string, bool> SimPlayerManager::rmSimPlayer(Player* player, std::
         if (!it->second.offlineEmptyInv) return {"translate.simplayer.error.notempty"_tr(), false};
         // remove
         std::filesystem::remove_all(CoralFans::getInstance().getSelf().getDataDir() / "simplayer" / it->second.xuid);
-        for (const auto& i : it->second.groups) this->mGroupNameMap[i].erase(it->first);
+        for (const auto& i : it->second.groups) this->mGroupNameMap[i].erase(spname);
         this->mOwnerNameMap[it->second.ownerUuid].erase(it->first);
         this->mNameSimPlayerMap.erase(it);
         this->refreshSoftEnum();
@@ -543,8 +543,8 @@ std::pair<std::string, bool> SimPlayerManager::rmGroup(Player* player, std::stri
     if (adminIt->second.find(player->getUuid().asString()) == adminIt->second.end())
         return {"translate.simplayer.error.permissiondenied"_tr(), false};
     // run
-    while (!this->mGroupNameMap.find(gname)->second.empty())
-        this->rmSimPlayer(player, *(this->mGroupNameMap.find(gname)->second.begin()), true);
+    auto set = this->mGroupNameMap[gname];
+    for (const auto& i : set) this->rmSimPlayer(player, i, true);
     // return
     return {"translate.simplayer.success"_tr(), true};
 }
@@ -676,14 +676,14 @@ LL_TYPE_INSTANCE_HOOK(
 LL_TYPE_INSTANCE_HOOK(
     CoralFansSimPlayerServerStopSaveHook,
     ll::memory::HookPriority::Normal,
-    DedicatedServer,
-    &DedicatedServer::stop,
-    bool
+    StopCommand,
+    "?execute@StopCommand@@UEBAXAEBVCommandOrigin@@AEAVCommandOutput@@@Z",
+    void,
+    CommandOrigin const& arg1,
+    CommandOutput&       arg2
 ) {
-    auto& mod = coral_fans::mod();
-    mod.getLogger().debug("call DedicatedServer::stop");
-    mod.getSimPlayerManager().save();
-    return origin();
+    coral_fans::mod().getSimPlayerManager().save();
+    origin(arg1, arg2);
 }
 
 LL_TYPE_INSTANCE_HOOK(
