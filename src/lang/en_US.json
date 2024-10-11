@@ -155,14 +155,6 @@
                 "seterror": "Failed to set config"
             }
         },
-        "sp": {
-            "description": "SimPlayer",
-            "success": "Success",
-            "error": {
-                "toomanyobj": "Too many objects",
-                "permissiondenied": "Permission Denied"
-            }
-        },
         "log": {
             "description": "Log info",
             "error": {
@@ -227,29 +219,6 @@
         },
         "cfhud": {
             "base": "Tick: {}\nPos: {}\nView: {}\nChunk: {}\nBlock: {} Light: {}\nSpeed: {:.4f} ({:.2f} {:.2f} {:.2f})\nBiome: {}\n"
-        },
-        "simplayer": {
-            "success": "Success",
-            "error": {
-                "maxspawn": "Spawned too many SimPlayer. Please restart the server.",
-                "exist": "Already exists",
-                "toomanyonline": "Too many SimPlayers online",
-                "toomanyown": "You own too many SimPlayers",
-                "toomanygroup": "Too many groups",
-                "cannotcreate": "Cannot create SimPlayer",
-                "notfound": "Not found",
-                "permissiondenied": "Permission Denied",
-                "rmself": "Cannot remove yourself from list",
-                "statuserror": "Status error",
-                "notempty": "SimPlayer Inventory not empty",
-                "nonpositive": "interval must be positive",
-                "nonfree": "SimPlayer Busy"
-            },
-            "info": {
-                "online": "Online: {}",
-                "simplayer": "\n- Name: {}\n - XUID: {}\n - OwnerUUID: {}\n - Status: {}\n - Group: {}",
-                "group": "- Name: {}\n - Admin: {}\n - SimPlayer: {}\n"
-            }
         }
     }
 }
