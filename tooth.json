@@ -7,8 +7,8 @@
         "description": "CoralFans Mod.",
         "author": "CoralFans-Dev",
         "tags": [
-            "levilamina",
-            "mod"
+            "platform:levilamina",
+            "type:mod"
         ]
     },
     "asset_url": "https://github.com/CoralFans-Dev/CoralFans/releases/download/v$(version)/CoralFans-windows-x64.zip",

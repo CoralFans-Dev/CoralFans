@@ -4,7 +4,6 @@
 
 #include "bsci/GeometryGroup.h"
 
-#include "ll/api/memory/Memory.h"
 #include "ll/api/mod/RegisterHelper.h"
 
 #include "ll/api/Config.h"
@@ -64,14 +63,6 @@ bool CoralFans::enable() {
     logger.debug("Enabling...");
     auto& mod = coral_fans::mod();
 
-    // get DefaultDataLoadHelper
-    mod.getDefaultDataLoadHelper() =
-        static_cast<DefaultDataLoadHelper*>(ll::memory::resolveSymbol("??_7DefaultDataLoadHelper@@6B@"));
-    if (!mod.getDefaultDataLoadHelper()) {
-        logger.error("Cannot get DefaultDataLoadHelper from symbol.");
-        return false;
-    }
-
     // register hooks
     functions::hookAll(true);
 
@@ -91,7 +82,6 @@ bool CoralFans::enable() {
         commands::registerRotateCommand(mod.getConfig().command.rotate.permission);
     if (mod.getConfig().command.data.enabled) commands::registerDataCommand(mod.getConfig().command.data.permission);
     if (mod.getConfig().command.cfhud.enabled) commands::registerCfhudCommand(mod.getConfig().command.cfhud.permission);
-    if (mod.getConfig().command.sp.enabled) commands::registerSpCommand(mod.getConfig().command.sp.permission);
     if (mod.getConfig().command.log.enabled) commands::registerLogCommand(mod.getConfig().command.log.permission);
 
     // register shortcuts
@@ -100,9 +90,6 @@ bool CoralFans::enable() {
 
     // register containerreader
     functions::registerContainerReader();
-
-    // load simplayer data
-    mod.getSimPlayerManager().load();
 
     // register autoitem
     coral_fans::functions::registerAutoItemListener();
