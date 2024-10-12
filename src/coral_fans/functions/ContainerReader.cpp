@@ -27,7 +27,8 @@ void SendContentToPlayer(ServerPlayer& pl, Container* container) {
     for (auto item : slots) {
         if (!item->isNull()) {
             ++cnt;
-            std::string name = item->getName();
+            std::string name = item->getCustomName();
+            if (name.empty()) name = item->getName();
             if (name.size() > 50) name = name.substr(0, 50) + "..."; // prevent overflow attack
             contentStr += "§6" + name + "§2(" + std::to_string(item->mCount) + ")§r, ";
         }
