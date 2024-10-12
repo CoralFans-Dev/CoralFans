@@ -11,6 +11,7 @@
 #include "mc/world/level/block/actor/ChestBlockActor.h"
 
 namespace coral_fans::functions {
+
 // force open
 LL_TYPE_INSTANCE_HOOK(
     CoralFansTweakersForceOpenHook,
@@ -110,6 +111,24 @@ LL_TYPE_INSTANCE_HOOK(
     } else return origin(item, randomly);
 }
 
+// nopickup
+LL_TYPE_INSTANCE_HOOK(
+    CoralFansTweakersNoPickUpHook,
+    HookPriority::Normal,
+    Player,
+    &Player::take,
+    bool,
+    Actor& itemActor,
+    int    orgCount,
+    int    favoredSlot
+) {
+    auto& modcfg = coral_fans::mod().getConfigDb();
+    if (itemActor.hasCategory(ActorCategory::Item) && modcfg->get("functions.global.nopickup") == "true"
+        && modcfg->get(std::format("functions.players.{}.nopickup", this->getUuid().asString())) == "true")
+        return false;
+    return origin(itemActor, orgCount, favoredSlot);
+}
+
 void hookTweakers(bool hook) {
     if (hook) {
         CoralFansTweakersForceOpenHook::hook();
@@ -118,6 +137,7 @@ void hookTweakers(bool hook) {
         CoralFansTweakersDropperNoCostHook::hook();
         CoralFansTweakersSafeExplodeHook::hook();
         CoralFansTweakersFastDropHook::hook();
+        CoralFansTweakersNoPickUpHook::hook();
     } else {
         CoralFansTweakersForceOpenHook::unhook();
         CoralFansTweakersForcePlaceHook::unhook();
@@ -125,6 +145,7 @@ void hookTweakers(bool hook) {
         CoralFansTweakersDropperNoCostHook::unhook();
         CoralFansTweakersSafeExplodeHook::unhook();
         CoralFansTweakersFastDropHook::unhook();
+        CoralFansTweakersNoPickUpHook::unhook();
     }
 }
 

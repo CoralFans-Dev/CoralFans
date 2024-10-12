@@ -1,21 +1,19 @@
 #pragma once
 
+#include "TimeWheel.h"
 #include "bsci/GeometryGroup.h"
 #include "coral_fans/Config.h"
 #include "coral_fans/CoralFans.h"
-#include "coral_fans/base/TimeWheel.h"
 #include "coral_fans/functions/HopperCounter.h"
 #include "coral_fans/functions/Hsa.h"
 #include "coral_fans/functions/Hud.h"
 #include "coral_fans/functions/Prof.h"
-#include "coral_fans/functions/SimPlayer.h"
 #include "coral_fans/functions/Slime.h"
 #include "coral_fans/functions/Village.h"
 #include "ll/api/Logger.h"
 #include "ll/api/data/KeyValueDB.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/event/ListenerBase.h"
-#include "mc/dataloadhelper/DefaultDataLoadHelper.h"
 #include <memory>
 #include <set>
 
@@ -34,8 +32,6 @@ private:
     functions::CFVillageManager           mVillageManager;
     timewheel::TimeWheel                  mScheduler;
     functions::HudHelper                  mHudHelper;
-    functions::SimPlayerManager           mSimPlayerManager;
-    DefaultDataLoadHelper*                mDefaultDataLoadHelper;
 
 public:
     CoralFansMod() : mScheduler(1200) {}
@@ -53,14 +49,9 @@ public:
     inline functions::SlimeManager&               getSlimeManager() { return this->mSlimeManager; }
     inline functions::CFVillageManager&           getVillageManager() { return this->mVillageManager; }
     inline timewheel::TimeWheel&                  getScheduler() { return this->mScheduler; }
-    inline functions::SimPlayerManager&           getSimPlayerManager() { return this->mSimPlayerManager; }
-    inline DefaultDataLoadHelper*&                getDefaultDataLoadHelper() { return this->mDefaultDataLoadHelper; }
 
 public:
     void tick();
-
-public:
-    const std::string VERSION = "1.0.2";
 };
 
 CoralFansMod& mod();

@@ -4,7 +4,6 @@ namespace coral_fans {
 
 void CoralFansMod::tick() {
     this->getScheduler().tick();
-    this->getSimPlayerManager().tick();
     this->getHopperCounterManager().tick(); // light 1
     this->getHsaManager().tick();           // heavy 80
     this->getSlimeManager().tick();         // heavy 80

@@ -15,6 +15,5 @@ void registerVillageCommand(CommandPermissionLevel);
 void registerRotateCommand(CommandPermissionLevel);
 void registerDataCommand(CommandPermissionLevel);
 void registerCfhudCommand(CommandPermissionLevel);
-void registerSpCommand(CommandPermissionLevel);
 void registerLogCommand(CommandPermissionLevel);
 } // namespace coral_fans::commands

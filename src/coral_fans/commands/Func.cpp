@@ -161,5 +161,16 @@ void registerFuncCommand(CommandPermissionLevel permission) {
                 output.success("command.func.fastdrop.success"_tr(isopen ? "true" : "false"));
             else output.error("command.func.fastdrop.error"_tr());
         });
+
+    // nopickup
+    funcCommand.runtimeOverload()
+        .text("nopickup")
+        .required("isopen", ll::command::ParamKind::Bool)
+        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
+            if (coral_fans::mod().getConfigDb()->set("functions.global.nopickup", isopen ? "true" : "false"))
+                output.success("command.func.nopickup.success"_tr(isopen ? "true" : "false"));
+            else output.error("command.func.nopickup.error"_tr());
+        });
 }
 } // namespace coral_fans::commands

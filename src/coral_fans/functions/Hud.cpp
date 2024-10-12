@@ -11,22 +11,27 @@
 #include "mc/network/packet/TextPacket.h"
 #include "mc/util/ProfilerLite.h"
 #include "mc/world/actor/player/Player.h"
+#include "mc/world/item/registry/ItemStack.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/biome/Biome.h"
+#include "mc/world/level/block/Block.h"
+#include "mc/world/level/block/actor/BlockActor.h"
 #include "mc/world/phys/HitResultType.h"
 #include <algorithm>
+#include <map>
 #include <string>
 
 namespace coral_fans::functions {
 
 std::vector<std::pair<std::string, uint64>> HudHelper::HudTypeVec = {
-    {"mspt",     HudType::mspt    },
-    {"base",     HudType::base    },
-    {"redstone", HudType::redstone},
-    {"village",  HudType::village },
-    {"hopper",   HudType::hopper  },
-    {"block",    HudType::block   }
+    {"mspt",      HudType::mspt     },
+    {"base",      HudType::base     },
+    {"redstone",  HudType::redstone },
+    {"village",   HudType::village  },
+    {"hopper",    HudType::hopper   },
+    {"block",     HudType::block    },
+    {"container", HudType::container}
 };
 
 void HudHelper::tick() {
@@ -105,6 +110,35 @@ void HudHelper::tick() {
                     if (hitrst.mType == HitResultType::Tile) {
                         auto rst  = getBlockData(blockSource, hitrst.mBlockPos);
                         msg      += rst + "\n";
+                    }
+                }
+                if (hud & (1 << HudHelper::HudType::container)) {
+                    if (hitrst.mType == HitResultType::Tile) {
+                        const auto& bl = blockSource.getBlock(hitrst.mBlockPos);
+                        auto*       ba = blockSource.getBlockEntity(hitrst.mBlockPos);
+                        if (bl.isContainerBlock() && ba) {
+                            auto* container = ba->getContainer();
+                            if (container) {
+                                std::map<std::string, int> items;
+                                for (const auto& item : container->getSlots()) {
+                                    if (*item == ItemStack::EMPTY_ITEM) continue;
+                                    std::string name = item->getCustomName();
+                                    if (name.empty()) name = item->getName();
+                                    if (auto it = items.find(name); it != items.end()) it->second += item->mCount;
+                                    else items.emplace(name, item->mCount);
+                                }
+                                std::vector<std::pair<std::string, int>> vec(items.begin(), items.end());
+                                std::sort(
+                                    vec.begin(),
+                                    vec.end(),
+                                    [](const std::pair<std::string, int>& a, const std::pair<std::string, int>& b) {
+                                        if (a.second == b.second) return a.first < b.first;
+                                        else return a.second > b.second;
+                                    }
+                                );
+                                for (const auto& it : vec) msg += std::format("{} : {}\n", it.first, it.second);
+                            }
+                        }
                     }
                 }
                 if (msg.ends_with('\n')) msg = msg.substr(0, msg.length() - 1);

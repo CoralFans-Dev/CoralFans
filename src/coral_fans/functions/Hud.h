@@ -9,7 +9,7 @@ namespace coral_fans::functions {
 
 class HudHelper {
 public:
-    enum HudType : unsigned long { mspt, base, redstone, village, hopper, block };
+    enum HudType : unsigned long { mspt, base, redstone, village, hopper, block, container };
     static std::vector<std::pair<std::string, uint64>> HudTypeVec;
 
 public:

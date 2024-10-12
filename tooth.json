@@ -1,14 +1,14 @@
 {
     "format_version": 2,
     "tooth": "github.com/CoralFans-Dev/CoralFans",
-    "version": "1.0.2",
+    "version": "2.0.0",
     "info": {
         "name": "CoralFans",
         "description": "CoralFans Mod.",
         "author": "CoralFans-Dev",
         "tags": [
-            "levilamina",
-            "mod"
+            "platform:levilamina",
+            "type:mod"
         ]
     },
     "asset_url": "https://github.com/CoralFans-Dev/CoralFans/releases/download/v$(version)/CoralFans-windows-x64.zip",
