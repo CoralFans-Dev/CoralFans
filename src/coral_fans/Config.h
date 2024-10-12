@@ -23,7 +23,6 @@ struct CommandStruct {
     CommandConfigStruct rotate  = {true, CommandPermissionLevel::Any};
     CommandConfigStruct data    = {true, CommandPermissionLevel::Any};
     CommandConfigStruct cfhud   = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct sp      = {true, CommandPermissionLevel::Any};
     CommandConfigStruct log     = {true, CommandPermissionLevel::Any};
 };
 
@@ -40,7 +39,7 @@ struct Shortcut {
 };
 
 struct Config {
-    int         version    = 2;
+    int         version    = 3;
     std::string locateName = "zh_CN";
 
     int cfhudRefreshTime = 20;

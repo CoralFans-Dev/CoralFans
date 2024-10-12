@@ -52,9 +52,6 @@ public:
 
 public:
     void tick();
-
-public:
-    const std::string VERSION = "1.0.2";
 };
 
 CoralFansMod& mod();

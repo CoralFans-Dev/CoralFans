@@ -1,4 +1,3 @@
-#include "coral_fans/base/Mod.h"
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "mc/server/commands/CommandOrigin.h"
@@ -16,7 +15,9 @@ void registerCoralfansCommand() {
 
     // version
     command.overload().text("version").execute([](CommandOrigin const&, CommandOutput& output) {
-        output.success(coral_fans::mod().VERSION);
+#ifdef VERSION
+        output.success(VERSION);
+#endif
 #ifdef COMMITID
         output.success("Commit ID: {}", COMMITID);
 #endif
