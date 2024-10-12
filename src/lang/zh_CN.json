@@ -52,6 +52,10 @@
             "fastdrop": {
                 "success": "全局设置 fastdrop \"{}\"",
                 "error": "全局设置 fastdrop 失败"
+            },
+            "nopickup": {
+                "success": "全局设置 nopickup \"{}\"",
+                "error": "全局设置 nopickup 失败"
             }
         },
         "self": {
@@ -83,6 +87,10 @@
             "fastdrop": {
                 "success": "设置 fastdrop \"{}\"",
                 "error": "设置 fastdrop 失败"
+            },
+            "nopickup": {
+                "success": "设置 nopickup \"{}\"",
+                "error": "设置 nopickup 失败"
             }
         },
         "tick": {
