@@ -52,6 +52,10 @@
             "fastdrop": {
                 "success": "globally set fastdrop \"{}\"",
                 "error": "failed to globally set fastdrop"
+            },
+            "nopickup": {
+                "success": "globally set nopickup \"{}\"",
+                "error": "failed to globally set nopickup"
             }
         },
         "self": {
@@ -83,6 +87,10 @@
             "fastdrop": {
                 "success": "set fastdrop \"{}\"",
                 "error": "failed to set fastdrop"
+            },
+            "nopickup": {
+                "success": "set nopickup \"{}\"",
+                "error": "failed to set nopickup"
             }
         },
         "tick": {

@@ -131,5 +131,21 @@ void registerSelfCommand(CommandPermissionLevel permission) {
                 output.success("command.self.fastdrop.success"_tr((isopen & global) ? "true" : "false"));
             else output.error("command.self.fastdrop.error"_tr());
         });
+
+    // self nopickup <bool>
+    selfCommand.runtimeOverload()
+        .text("nopickup")
+        .required("isopen", ll::command::ParamKind::Bool)
+        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            COMMAND_CHECK_PLAYER
+            bool       isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
+            const auto global = coral_fans::mod().getConfigDb()->get("functions.global.nopickup") == "true";
+            if (coral_fans::mod().getConfigDb()->set(
+                    std::format("functions.players.{}.nopickup", player->getUuid().asString()),
+                    (isopen & global) ? "true" : "false"
+                ))
+                output.success("command.self.nopickup.success"_tr((isopen & global) ? "true" : "false"));
+            else output.error("command.self.nopickup.error"_tr());
+        });
 }
 } // namespace coral_fans::commands
