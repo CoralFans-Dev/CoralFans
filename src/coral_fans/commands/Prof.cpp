@@ -28,7 +28,7 @@ void registerProfCommand(CommandPermissionLevel permission) {
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             uint64 type         = functions::Profiler::Type::normal;
             int    numberOfTick = 100;
-            if (self["type"].has_value()) type = self["type"].get<ll::command::ParamKind::Enum>().second;
+            if (self["type"].has_value()) type = self["type"].get<ll::command::ParamKind::Enum>().index;
             if (self["numberOfTick"].has_value())
                 numberOfTick = self["numberOfTick"].get<ll::command::ParamKind::Int>();
             if (numberOfTick <= 0 || numberOfTick > 1200) return output.error("command.prof.error.outofrange"_tr());

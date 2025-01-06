@@ -46,8 +46,8 @@ void registerFuncCommand(CommandPermissionLevel permission) {
         .required("level", ll::command::ParamKind::Enum, "forceplaceLevel")
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             const auto val = self["level"].get<ll::command::ParamKind::Enum>();
-            if (coral_fans::mod().getConfigDb()->set("functions.global.forceplace", val.first))
-                output.success("command.func.forceplace.success"_tr(val.first));
+            if (coral_fans::mod().getConfigDb()->set("functions.global.forceplace", val.name))
+                output.success("command.func.forceplace.success"_tr(val.name));
             else output.error("command.func.forceplace.error"_tr());
         });
 

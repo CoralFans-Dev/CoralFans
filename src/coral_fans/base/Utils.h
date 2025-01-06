@@ -1,12 +1,13 @@
 #pragma once
 
-#include "mc/deps/core/mce/Color.h"
 #include "mc/nbt/CompoundTag.h"
 #include "mc/nbt/CompoundTagVariant.h"
+#include "mc/resources/persona/color.h"
 #include "mc/world/Container.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/ChunkPos.h"
+
 
 #include <memory>
 #include <optional>

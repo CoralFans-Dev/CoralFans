@@ -15,7 +15,7 @@ private:
     bool                                                 mShow;
 
 public:
-    void        drawHsa(LevelChunk::HardcodedSpawningArea);
+    void        drawHsa(LevelChunk::SpawningArea);
     inline void setShow(bool enable) { this->mShow = enable; }
     void        tick();
     void        remove();

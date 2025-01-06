@@ -7,10 +7,11 @@
 #include "ll/api/memory/Hook.h"
 #include "ll/api/memory/Memory.h"
 #include "ll/api/service/Bedrock.h"
-#include "mc/deps/core/mce/Color.h"
-#include "mc/deps/core/mce/UUID.h"
-#include "mc/math/Vec3.h"
-#include "mc/world/ActorUniqueID.h"
+#include "mc/common/ActorUniqueID.h"
+#include "mc/deps/core/math/Color.h"
+#include "mc/deps/core/math/Vec3.h"
+#include "mc/deps/core/string/HashedString.h"
+#include "mc/platform/UUID.h"
 #include "mc/world/actor/Actor.h"
 #include "mc/world/actor/ai/village/POIInstance.h"
 #include "mc/world/actor/ai/village/Village.h"
@@ -19,6 +20,7 @@
 #include "mc/world/level/Tick.h"
 #include "mc/world/level/levelgen/structure/BoundingBox.h"
 #include "mc/world/phys/AABB.h"
+
 
 #include <array>
 #include <format>
@@ -113,7 +115,8 @@ void CFVillageManager::heavyTick() {
             if (this->mShowRaidBounds) {
                 auto ids = std::array{
                     this->mParticleId,
-                    mod.getGeometryGroup()->box(kv.second.second, kv.second.first->getRaidBounds(), mce::Color::ORANGE)
+                    mod.getGeometryGroup()
+                        ->box(kv.second.second, kv.second.first->getRaidBounds(), mce::Color::ORANGE())
                 };
                 this->mParticleId = mod.getGeometryGroup()->merge(ids);
             }
@@ -123,7 +126,7 @@ void CFVillageManager::heavyTick() {
                     mod.getGeometryGroup()->box(
                         kv.second.second,
                         {kv.second.first->getCenter() - Vec3{8, 6, 8}, kv.second.first->getCenter() + Vec3{9, 7, 9}},
-                        mce::Color::BLUE
+                        mce::Color::BLUE()
                     )
                 };
                 this->mParticleId = mod.getGeometryGroup()->merge(ids);
@@ -134,7 +137,7 @@ void CFVillageManager::heavyTick() {
                     mod.getGeometryGroup()->box(
                         kv.second.second,
                         {kv.second.first->getCenter(), kv.second.first->getCenter() + Vec3{1, 1, 1}},
-                        mce::Color::RED
+                        mce::Color::RED()
                     )
                 };
                 this->mParticleId = mod.getGeometryGroup()->merge(ids);
@@ -146,7 +149,7 @@ void CFVillageManager::heavyTick() {
                         kv.second.second,
                         {kv.second.first->getBounds().min - Vec3{64, 64, 64},
                                         kv.second.first->getBounds().max + Vec3{64, 64, 64}},
-                        mce::Color::PINK
+                        mce::Color::PINK()
                     )
                 };
                 this->mParticleId = mod.getGeometryGroup()->merge(ids);
@@ -156,9 +159,9 @@ void CFVillageManager::heavyTick() {
                 if (level) {
                     auto                    ids = std::vector{this->mParticleId};
                     const static mce::Color colors[3] =
-                        {mce::Color::CYAN, mce::Color::MINECOIN_GOLD, mce::Color::GREEN};
+                        {mce::Color::CYAN(), mce::Color::MINECOIN_GOLD(), mce::Color::GREEN()};
                     for (auto& item : ::getDwellerPoiMap(kv.second.first)) {
-                        auto villager = level->fetchEntity(item.first);
+                        auto villager = level->fetchEntity(item.first, false);
                         if (villager) {
                             for (int i = 0; i < 3; i++) {
                                 const auto& poi = item.second[i].lock();
@@ -185,12 +188,13 @@ std::string CFVillageManager::listTickingVillages() {
     std::string retstr;
     for (auto& kv : this->mVidVillageMap) {
         if (!kv.second.first) continue;
-        auto dwellerCountArray  = ::getDwellerCount(kv.second.first);
-        retstr                 += std::format(
+        auto   dwellerCountArray  = ::getDwellerCount(kv.second.first);
+        float* approximateRadius  = (float*)&kv.second.first->mUnkbc5c53;
+        retstr                   += std::format(
             "- §a[{}]§r §b[{}]§r r: {} p: {} g: {} b: {} §6[{}, {}]§r\n",
             kv.first,
             kv.second.first->getCenter(),
-            kv.second.first->getApproximateRadius(),
+            *approximateRadius,
             dwellerCountArray[0], // Villager
             dwellerCountArray[1], // IronGolem
             kv.second.first->getBedPOICount(),
@@ -223,13 +227,14 @@ std::pair<std::string, bool> CFVillageManager::getVillageInfo(std::string id) {
     Village* village = this->mVidVillageMap[vid].first;
     if (!village) return {"translate.village.cannotget"_tr(), false};
     auto        dwellerCountArray = ::getDwellerCount(village);
+    float*      approximateRadius = (float*)&village->mUnkbc5c53;
     std::string retstr            = "translate.village.info"_tr(
         vid,
         village->getUniqueID().asString(),
         village->getCenter().toString(),
         village->getBounds().min.toString(),
         village->getBounds().max.toString(),
-        village->getApproximateRadius(),
+        *approximateRadius,
         dwellerCountArray[0],
         dwellerCountArray[1],
         dwellerCountArray[2],
@@ -245,10 +250,10 @@ std::pair<std::string, bool> CFVillageManager::getVillageInfo(std::string id) {
                 retstr += std::format(
                     " §a{}§r §b{}§r, §d{}§r, §e{:.1f}§r, {} |",
                     poi->getPosition(),
-                    poi->getOwnerCount(),
-                    poi->getOwnerCapacity(),
+                    "poi->getOwnerCount()",
+                    "poi->getOwnerCapacity()",
                     poi->getRadius(),
-                    poi->getWeight()
+                    "poi->getWeight()"
                 );
             else retstr += " §7(x)§r |";
             if (index == 2) retstr += "\n";
@@ -270,12 +275,12 @@ std::pair<std::string, bool> CFVillageManager::getVillagerInfo(ActorUniqueID aui
                 if (poi)
                     retstr += std::format(
                         "\n{}: {}, {} / {}, {:.2f}, {}",
-                        poi->getTypeName(),
+                        poi->getName().mStr,
                         poi->getPosition(),
-                        poi->getOwnerCount(),
-                        poi->getOwnerCapacity(),
+                        "poi->getOwnerCount()",
+                        "poi->getOwnerCapacity()",
                         poi->getRadius(),
-                        poi->getWeight()
+                        "poi->getWeight()"
                     );
             }
             return {retstr, true};

@@ -172,8 +172,21 @@
             "success": {
                 "pt": {
                     "title": "[{}] 区块 {} 有 {} 个计划刻 ->",
-                    "remove": " {}: 删除",
-                    "info": " {}: tick time {}, 优先级 {}, {}"
+                    "remove": " 移除 {}: 目标游戏刻 {}, 优先级 {}, {}",
+                    "info": " {}: 目标游戏刻 {}, 优先级 {}, {}"
+                }
+            }
+        },
+        "calculate": {
+            "description": "统计信息",
+            "error": {
+                "nopt": "无计划刻"
+            },
+            "success": {
+                "pt": {
+                    "title": "[{}] 区块 {} 有 {} 个计划刻 ->",
+                    "remove": " 移除 {}: 目标游戏刻 {}, 数量 {}",
+                    "info": " {}: 目标游戏刻 {}, 数量 {}"
                 }
             }
         }
@@ -206,7 +219,7 @@
         },
         "data": {
             "info": {
-                "block": "- §b位置: §a{}§r\n- §b名称: §a{}§r\n- §b类型名: §a{}§r\n- §bID: §a{}§r\n- §bRTID: §a{}§r\n- §b特殊值: §a{}§r\n- §bCanInstanceTick: §a{}§r\n- §bHasBlockEntity: §a{}§r\n- §bIsSolid: §a{}§r\n- §b比较器输出: §a{}§r\n- §b材质:§r\n - §bMotion: §a{}§r\n - §bTopSolid: §a{}§r\n - §bIsSolid: §a{}§r\n - §bIsSolidBlocking: §a{}§r\n - §bTranslucency: §a{}§r",
+                "block": "- §b位置: §a{}§r\n- §b名称: §a{}§r\n- §b类型名: §a{}§r\n- §bID: §a{}§r\n- §bRTID: §a{}§r\n- §b特殊值: §a{}§r\n- §bCanInstanceTick: §a{}§r\n- §bHasBlockEntity: §a{}§r\n- §bIsSolid: §a{}§r\n- §b比较器输出: §a{}§r\n- §b材质:§r\n - §bMotion: §a{}§r\n - §bTopSolid: §a{}§r\n - §bIsSolid: §a{}§r\n - §bIsSolidBlocking: §a{}§r",
                 "entity": "- §bNameTag: §a{}§r\n- §bTypeName: §a{}§r\n- §bUID: §a{}§r\n- §bPos: §a{}§r\n- §bDeltaPos: §a{}§r\n- §bAABB: §a{}§r\n- §bSurface: §a{}§r\n",
                 "redstone": {
                     "signal": {

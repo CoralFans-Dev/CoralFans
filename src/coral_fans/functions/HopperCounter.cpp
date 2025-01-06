@@ -6,7 +6,7 @@
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/memory/Hook.h"
 #include "ll/api/memory/Memory.h"
-#include "mc/world/item/registry/ItemStack.h"
+#include "mc/world/item/ItemStack.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/block/Block.h"
@@ -95,10 +95,10 @@ void HopperCounterManager::tick() {
 
 int HopperCounterManager::getViewChannel(BlockSource& blockSource, HitResult hitrst) {
     if (!hitrst) return -1;
-    const auto&                                          dest = blockSource.getBlock(hitrst.mBlockPos);
+    const auto&                                          dest = blockSource.getBlock(hitrst.mBlock);
     std::unordered_map<std::string, int>::const_iterator it;
     if (utils::removeMinecraftPrefix(dest.getTypeName()) == "hopper") {
-        const auto& block = blockSource.getBlock(hitrst.mBlockPos.neighbor((uchar)dest.getVariant()));
+        const auto& block = blockSource.getBlock(hitrst.mBlock.neighbor((uchar)dest.getVariant()));
         it =
             functions::HopperCounterManager::HOPPER_COUNTER_MAP.find(utils::removeMinecraftPrefix(block.getTypeName()));
     } else
@@ -111,7 +111,7 @@ LL_TYPE_INSTANCE_HOOK(
     CoralFansFunctionsHopperCounterHook1,
     ll::memory::HookPriority::Normal,
     HopperBlockActor,
-    "?tick@HopperBlockActor@@UEAAXAEAVBlockSource@@@Z",
+    &HopperBlockActor::tick,
     void,
     BlockSource& region
 ) {
@@ -123,10 +123,10 @@ LL_TYPE_INSTANCE_HOOK(
     CoralFansFunctionsHopperCounterHook2,
     ll::memory::HookPriority::Normal,
     HopperBlockActor,
-    "?setItem@HopperBlockActor@@UEAAXHAEBVItemStack@@@Z",
+    &HopperBlockActor::setItem,
     void,
-    int              slot,
-    ItemStack const& item
+    int                slot,
+    ::ItemStack const& item
 ) {
     if (coral_fans::mod().getConfigDb()->get("functions.global.hoppercounter") != "true") {
         HOOK_HOPPER_RETURN

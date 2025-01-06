@@ -3,8 +3,9 @@
 #include "ll/api/memory/Hook.h"
 #include "mc/world/Container.h"
 #include "mc/world/actor/player/Player.h"
-#include "mc/world/item/registry/ItemStack.h"
-#include "mc/world/level/BlockEventCoordinator.h"
+#include "mc/world/events/BlockEventCoordinator.h"
+#include "mc/world/item/ItemStack.h"
+
 
 #include <format>
 #include <string>
@@ -81,7 +82,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     CoralFansTweakersAutoToolHook2,
     ll::memory::HookPriority::Normal,
     Player,
-    "?attack@Player@@UEAA_NAEAVActor@@AEBW4ActorDamageCause@@@Z",
+    &Player::$attack,
     bool,
     Actor&                    actor,
     const ::ActorDamageCause& cause

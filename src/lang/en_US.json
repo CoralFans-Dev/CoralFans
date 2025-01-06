@@ -172,8 +172,21 @@
             "success": {
                 "pt": {
                     "title": "[{}] chunk {} has {} pendingTicks ->",
-                    "remove": " {}: removed",
-                    "info": " {}: tick time {}, priority {}, {}"
+                    "remove": " removed {}: tick time {}, priority {}, {}",
+                    "info": " {}: target tick {}, priority {}, {}"
+                }
+            }
+        },
+        "calculate": {
+            "description": "Calculate info",
+            "error": {
+                "nopt": "no pendingTick"
+            },
+            "success": {
+                "pt": {
+                    "title": "[{}] chunk {} has {} pendingTicks ->",
+                    "remove": " removed {}: target tick {}, count {}",
+                    "info": "  {}: target tick {}, count {}"
                 }
             }
         }
@@ -206,7 +219,7 @@
         },
         "data": {
             "info": {
-                "block": "- §bPos: §a{}§r\n- §bName: §a{}§r\n- §bTypeName: §a{}§r\n- §bID: §a{}§r\n- §bRTID: §a{}§r\n- §bVariant: §a{}§r\n- §bCanInstanceTick: §a{}§r\n- §bHasBlockEntity: §a{}§r\n- §bIsSolid: §a{}§r\n- §bComparatorSignal: §a{}§r\n- §bMaterial:§r\n - §bMotion: §a{}§r\n - §bTopSolid: §a{}§r\n - §bIsSolid: §a{}§r\n - §bIsSolidBlocking: §a{}§r\n - §bTranslucency: §a{}§r",
+                "block": "- §bPos: §a{}§r\n- §bName: §a{}§r\n- §bTypeName: §a{}§r\n- §bID: §a{}§r\n- §bRTID: §a{}§r\n- §bVariant: §a{}§r\n- §bCanInstanceTick: §a{}§r\n- §bHasBlockEntity: §a{}§r\n- §bIsSolid: §a{}§r\n- §bComparatorSignal: §a{}§r\n- §bMaterial:§r\n - §bMotion: §a{}§r\n - §bTopSolid: §a{}§r\n - §bIsSolid: §a{}§r\n - §bIsSolidBlocking: §a{}§r",
                 "entity": "- §bNameTag: §a{}§r\n- §bTypeName: §a{}§r\n- §bUID: §a{}§r\n- §bPos: §a{}§r\n- §bDeltaPos: §a{}§r\n- §bAABB: §a{}§r\n- §bSurface: §a{}§r\n",
                 "redstone": {
                     "signal": {

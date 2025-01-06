@@ -24,7 +24,7 @@ void registerTickCommand(CommandPermissionLevel permission) {
     tickCommand.overload().text("query").execute([](CommandOrigin const&, CommandOutput& output) {
         output.success(
             "command.tick.query.output"_tr(std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(
-                ProfilerLite::gProfilerLiteInstance.getServerTickTime()
+                ProfilerLite::gProfilerLiteInstance().getServerTickTime()
             ))
         );
     });
@@ -44,7 +44,7 @@ void registerTickCommand(CommandPermissionLevel permission) {
         .execute([&](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             bool       pause = false;
             const auto val   = self["tickFreezeType"].get<ll::command::ParamKind::Enum>();
-            switch (val.second) {
+            switch (val.index) {
             case 1:
                 pause = true;
                 break;
@@ -55,7 +55,7 @@ void registerTickCommand(CommandPermissionLevel permission) {
             // LevelEventPacket{LevelEvent::SimTimeStep, origin.getWorldPosition(), pause}.sendToClients();
             auto mc = ll::service::getMinecraft();
             if (mc.has_value()) mc->setSimTimePause(pause);
-            output.success("command.tick.set.output"_tr(val.first));
+            output.success("command.tick.set.output"_tr(val.name));
         });
 
     // tick rate <float>
@@ -79,8 +79,8 @@ void registerTickCommand(CommandPermissionLevel permission) {
         auto mc = ll::service::getMinecraft();
         if (mc.has_value()) {
             // Minecraft.mSimTimer
-            auto* timer = ll::memory::dAccess<Timer*>(mc.as_ptr(), 0xD8); // this+0xd8
-            timer->stepTick(tick);
+            Timer timer = mc->mSimTimer;
+            timer.stepTick(tick);
         }
         output.success("command.tick.step.output"_tr(tick));
     };

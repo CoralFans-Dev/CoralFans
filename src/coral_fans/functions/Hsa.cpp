@@ -3,8 +3,7 @@
 #include "coral_fans/base/Utils.h"
 #include "ll/api/service/Bedrock.h"
 #include "mc/_HeaderOutputPredefine.h"
-#include "mc/deps/core/mce/Color.h"
-#include "mc/enums/HardcodedSpawnAreaType.h"
+#include "mc/resources/persona/color.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/ChunkPos.h"
@@ -12,13 +11,15 @@
 #include "mc/world/level/chunk/ChunkSource.h"
 #include "mc/world/level/chunk/LevelChunk.h"
 #include "mc/world/level/dimension/Dimension.h"
+#include "mc/world/level/levelgen/v1/HardcodedSpawnAreaType.h"
 #include "mc/world/phys/AABB.h"
+
 
 namespace {
 
 static const int radius = 5;
 
-auto getSpawnAreaFromHSA = [](const BoundingBox& aabb) {
+auto getSpawnAreaFromHSA = [](AABB& aabb) {
     return AABB{
         BlockPos{
                  (aabb.max.x - aabb.min.x + 1) / 2 + aabb.min.x,
@@ -36,19 +37,19 @@ auto getSpawnAreaFromHSA = [](const BoundingBox& aabb) {
 auto getHsaColor = [](const HardcodedSpawnAreaType& type) {
     switch (type) {
     case HardcodedSpawnAreaType::NetherFortress:
-        return mce::Color::GREEN;
+        return mce::Color::GREEN();
         break;
     case HardcodedSpawnAreaType::PillagerOutpost:
-        return mce::Color::BLUE;
+        return mce::Color::BLUE();
         break;
     case HardcodedSpawnAreaType::OceanMonument:
-        return mce::Color::YELLOW;
+        return mce::Color::YELLOW();
         break;
     case HardcodedSpawnAreaType::WitchHut:
-        return mce::Color::RED;
+        return mce::Color::RED();
         break;
     default:
-        return mce::Color::WHITE;
+        return mce::Color::WHITE();
         break;
     }
 };
@@ -57,12 +58,16 @@ auto getHsaColor = [](const HardcodedSpawnAreaType& type) {
 
 namespace coral_fans::functions {
 
-void HsaManager::drawHsa(LevelChunk::HardcodedSpawningArea hsa) {
+void HsaManager::drawHsa(LevelChunk::SpawningArea hsa) {
     // if not show: show particle
-    if (this->mParticleMap.find(hsa.aabb) != this->mParticleMap.end()) return;
-    int        dim   = hsa.type == HardcodedSpawnAreaType::NetherFortress ? 1 : 0;
-    mce::Color color = ::getHsaColor(hsa.type);
-    auto       aabb  = ::getSpawnAreaFromHSA(hsa.aabb);
+    AABB _aabb;
+    std::memcpy(&_aabb, &hsa.mUnkaa0f6a, 2 * sizeof(Vec3));
+    if (this->mParticleMap.find(_aabb) != this->mParticleMap.end()) return;
+    ::HardcodedSpawnAreaType _type;
+    std::memcpy(&_type, &hsa.mUnkcb47a3, sizeof(hsa.mUnkcb47a3));
+    int        dim   = _type == HardcodedSpawnAreaType::NetherFortress ? 1 : 0;
+    mce::Color color = ::getHsaColor(_type);
+    auto       aabb  = ::getSpawnAreaFromHSA(_aabb);
     auto&      mod   = coral_fans::mod();
     auto       ids   = std::array{
         mod.getGeometryGroup()
@@ -88,9 +93,9 @@ void HsaManager::drawHsa(LevelChunk::HardcodedSpawningArea hsa) {
         mod.getGeometryGroup()
             ->line(dim, {aabb.max.x, aabb.max.y, aabb.min.z}, {aabb.max.x, aabb.min.y, aabb.min.z}, color),
         mod.getGeometryGroup()
-            ->line(dim, {aabb.min.x, aabb.min.y, aabb.min.z}, {aabb.min.x, aabb.max.y, aabb.min.z}, mce::Color::WHITE)
+            ->line(dim, {aabb.min.x, aabb.min.y, aabb.min.z}, {aabb.min.x, aabb.max.y, aabb.min.z}, mce::Color::WHITE())
     };
-    this->mParticleMap[hsa.aabb] = mod.getGeometryGroup()->merge(ids);
+    this->mParticleMap[_aabb] = mod.getGeometryGroup()->merge(ids);
 }
 
 void HsaManager::tick() {
@@ -100,16 +105,17 @@ void HsaManager::tick() {
         if (level.has_value()) {
             // get players
             level->forEachPlayer([&](Player& player) {
-                auto originChunkPos = utils::blockPosToChunkPos(player.getFeetBlockPos());
+                auto originChunkPos = utils::blockPosToChunkPos(((const Actor&)player).getFeetBlockPos());
                 // chunks
                 for (int i = -radius; i <= radius; ++i) {
                     for (int j = -radius; j <= radius; ++j) {
-                        auto chunk = player.getDimension().getChunkSource().getExistingChunk(
-                            ChunkPos{originChunkPos.x + i, originChunkPos.z + j}
-                        );
+                        auto chunk = ((const Actor&)player)
+                                         .getDimension()
+                                         .getChunkSource()
+                                         .getExistingChunk(ChunkPos{originChunkPos.x + i, originChunkPos.z + j});
                         if (chunk && chunk->isFullyLoaded()) {
                             // HSAs
-                            for (const auto& hsa : chunk->getSpawningAreas()) {
+                            for (const auto& hsa : (std::vector<::LevelChunk::SpawningArea>)chunk->mSpawningAreas) {
                                 this->drawHsa(hsa);
                             }
                         }

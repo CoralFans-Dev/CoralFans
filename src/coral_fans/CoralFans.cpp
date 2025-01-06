@@ -3,7 +3,6 @@
 #include <memory>
 
 #include "bsci/GeometryGroup.h"
-
 #include "ll/api/mod/RegisterHelper.h"
 
 #include "ll/api/Config.h"
@@ -18,9 +17,10 @@
 
 namespace coral_fans {
 
-static std::unique_ptr<CoralFans> instance;
-
-CoralFans& CoralFans::getInstance() { return *instance; }
+CoralFans& CoralFans::getInstance() {
+    static CoralFans instance;
+    return instance;
+}
 
 bool CoralFans::load() {
     const auto& logger = getSelf().getLogger();
@@ -44,8 +44,9 @@ bool CoralFans::load() {
 
     // load i18n
     logger.debug("Loading I18n");
-    ll::i18n::load(getSelf().getLangDir());
-    ll::i18n::getInstance()->mDefaultLocaleName = mod.getConfig().locateName;
+    if (!ll::i18n::getInstance().load(getSelf().getLangDir())) logger.error("Failed to load I18n");
+    ;
+    ll::i18n::defaultLocaleCode() = mod.getConfig().locateName;
 
     // load Config Database
     logger.debug("Loading Config Database");
@@ -83,6 +84,8 @@ bool CoralFans::enable() {
     if (mod.getConfig().command.data.enabled) commands::registerDataCommand(mod.getConfig().command.data.permission);
     if (mod.getConfig().command.cfhud.enabled) commands::registerCfhudCommand(mod.getConfig().command.cfhud.permission);
     if (mod.getConfig().command.log.enabled) commands::registerLogCommand(mod.getConfig().command.log.permission);
+    if (mod.getConfig().command.calculate.enabled)
+        commands::registerCalculateCommand(mod.getConfig().command.log.permission);
 
     // register shortcuts
     functions::registerShortcutsListener();
@@ -115,4 +118,4 @@ bool CoralFans::disable() {
 
 } // namespace coral_fans
 
-LL_REGISTER_MOD(coral_fans::CoralFans, coral_fans::instance);
+LL_REGISTER_MOD(coral_fans::CoralFans, coral_fans::CoralFans::getInstance());

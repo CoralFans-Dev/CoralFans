@@ -1,12 +1,15 @@
 #include "coral_fans/base/Utils.h"
 #include "ll/api/i18n/I18n.h"
 #include "magic_enum.hpp"
-#include "mc/deps/core/mce/Color.h"
+#include "mc/common/ActorUniqueID.h"
+#include "mc/deps/core/math/Color.h"
 #include "mc/nbt/CompoundTag.h"
 #include "mc/nbt/CompoundTagVariant.h"
 #include "mc/nbt/Tag.h"
+#include "mc/resources/persona/color.h"
 #include "mc/world/actor/Actor.h"
-#include "mc/world/item/registry/ItemStack.h"
+#include "mc/world/item/ItemStack.h"
+#include "mc/world/item/SaveContextFactory.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/block/Block.h"
@@ -14,7 +17,12 @@
 #include "mc/world/level/dimension/Dimension.h"
 #include "mc/world/level/material/Material.h"
 #include "mc/world/phys/AABB.h"
+#include "mc/world/redstone/circuit/ChunkCircuitComponentList.h"
+#include "mc/world/redstone/circuit/CircuitSceneGraph.h"
 #include "mc/world/redstone/circuit/CircuitSystem.h"
+#include "mc/world/redstone/circuit/components/BaseCircuitComponent.h"
+#include "mc/world/redstone/circuit/components/CircuitComponentList.h"
+
 
 #include <string>
 
@@ -38,8 +46,7 @@ std::string getBlockData(BlockSource& blockSource, BlockPos blockPos) {
         m.getBlocksMotion(),
         m.isTopSolid(false, false),
         m.isSolid(),
-        m.isSolidBlocking(),
-        m.getTranslucency()
+        m.isSolidBlocking()
     );
 }
 
@@ -50,7 +57,7 @@ std::pair<std::string, bool> getBlockNbt(uint64 type, BlockSource& blockSource, 
     if (type == 0) *tag = block.getSerializationId();
     if (type == 1) {
         auto blockEntity = blockSource.getBlockEntity(blockPos);
-        if (blockEntity) blockEntity->save(*tag);
+        if (blockEntity) blockEntity->save(*tag, *SaveContextFactory::createCloneSaveContext());
         else return {"translate.data.error.noblockentity"_tr(), false};
     }
     if (path.empty()) return {tag->toSnbt(SnbtFormat::PrettyChatPrint), true};
@@ -64,7 +71,7 @@ std::pair<std::string, bool> getEntityData(Actor* actor) {
         "translate.data.info.entity"_tr(
             actor->getNameTag(),
             actor->getTypeName(),
-            actor->getOrCreateUniqueID().id,
+            actor->getOrCreateUniqueID().rawID,
             actor->getPosition().toString(),
             actor->getPosDelta().toString(),
             actor->getAABB().toString(),
@@ -84,25 +91,44 @@ std::pair<std::string, bool> getEntityNbt(Actor* actor, std::string path) {
 }
 
 std::pair<std::string, bool> showRedstoneComponentsInfo(Dimension& dimension, BlockPos& pos, uint64 type) {
-    auto& circuitSys = dimension.getCircuitSystem();
-    auto& graph      = circuitSys.mSceneGraph;
+    auto&             circuitSys = dimension.getCircuitSystem();
+    CircuitSceneGraph graph      = (CircuitSceneGraph)circuitSys.mSceneGraph;
     if (type == 0) {
         // chunk
         auto     chunkPos = utils::blockPosToChunkPos(pos);
         BlockPos chunkBlockPos{chunkPos.x * 16, 0, chunkPos.z * 16};
         auto     iter = graph.mActiveComponentsPerChunk.find(chunkBlockPos);
         if (iter != graph.mActiveComponentsPerChunk.end())
-            for (auto& c : iter->second.mComponents)
-                utils::shortHighligntBlock(dimension.mId, c.mPos, mce::Color::CYAN, 80);
+            for (auto& c : std::vector<::ChunkCircuitComponentList::Item>(iter->second.mComponents))
+                utils::shortHighligntBlock((DimensionType)dimension.mId, c.mPos, mce::Color::CYAN(), 80);
         return {"", true};
     }
     using ll::i18n_literals::operator""_tr;
-    auto* component = graph.getBaseComponent(pos);
+    auto* component = graph.getComponent(pos, CircuitComponentType::BaseCircuitComponent);
+    /*貌似没法用昨天说的那个
+
+enum class CircuitComponentType : uint64 {
+Undefined              = 1,
+GroupMask              = 4294901760,
+BaseCircuitComponent   = 2147483648,
+BaseRailTransporter    = 65536,
+ConsumerComponent      = 131072,
+PoweredBlockComponent  = 262144,
+ProducerComponent      = 524288,
+TransporterComponent   = 1048576,
+CapacitorComponent     = 2097152,
+PistonConsumer         = 131073,
+ComparatorCapacitor    = 2097153,
+PulseCapacitor         = 2097154,
+RedstoneTorchCapacitor = 2097155,
+RepeaterCapacitor      = 2097156,
+};
+*/
     if (!component) return {"translate.data.error.nocircuitcomponent"_tr(), false};
     if (type == 1) {
         // signal
         std::string retstr = "translate.data.info.redstone.signal.title"_tr(component->getStrength());
-        for (auto& source : component->mSources.mComponents)
+        for (auto& source : component->mSources->mComponents)
             retstr += "translate.data.info.redstone.signal.info"_tr(
                 source.mPos.toString(),
                 source.mDampening,
@@ -122,7 +148,7 @@ std::pair<std::string, bool> showRedstoneComponentsInfo(Dimension& dimension, Bl
                 component->canConsumerPower() ? "true" : "false",
                 component->canStopPower() ? "true" : "false",
                 component->isHalfPulse() ? "true" : "false",
-                magic_enum::enum_name(component->mDirection),
+                "magic_enum::enum_name(component->mDirection)",
                 block.hasComparatorSignal() ? std::to_string(block.getComparatorSignal(blockSource, pos, 0)) : "-"
             ),
             true
@@ -130,13 +156,23 @@ std::pair<std::string, bool> showRedstoneComponentsInfo(Dimension& dimension, Bl
     }
     if (type == 3) {
         // conn
-        utils::shortHighligntBlock(dimension.mId, pos, mce::Color::GREEN, 80); // highlight self
+        utils::shortHighligntBlock((DimensionType)dimension.mId, pos, mce::Color::GREEN(), 80); // highlight self
         auto it = graph.mPowerAssociationMap.find(pos);
         if (it != graph.mPowerAssociationMap.end())
             for (auto& c : it->second.mComponents)
-                utils::shortHighligntBlock(dimension.mId, c.mPos, mce::Color::YELLOW, 80); // highlight children
-        for (auto& source : component->mSources.mComponents)
-            utils::shortHighligntBlock(dimension.mId, source.mPos, mce::Color::RED, 80); // highlight parents
+                utils::shortHighligntBlock(
+                    (DimensionType)dimension.mId,
+                    c.mPos,
+                    mce::Color::YELLOW(),
+                    80
+                ); // highlight children
+        for (auto& source : component->mSources->mComponents)
+            utils::shortHighligntBlock(
+                (DimensionType)dimension.mId,
+                source.mPos,
+                mce::Color::RED(),
+                80
+            ); // highlight parents
         return {"", true};
     }
     return {"", false};
@@ -144,7 +180,7 @@ std::pair<std::string, bool> showRedstoneComponentsInfo(Dimension& dimension, Bl
 
 std::pair<std::string, bool> getItemNbt(ItemStack const& item, std::string path) {
     using ll::i18n_literals::operator""_tr;
-    auto tag = item.save();
+    auto tag = item.save(*SaveContextFactory::createCloneSaveContext());
     if (path.empty()) {
         if (tag) return {tag->toSnbt(SnbtFormat::PrettyChatPrint), true};
         else return {"translate.data.error.geterror"_tr(), false};
@@ -158,19 +194,19 @@ void highlightBlockEntity(Player* player, int radius, int time) {
         Vec3              offset{radius, radius, radius};
         static int        colorindex = 0;
         static std::array colors{
-            mce::Color::BLACK,
-            mce::Color::BLUE,
-            mce::Color::CYAN,
-            mce::Color::GREEN,
-            mce::Color::GREY,
-            mce::Color::MINECOIN_GOLD,
-            mce::Color::ORANGE,
-            mce::Color::PINK,
-            mce::Color::PURPLE,
-            mce::Color::REBECCA_PURPLE,
-            mce::Color::RED,
-            mce::Color::WHITE,
-            mce::Color::YELLOW
+            mce::Color::BLACK(),
+            mce::Color::BLUE(),
+            mce::Color::CYAN(),
+            mce::Color::GREEN(),
+            mce::Color::GREY(),
+            mce::Color::MINECOIN_GOLD(),
+            mce::Color::ORANGE(),
+            mce::Color::PINK(),
+            mce::Color::PURPLE(),
+            mce::Color::REBECCA_PURPLE(),
+            mce::Color::RED(),
+            mce::Color::WHITE(),
+            mce::Color::YELLOW()
         };
         for (auto blockActor : player->getDimensionBlockSource().fetchBlockEntities({origin - offset, origin + offset}))
             if (blockActor) utils::shortHighligntBlock(dimid, blockActor->getPosition(), colors[colorindex], time);

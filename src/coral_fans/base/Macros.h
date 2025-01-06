@@ -28,7 +28,7 @@
     BlockActor* blockEntity = blockSource.getBlockEntity(blockPos);                                                    \
     if (blockEntity) {                                                                                                 \
         std::unique_ptr<CompoundTag> blockEntityTag = std::make_unique<CompoundTag>();                                 \
-        blockEntity->save(*blockEntityTag);                                                                            \
+        blockEntity->save(*blockEntityTag, , *SaveContextFactory::createCloneSaveContext());                           \
         blockSource.removeBlockEntity(blockPos);                                                                       \
         blockSource.setBlock(blockPos, Block::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);               \
         blockSource.setBlock(blockPos, newBlock, 3, BlockActor::create(*blockEntityTag), nullptr, nullptr);            \

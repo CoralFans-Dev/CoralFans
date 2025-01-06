@@ -14,9 +14,12 @@
 #include "mc/world/level/ChunkPos.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/LevelSeed64.h"
+#include "mc/world/level/TickNextTickData.h"
 #include "mc/world/level/chunk/ChunkSource.h"
 #include "mc/world/level/chunk/LevelChunk.h"
+#include "mc/world/level/dimension/Dimension.h"
 #include <string>
+
 
 namespace coral_fans::commands {
 
@@ -46,32 +49,40 @@ void registerLogCommand(CommandPermissionLevel permission) {
             // Original License: LGPL-3.0
             auto chunk = player->getDimension().getChunkSource().getExistingChunk(chunkPos);
             if (chunk && chunk->isFullyLoaded()) {
-                BlockTickingQueue& pt = chunk->getTickQueue();
-                auto nextTickQueue    = ll::memory::dAccess<std::vector<BlockTickingQueue::BlockTick>>(&pt, 16);
-                BlockTickingQueue::TickDataSet copiedQueue;
+                BlockTickingQueue&                        pt            = chunk->getTickQueue();
+                std::vector<BlockTickingQueue::BlockTick> nextTickQueue = pt.mNextTickQueue->mC;
+                BlockTickingQueue::TickDataSet            copiedQueue;
                 copiedQueue.mC = std::move(nextTickQueue);
                 if (!copiedQueue.empty()) {
                     BlockTickingQueue::TickDataSet activeQueue;
                     output.success("command.log.success.pt.title"_tr(
-                        region.getLevel().getCurrentTick().t,
+                        region.getLevel().getCurrentTick().tickID,
                         chunkPos.toString(),
                         copiedQueue.size()
                     ));
                     for (; !copiedQueue.empty();) {
                         auto& blockTick = copiedQueue.top();
-                        if (blockTick.mIsRemoved)
-                            output.success("command.log.success.pt.remove"_tr(blockTick.mData.mPos.toString()));
-                        else nextTickQueue.emplace_back(blockTick);
+                        bool* tem       = (bool*)&blockTick.mUnk958ddb;
+                        if (*tem) {
+                            TickNextTickData* _data = (TickNextTickData*)&blockTick.mUnk723bc0;
+                            output.success("command.log.success.pt.remove"_tr(
+                                _data->pos->toString(),
+                                _data->tick->tickID,
+                                _data->priorityOffset,
+                                _data->mBlock->getTypeName()
+                            ));
+                        } else nextTickQueue.emplace_back(blockTick);
                         (void)copiedQueue.pop();
                     }
                     copiedQueue.mC = std::move(nextTickQueue);
                     for (; !copiedQueue.empty();) {
-                        auto& blockTick = copiedQueue.top();
+                        auto&             blockTick = copiedQueue.top();
+                        TickNextTickData* _data     = (TickNextTickData*)&blockTick.mUnk723bc0;
                         output.success("command.log.success.pt.info"_tr(
-                            blockTick.mData.mPos.toString(),
-                            blockTick.mData.mTick.t,
-                            blockTick.mData.mPriorityOffset,
-                            blockTick.mData.mBlock->buildDescriptionName()
+                            _data->pos->toString(),
+                            _data->tick->tickID,
+                            _data->priorityOffset,
+                            _data->mBlock->getTypeName()
                         ));
                         (void)copiedQueue.pop();
                     }

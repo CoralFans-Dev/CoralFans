@@ -1,14 +1,15 @@
 #include "coral_fans/base/Mod.h"
 #include "ll/api/memory/Hook.h"
-#include "mc/enums/AbilitiesIndex.h"
-#include "mc/enums/GameType.h"
 #include "mc/server/ServerPlayer.h"
 #include "mc/world/Container.h"
+#include "mc/world/actor/player/AbilitiesIndex.h"
 #include "mc/world/actor/player/Player.h"
-#include "mc/world/item/registry/ItemStack.h"
+#include "mc/world/item/ItemStack.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/Explosion.h"
+#include "mc/world/level/GameType.h"
 #include "mc/world/level/block/actor/ChestBlockActor.h"
+
 
 namespace coral_fans::functions {
 
@@ -50,7 +51,7 @@ LL_TYPE_INSTANCE_HOOK(
     CoralFansTweakersNoClipHook,
     ll::memory::HookPriority::Normal,
     ServerPlayer,
-    "?setPlayerGameType@ServerPlayer@@UEAAXW4GameType@@@Z",
+    &ServerPlayer::setPlayerGameType,
     void,
     ::GameType gameType
 ) {
@@ -66,7 +67,7 @@ LL_TYPE_INSTANCE_HOOK(
     CoralFansTweakersDropperNoCostHook,
     ll::memory::HookPriority::Normal,
     Container,
-    "?removeItem@Container@@UEAAXHH@Z",
+    &Container::removeItem,
     void,
     int slot,
     int count
@@ -91,7 +92,7 @@ LL_TYPE_INSTANCE_HOOK(
     CoralFansTweakersFastDropHook,
     ll::memory::HookPriority::Normal,
     Player,
-    "?drop@Player@@UEAA_NAEBVItemStack@@_N@Z",
+    &Player::drop,
     bool,
     ItemStack const& item,
     bool             randomly
@@ -104,7 +105,7 @@ LL_TYPE_INSTANCE_HOOK(
         for (int i = 0; i < size; ++i) {
             const auto& itemi = inv.getItem(i);
             if (itemi.matchesItem(item))
-                if (origin(itemi, randomly)) inv.setItem(i, ItemStack::EMPTY_ITEM);
+                if (origin(itemi, randomly)) inv.setItem(i, ItemStack::EMPTY_ITEM());
         }
         this->refreshInventory();
         return false;

@@ -9,15 +9,19 @@
 #include "ll/api/event/player/PlayerUseItemEvent.h"
 #include "ll/api/service/Bedrock.h"
 #include "ll/api/utils/StringUtils.h"
+#include "mc/deps/core/utility/MCRESULT.h"
 #include "mc/server/ServerPlayer.h"
+#include "mc/server/commands/CommandContext.h"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
+#include "mc/server/commands/CommandVersion.h"
 #include "mc/server/commands/MinecraftCommands.h"
 #include "mc/server/commands/PlayerCommandOrigin.h"
 #include "mc/world/Minecraft.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/Level.h"
 #include <memory>
+
 
 namespace {
 
@@ -39,9 +43,9 @@ std::unordered_map<std::string, UseOnAction>& getUseOnCache() {
     return cache;
 }
 
-bool antiShake(const ServerPlayer& player, const BlockPos& pos) {
+bool antiShake(const Player& player, const BlockPos& pos) {
     const auto& playerUuid      = player.getUuid().asString();
-    uint64_t    gt              = player.getLevel().getCurrentServerTick().t;
+    uint64_t    gt              = player.getLevel().getCurrentServerTick().tickID;
     auto        useOnAction     = UseOnAction{gt, pos};
     auto        lastUseOnAction = getUseOnCache()[playerUuid];
     if (useOnAction == lastUseOnAction) return false;
@@ -115,9 +119,10 @@ void registerShortcutsListener() {
                                 ll::string_utils::replaceAll(command, "{blockz}", std::to_string(event.blockPos().z));
                             CommandContext context = CommandContext(
                                 command,
-                                std::make_unique<PlayerCommandOrigin>(PlayerCommandOrigin(event.self()))
+                                std::make_unique<PlayerCommandOrigin>(PlayerCommandOrigin(event.self())),
+                                CommandVersion::CurrentVersion()
                             );
-                            mc->getCommands().executeCommand(context);
+                            mc->getCommands().executeCommand(context, false);
                         }
                     cancel |= shortcut.prevent;
                 }
@@ -164,9 +169,10 @@ void registerShortcutsListener() {
                         );
                         CommandContext context = CommandContext(
                             command,
-                            std::make_unique<PlayerCommandOrigin>(PlayerCommandOrigin(event.self()))
+                            std::make_unique<PlayerCommandOrigin>(PlayerCommandOrigin(event.self())),
+                            CommandVersion::CurrentVersion()
                         );
-                        mc->getCommands().executeCommand(context);
+                        mc->getCommands().executeCommand(context, false);
                     }
                 cancel |= shortcut.prevent;
             }
@@ -213,9 +219,10 @@ void registerShortcutsListener() {
                                 ll::string_utils::replaceAll(command, "{itemaux}", std::to_string(item.getAuxValue()));
                             CommandContext context = CommandContext(
                                 command,
-                                std::make_unique<PlayerCommandOrigin>(PlayerCommandOrigin(event.self()))
+                                std::make_unique<PlayerCommandOrigin>(PlayerCommandOrigin(event.self())),
+                                CommandVersion::CurrentVersion()
                             );
-                            mc->getCommands().executeCommand(context);
+                            mc->getCommands().executeCommand(context, false);
                         }
                     cancel |= shortcut.prevent;
                 }
@@ -239,9 +246,12 @@ void registerShortcutsCommand() {
                     command = ll::string_utils::replaceAll(command, "{selfx}", std::to_string(player->getPosition().x));
                     command = ll::string_utils::replaceAll(command, "{selfy}", std::to_string(player->getPosition().y));
                     command = ll::string_utils::replaceAll(command, "{selfz}", std::to_string(player->getPosition().z));
-                    CommandContext context =
-                        CommandContext(command, std::make_unique<PlayerCommandOrigin>(PlayerCommandOrigin(*player)));
-                    mc->getCommands().executeCommand(context);
+                    CommandContext context = CommandContext(
+                        command,
+                        std::make_unique<PlayerCommandOrigin>(PlayerCommandOrigin(*player)),
+                        CommandVersion::CurrentVersion()
+                    );
+                    mc->getCommands().executeCommand(context, false);
                 }
         });
     }
