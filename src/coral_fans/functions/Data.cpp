@@ -91,8 +91,8 @@ std::pair<std::string, bool> getEntityNbt(Actor* actor, std::string path) {
 }
 
 std::pair<std::string, bool> showRedstoneComponentsInfo(Dimension& dimension, BlockPos& pos, uint64 type) {
-    auto&             circuitSys = dimension.getCircuitSystem();
-    CircuitSceneGraph graph      = (CircuitSceneGraph)circuitSys.mSceneGraph;
+    auto&              circuitSys = dimension.getCircuitSystem();
+    CircuitSceneGraph& graph      = circuitSys.mSceneGraph;
     if (type == 0) {
         // chunk
         auto     chunkPos = utils::blockPosToChunkPos(pos);
@@ -105,7 +105,7 @@ std::pair<std::string, bool> showRedstoneComponentsInfo(Dimension& dimension, Bl
     }
     using ll::i18n_literals::operator""_tr;
     auto* component = graph.getComponent(pos, CircuitComponentType::BaseCircuitComponent);
-    /*貌似没法用昨天说的那个
+    /*
 
 enum class CircuitComponentType : uint64 {
 Undefined              = 1,
@@ -148,7 +148,8 @@ RepeaterCapacitor      = 2097156,
                 component->canConsumerPower() ? "true" : "false",
                 component->canStopPower() ? "true" : "false",
                 component->isHalfPulse() ? "true" : "false",
-                "magic_enum::enum_name(component->mDirection)",
+                component->mDirection,
+                // "magic_enum::enum_name(component->mDirection)",
                 block.hasComparatorSignal() ? std::to_string(block.getComparatorSignal(blockSource, pos, 0)) : "-"
             ),
             true

@@ -2,6 +2,7 @@
 #include "coral_fans/base/Mod.h"
 #include "coral_fans/base/Utils.h"
 
+#include "coral_fans/base/MySchedule.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/entity/systems/EntitySystems.h"
 #include "mc/world/actor/Actor.h"
@@ -18,7 +19,7 @@
 namespace coral_fans::functions {
 
 // main game tick
-LL_TYPE_INSTANCE_HOOK(CoralFansTickLevelTickHook, ll::memory::HookPriority::Normal, Level, &Level::tick, void) {
+LL_TYPE_INSTANCE_HOOK(CoralFansTickLevelTickHook, ll::memory::HookPriority::Normal, Level, &Level::$tick, void) {
     auto& mod  = coral_fans::mod();
     auto& prof = mod.getProfiler();
     PROF_TIMER(level, { origin(); })
@@ -32,6 +33,7 @@ LL_TYPE_INSTANCE_HOOK(CoralFansTickLevelTickHook, ll::memory::HookPriority::Norm
             prof.stop();
         }
     }
+    my_schedule::MySchedule::getSchedule().update();
 }
 
 // LevelChunk tick
@@ -104,9 +106,10 @@ LL_TYPE_INSTANCE_HOOK(
         bool res;
         // from
         // https://github.com/glibcxx/figure_hack/blob/f74b0badc2a2397f811282a3cdda3725f7e13c55/src/figure_hack/Function/PendingTickVisualization.cpp#L56
-        auto mNextTickQueue = ll::memory::dAccess<std::vector<BlockTickingQueue::BlockTick>>(this, 16);
+        // auto mNextTickQueue = ll::memory::dAccess<std::vector<BlockTickingQueue::BlockTick>>(this, 16);
+        auto mNextTickQueue = this->mNextTickQueue->mC;
         if (!mNextTickQueue.empty()) {
-            auto              tickData      = mNextTickQueue.front().mUnk723bc0;
+            auto              tickData      = mNextTickQueue.front().mData;
             TickNextTickData* _tickData     = (TickNextTickData*)&tickData;
             auto              chunkPos      = utils::blockPosToChunkPos(_tickData->pos);
             auto              dimId         = static_cast<int>(region.getDimensionId());
@@ -124,7 +127,7 @@ LL_TYPE_INSTANCE_HOOK(
     CoralFansTickDimensionTickHook,
     ll::memory::HookPriority::Normal,
     Dimension,
-    &Dimension::tick,
+    &Dimension::$tick,
     void
 ) {
     auto& prof = coral_fans::mod().getProfiler();
@@ -158,7 +161,7 @@ LL_TYPE_INSTANCE_HOOK(
     CoralFansTickDimensionTickRedstoneHook,
     ll::memory::HookPriority::Normal,
     Dimension,
-    &Dimension::tickRedstone,
+    &Dimension::$tickRedstone,
     void
 ) {
     auto& prof = coral_fans::mod().getProfiler();

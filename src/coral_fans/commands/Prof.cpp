@@ -2,14 +2,17 @@
 #include "coral_fans/base/Mod.h"
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
+#include "ll/api/command/ParamTraits.h"
 #include "ll/api/command/runtime/ParamKind.h"
 #include "ll/api/command/runtime/RuntimeCommand.h"
 #include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
+#include "ll/api/service/Bedrock.h"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/server/commands/CommandPermissionLevel.h"
 #include <string>
+
 
 namespace coral_fans::commands {
 
@@ -20,8 +23,7 @@ void registerProfCommand(CommandPermissionLevel permission) {
     auto& profCommand = ll::command::CommandRegistrar::getInstance()
                             .getOrCreateCommand("prof", "command.prof.description"_tr(), permission);
 
-    ll::command::CommandRegistrar::getInstance()
-        .tryRegisterEnum("profType", functions::Profiler::TypeVec, Bedrock::type_id<CommandRegistry, std::pair<std::string, uint64>>(), &CommandRegistry::parse<std::pair<std::string, uint64>>);
+    ll::command::CommandRegistrar::getInstance().tryRegisterRuntimeEnum("profType", functions::Profiler::TypeVec);
     profCommand.runtimeOverload()
         .optional("type", ll::command::ParamKind::Enum, "profType")
         .optional("numberOfTick", ll::command::ParamKind::Int)

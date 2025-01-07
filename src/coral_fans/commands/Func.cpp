@@ -31,15 +31,13 @@ void registerFuncCommand(CommandPermissionLevel permission) {
         });
 
     // func forceplace normal|entity|all
-    ll::command::CommandRegistrar::getInstance().tryRegisterEnum(
+    ll::command::CommandRegistrar::getInstance().tryRegisterRuntimeEnum(
         "forceplaceLevel",
         {
             {"normal", 0},
             {"entity", 1},
-            {"all", 2}
-        },
-        Bedrock::type_id<CommandRegistry, std::pair<std::string,uint64>>(),
-        &CommandRegistry::parse<std::pair<std::string,uint64>>
+            {"all",    2}
+    }
     );
     funcCommand.runtimeOverload()
         .text("forceplace")

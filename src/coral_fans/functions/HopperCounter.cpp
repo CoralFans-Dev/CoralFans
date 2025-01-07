@@ -111,7 +111,7 @@ LL_TYPE_INSTANCE_HOOK(
     CoralFansFunctionsHopperCounterHook1,
     ll::memory::HookPriority::Normal,
     HopperBlockActor,
-    &HopperBlockActor::tick,
+    &HopperBlockActor::$tick,
     void,
     BlockSource& region
 ) {
@@ -123,7 +123,7 @@ LL_TYPE_INSTANCE_HOOK(
     CoralFansFunctionsHopperCounterHook2,
     ll::memory::HookPriority::Normal,
     HopperBlockActor,
-    &HopperBlockActor::setItem,
+    &HopperBlockActor::$setItem,
     void,
     int                slot,
     ::ItemStack const& item
@@ -154,7 +154,7 @@ LL_TYPE_INSTANCE_HOOK(
         item.mCount
     );
     // remove item
-    origin(slot, ItemStack::EMPTY_ITEM);
+    origin(slot, ItemStack::EMPTY_ITEM());
 }
 
 void hookFunctionsHopperCounter(bool hook) {

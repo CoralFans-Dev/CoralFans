@@ -31,7 +31,7 @@ LL_TYPE_INSTANCE_HOOK(
     CoralFansTweakersForcePlaceHook,
     ll::memory::HookPriority::Normal,
     BlockSource,
-    &BlockSource::mayPlace,
+    &BlockSource::$mayPlace,
     bool,
     Block const&    block,
     BlockPos const& pos,
@@ -51,7 +51,7 @@ LL_TYPE_INSTANCE_HOOK(
     CoralFansTweakersNoClipHook,
     ll::memory::HookPriority::Normal,
     ServerPlayer,
-    &ServerPlayer::setPlayerGameType,
+    &ServerPlayer::$setPlayerGameType,
     void,
     ::GameType gameType
 ) {
@@ -67,7 +67,7 @@ LL_TYPE_INSTANCE_HOOK(
     CoralFansTweakersDropperNoCostHook,
     ll::memory::HookPriority::Normal,
     Container,
-    &Container::removeItem,
+    &Container::$removeItem,
     void,
     int slot,
     int count
@@ -92,7 +92,7 @@ LL_TYPE_INSTANCE_HOOK(
     CoralFansTweakersFastDropHook,
     ll::memory::HookPriority::Normal,
     Player,
-    &Player::drop,
+    &Player::$drop,
     bool,
     ItemStack const& item,
     bool             randomly

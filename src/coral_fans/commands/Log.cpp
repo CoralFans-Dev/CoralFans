@@ -15,6 +15,7 @@
 #include "mc/world/level/Level.h"
 #include "mc/world/level/LevelSeed64.h"
 #include "mc/world/level/TickNextTickData.h"
+#include "mc/world/level/block/Block.h"
 #include "mc/world/level/chunk/ChunkSource.h"
 #include "mc/world/level/chunk/LevelChunk.h"
 #include "mc/world/level/dimension/Dimension.h"
@@ -62,27 +63,24 @@ void registerLogCommand(CommandPermissionLevel permission) {
                     ));
                     for (; !copiedQueue.empty();) {
                         auto& blockTick = copiedQueue.top();
-                        bool* tem       = (bool*)&blockTick.mUnk958ddb;
-                        if (*tem) {
-                            TickNextTickData* _data = (TickNextTickData*)&blockTick.mUnk723bc0;
+                        if (blockTick.mIsRemoved) {
                             output.success("command.log.success.pt.remove"_tr(
-                                _data->pos->toString(),
-                                _data->tick->tickID,
-                                _data->priorityOffset,
-                                _data->mBlock->getTypeName()
+                                blockTick.mData.pos->toString(),
+                                blockTick.mData.tick->tickID,
+                                blockTick.mData.priorityOffset,
+                                blockTick.mData.mBlock->getTypeName()
                             ));
                         } else nextTickQueue.emplace_back(blockTick);
                         (void)copiedQueue.pop();
                     }
                     copiedQueue.mC = std::move(nextTickQueue);
                     for (; !copiedQueue.empty();) {
-                        auto&             blockTick = copiedQueue.top();
-                        TickNextTickData* _data     = (TickNextTickData*)&blockTick.mUnk723bc0;
+                        auto& blockTick = copiedQueue.top();
                         output.success("command.log.success.pt.info"_tr(
-                            _data->pos->toString(),
-                            _data->tick->tickID,
-                            _data->priorityOffset,
-                            _data->mBlock->getTypeName()
+                            blockTick.mData.pos->toString(),
+                            blockTick.mData.tick->tickID,
+                            blockTick.mData.priorityOffset,
+                            blockTick.mData.mBlock->getTypeName()
                         ));
                         (void)copiedQueue.pop();
                     }

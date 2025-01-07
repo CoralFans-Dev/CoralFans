@@ -1,6 +1,7 @@
 #include "coral_fans/CoralFans.h"
 
 #include <memory>
+#include <string>
 
 #include "bsci/GeometryGroup.h"
 #include "ll/api/mod/RegisterHelper.h"
@@ -9,11 +10,13 @@
 #include "ll/api/i18n/I18n.h"
 
 #include "coral_fans/base/Mod.h"
+#include "coral_fans/base/MySchedule.h"
 #include "coral_fans/commands/Commands.h"
 #include "coral_fans/functions/AutoItem.h"
 #include "coral_fans/functions/ContainerReader.h"
 #include "coral_fans/functions/HookRegister.h"
 #include "coral_fans/functions/Shortcuts.h"
+
 
 namespace coral_fans {
 
@@ -45,8 +48,6 @@ bool CoralFans::load() {
     // load i18n
     logger.debug("Loading I18n");
     if (!ll::i18n::getInstance().load(getSelf().getLangDir())) logger.error("Failed to load I18n");
-    ;
-    ll::i18n::defaultLocaleCode() = mod.getConfig().locateName;
 
     // load Config Database
     logger.debug("Loading Config Database");
@@ -111,7 +112,7 @@ bool CoralFans::disable() {
     functions::hookAll(false);
 
     // remove tasks
-    mod.getScheduler().clear();
+    my_schedule::MySchedule::getSchedule();
 
     return true;
 }

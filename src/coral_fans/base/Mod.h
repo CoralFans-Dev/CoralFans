@@ -1,7 +1,6 @@
 #pragma once
 
 // #include "bsci/GeometryGroup.h"
-#include "TimeWheel.h"
 #include "coral_fans/Config.h"
 #include "coral_fans/CoralFans.h"
 #include "coral_fans/functions/HopperCounter.h"
@@ -30,12 +29,9 @@ private:
     functions::Profiler                   mProfiler;
     functions::SlimeManager               mSlimeManager;
     functions::CFVillageManager           mVillageManager;
-    timewheel::TimeWheel                  mScheduler;
     functions::HudHelper                  mHudHelper;
 
 public:
-    CoralFansMod() : mScheduler(1200) {}
-
 public:
     inline std::unique_ptr<ll::data::KeyValueDB>& getConfigDb() { return this->mConfigDb; }
     inline config::Config&                        getConfig() { return this->mConfig; }
@@ -48,7 +44,6 @@ public:
     inline functions::Profiler&              getProfiler() { return this->mProfiler; }
     inline functions::SlimeManager&          getSlimeManager() { return this->mSlimeManager; }
     inline functions::CFVillageManager&      getVillageManager() { return this->mVillageManager; }
-    inline timewheel::TimeWheel&             getScheduler() { return this->mScheduler; }
 
 public:
     void tick();

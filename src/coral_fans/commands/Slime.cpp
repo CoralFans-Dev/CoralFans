@@ -8,7 +8,8 @@
 #include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
 #include "mc/server/commands/CommandOutput.h"
-#include "mc/world/actor/player/Player.h"
+#include "mc/world/actor/player/Player.h" 
+#include "coral_fans/base/Mod.h"
 
 namespace coral_fans::commands {
 

@@ -21,18 +21,16 @@ void registerVillageCommand(CommandPermissionLevel permission) {
                                .getOrCreateCommand("village", "command.village.description"_tr(), permission);
 
     // village show <bounds|raid|spawn|center|poi|bind> <bool>
-    ll::command::CommandRegistrar::getInstance().tryRegisterEnum(
+    ll::command::CommandRegistrar::getInstance().tryRegisterRuntimeEnum(
         "villageShowType",
         {
             {"bounds", 0},
-            {"raid", 1},
-            {"spawn", 2},
+            {"raid",   1},
+            {"spawn",  2},
             {"center", 3},
-            {"poi", 4},
-            {"bind", 5}
-        },
-        Bedrock::type_id<CommandRegistry, std::pair<std::string,uint64>>(),
-        &CommandRegistry::parse<std::pair<std::string,uint64>>
+            {"poi",    4},
+            {"bind",   5}
+    }
     );
     villageCommand.runtimeOverload()
         .text("show")

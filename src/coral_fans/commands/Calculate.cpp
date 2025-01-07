@@ -49,12 +49,10 @@ void registerCalculateCommand(CommandPermissionLevel permission) {
                 std::map<std::pair<unsigned long long, std::string>, int> cal;
                 for (; !copiedQueue.empty();) {
                     auto& blockTick = copiedQueue.top();
-                    bool* tem       = (bool*)&blockTick.mUnk958ddb;
-                    if (*tem) {
-                        TickNextTickData*                          _data = (TickNextTickData*)&blockTick.mUnk723bc0;
-                        std::pair<unsigned long long, std::string> tem   = {
-                            _data->tick->tickID,
-                            _data->mBlock->getTypeName()
+                    if (blockTick.mIsRemoved) {
+                        std::pair<unsigned long long, std::string> tem = {
+                            blockTick.mData.tick->tickID,
+                            blockTick.mData.mBlock->getTypeName()
                         };
                         auto it = cal.find(tem);
                         if (it != cal.end()) {
@@ -82,10 +80,9 @@ void registerCalculateCommand(CommandPermissionLevel permission) {
                     //     blockTick.mData.mPriorityOffset,
                     //     blockTick.mData.mBlock->getName().getString()
                     // );
-                    TickNextTickData*                          _data = (TickNextTickData*)&blockTick.mUnk723bc0;
-                    std::pair<unsigned long long, std::string> tem   = {
-                        _data->tick->tickID,
-                        _data->mBlock->getTypeName()
+                    std::pair<unsigned long long, std::string> tem = {
+                        blockTick.mData.tick->tickID,
+                        blockTick.mData.mBlock->getTypeName()
                     };
                     auto it = cal2.find(tem);
                     if (it != cal2.end()) {

@@ -14,10 +14,9 @@ add_repositories("coralfansdev-repo https://github.com/CoralFans-Dev/xmake-repo.
 -- end
 
 add_requires(
-    "levilamina 1.0.0-rc.1",
+    "levilamina",
     "levibuildscript",
-    "bsci main",
-    "timewheel"
+    "bsci main"
 )
 
 if not has_config("vs_runtime") then
@@ -30,7 +29,7 @@ option("CoralFans")
     set_values("server", "client")
 option_end()
 
-target("my-mod") -- Change this to your mod name.
+target("CoralFans") -- Change this to your mod name.
     add_rules("@levibuildscript/linkrule")
     add_rules("@levibuildscript/modpacker")
     add_cxflags( "/EHa", "/utf-8", "/W4", "/w44265", "/w44289", "/w44296", "/w45263", "/w44738", "/w45204")
@@ -38,8 +37,7 @@ target("my-mod") -- Change this to your mod name.
     add_packages(
         "levilamina",
         "levibuildscript",
-        "bsci",
-        "timewheel"
+        "bsci"
     )
     set_exceptions("none") -- To avoid conflicts with /EHa.
     set_kind("shared")

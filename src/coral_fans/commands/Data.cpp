@@ -2,14 +2,17 @@
 #include "coral_fans/base/Macros.h"
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
+#include "ll/api/command/ParamTraits.h"
 #include "ll/api/command/runtime/ParamKind.h"
 #include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
+#include "ll/api/service/Bedrock.h"
 #include "mc/server/commands/CommandPermissionLevel.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/phys/HitResult.h"
+
 
 #include <string>
 
@@ -154,16 +157,14 @@ void registerDataCommand(CommandPermissionLevel permission) {
         });
 
     // redstone <signal|info|chunk|conn> [blockPos: x y z]
-    ll::command::CommandRegistrar::getInstance().tryRegisterEnum(
+    ll::command::CommandRegistrar::getInstance().tryRegisterRuntimeEnum(
         "redstoneType",
         {
-            {"chunk", 0},
+            {"chunk",  0},
             {"signal", 1},
-            {"info", 2},
-            {"conn", 3},
-        },
-        Bedrock::type_id<CommandRegistry, std::pair<std::string,uint64>>(),
-        &CommandRegistry::parse<std::pair<std::string,uint64>>
+            {"info",   2},
+            {"conn",   3},
+    }
     );
     dataCommand.runtimeOverload()
         .text("redstone")

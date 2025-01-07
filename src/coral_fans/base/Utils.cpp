@@ -2,13 +2,14 @@
 
 #include "coral_fans/base/Mod.h"
 
+#include "coral_fans/base/MySchedule.h"
 #include "ll/api/i18n/I18n.h"
+#include "ll/api/io/Logger.h"
 #include "mc/nbt/ByteTag.h"
 #include "mc/nbt/CompoundTag.h"
 #include "mc/nbt/CompoundTagVariant.h"
 #include "mc/nbt/ListTag.h"
 #include "mc/nbt/StringTag.h"
-#include "mc/resources/persona/color.h"
 #include "mc/world/Container.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/item/SaveContextFactory.h"
@@ -86,10 +87,7 @@ std::string removeMinecraftPrefix(std::string const& s) { return s.find("minecra
 void shortHighligntBlock(int dimid, BlockPos const& blockPos, mce::Color const& color, int time) {
     auto& mod = coral_fans::mod();
     auto  s   = mod.getGeometryGroup()->box(dimid, {blockPos, blockPos + BlockPos::ONE()}, color);
-    mod.getScheduler().add(time, [&, s](unsigned long long) {
-        mod.getGeometryGroup()->remove(s);
-        return false;
-    });
+    my_schedule::MySchedule::getSchedule().add(time, [&, s]() { mod.getGeometryGroup()->remove(s); });
 }
 
 void swapItemInContainer(Player* player, int slot1, int slot2) {
