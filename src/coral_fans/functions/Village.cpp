@@ -246,15 +246,7 @@ std::pair<std::string, bool> CFVillageManager::getVillageInfo(std::string id) {
                 retstr += "|";
             }
             auto poi = villager.second[index].lock();
-            if (poi)
-                retstr += std::format(
-                    " §a{}§r §b{}§r, §d{}§r, §e{:.1f}§r, {} |",
-                    poi->getPosition(),
-                    "poi->getOwnerCount()",
-                    "poi->getOwnerCapacity()",
-                    poi->getRadius(),
-                    "poi->getWeight()"
-                );
+            if (poi) retstr += std::format(" §a{}§r, §e{:.1f}§r |", poi->getPosition(), poi->getRadius());
             else retstr += " §7(x)§r |";
             if (index == 2) retstr += "\n";
         }
@@ -273,15 +265,8 @@ std::pair<std::string, bool> CFVillageManager::getVillagerInfo(ActorUniqueID aui
             for (int i = 0; i < 3; i++) {
                 const auto& poi = it->second[i].lock();
                 if (poi)
-                    retstr += std::format(
-                        "\n{}: {}, {} / {}, {:.2f}, {}",
-                        poi->getName().mStr,
-                        poi->getPosition(),
-                        "poi->getOwnerCount()",
-                        "poi->getOwnerCapacity()",
-                        poi->getRadius(),
-                        "poi->getWeight()"
-                    );
+                    retstr +=
+                        std::format("\n{}: {}, {:.2f}", poi->getName().mStr, poi->getPosition(), poi->getRadius());
             }
             return {retstr, true};
         }

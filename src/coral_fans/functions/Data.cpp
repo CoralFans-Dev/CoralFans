@@ -104,24 +104,30 @@ std::pair<std::string, bool> showRedstoneComponentsInfo(Dimension& dimension, Bl
         return {"", true};
     }
     using ll::i18n_literals::operator""_tr;
-    auto* component = graph.getComponent(pos, CircuitComponentType::BaseCircuitComponent);
+    auto* component = graph.getComponent(pos, CircuitComponentType::CapacitorComponent);
+    if (!component) component = graph.getComponent(pos, CircuitComponentType::ConsumerComponent);
+    if (!component) component = graph.getComponent(pos, CircuitComponentType::TransporterComponent);
+    if (!component) component = graph.getComponent(pos, CircuitComponentType::PoweredBlockComponent);
+    if (!component) component = graph.getComponent(pos, CircuitComponentType::PoweredBlockComponent);
+    if (!component) component = graph.getComponent(pos, CircuitComponentType::ProducerComponent);
+    if (!component) component = graph.getComponent(pos, CircuitComponentType::BaseRailTransporter);
     /*
 
 enum class CircuitComponentType : uint64 {
 Undefined              = 1,
-GroupMask              = 4294901760,
-BaseCircuitComponent   = 2147483648,
-BaseRailTransporter    = 65536,
-ConsumerComponent      = 131072,
-PoweredBlockComponent  = 262144,
-ProducerComponent      = 524288,
-TransporterComponent   = 1048576,
-CapacitorComponent     = 2097152,
-PistonConsumer         = 131073,
-ComparatorCapacitor    = 2097153,
-PulseCapacitor         = 2097154,
-RedstoneTorchCapacitor = 2097155,
-RepeaterCapacitor      = 2097156,
+GroupMask              = 4294901760,    基础原件，铁轨，消费者，充能方块，生产者，红石粉，电容器的掩码，但是失效了
+BaseCircuitComponent   = 2147483648,    貌似现在失效了
+BaseRailTransporter    = 65536,         铁轨
+ConsumerComponent      = 131072,        消费者
+PoweredBlockComponent  = 262144,        充能方块
+ProducerComponent      = 524288,        生产者
+TransporterComponent   = 1048576,       红石粉
+CapacitorComponent     = 2097152,       电容器，包括火把，比较器，中继器，观察者
+PistonConsumer         = 131073,        活塞，已包含在生产者中
+ComparatorCapacitor    = 2097153,       比较器，已包含在电容器中
+PulseCapacitor         = 2097154,       脉冲电容器，仅发现观察者
+RedstoneTorchCapacitor = 2097155,       红石火把
+RepeaterCapacitor      = 2097156,       中继器，已包含在电容器中
 };
 */
     if (!component) return {"translate.data.error.nocircuitcomponent"_tr(), false};

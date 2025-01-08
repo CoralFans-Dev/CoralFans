@@ -13,6 +13,9 @@
 #include "mc/world/level/dimension/Dimension.h"
 #include "mc/world/level/levelgen/v1/HardcodedSpawnAreaType.h"
 #include "mc/world/phys/AABB.h"
+#include <memory>
+#include <string>
+#include <vector>
 
 
 namespace {
@@ -60,16 +63,15 @@ namespace coral_fans::functions {
 
 void HsaManager::drawHsa(LevelChunk::SpawningArea hsa) {
     // if not show: show particle
-    AABB _aabb;
-    std::memcpy(&_aabb, &hsa.mUnkaa0f6a, 2 * sizeof(Vec3));
-    if (this->mParticleMap.find(_aabb) != this->mParticleMap.end()) return;
-    ::HardcodedSpawnAreaType _type;
-    std::memcpy(&_type, &hsa.mUnkcb47a3, sizeof(hsa.mUnkcb47a3));
-    int        dim   = _type == HardcodedSpawnAreaType::NetherFortress ? 1 : 0;
-    mce::Color color = ::getHsaColor(_type);
-    auto       aabb  = ::getSpawnAreaFromHSA(_aabb);
-    auto&      mod   = coral_fans::mod();
-    auto       ids   = std::array{
+    coral_fans::mod().getLogger().warn("HsaManager::drawHsa");
+    AABB* _aabb = (AABB*)&hsa.mUnkaa0f6a;
+    if (this->mParticleMap.find(*_aabb) != this->mParticleMap.end()) return;
+    ::HardcodedSpawnAreaType* _type = (::HardcodedSpawnAreaType*)&hsa.mUnkcb47a3;
+    int                       dim   = *_type == HardcodedSpawnAreaType::NetherFortress ? 1 : 0;
+    mce::Color                color = ::getHsaColor(*_type);
+    auto                      aabb  = ::getSpawnAreaFromHSA(*_aabb);
+    auto&                     mod   = coral_fans::mod();
+    auto                      ids   = std::array{
         mod.getGeometryGroup()
             ->line(dim, {aabb.min.x, aabb.min.y, aabb.min.z}, {aabb.min.x, aabb.min.y, aabb.max.z}, color),
         mod.getGeometryGroup()
@@ -95,7 +97,7 @@ void HsaManager::drawHsa(LevelChunk::SpawningArea hsa) {
         mod.getGeometryGroup()
             ->line(dim, {aabb.min.x, aabb.min.y, aabb.min.z}, {aabb.min.x, aabb.max.y, aabb.min.z}, mce::Color::WHITE())
     };
-    this->mParticleMap[_aabb] = mod.getGeometryGroup()->merge(ids);
+    this->mParticleMap[*_aabb] = mod.getGeometryGroup()->merge(ids);
 }
 
 void HsaManager::tick() {
@@ -115,7 +117,14 @@ void HsaManager::tick() {
                                          .getExistingChunk(ChunkPos{originChunkPos.x + i, originChunkPos.z + j});
                         if (chunk && chunk->isFullyLoaded()) {
                             // HSAs
-                            for (const auto& hsa : (std::vector<::LevelChunk::SpawningArea>)chunk->mSpawningAreas) {
+
+                            std::vector<LevelChunk::SpawningArea>* _hsa =
+                                (std::vector<LevelChunk::SpawningArea>*)&chunk->mSpawningAreas;
+                            coral_fans::mod().getLogger().warn(
+                                "HsaManager::chunk->isFullyLoaded() " + std::to_string(_hsa->size())
+                            );
+                            for (const auto hsa : *_hsa) {
+                                coral_fans::mod().getLogger().warn("HsaManager::1");
                                 this->drawHsa(hsa);
                             }
                         }
