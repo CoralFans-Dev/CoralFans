@@ -68,6 +68,8 @@ void registerTickCommand(CommandPermissionLevel permission) {
             if (rate < 0) output.error("command.tick.rate.error"_tr());
             // LevelEventPacket{LevelEvent::SimTimeScale, {rate / 20}, rate > 0}.sendToClients();
             auto mc = ll::service::getMinecraft();
+
+            mc->setSimTimePause(false);
             if (mc.has_value()) mc->setSimTimeScale(rate / 20.0f);
             output.success("command.tick.rate.success"_tr(rate));
         });
