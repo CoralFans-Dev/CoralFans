@@ -1,4 +1,4 @@
-#include "coral_fans/functions/Hsa.h"
+#include "coral_fans/functions/hsa/Hsa.h"
 #include "coral_fans/base/Mod.h"
 #include "coral_fans/base/Utils.h"
 #include "ll/api/service/Bedrock.h"
@@ -61,7 +61,7 @@ auto getHsaColor = [](const HardcodedSpawnAreaType& type) {
 
 namespace coral_fans::functions {
 
-void HsaManager::drawHsa(LevelChunk::SpawningArea hsa) {
+void HsaManager::drawHsa(const LevelChunk::SpawningArea& hsa) {
     // if not show: show particle
     coral_fans::mod().getLogger().warn("HsaManager::drawHsa");
     AABB* _aabb = (AABB*)&hsa.mUnkaa0f6a;
@@ -118,13 +118,17 @@ void HsaManager::tick() {
                         if (chunk && chunk->isFullyLoaded()) {
                             // HSAs
 
-                            std::vector<LevelChunk::SpawningArea>* _hsa =
-                                (std::vector<LevelChunk::SpawningArea>*)&chunk->mSpawningAreas;
-                            coral_fans::mod().getLogger().warn(
-                                "HsaManager::chunk->isFullyLoaded() " + std::to_string(_hsa->size())
-                            );
-                            for (const auto hsa : *_hsa) {
-                                coral_fans::mod().getLogger().warn("HsaManager::1");
+                            const std::vector<LevelChunk::SpawningArea>& _hsa = chunk->mSpawningAreas;
+                            if (_hsa.size())
+                                coral_fans::mod().getLogger().warn(
+                                    "HsaManager::chunk->isFullyLoaded() " + std::to_string(_hsa.size())
+                                );
+                            else
+                                coral_fans::mod().getLogger().error(
+                                    "HsaManager::chunk->isFullyLoaded() " + std::to_string(_hsa.size())
+                                );
+                            for (const auto& hsa : _hsa) {
+                                coral_fans::mod().getLogger().error("HsaManager::1");
                                 this->drawHsa(hsa);
                             }
                         }

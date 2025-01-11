@@ -1,4 +1,4 @@
-#include "coral_fans/functions/Prof.h"
+#include "coral_fans/functions/prof/Prof.h"
 #include "coral_fans/base/Mod.h"
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"

@@ -58,8 +58,9 @@ LL_TYPE_INSTANCE_HOOK(
     origin(gameType);
     if (gameType == ::GameType::Creative && coral_fans::mod().getConfigDb()->get("functions.global.noclip") == "true"
         && coral_fans::mod().getConfigDb()->get(std::format("functions.players.{}.noclip", this->getUuid().asString()))
-               == "true")
+               == "true") {
         this->setAbility(::AbilitiesIndex::NoClip, true);
+    }
 }
 
 // droppernocost

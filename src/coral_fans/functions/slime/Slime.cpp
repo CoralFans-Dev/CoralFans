@@ -1,4 +1,4 @@
-#include "coral_fans/functions/Slime.h"
+#include "coral_fans/functions/slime/Slime.h"
 #include "coral_fans/base/Mod.h"
 #include "coral_fans/base/Utils.h"
 

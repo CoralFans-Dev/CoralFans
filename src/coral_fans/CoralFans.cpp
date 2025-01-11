@@ -1,7 +1,6 @@
 #include "coral_fans/CoralFans.h"
 
 #include <memory>
-#include <string>
 
 #include "bsci/GeometryGroup.h"
 #include "ll/api/mod/RegisterHelper.h"
@@ -12,10 +11,10 @@
 #include "coral_fans/base/Mod.h"
 #include "coral_fans/base/MySchedule.h"
 #include "coral_fans/commands/Commands.h"
-#include "coral_fans/functions/AutoItem.h"
-#include "coral_fans/functions/ContainerReader.h"
-#include "coral_fans/functions/HookRegister.h"
-#include "coral_fans/functions/Shortcuts.h"
+#include "coral_fans/functions/func/AutoItem.h"
+#include "coral_fans/functions/func/ContainerReader.h"
+#include "coral_fans/functions/other/HookRegister.h"
+#include "coral_fans/functions/other/Shortcuts.h"
 
 
 namespace coral_fans {
@@ -87,6 +86,8 @@ bool CoralFans::enable() {
     if (mod.getConfig().command.log.enabled) commands::registerLogCommand(mod.getConfig().command.log.permission);
     if (mod.getConfig().command.calculate.enabled)
         commands::registerCalculateCommand(mod.getConfig().command.log.permission);
+    if (mod.getConfig().command.minerule.enabled)
+        commands::registerMineruleCommand(mod.getConfig().command.log.permission);
 
     // register shortcuts
     functions::registerShortcutsListener();

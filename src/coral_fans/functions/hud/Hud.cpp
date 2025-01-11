@@ -1,8 +1,9 @@
-#include "coral_fans/functions/Hud.h"
+#include "coral_fans/functions/hud/Hud.h"
 #include "coral_fans/base/Mod.h"
 #include "coral_fans/base/Utils.h"
-#include "coral_fans/functions/Data.h"
-#include "coral_fans/functions/HopperCounter.h"
+#include "coral_fans/functions/data/Data.h"
+#include "coral_fans/functions/hopperCounter/HopperCounter.h"
+
 #include "ll/api/base/StdInt.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/service/Bedrock.h"

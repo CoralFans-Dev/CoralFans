@@ -7,6 +7,7 @@
 #include "ll/api/event/player/PlayerDestroyBlockEvent.h"
 #include "ll/api/event/player/PlayerInteractBlockEvent.h"
 #include "ll/api/event/player/PlayerUseItemEvent.h"
+#include "ll/api/i18n/I18n.h"
 #include "ll/api/service/Bedrock.h"
 #include "ll/api/utils/StringUtils.h"
 #include "mc/deps/core/utility/MCRESULT.h"
@@ -233,6 +234,7 @@ void registerShortcutsListener() {
 }
 
 void registerShortcutsCommand() {
+    using ll::i18n_literals::operator""_tr;
     for (auto& shortcut : coral_fans::mod().getConfig().shortcuts) {
         if (!shortcut.enable || shortcut.type != "command" || shortcut.command == "") continue;
         auto& cmd = ll::command::CommandRegistrar::getInstance()

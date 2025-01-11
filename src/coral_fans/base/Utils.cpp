@@ -1,10 +1,8 @@
 #pragma once
 
 #include "coral_fans/base/Mod.h"
-
 #include "coral_fans/base/MySchedule.h"
 #include "ll/api/i18n/I18n.h"
-#include "ll/api/io/Logger.h"
 #include "mc/nbt/ByteTag.h"
 #include "mc/nbt/CompoundTag.h"
 #include "mc/nbt/CompoundTagVariant.h"

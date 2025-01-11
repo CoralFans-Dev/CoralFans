@@ -50,9 +50,9 @@ void registerLogCommand(CommandPermissionLevel permission) {
             // Original License: LGPL-3.0
             auto chunk = player->getDimension().getChunkSource().getExistingChunk(chunkPos);
             if (chunk && chunk->isFullyLoaded()) {
-                BlockTickingQueue&                        pt            = chunk->getTickQueue();
-                std::vector<BlockTickingQueue::BlockTick> nextTickQueue = pt.mNextTickQueue->mC;
-                BlockTickingQueue::TickDataSet            copiedQueue;
+                BlockTickingQueue&                         pt            = chunk->getTickQueue();
+                std::vector<BlockTickingQueue::BlockTick>& nextTickQueue = pt.mNextTickQueue->mC;
+                BlockTickingQueue::TickDataSet             copiedQueue;
                 copiedQueue.mC = std::move(nextTickQueue);
                 if (!copiedQueue.empty()) {
                     BlockTickingQueue::TickDataSet activeQueue;
@@ -85,6 +85,52 @@ void registerLogCommand(CommandPermissionLevel permission) {
                         (void)copiedQueue.pop();
                     }
                 } else output.error("command.log.error.nopt"_tr());
+            }
+        }
+    );
+    logCommand.runtimeOverload().text("rpt").execute(
+        [](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const&) {
+            COMMAND_CHECK_PLAYER
+            ChunkPos     chunkPos = utils::blockPosToChunkPos(player->getFeetBlockPos());
+            BlockSource& region   = player->getDimensionBlockSource();
+            auto         chunk    = player->getDimension().getChunkSource().getExistingChunk(chunkPos);
+            if (chunk && chunk->isFullyLoaded()) {
+                BlockTickingQueue& pt = chunk->getRandomTickQueue();
+
+                std::vector<BlockTickingQueue::BlockTick>& nextTickQueue = pt.mNextTickQueue->mC;
+                BlockTickingQueue::TickDataSet             copiedQueue;
+                copiedQueue.mC = std::move(nextTickQueue);
+                if (!copiedQueue.empty()) {
+                    BlockTickingQueue::TickDataSet activeQueue;
+                    output.success("command.log.success.rpt.title"_tr(
+                        region.getLevel().getCurrentTick().tickID,
+                        chunkPos.toString(),
+                        copiedQueue.size()
+                    ));
+                    for (; !copiedQueue.empty();) {
+                        auto& blockTick = copiedQueue.top();
+                        if (blockTick.mIsRemoved) {
+                            output.success("command.log.success.rpt.remove"_tr(
+                                blockTick.mData.pos->toString(),
+                                blockTick.mData.tick->tickID,
+                                blockTick.mData.priorityOffset,
+                                blockTick.mData.mBlock->getTypeName()
+                            ));
+                        } else nextTickQueue.emplace_back(blockTick);
+                        (void)copiedQueue.pop();
+                    }
+                    copiedQueue.mC = std::move(nextTickQueue);
+                    for (; !copiedQueue.empty();) {
+                        auto& blockTick = copiedQueue.top();
+                        output.success("command.log.success.rpt.info"_tr(
+                            blockTick.mData.pos->toString(),
+                            blockTick.mData.tick->tickID,
+                            blockTick.mData.priorityOffset,
+                            blockTick.mData.mBlock->getTypeName()
+                        ));
+                        (void)copiedQueue.pop();
+                    }
+                } else output.error("command.log.error.norpt"_tr());
             }
         }
     );

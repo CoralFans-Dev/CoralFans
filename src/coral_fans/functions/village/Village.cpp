@@ -1,4 +1,4 @@
-#include "coral_fans/functions/Village.h"
+#include "coral_fans/functions/village/Village.h"
 #include "bsci/GeometryGroup.h"
 #include "coral_fans/base/Mod.h"
 

@@ -1,6 +1,5 @@
 #include "coral_fans/base/Macros.h"
 #include "coral_fans/base/Utils.h"
-#include "ll/api/base/StdInt.h"
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/command/runtime/RuntimeCommand.h"
@@ -16,7 +15,6 @@
 #include "mc/world/level/chunk/ChunkSource.h"
 #include "mc/world/level/chunk/LevelChunk.h"
 #include "mc/world/level/dimension/Dimension.h"
-#include <cstring>
 
 
 namespace coral_fans::commands {
@@ -35,9 +33,9 @@ void registerCalculateCommand(CommandPermissionLevel permission) {
         BlockSource& region   = player->getDimensionBlockSource();
         auto         chunk    = player->getDimension().getChunkSource().getExistingChunk(chunkPos);
         if (chunk && chunk->isFullyLoaded()) {
-            BlockTickingQueue&                        pt            = chunk->getTickQueue();
-            std::vector<BlockTickingQueue::BlockTick> nextTickQueue = pt.mNextTickQueue->mC;
-            BlockTickingQueue::TickDataSet            copiedQueue;
+            BlockTickingQueue&                         pt            = chunk->getTickQueue();
+            std::vector<BlockTickingQueue::BlockTick>& nextTickQueue = pt.mNextTickQueue->mC;
+            BlockTickingQueue::TickDataSet             copiedQueue;
             copiedQueue.mC = std::move(nextTickQueue);
             if (!copiedQueue.empty()) {
                 BlockTickingQueue::TickDataSet activeQueue;

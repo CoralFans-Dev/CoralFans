@@ -1,8 +1,8 @@
 #include "coral_fans/base/Macros.h"
 #include "coral_fans/base/Mod.h"
+#include "coral_fans/base/MySchedule.h"
 #include "coral_fans/base/Utils.h"
 
-#include "coral_fans/base/MySchedule.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/entity/systems/EntitySystems.h"
 #include "mc/world/actor/Actor.h"

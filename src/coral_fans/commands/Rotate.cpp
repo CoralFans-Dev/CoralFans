@@ -1,4 +1,4 @@
-#include "coral_fans/functions/Rotate.h"
+#include "coral_fans/functions/rotate/Rotate.h"
 #include "coral_fans/base/Macros.h"
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"

@@ -1,5 +1,8 @@
 {
     "command": {
+        "error": {
+            "checkPlayer": "Only players can run this command"
+        },
         "func": {
             "description": "Globally controls functions of CoralFans Mod",
             "forceopen": {
@@ -167,13 +170,19 @@
             "description": "Log info",
             "error": {
                 "nulllevel": "Null Level",
-                "nopt": "no pendingTick"
+                "nopt": "no pendingTick in current chunk",
+                "norpt": "no randomPendingTick in current chunk"
             },
             "success": {
                 "pt": {
                     "title": "[{}] chunk {} has {} pendingTicks ->",
-                    "remove": " removed {}: tick time {}, priority {}, {}",
+                    "remove": " removed {}: target tick {}, priority {}, {}",
                     "info": " {}: target tick {}, priority {}, {}"
+                },
+                "rpt": {
+                    "title": "[{}] chunk {} has {} randomPendingTicks ->",
+                    "remove": " removed {}: randomTick time {}, priority {}, {}",
+                    "info": " {}: randomTick time {}, priority {}, {}"
                 }
             }
         },
@@ -188,6 +197,23 @@
                     "remove": " removed {}: target tick {}, count {}",
                     "info": "  {}: target tick {}, count {}"
                 }
+            }
+        },
+        "minerule": {
+            "description": "Mine rule is the rule",
+            "bedrockDrop": {
+                "success": {
+                    "true": "The Bedrock Edition can't get bedrock, just like jang's staff can't get it's Mom.\nCongratulations on enabling the bedrock drop feature",
+                    "false": "success to set bedrock drop false"
+                },
+                "error": "failed to set bedrockDrop"
+            },
+            "movingBlockDrop": {
+                "success": {
+                    "true": "success to set movingBlock drop true",
+                    "false": "success to set movingBlock drop false"
+                },
+                "error": "failed to set movingBlock"
             }
         }
     },
