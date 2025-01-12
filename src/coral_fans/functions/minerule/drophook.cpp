@@ -54,7 +54,7 @@ LL_TYPE_INSTANCE_HOOK(
     if (this->getTypeName() == "minecraft:moving_block") {
         MovingBlockActor* mba = (MovingBlockActor*)region.getBlockEntity(pos);
         region.setBlock(pos, mba->getWrappedBlock(), 3, mba->mWrappedBlockActor, nullptr, nullptr);
-        Block                  bl = region.getBlock(pos);
+        const Block&           bl = region.getBlock(pos);
         std::vector<ItemStack> drops =
             bl.getLegacyBlock()
                 .getResourceDrops(bl, *DropHookManager::getInstance().ram, *DropHookManager::getInstance().dropsContext)

@@ -1,5 +1,6 @@
 #include "coral_fans/base/Mod.h"
-#include "coral_fans/functions/minerule/drophook.h"
+#include "coral_fans/functions/minerule/Drophook.h"
+#include "coral_fans/functions/minerule/Portal_sand_farm.h"
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/command/runtime/RuntimeOverload.h"
@@ -60,5 +61,23 @@ void registerMineruleCommand(CommandPermissionLevel permission) {
         });
 
     functions::DropHookManager::getInstance().dropHook();
+
+    mineruleCommand.runtimeOverload()
+        .text("replicated_portal_sand_farm")
+        .required("isopen", ll::command::ParamKind::Bool)
+        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
+            if (coral_fans::mod().getConfigDb()->set(
+                    "minerule.replicated_portal_sand_farm",
+                    isopen ? "true" : "false"
+                )) {
+                output.success("command.minerule.replicated_portal_sand_farm.success"_tr(isopen ? "true" : "false"));
+                functions::hook_portal_sand_farm(isopen);
+            } else output.error("command.minerule.replicated_portal_sand_farm.error"_tr());
+        });
+
+    functions::hook_portal_sand_farm(
+        coral_fans::mod().getConfigDb()->get("minerule.replicated_portal_sand_farm") == "true"
+    );
 }
 } // namespace coral_fans::commands

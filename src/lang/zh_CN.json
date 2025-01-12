@@ -214,6 +214,10 @@
                     "false": "成功关闭mb掉落功能"
                 },
                 "error": "设置 movingBlockDrop 失败"
+            },
+            "replicated_portal_sand_farm": {
+                "success": "设置 replicated_portal_sand_farm \"{}\"",
+                "error": "设置 replicated_portal_sand_farm 失败"
             }
         }
     },

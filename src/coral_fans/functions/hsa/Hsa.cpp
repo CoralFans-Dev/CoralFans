@@ -64,14 +64,12 @@ namespace coral_fans::functions {
 void HsaManager::drawHsa(const LevelChunk::SpawningArea& hsa) {
     // if not show: show particle
     coral_fans::mod().getLogger().warn("HsaManager::drawHsa");
-    AABB* _aabb = (AABB*)&hsa.mUnkaa0f6a;
-    if (this->mParticleMap.find(*_aabb) != this->mParticleMap.end()) return;
-    ::HardcodedSpawnAreaType* _type = (::HardcodedSpawnAreaType*)&hsa.mUnkcb47a3;
-    int                       dim   = *_type == HardcodedSpawnAreaType::NetherFortress ? 1 : 0;
-    mce::Color                color = ::getHsaColor(*_type);
-    auto                      aabb  = ::getSpawnAreaFromHSA(*_aabb);
-    auto&                     mod   = coral_fans::mod();
-    auto                      ids   = std::array{
+    if (this->mParticleMap.find(*hsa.aabb) != this->mParticleMap.end()) return;
+    int        dim   = hsa.type == HardcodedSpawnAreaType::NetherFortress ? 1 : 0;
+    mce::Color color = ::getHsaColor(hsa.type);
+    auto       aabb  = ::getSpawnAreaFromHSA((AABB&)hsa.aabb);
+    auto&      mod   = coral_fans::mod();
+    auto       ids   = std::array{
         mod.getGeometryGroup()
             ->line(dim, {aabb.min.x, aabb.min.y, aabb.min.z}, {aabb.min.x, aabb.min.y, aabb.max.z}, color),
         mod.getGeometryGroup()
@@ -97,7 +95,7 @@ void HsaManager::drawHsa(const LevelChunk::SpawningArea& hsa) {
         mod.getGeometryGroup()
             ->line(dim, {aabb.min.x, aabb.min.y, aabb.min.z}, {aabb.min.x, aabb.max.y, aabb.min.z}, mce::Color::WHITE())
     };
-    this->mParticleMap[*_aabb] = mod.getGeometryGroup()->merge(ids);
+    this->mParticleMap[(AABB&)hsa.aabb] = mod.getGeometryGroup()->merge(ids);
 }
 
 void HsaManager::tick() {

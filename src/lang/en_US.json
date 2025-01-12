@@ -203,7 +203,7 @@
             "description": "Mine rule is the rule",
             "bedrockDrop": {
                 "success": {
-                    "true": "The Bedrock Edition can't get bedrock, just like jang's staff can't get it's Mom.\nCongratulations on enabling the bedrock drop feature",
+                    "true": "Bedrock edition doesn't drop bedrock, just like jang' staff don't have moms.\n\nCongratulations on enabling the bedrock drop feature",
                     "false": "success to set bedrock drop false"
                 },
                 "error": "failed to set bedrockDrop"
@@ -214,6 +214,10 @@
                     "false": "success to set movingBlock drop false"
                 },
                 "error": "failed to set movingBlock"
+            },
+            "replicated_portal_sand_farm": {
+                "success": "set replicated_portal_sand_farm \"{}\"",
+                "error": "failed to set replicated_portal_sand_farm"
             }
         }
     },
