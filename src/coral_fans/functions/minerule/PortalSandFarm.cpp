@@ -1,5 +1,4 @@
-#include "coral_fans/functions/minerule/Portal_sand_farm.h"
-#include "coral_fans/base/Mod.h"
+#include "coral_fans/functions/minerule/PortalSandFarm.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/item/FallingBlockActor.h"
 
@@ -22,7 +21,6 @@ LL_TYPE_INSTANCE_HOOK(
 }
 
 void hook_portal_sand_farm(bool bl) {
-    mod().getLogger().error(bl ? "true" : "false");
     if (bl) CoralFansportalSandFarmHook::hook();
     else CoralFansportalSandFarmHook::unhook();
 }

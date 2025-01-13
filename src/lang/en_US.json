@@ -218,6 +218,10 @@
             "replicated_portal_sand_farm": {
                 "success": "set replicated_portal_sand_farm \"{}\"",
                 "error": "failed to set replicated_portal_sand_farm"
+            },
+            "remove_portal_pigzombie_cd": {
+                "success": "set remove_portal_pigzombie_cd \"{}\"",
+                "error": "failed to set remove_portal_pigzombie_cd"
             }
         }
     },

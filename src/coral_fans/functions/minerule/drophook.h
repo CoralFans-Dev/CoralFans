@@ -11,10 +11,9 @@ public:
     const ResourceDropsContext* dropsContext;
 
     static DropHookManager& getInstance() {
-        static DropHookManager instance; // 唯一实例
+        static DropHookManager instance;
         return instance;
     }
-
-    void dropHook();
 };
+void dropHook();
 } // namespace coral_fans::functions

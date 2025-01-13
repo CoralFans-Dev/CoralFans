@@ -218,6 +218,10 @@
             "replicated_portal_sand_farm": {
                 "success": "设置 replicated_portal_sand_farm \"{}\"",
                 "error": "设置 replicated_portal_sand_farm 失败"
+            },
+            "remove_portal_pigzombie_cd": {
+                "success": "设置 remove_portal_pigzombie_cd \"{}\"",
+                "error": "设置 remove_portal_pigzombie_cd 失败"
             }
         }
     },

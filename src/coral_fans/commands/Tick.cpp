@@ -81,16 +81,10 @@ void registerTickCommand(CommandPermissionLevel permission) {
         }
         auto mc = ll::service::getMinecraft();
         if (mc.has_value()) {
-            // Minecraft.mSimTimer
-            // Timer timer = mc->mSimTimer;
-
-            // timer.stepTick(tick);
-            // coral_fans::mod().getLogger().error("timer.stepTick(tick);");
-            // int _tick = tick;
-            // while (_tick--) mc->setSimTimePause(true);
             if (tick == 1) mc->setSimTimePause(true);
             else {
                 mc->setSimTimePause(false);
+                mc->setSimTimeScale(10000);
                 my_schedule::MySchedule::getSchedule().add(tick - 1, []() {
                     ll::service::getMinecraft()->setSimTimePause(true);
                 });

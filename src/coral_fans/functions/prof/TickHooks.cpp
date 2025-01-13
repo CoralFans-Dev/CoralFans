@@ -107,14 +107,14 @@ LL_TYPE_INSTANCE_HOOK(
         // from
         // https://github.com/glibcxx/figure_hack/blob/f74b0badc2a2397f811282a3cdda3725f7e13c55/src/figure_hack/Function/PendingTickVisualization.cpp#L56
         // auto mNextTickQueue = ll::memory::dAccess<std::vector<BlockTickingQueue::BlockTick>>(this, 16);
-        auto mNextTickQueue = this->mNextTickQueue->mC;
-        if (!mNextTickQueue.empty()) {
-            auto              tickData      = mNextTickQueue.front().mData;
+        auto _mNextTickQueue = this->mNextTickQueue->mC;
+        if (!_mNextTickQueue.empty()) {
+            auto              tickData      = _mNextTickQueue.front().mData;
             TickNextTickData* _tickData     = (TickNextTickData*)&tickData;
             auto              chunkPos      = utils::blockPosToChunkPos(_tickData->pos);
             auto              dimId         = static_cast<int>(region.getDimensionId());
             auto              current       = prof.ptCounter[dimId][chunkPos];
-            prof.ptCounter[dimId][chunkPos] = std::max(current, mNextTickQueue.size());
+            prof.ptCounter[dimId][chunkPos] = std::max(current, _mNextTickQueue.size());
         }
         PROF_TIMER(chunk_pt, { res = origin(region, until, max, instaTick_); })
         prof.chunkInfo.pendingTickTime += time_chunk_pt;

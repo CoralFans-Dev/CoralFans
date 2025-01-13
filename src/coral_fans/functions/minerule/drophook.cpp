@@ -66,7 +66,7 @@ LL_TYPE_INSTANCE_HOOK(
     return origin(region, pos, entitySource);
 }
 
-void DropHookManager::dropHook() {
+void dropHook() {
     if (DropHookManager::getInstance().mbDrop) {
         CoralFansDropHook1::hook();
         CoralFansDropHook2::hook();
