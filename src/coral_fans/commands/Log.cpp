@@ -50,14 +50,14 @@ void registerLogCommand(CommandPermissionLevel permission) {
             // Original License: LGPL-3.0
             auto chunk = player->getDimension().getChunkSource().getExistingChunk(chunkPos);
             if (chunk && chunk->isFullyLoaded()) {
-                BlockTickingQueue&                         pt            = chunk->getTickQueue();
-                std::vector<BlockTickingQueue::BlockTick>& nextTickQueue = pt.mNextTickQueue->mC;
-                BlockTickingQueue::TickDataSet             copiedQueue;
+                BlockTickingQueue&                        pt            = chunk->getTickQueue();
+                std::vector<BlockTickingQueue::BlockTick> nextTickQueue = pt.mNextTickQueue->mC;
+                BlockTickingQueue::TickDataSet            copiedQueue;
                 copiedQueue.mC = std::move(nextTickQueue);
                 if (!copiedQueue.empty()) {
                     BlockTickingQueue::TickDataSet activeQueue;
                     output.success("command.log.success.pt.title"_tr(
-                        region.getLevel().getCurrentTick().tickID,
+                        region.getLevel().getCurrentTick().tickID - 1,
                         chunkPos.toString(),
                         copiedQueue.size()
                     ));
@@ -97,13 +97,13 @@ void registerLogCommand(CommandPermissionLevel permission) {
             if (chunk && chunk->isFullyLoaded()) {
                 BlockTickingQueue& pt = chunk->getRandomTickQueue();
 
-                std::vector<BlockTickingQueue::BlockTick>& nextTickQueue = pt.mNextTickQueue->mC;
-                BlockTickingQueue::TickDataSet             copiedQueue;
+                std::vector<BlockTickingQueue::BlockTick> nextTickQueue = pt.mNextTickQueue->mC;
+                BlockTickingQueue::TickDataSet            copiedQueue;
                 copiedQueue.mC = std::move(nextTickQueue);
                 if (!copiedQueue.empty()) {
                     BlockTickingQueue::TickDataSet activeQueue;
                     output.success("command.log.success.rpt.title"_tr(
-                        region.getLevel().getCurrentTick().tickID,
+                        region.getLevel().getCurrentTick().tickID - 1,
                         chunkPos.toString(),
                         copiedQueue.size()
                     ));

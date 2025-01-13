@@ -22,13 +22,11 @@ LL_TYPE_STATIC_HOOK(
     ::PortalAxis      axis
 ) {
     Vec3 _pos = pos;
-    _pos.y--;
-    while (_pos.y > 0) {
-        if (!region.canProvideSupport(_pos, (char)1, ::BlockSupportType(2))) _pos.y--;
-        else
-        // if (!region.isSolidBlockingBlock(_pos.x, _pos.y + 1, pos.z)
-        // 源码中的判定条件，但是据我所知没有任何一个固体方块不给上方提供支持，所以源码中这条判定完全是多余的
-        {
+    while (_pos.y-- > 0) {
+        if (region.canProvideSupport(_pos, 1, ::BlockSupportType(2))
+            // && !region.isSolidBlockingBlock(_pos.x, _pos.y + 1, pos.z)
+            // 源码中的判定条件，但是据我所知没有任何一个固体方块不给上方提供支持，所以源码中这条判定完全是多余的
+        ) {
             if (axis == PortalAxis(2)) {
                 _pos.x += 1.5f;
                 _pos.z += 0.5f;

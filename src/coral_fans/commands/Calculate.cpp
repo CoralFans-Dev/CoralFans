@@ -33,14 +33,14 @@ void registerCalculateCommand(CommandPermissionLevel permission) {
         BlockSource& region   = player->getDimensionBlockSource();
         auto         chunk    = player->getDimension().getChunkSource().getExistingChunk(chunkPos);
         if (chunk && chunk->isFullyLoaded()) {
-            BlockTickingQueue&                         pt            = chunk->getTickQueue();
-            std::vector<BlockTickingQueue::BlockTick>& nextTickQueue = pt.mNextTickQueue->mC;
-            BlockTickingQueue::TickDataSet             copiedQueue;
+            BlockTickingQueue&                        pt            = chunk->getTickQueue();
+            std::vector<BlockTickingQueue::BlockTick> nextTickQueue = pt.mNextTickQueue->mC;
+            BlockTickingQueue::TickDataSet            copiedQueue;
             copiedQueue.mC = std::move(nextTickQueue);
             if (!copiedQueue.empty()) {
                 BlockTickingQueue::TickDataSet activeQueue;
                 output.success("command.calculate.success.pt.title"_tr(
-                    region.getLevel().getCurrentTick().tickID,
+                    region.getLevel().getCurrentTick().tickID - 1,
                     chunkPos.toString(),
                     copiedQueue.size()
                 ));
