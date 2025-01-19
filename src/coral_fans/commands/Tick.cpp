@@ -82,14 +82,16 @@ void registerTickCommand(CommandPermissionLevel permission) {
         auto mc = ll::service::getMinecraft();
         if (mc.has_value()) {
             if (tick == 1) mc->setSimTimePause(true);
-            else if (tick == 2) {
-                mc->setSimTimePause(true); // tick step 2也要特判，否则会直接step 3
-                my_schedule::MySchedule::getSchedule().add(1, []() {
-                    ll::service::getMinecraft()->setSimTimePause(true);
-                });
-            } else {
+            // else if (tick == 2) { //与何以贯之的timeFix一起使用时不能加速，加速就会出现误差，且step 2需要特判
+
+            //     mc->setSimTimePause(true);
+            //     my_schedule::MySchedule::getSchedule().add(1, []() {
+            //         ll::service::getMinecraft()->setSimTimePause(true);
+            //     });
+            // }
+            else {
                 mc->setSimTimePause(false);
-                // mc->setSimTimeScale(100000);                 //不能加速，加速就会出现误差。疑似是浮点误差
+                mc->setSimTimeScale(10000); // 与何以贯之的timeFix一起使用时不能加速，加速就会出现误差，且step 2需要特判
                 my_schedule::MySchedule::getSchedule().add(tick - 1, []() {
                     ll::service::getMinecraft()->setSimTimePause(true);
                 });
