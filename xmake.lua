@@ -46,7 +46,6 @@ target("CoralFans") -- Change this to your mod name.
     set_toolchains("msvc")
     add_files("src/**.cpp")
     add_includedirs("src")
-    add_installfiles("src/lang/**.*", {destination = "bin/CoralFans/lang"})
     -- if is_config("target_type", "server") then
     --     add_includedirs("src-server")
     --     add_files("src-server/**.cpp")

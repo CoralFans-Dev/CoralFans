@@ -59,8 +59,9 @@ LL_TYPE_INSTANCE_HOOK(
             bl.getLegacyBlock()
                 .getResourceDrops(bl, *DropHookManager::getInstance().ram, *DropHookManager::getInstance().dropsContext)
                 .mItems;
+        Vec3 _pos = Vec3(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5);
         for (auto i : drops) {
-            ll::service::getLevel()->getSpawner().spawnItem(region, i, 0, pos, region.getDimensionId());
+            ll::service::getLevel()->getSpawner().spawnItem(region, i, 0, _pos, region.getDimensionId());
         }
     }
     return origin(region, pos, entitySource);

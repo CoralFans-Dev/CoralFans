@@ -20,6 +20,8 @@ namespace coral_fans::functions {
 
 // main game tick
 LL_TYPE_INSTANCE_HOOK(CoralFansTickLevelTickHook, ll::memory::HookPriority::Normal, Level, &Level::$tick, void) {
+    my_schedule::MySchedule::getSchedule().update();
+
     auto& mod  = coral_fans::mod();
     auto& prof = mod.getProfiler();
     PROF_TIMER(level, { origin(); })
@@ -33,7 +35,6 @@ LL_TYPE_INSTANCE_HOOK(CoralFansTickLevelTickHook, ll::memory::HookPriority::Norm
             prof.stop();
         }
     }
-    my_schedule::MySchedule::getSchedule().update();
 }
 
 // LevelChunk tick
