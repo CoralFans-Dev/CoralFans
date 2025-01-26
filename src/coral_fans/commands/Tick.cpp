@@ -12,6 +12,7 @@
 #include "mc/server/commands/CommandPermissionLevel.h"
 #include "mc/server/commands/CommandRegistry.h"
 #include "mc/util/ProfilerLite.h"
+#include "mc/util/Timer.h"
 #include "mc/world/Minecraft.h"
 
 
@@ -80,25 +81,10 @@ void registerTickCommand(CommandPermissionLevel permission) {
             return;
         }
         auto mc = ll::service::getMinecraft();
-        if (mc.has_value()) {
-            if (tick == 1) mc->setSimTimePause(true);
-            // else if (tick == 2) { //与何以贯之的timeFix一起使用时不能加速，加速就会出现误差，且step 2需要特判
-
-            //     mc->setSimTimePause(true);
-            //     my_schedule::MySchedule::getSchedule().add(1, []() {
-            //         ll::service::getMinecraft()->setSimTimePause(true);
-            //     });
-            // }
-            else {
-                mc->setSimTimePause(false);
-                mc->setSimTimeScale(10000); // 与何以贯之的timeFix一起使用时不能加速，加速就会出现误差，且step 2需要特判
-                my_schedule::MySchedule::getSchedule().add(tick - 1, []() {
-                    ll::service::getMinecraft()->setSimTimePause(true);
-                });
-            }
-        }
+        if (mc.has_value()) mc->mSimTimer.stepTick(tick);
         output.success("command.tick.step.output"_tr(tick));
     };
+
     tickCommand.runtimeOverload()
         .text("step")
         .required("time", ll::command::ParamKind::Int)
