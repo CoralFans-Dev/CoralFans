@@ -203,7 +203,7 @@
             "description": "Mine rule is the rule",
             "bedrockDrop": {
                 "success": {
-                    "true": "Bedrock edition doesn't drop bedrock, just like jang' staff don't have moms.\n\nCongratulations on enabling the bedrock drop feature",
+                    "true": "Bedrock edition without bedrock, just like jang without moms.\n\nCongratulations on enabling the bedrock drop feature",
                     "false": "success to set bedrock drop false"
                 },
                 "error": "failed to set bedrockDrop"
