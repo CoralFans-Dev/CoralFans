@@ -46,7 +46,7 @@ int searchBestToolInInv(Container& inv, int currentSlot, const Block* block, con
 
 namespace coral_fans::functions {
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     CoralFansTweakersAutoToolHook1,
     ll::memory::HookPriority::Normal,
     BlockEventCoordinator,
@@ -75,10 +75,10 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
             player.refreshInventory();
         }
     }
-    origin(player, blockPos, block, unk_char);
+    return origin(player, blockPos, block, unk_char);
 }
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     CoralFansTweakersAutoToolHook2,
     ll::memory::HookPriority::Normal,
     Player,
