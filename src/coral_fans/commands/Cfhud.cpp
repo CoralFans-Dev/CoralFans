@@ -35,17 +35,14 @@ void registerCfhudCommand(CommandPermissionLevel permission) {
         });
 
     // cfhud <add|remove> <mspt|base|redstone|village>
-    ll::command::CommandRegistrar::getInstance().tryRegisterEnum(
+    ll::command::CommandRegistrar::getInstance().tryRegisterRuntimeEnum(
         "cfhudActionType",
         {
-            {"add", 0},
+            {"add",    0},
             {"remove", 1}
-        },
-        Bedrock::type_id<CommandRegistry, std::pair<std::string,uint64>>(),
-        &CommandRegistry::parse<std::pair<std::string,uint64>>
+    }
     );
-    ll::command::CommandRegistrar::getInstance()
-        .tryRegisterEnum("cfhudType", functions::HudHelper::HudTypeVec, Bedrock::type_id<CommandRegistry, std::pair<std::string, uint64>>(), &CommandRegistry::parse<std::pair<std::string, uint64>>);
+    ll::command::CommandRegistrar::getInstance().tryRegisterRuntimeEnum("cfhudType", functions::HudHelper::HudTypeVec);
     cfhudCommand.runtimeOverload()
         .required("action", ll::command::ParamKind::Enum, "cfhudActionType")
         .required("hud", ll::command::ParamKind::Enum, "cfhudType")
@@ -60,9 +57,9 @@ void registerCfhudCommand(CommandPermissionLevel permission) {
             } catch (...) {
                 return output.error("command.cfhud.error.geterror"_tr());
             }
-            if (self["action"].get<ll::command::ParamKind::Enum>().second == 0)
-                hud |= (1 << self["hud"].get<ll::command::ParamKind::Enum>().second);
-            else hud &= ~(1 << self["hud"].get<ll::command::ParamKind::Enum>().second);
+            if (self["action"].get<ll::command::ParamKind::Enum>().index == 0)
+                hud |= (1 << self["hud"].get<ll::command::ParamKind::Enum>().index);
+            else hud &= ~(1 << self["hud"].get<ll::command::ParamKind::Enum>().index);
             if (mod.getConfigDb()
                     ->set("functions.players." + player->getUuid().asString() + ".cfhud.hud", std::to_string(hud)))
                 output.success("command.cfhud.success"_tr());

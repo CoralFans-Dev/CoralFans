@@ -9,7 +9,7 @@ class CoralFans {
 public:
     static CoralFans& getInstance();
 
-    CoralFans(ll::mod::NativeMod& self) : mSelf(self) {}
+    CoralFans() : mSelf(*ll::mod::NativeMod::current()) {}
 
     [[nodiscard]] ll::mod::NativeMod& getSelf() const { return mSelf; }
 

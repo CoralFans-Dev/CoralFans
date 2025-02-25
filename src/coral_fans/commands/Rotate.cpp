@@ -1,4 +1,4 @@
-#include "coral_fans/functions/Rotate.h"
+#include "coral_fans/functions/rotate/Rotate.h"
 #include "coral_fans/base/Macros.h"
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
@@ -7,6 +7,7 @@
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/server/commands/CommandPermissionLevel.h"
 #include "mc/world/actor/player/Player.h"
+#include "mc/world/phys/HitResult.h"
 
 namespace coral_fans::commands {
 
@@ -21,7 +22,7 @@ void registerRotateCommand(CommandPermissionLevel permission) {
         COMMAND_CHECK_PLAYER
         auto hitrst = player->traceRay(5.25f, false, true, [](BlockSource const&, Block const&, bool) { return true; });
         if (!hitrst) return;
-        functions::rotateBlock(player, hitrst.mBlockPos);
+        functions::rotateBlock(player, hitrst.mBlock);
     });
 }
 

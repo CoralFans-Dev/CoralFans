@@ -1,9 +1,8 @@
 #pragma once
 
 #include "coral_fans/base/Mod.h"
-
+#include "coral_fans/base/MySchedule.h"
 #include "ll/api/i18n/I18n.h"
-#include "mc/deps/core/mce/Color.h"
 #include "mc/nbt/ByteTag.h"
 #include "mc/nbt/CompoundTag.h"
 #include "mc/nbt/CompoundTagVariant.h"
@@ -11,8 +10,10 @@
 #include "mc/nbt/StringTag.h"
 #include "mc/world/Container.h"
 #include "mc/world/actor/player/Player.h"
+#include "mc/world/item/SaveContextFactory.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/ChunkPos.h"
+
 
 #include <memory>
 #include <optional>
@@ -83,11 +84,8 @@ std::string removeMinecraftPrefix(std::string const& s) { return s.find("minecra
 
 void shortHighligntBlock(int dimid, BlockPos const& blockPos, mce::Color const& color, int time) {
     auto& mod = coral_fans::mod();
-    auto  s   = mod.getGeometryGroup()->box(dimid, {blockPos, blockPos + BlockPos::ONE}, color);
-    mod.getScheduler().add(time, [&, s](unsigned long long) {
-        mod.getGeometryGroup()->remove(s);
-        return false;
-    });
+    auto  s   = mod.getGeometryGroup()->box(dimid, {blockPos, blockPos + BlockPos::ONE()}, color);
+    my_schedule::MySchedule::getSchedule().add(time, [&, s]() { mod.getGeometryGroup()->remove(s); });
 }
 
 void swapItemInContainer(Player* player, int slot1, int slot2) {
@@ -108,7 +106,7 @@ getItemFromShulkerBox(std::unique_ptr<CompoundTag> tag, ItemStack const& itemSta
     if (tag && (*tag)["Name"].is_string() && (*tag)["Name"].get<StringTag>().ends_with("_shulker_box")
         && (*tag).contains("tag")) {
         auto list = (*tag)["tag"]["Items"].get<ListTag>();
-        for (unsigned long long i = 0; i < list.size(); ++i) {
+        for (int i = 0; i < list.size(); ++i) {
             auto* item = list.getCompound(i);
             if (!item) continue;
             if ((*item)["Name"].is_string()
@@ -117,9 +115,9 @@ getItemFromShulkerBox(std::unique_ptr<CompoundTag> tag, ItemStack const& itemSta
                 && (*item)["Count"].is_number() && (*item)["Count"].get<ByteTag>().data > minCount) {
                 CompoundTag ret = *item;
                 if (replace) {
-                    list[i]                            = itemStack.save();
+                    list[i]                            = itemStack.save(*SaveContextFactory::createCloneSaveContext());
                     list[i].get<CompoundTag>()["Slot"] = ret["Slot"];
-                } else list.erase(i);
+                } else list.erase(list.begin() + i);
                 (*tag)["tag"]["Items"] = list;
                 return {
                     {*tag, ret}

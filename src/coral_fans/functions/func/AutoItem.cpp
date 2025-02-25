@@ -3,9 +3,12 @@
 #include "ll/api/event/ListenerBase.h"
 #include "ll/api/event/player/PlayerPlaceBlockEvent.h"
 #include "ll/api/event/player/PlayerUseItemEvent.h"
+#include "mc/world/actor/Mob.h"
 #include "mc/world/actor/player/Player.h"
-#include "mc/world/item/registry/ItemStack.h"
+#include "mc/world/item/ItemStack.h"
+#include "mc/world/item/SaveContextFactory.h"
 #include "mc/world/level/Level.h"
+
 
 namespace {
 
@@ -17,7 +20,7 @@ bool autoItem(Player& player, ItemStack const& item) {
         auto& itemi = inv.getItem(i);
         if (itemi.mCount != 0) {
             if (coral_fans::utils::removeMinecraftPrefix(itemi.getTypeName()).ends_with("_shulker_box")) {
-                auto tag = itemi.save();
+                auto tag = itemi.save(*SaveContextFactory::createCloneSaveContext());
                 auto rst = coral_fans::utils::getItemFromShulkerBox(std::move(tag), item, true, 1);
                 if (rst) {
                     inv.setItem(i, ItemStack::fromTag(rst->first));

@@ -1,9 +1,9 @@
-#include "coral_fans/functions/Slime.h"
+#include "coral_fans/functions/slime/Slime.h"
 #include "coral_fans/base/Mod.h"
 #include "coral_fans/base/Utils.h"
 
 #include "ll/api/service/Bedrock.h"
-#include "mc/deps/core/mce/Color.h"
+#include "mc/deps/core/math/Color.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/level/ChunkPos.h"
 #include "mc/world/level/Level.h"
@@ -42,7 +42,7 @@ void SlimeManager::tick() {
                                         {(originChunkPos.x + i) * 16, -64, (originChunkPos.z + j) * 16},
                                         {(originChunkPos.x + i) * 16 + 15, 320, (originChunkPos.z + j) * 16 + 15}
                                     },
-                                    mce::Color::GREEN
+                                    mce::Color::GREEN()
                                 );
                     }
                 }

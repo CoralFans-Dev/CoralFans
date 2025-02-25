@@ -14,7 +14,7 @@ void registerCoralfansCommand() {
                         .getOrCreateCommand("coralfans", "CoralFans Mod", CommandPermissionLevel::Any);
 
     // version
-    command.overload().text("version").execute([](CommandOrigin const&, CommandOutput& output) {
+    command.overload().text("version").execute([](CommandOrigin const&, CommandOutput&) {
 #ifdef VERSION
         output.success(VERSION);
 #endif
@@ -23,5 +23,4 @@ void registerCoralfansCommand() {
 #endif
     });
 }
-
 } // namespace coral_fans::commands

@@ -1,17 +1,19 @@
-#include "coral_fans/functions/Hud.h"
+#include "coral_fans/functions/hud/Hud.h"
 #include "coral_fans/base/Mod.h"
 #include "coral_fans/base/Utils.h"
-#include "coral_fans/functions/Data.h"
-#include "coral_fans/functions/HopperCounter.h"
+#include "coral_fans/functions/data/Data.h"
+#include "coral_fans/functions/hopperCounter/HopperCounter.h"
+
 #include "ll/api/base/StdInt.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/service/Bedrock.h"
 #include "magic_enum.hpp"
-#include "mc/enums/TextPacketType.h"
+#include "mc/common/Brightness.h"
 #include "mc/network/packet/TextPacket.h"
+#include "mc/network/packet/TextPacketType.h"
 #include "mc/util/ProfilerLite.h"
 #include "mc/world/actor/player/Player.h"
-#include "mc/world/item/registry/ItemStack.h"
+#include "mc/world/item/ItemStack.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/biome/Biome.h"
@@ -21,6 +23,7 @@
 #include <algorithm>
 #include <map>
 #include <string>
+
 
 namespace coral_fans::functions {
 
@@ -54,10 +57,10 @@ void HudHelper::tick() {
                     return true;
                 }
                 std::string msg;
-                double      mspt = (double)ProfilerLite::gProfilerLiteInstance.getServerTickTime().count() / 1000000.0;
-                double      currentTps  = mspt <= 50 ? 20 : (double)(1000.0 / mspt);
-                auto        hitrst      = player.traceRay(5.25f, true, true);
-                auto&       blockSource = player.getDimensionBlockSource();
+                double mspt = (double)ProfilerLite::gProfilerLiteInstance().getServerTickTime().count() / 1000000.0;
+                double currentTps  = mspt <= 50 ? 20 : (double)(1000.0 / mspt);
+                auto   hitrst      = player.traceRay(5.25f, true, true);
+                auto&  blockSource = player.getDimensionBlockSource();
                 if (hud & (1 << HudHelper::HudType::mspt)) {
                     msg += std::format(
                         "MSPT:{}{:.2f}§r TPS:{}{:.2f}§r\n",
@@ -71,15 +74,16 @@ void HudHelper::tick() {
                     auto& delta  = player.getPosDeltaNonConst();
                     auto& biome  = blockSource.getBiome(player.getFeetBlockPos());
                     msg         += "translate.cfhud.base"_tr(
-                        level->getCurrentServerTick().t,
+                        level->getCurrentServerTick().tickID,
                         player.getPosition().toString(),
                         player.getViewVector(1.0f).toString(),
                         utils::blockPosToChunkPos(player.getFeetBlockPos()).toString(),
-                        hitrst.mType == HitResultType::Tile ? hitrst.mBlockPos.toString() : "-",
-                        hitrst.mType == HitResultType::Tile ? std::to_string(
-                            blockSource.getRawBrightness(hitrst.mBlockPos + BlockPos{0, 1, 0}, true, true).value
-                        )
-                                                                    : "-",
+                        hitrst.mType == HitResultType::Tile ? hitrst.mBlock.toString() : "-",
+                        hitrst.mType == HitResultType::Tile
+                                    ? std::to_string(
+                                  blockSource.getRawBrightness(hitrst.mBlock + BlockPos{0, 1, 0}, true, true).mValue
+                              )
+                                    : "-",
                         delta.length() * 20,
                         delta.x * 20,
                         delta.y * 20,
@@ -89,7 +93,7 @@ void HudHelper::tick() {
                 }
                 if (hud & (1 << HudHelper::HudType::redstone)) {
                     if (hitrst.mType == HitResultType::Tile) {
-                        auto rst  = showRedstoneComponentsInfo(player.getDimension(), hitrst.mBlockPos, 2);
+                        auto rst  = showRedstoneComponentsInfo(player.getDimension(), hitrst.mBlock, 2);
                         msg      += rst.first + "\n";
                     }
                 }
@@ -108,20 +112,20 @@ void HudHelper::tick() {
                 }
                 if (hud & (1 << HudHelper::HudType::block)) {
                     if (hitrst.mType == HitResultType::Tile) {
-                        auto rst  = getBlockData(blockSource, hitrst.mBlockPos);
+                        auto rst  = getBlockData(blockSource, hitrst.mBlock);
                         msg      += rst + "\n";
                     }
                 }
                 if (hud & (1 << HudHelper::HudType::container)) {
                     if (hitrst.mType == HitResultType::Tile) {
-                        const auto& bl = blockSource.getBlock(hitrst.mBlockPos);
-                        auto*       ba = blockSource.getBlockEntity(hitrst.mBlockPos);
+                        const auto& bl = blockSource.getBlock(hitrst.mBlock);
+                        auto*       ba = blockSource.getBlockEntity(hitrst.mBlock);
                         if (bl.isContainerBlock() && ba) {
                             auto* container = ba->getContainer();
                             if (container) {
                                 std::map<std::string, int> items;
                                 for (const auto& item : container->getSlots()) {
-                                    if (*item == ItemStack::EMPTY_ITEM) continue;
+                                    if (*item == ItemStack::EMPTY_ITEM()) continue;
                                     std::string name = item->getCustomName();
                                     if (name.empty()) name = item->getName();
                                     if (auto it = items.find(name); it != items.end()) it->second += item->mCount;

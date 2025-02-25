@@ -1,5 +1,8 @@
 {
     "command": {
+        "error": {
+            "checkPlayer": "当前指令仅玩家可执行"
+        },
         "func": {
             "description": "全局控制CoralFans Mod的功能",
             "forceopen": {
@@ -167,14 +170,58 @@
             "description": "打印信息",
             "error": {
                 "nulllevel": "空的Level值",
-                "nopt": "无计划刻"
+                "nopt": "当前区块无计划刻",
+                "norpt": "当前区块无随机计划刻"
             },
             "success": {
                 "pt": {
                     "title": "[{}] 区块 {} 有 {} 个计划刻 ->",
-                    "remove": " {}: 删除",
-                    "info": " {}: tick time {}, 优先级 {}, {}"
+                    "remove": " 移除 {}: 目标游戏刻 {}, 优先级 {}, {}",
+                    "info": " {}: 目标游戏刻 {}, 优先级 {}, {}"
+                },
+                "rpt": {
+                    "title": "[{}] 区块 {} 有 {} 个随机计划刻 ->",
+                    "remove": " 移除 {}: 随机计划刻 {}, 优先级 {}, {}",
+                    "info": " {}: 随机计划刻 {}, 优先级 {}, {}"
                 }
+            }
+        },
+        "calculate": {
+            "description": "统计信息",
+            "error": {
+                "nopt": "当前区块无计划刻"
+            },
+            "success": {
+                "pt": {
+                    "title": "[{}] 区块 {} 有 {} 个计划刻 ->",
+                    "remove": " 移除 {}: 目标游戏刻 {}, 数量 {}",
+                    "info": " {}: 目标游戏刻 {}, 数量 {}"
+                }
+            }
+        },
+        "minerule": {
+            "description": "我的规矩就是规矩",
+            "bedrockDrop": {
+                "success": {
+                    "true": "基岩版没有基岩，就像ojng没有ma\n恭喜你打开了基岩掉落功能",
+                    "false": "成功关闭基岩掉落功能"
+                },
+                "error": "设置 bedrockDrop 失败"
+            },
+            "movingBlockDrop": {
+                "success": {
+                    "true": "成功开启mb掉落功能",
+                    "false": "成功关闭mb掉落功能"
+                },
+                "error": "设置 movingBlockDrop 失败"
+            },
+            "replicated_portal_sand_farm": {
+                "success": "设置 replicated_portal_sand_farm \"{}\"",
+                "error": "设置 replicated_portal_sand_farm 失败"
+            },
+            "remove_portal_pigzombie_cd": {
+                "success": "设置 remove_portal_pigzombie_cd \"{}\"",
+                "error": "设置 remove_portal_pigzombie_cd 失败"
             }
         }
     },
@@ -206,7 +253,7 @@
         },
         "data": {
             "info": {
-                "block": "- §b位置: §a{}§r\n- §b名称: §a{}§r\n- §b类型名: §a{}§r\n- §bID: §a{}§r\n- §bRTID: §a{}§r\n- §b特殊值: §a{}§r\n- §bCanInstanceTick: §a{}§r\n- §bHasBlockEntity: §a{}§r\n- §bIsSolid: §a{}§r\n- §b比较器输出: §a{}§r\n- §b材质:§r\n - §bMotion: §a{}§r\n - §bTopSolid: §a{}§r\n - §bIsSolid: §a{}§r\n - §bIsSolidBlocking: §a{}§r\n - §bTranslucency: §a{}§r",
+                "block": "- §b位置: §a{}§r\n- §b名称: §a{}§r\n- §b类型名: §a{}§r\n- §bID: §a{}§r\n- §bRTID: §a{}§r\n- §b特殊值: §a{}§r\n- §bCanInstanceTick: §a{}§r\n- §bHasBlockEntity: §a{}§r\n- §bIsSolid: §a{}§r\n- §b比较器输出: §a{}§r\n- §b材质:§r\n - §bMotion: §a{}§r\n - §bTopSolid: §a{}§r\n - §bIsSolid: §a{}§r\n - §bIsSolidBlocking: §a{}§r",
                 "entity": "- §bNameTag: §a{}§r\n- §bTypeName: §a{}§r\n- §bUID: §a{}§r\n- §bPos: §a{}§r\n- §bDeltaPos: §a{}§r\n- §bAABB: §a{}§r\n- §bSurface: §a{}§r\n",
                 "redstone": {
                     "signal": {

@@ -12,18 +12,20 @@ struct CommandConfigStruct {
 };
 
 struct CommandStruct {
-    CommandConfigStruct tick    = {true, CommandPermissionLevel::GameDirectors};
-    CommandConfigStruct func    = {true, CommandPermissionLevel::GameDirectors};
-    CommandConfigStruct self    = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct hsa     = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct counter = {true, CommandPermissionLevel::GameDirectors};
-    CommandConfigStruct prof    = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct slime   = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct village = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct rotate  = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct data    = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct cfhud   = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct log     = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct tick      = {true, CommandPermissionLevel::GameDirectors};
+    CommandConfigStruct func      = {true, CommandPermissionLevel::GameDirectors};
+    CommandConfigStruct self      = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct hsa       = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct counter   = {true, CommandPermissionLevel::GameDirectors};
+    CommandConfigStruct prof      = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct slime     = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct village   = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct rotate    = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct data      = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct cfhud     = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct log       = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct calculate = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct minerule  = {true, CommandPermissionLevel::Admin};
 };
 
 struct Shortcut {
@@ -47,7 +49,7 @@ struct Config {
     CommandStruct command;
 
     std::vector<Shortcut> shortcuts = {
-  /* hoppercounter */
+        /* hoppercounter */
         {.enable = true, .type = "useon", .item = "cactus", .block = "white_concrete", .actions = {"counter print"}},
         {.enable = true, .type = "useon", .item = "cactus", .block = "orange_concrete", .actions = {"counter print"}},
         {.enable = true, .type = "useon", .item = "cactus", .block = "magenta_concrete", .actions = {"counter print"}},
@@ -66,7 +68,7 @@ struct Config {
         {.enable = true, .type = "useon", .item = "cactus", .block = "green_concrete", .actions = {"counter print"}},
         {.enable = true, .type = "useon", .item = "cactus", .block = "red_concrete", .actions = {"counter print"}},
         {.enable = true, .type = "useon", .item = "cactus", .block = "black_concrete", .actions = {"counter print"}},
- /* blockrotate */
+        /* blockrotate */
         {.enable = true, .type = "use", .item = "cactus", .prevent = true, .actions = {"rotate"}},
         {.enable      = true,
          .type        = "command",
@@ -74,7 +76,7 @@ struct Config {
          .description = "rotate",
          .permission  = CommandPermissionLevel::Any,
          .actions     = {"rotate"}},
- /* fastcommand */
+        /* fastcommand */
         {.enable      = false,
          .type        = "command",
          .command     = "c",

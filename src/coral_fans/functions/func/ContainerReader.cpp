@@ -7,19 +7,21 @@
 #include "ll/api/i18n/I18n.h"
 #include "mc/server/ServerPlayer.h"
 #include "mc/world/Container.h"
+#include "mc/world/actor/player/Player.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/block/Block.h"
 #include "mc/world/level/block/actor/BlockActor.h"
+#include "mc/world/level/block/actor/BlockActorType.h"
 #include "mc/world/level/block/actor/ChestBlockActor.h"
-#include "mc/world/level/block/utils/BlockActorType.h"
 #include "mc/world/level/dimension/Dimension.h"
+
 
 #include <string>
 
 namespace {
 
-void SendContentToPlayer(ServerPlayer& pl, Container* container) {
+void SendContentToPlayer(Player& pl, Container* container) {
     using ll::i18n_literals::operator""_tr;
     auto        slots = container->getSlots();
     std::string contentStr;

@@ -1,5 +1,6 @@
 #include "coral_fans/base/Macros.h"
 #include "coral_fans/base/Mod.h"
+#include "coral_fans/base/MySchedule.h"
 #include "coral_fans/base/Utils.h"
 
 #include "ll/api/memory/Hook.h"
@@ -8,21 +9,19 @@
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/BlockTickingQueue.h"
 #include "mc/world/level/Level.h"
+#include "mc/world/level/TickNextTickData.h"
 #include "mc/world/level/chunk/LevelChunk.h"
 #include "mc/world/level/dimension/Dimension.h"
 #include "mc/world/redstone/circuit/CircuitSceneGraph.h"
 #include <string>
 
+
 namespace coral_fans::functions {
 
 // main game tick
-LL_TYPE_INSTANCE_HOOK(
-    CoralFansTickLevelTickHook,
-    ll::memory::HookPriority::Normal,
-    Level,
-    "?tick@Level@@UEAAXXZ",
-    void
-) {
+LL_TYPE_INSTANCE_HOOK(CoralFansTickLevelTickHook, ll::memory::HookPriority::Normal, Level, &Level::$tick, void) {
+    my_schedule::MySchedule::getSchedule().update();
+
     auto& mod  = coral_fans::mod();
     auto& prof = mod.getProfiler();
     PROF_TIMER(level, { origin(); })
@@ -108,13 +107,15 @@ LL_TYPE_INSTANCE_HOOK(
         bool res;
         // from
         // https://github.com/glibcxx/figure_hack/blob/f74b0badc2a2397f811282a3cdda3725f7e13c55/src/figure_hack/Function/PendingTickVisualization.cpp#L56
-        auto mNextTickQueue = ll::memory::dAccess<std::vector<BlockTickingQueue::BlockTick>>(this, 16);
-        if (!mNextTickQueue.empty()) {
-            auto tickData                   = mNextTickQueue.front().mData;
-            auto chunkPos                   = utils::blockPosToChunkPos(tickData.mPos);
-            auto dimId                      = static_cast<int>(region.getDimensionId());
-            auto current                    = prof.ptCounter[dimId][chunkPos];
-            prof.ptCounter[dimId][chunkPos] = std::max(current, mNextTickQueue.size());
+        // auto mNextTickQueue = ll::memory::dAccess<std::vector<BlockTickingQueue::BlockTick>>(this, 16);
+        auto _mNextTickQueue = this->mNextTickQueue->mC;
+        if (!_mNextTickQueue.empty()) {
+            auto              tickData      = _mNextTickQueue.front().mData;
+            TickNextTickData* _tickData     = (TickNextTickData*)&tickData;
+            auto              chunkPos      = utils::blockPosToChunkPos(_tickData->pos);
+            auto              dimId         = static_cast<int>(region.getDimensionId());
+            auto              current       = prof.ptCounter[dimId][chunkPos];
+            prof.ptCounter[dimId][chunkPos] = std::max(current, _mNextTickQueue.size());
         }
         PROF_TIMER(chunk_pt, { res = origin(region, until, max, instaTick_); })
         prof.chunkInfo.pendingTickTime += time_chunk_pt;
@@ -127,7 +128,7 @@ LL_TYPE_INSTANCE_HOOK(
     CoralFansTickDimensionTickHook,
     ll::memory::HookPriority::Normal,
     Dimension,
-    "?tick@Dimension@@UEAAXXZ",
+    &Dimension::$tick,
     void
 ) {
     auto& prof = coral_fans::mod().getProfiler();
@@ -161,7 +162,7 @@ LL_TYPE_INSTANCE_HOOK(
     CoralFansTickDimensionTickRedstoneHook,
     ll::memory::HookPriority::Normal,
     Dimension,
-    "?tickRedstone@Dimension@@UEAAXXZ",
+    &Dimension::$tickRedstone,
     void
 ) {
     auto& prof = coral_fans::mod().getProfiler();
@@ -193,7 +194,7 @@ LL_TYPE_INSTANCE_HOOK(
     CoralFansTickCircuitSceneGraphProcessPendingUpdatesHook,
     ll::memory::HookPriority::Normal,
     CircuitSceneGraph,
-    &CircuitSceneGraph::processPendingUpdates,
+    &CircuitSceneGraph::update,
     void,
     BlockSource* region
 ) {

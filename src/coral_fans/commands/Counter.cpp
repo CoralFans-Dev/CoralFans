@@ -1,7 +1,7 @@
 #include "coral_fans/base/Macros.h"
 #include "coral_fans/base/Mod.h"
 
-#include "coral_fans/functions/HopperCounter.h"
+#include "coral_fans/functions/hopperCounter/HopperCounter.h"
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/command/runtime/ParamKind.h"

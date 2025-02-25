@@ -3,8 +3,9 @@
 #include "ll/api/memory/Hook.h"
 #include "mc/world/Container.h"
 #include "mc/world/actor/player/Player.h"
-#include "mc/world/item/registry/ItemStack.h"
-#include "mc/world/level/BlockEventCoordinator.h"
+#include "mc/world/events/BlockEventCoordinator.h"
+#include "mc/world/item/ItemStack.h"
+
 
 #include <format>
 #include <string>
@@ -45,7 +46,7 @@ int searchBestToolInInv(Container& inv, int currentSlot, const Block* block, con
 
 namespace coral_fans::functions {
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     CoralFansTweakersAutoToolHook1,
     ll::memory::HookPriority::Normal,
     BlockEventCoordinator,
@@ -74,14 +75,14 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
             player.refreshInventory();
         }
     }
-    origin(player, blockPos, block, unk_char);
+    return origin(player, blockPos, block, unk_char);
 }
 
-LL_AUTO_TYPE_INSTANCE_HOOK(
+LL_TYPE_INSTANCE_HOOK(
     CoralFansTweakersAutoToolHook2,
     ll::memory::HookPriority::Normal,
     Player,
-    "?attack@Player@@UEAA_NAEAVActor@@AEBW4ActorDamageCause@@@Z",
+    &Player::$attack,
     bool,
     Actor&                    actor,
     const ::ActorDamageCause& cause

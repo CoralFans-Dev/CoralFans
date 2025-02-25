@@ -31,23 +31,21 @@ void registerFuncCommand(CommandPermissionLevel permission) {
         });
 
     // func forceplace normal|entity|all
-    ll::command::CommandRegistrar::getInstance().tryRegisterEnum(
+    ll::command::CommandRegistrar::getInstance().tryRegisterRuntimeEnum(
         "forceplaceLevel",
         {
             {"normal", 0},
             {"entity", 1},
-            {"all", 2}
-        },
-        Bedrock::type_id<CommandRegistry, std::pair<std::string,uint64>>(),
-        &CommandRegistry::parse<std::pair<std::string,uint64>>
+            {"all",    2}
+    }
     );
     funcCommand.runtimeOverload()
         .text("forceplace")
         .required("level", ll::command::ParamKind::Enum, "forceplaceLevel")
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             const auto val = self["level"].get<ll::command::ParamKind::Enum>();
-            if (coral_fans::mod().getConfigDb()->set("functions.global.forceplace", val.first))
-                output.success("command.func.forceplace.success"_tr(val.first));
+            if (coral_fans::mod().getConfigDb()->set("functions.global.forceplace", val.name))
+                output.success("command.func.forceplace.success"_tr(val.name));
             else output.error("command.func.forceplace.error"_tr());
         });
 

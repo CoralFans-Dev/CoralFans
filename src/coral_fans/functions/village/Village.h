@@ -1,9 +1,10 @@
 #pragma once
 
 #include "bsci/GeometryGroup.h"
-#include "mc/deps/core/mce/UUID.h"
-#include "mc/world/ActorUniqueID.h"
+#include "mc/common/ActorUniqueID.h"
+#include "mc/platform/UUID.h"
 #include "mc/world/actor/ai/village/Village.h"
+
 
 #include <map>
 #include <utility>
