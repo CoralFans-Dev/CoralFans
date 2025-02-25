@@ -55,15 +55,16 @@ void HsaManager::drawHsa() {
             for (int _i = -radius; _i <= radius; ++_i) {
                 for (int j = -radius; j <= radius; ++j) {
                     ChunkPos chunkPos = ChunkPos(originChunkPos.x + _i, originChunkPos.z + j);
-                    auto     _it      = mChunkLoaded[dim].find(chunkPos);
-                    if (!(_it == mChunkLoaded[dim].end())) {
-                        _it->second = true;
-                        continue;
-                    }
-                    mChunkLoaded[dim][chunkPos] = true;
-                    auto chunk                  = region.getExistingChunk(chunkPos);
+                    auto     chunk    = region.getExistingChunk(chunkPos);
                     if (chunk && chunk->isFullyLoaded()) {
-                        ::std::vector<::BlockPos>               hsa = chunk->mLevelChunkVolumeData->structureSpawnPos();
+                        ::std::vector<::BlockPos> hsa = chunk->mLevelChunkVolumeData->structureSpawnPos();
+                        if (!hsa.size()) continue;
+                        auto _it = mChunkLoaded[dim].find(chunkPos);
+                        if (!(_it == mChunkLoaded[dim].end())) {
+                            _it->second = true;
+                            continue;
+                        }
+                        mChunkLoaded[dim][chunkPos] = true;
                         std::unordered_map<BlockPos, short>     count;
                         std::vector<bsci::GeometryGroup::GeoId> geometryGroup;
                         for (auto i : hsa) {
