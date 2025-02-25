@@ -23,7 +23,7 @@ private:
 
 public:
     static MySchedule& getSchedule() {
-        static MySchedule instance; // 静态局部变量，保证只有一个实例
+        static MySchedule instance;
         return instance;
     }
 
@@ -35,7 +35,7 @@ public:
             try {
                 schduleList[now]->task(); // 执行任务
             } catch (const std::exception& e) {
-                coral_fans::mod().getLogger().error("Exception occurred while executing task: {}", e.what());
+                mod().getLogger().error("Exception occurred while executing task: {}", e.what());
             }
             SchduleUnit* tem = schduleList[now];
             schduleList[now] = tem->next;

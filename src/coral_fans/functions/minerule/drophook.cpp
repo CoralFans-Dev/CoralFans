@@ -1,4 +1,5 @@
 #include "coral_fans/functions/minerule/drophook.h"
+#include "coral_fans/base/Mod.h"
 #include "ll/api/memory/Hook.h"
 #include "ll/api/service/Bedrock.h"
 #include "mc/deps/core/math/Vec3.h"
@@ -31,12 +32,9 @@ LL_TYPE_INSTANCE_HOOK(
     ::Randomize&                  randomize,
     ::ResourceDropsContext const& resourceDropsContext
 ) {
-    if (DropHookManager::getInstance().bedrockDrop && block.getTypeName() == "minecraft:bedrock") {
+    if (block.getTypeName() == "minecraft:bedrock") {
         std::vector<ItemStack> a{ItemStack("bedrock", 1, 0, nullptr)};
         return ResourceDrops(a);
-    } else if (DropHookManager::getInstance().mbDrop && block.getTypeName() == "minecraft:moving_block") {
-        DropHookManager::getInstance().ram          = &randomize;
-        DropHookManager::getInstance().dropsContext = &resourceDropsContext;
     }
     return origin(block, randomize, resourceDropsContext);
 }
@@ -54,29 +52,19 @@ LL_TYPE_INSTANCE_HOOK(
     if (this->getTypeName() == "minecraft:moving_block") {
         MovingBlockActor* mba = (MovingBlockActor*)region.getBlockEntity(pos);
         region.setBlock(pos, mba->getWrappedBlock(), 3, mba->mWrappedBlockActor, nullptr, nullptr);
-        const Block&           bl = region.getBlock(pos);
-        std::vector<ItemStack> drops =
-            bl.getLegacyBlock()
-                .getResourceDrops(bl, *DropHookManager::getInstance().ram, *DropHookManager::getInstance().dropsContext)
-                .mItems;
-        Vec3 _pos = Vec3(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5);
+        const Block&           bl      = region.getBlock(pos);
+        ResourceDropsContext   tem     = ResourceDropsContext::fromExplosion(region, 1.0, BlockPos(0, 0, 0));
+        Randomize              ran     = Randomize(tem.getRandom());
+        std::vector<ItemStack> drops   = bl.getLegacyBlock().getResourceDrops(bl, ran, tem).mItems;
+        Vec3                   _pos    = Vec3(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5);
+        auto&                  spawner = ll::service::getLevel()->getSpawner();
         for (auto i : drops) {
-            ll::service::getLevel()->getSpawner().spawnItem(region, i, 0, _pos, region.getDimensionId());
+            spawner.spawnItem(region, i, 0, _pos, region.getDimensionId());
         }
     }
     return origin(region, pos, entitySource);
 }
 
-void dropHook() {
-    if (DropHookManager::getInstance().mbDrop) {
-        CoralFansDropHook1::hook();
-        CoralFansDropHook2::hook();
-    } else if (DropHookManager::getInstance().bedrockDrop) {
-        CoralFansDropHook1::hook();
-        CoralFansDropHook2::unhook();
-    } else {
-        CoralFansDropHook1::unhook();
-        CoralFansDropHook2::unhook();
-    }
-}
+void bedrockDropHook(bool bl) { bl ? CoralFansDropHook1::hook() : CoralFansDropHook1::unhook(); }
+void mbDropHook(bool bl) { bl ? CoralFansDropHook2::hook() : CoralFansDropHook2::unhook(); }
 } // namespace coral_fans::functions

@@ -21,8 +21,7 @@ LL_TYPE_INSTANCE_HOOK(
 }
 
 void hook_portal_sand_farm(bool bl) {
-    if (bl) CoralFansportalSandFarmHook::hook();
-    else CoralFansportalSandFarmHook::unhook();
+    bl ? CoralFansportalSandFarmHook::hook() : CoralFansportalSandFarmHook::unhook();
 }
 
 } // namespace coral_fans::functions
