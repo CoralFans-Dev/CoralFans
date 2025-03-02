@@ -3,7 +3,18 @@
 
 
 namespace coral_fans::functions {
+class DropHookManager {
+public:
+    bool                        bedrockDrop;
+    bool                        mbDrop;
+    Randomize*                  ram;
+    const ResourceDropsContext* dropsContext;
 
-void bedrockDropHook(bool);
-void mbDropHook(bool);
+    static DropHookManager& getInstance() {
+        static DropHookManager instance; // 唯一实例
+        return instance;
+    }
+
+    void dropHook();
+};
 } // namespace coral_fans::functions

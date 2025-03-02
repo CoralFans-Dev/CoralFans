@@ -1,10 +1,10 @@
 #include "coral_fans/base/Mod.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/server/ServerPlayer.h"
-#include "mc/world/Container.h"
 #include "mc/world/actor/player/AbilitiesIndex.h"
+#include "mc/world/actor/player/Inventory.h"
 #include "mc/world/actor/player/Player.h"
-#include "mc/world/item/ItemStack.h"
+#include "mc/world/actor/player/PlayerInventory.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/Explosion.h"
 #include "mc/world/level/GameType.h"
@@ -13,12 +13,13 @@
 
 namespace coral_fans::functions {
 
+
 // force open
 LL_TYPE_INSTANCE_HOOK(
     CoralFansTweakersForceOpenHook,
     ll::memory::HookPriority::Normal,
     ChestBlockActor,
-    &ChestBlockActor::canOpen,
+    &ChestBlockActor::$_canOpenThis,
     bool,
     BlockSource& region
 ) {
@@ -63,18 +64,6 @@ LL_TYPE_INSTANCE_HOOK(
     }
 }
 
-// droppernocost
-LL_TYPE_INSTANCE_HOOK(
-    CoralFansTweakersDropperNoCostHook,
-    ll::memory::HookPriority::Normal,
-    Container,
-    &Container::$removeItem,
-    void,
-    int slot,
-    int count
-) {
-    if (coral_fans::mod().getConfigDb()->get("functions.global.droppernocost") != "true") origin(slot, count);
-}
 
 // safeexplode
 LL_TYPE_INSTANCE_HOOK(
@@ -101,7 +90,7 @@ LL_TYPE_INSTANCE_HOOK(
     auto& modcfg = coral_fans::mod().getConfigDb();
     if (modcfg->get("functions.global.fastdrop") == "true"
         && modcfg->get(std::format("functions.players.{}.fastdrop", this->getUuid().asString())) == "true") {
-        auto& inv  = this->getInventory();
+        auto& inv  = *this->mInventory->mInventory;
         int   size = inv.getContainerSize();
         for (int i = 0; i < size; ++i) {
             const auto& itemi = inv.getItem(i);
@@ -136,7 +125,7 @@ void hookTweakers(bool hook) {
         CoralFansTweakersForceOpenHook::hook();
         CoralFansTweakersForcePlaceHook::hook();
         CoralFansTweakersNoClipHook::hook();
-        CoralFansTweakersDropperNoCostHook::hook();
+
         CoralFansTweakersSafeExplodeHook::hook();
         CoralFansTweakersFastDropHook::hook();
         CoralFansTweakersNoPickUpHook::hook();
@@ -144,7 +133,7 @@ void hookTweakers(bool hook) {
         CoralFansTweakersForceOpenHook::unhook();
         CoralFansTweakersForcePlaceHook::unhook();
         CoralFansTweakersNoClipHook::unhook();
-        CoralFansTweakersDropperNoCostHook::unhook();
+
         CoralFansTweakersSafeExplodeHook::unhook();
         CoralFansTweakersFastDropHook::unhook();
         CoralFansTweakersNoPickUpHook::unhook();

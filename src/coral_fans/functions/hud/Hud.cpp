@@ -19,6 +19,7 @@
 #include "mc/world/level/biome/Biome.h"
 #include "mc/world/level/block/Block.h"
 #include "mc/world/level/block/actor/BlockActor.h"
+#include "mc/world/level/dimension/Dimension.h"
 #include "mc/world/phys/HitResultType.h"
 #include <algorithm>
 #include <map>
@@ -57,7 +58,7 @@ void HudHelper::tick() {
                     return true;
                 }
                 std::string msg;
-                double mspt = (double)ProfilerLite::gProfilerLiteInstance().getServerTickTime().count() / 1000000.0;
+                double mspt = (double)ProfilerLite::gProfilerLiteInstance().mDebugServerTickTime->count() / 1000000.0;
                 double currentTps  = mspt <= 50 ? 20 : (double)(1000.0 / mspt);
                 auto   hitrst      = player.traceRay(5.25f, true, true);
                 auto&  blockSource = player.getDimensionBlockSource();
@@ -71,7 +72,7 @@ void HudHelper::tick() {
                     );
                 }
                 if (hud & (1 << HudHelper::HudType::base)) {
-                    auto& delta  = player.getPosDeltaNonConst();
+                    auto& delta  = player.getPosDelta();
                     auto& biome  = blockSource.getBiome(player.getFeetBlockPos());
                     msg         += "translate.cfhud.base"_tr(
                         level->getCurrentServerTick().tickID,
@@ -79,11 +80,15 @@ void HudHelper::tick() {
                         player.getViewVector(1.0f).toString(),
                         utils::blockPosToChunkPos(player.getFeetBlockPos()).toString(),
                         hitrst.mType == HitResultType::Tile ? hitrst.mBlock.toString() : "-",
-                        hitrst.mType == HitResultType::Tile
-                                    ? std::to_string(
-                                  blockSource.getRawBrightness(hitrst.mBlock + BlockPos{0, 1, 0}, true, true).mValue
-                              )
-                                    : "-",
+                        hitrst.mType == HitResultType::Tile ? std::to_string(blockSource
+                                                                                 ._getRawBrightness(
+                                                                                     hitrst.mBlock + BlockPos{0, 1, 0},
+                                                                                     player.getDimension().mSkyDarken,
+                                                                                     true,
+                                                                                     true
+                                                                                 )
+                                                                                 .mValue)
+                                                                    : "-",
                         delta.length() * 20,
                         delta.x * 20,
                         delta.y * 20,
@@ -120,7 +125,7 @@ void HudHelper::tick() {
                     if (hitrst.mType == HitResultType::Tile) {
                         const auto& bl = blockSource.getBlock(hitrst.mBlock);
                         auto*       ba = blockSource.getBlockEntity(hitrst.mBlock);
-                        if (bl.isContainerBlock() && ba) {
+                        if (bl.mLegacyBlock->isContainerBlock() && ba) {
                             auto* container = ba->getContainer();
                             if (container) {
                                 std::map<std::string, int> items;

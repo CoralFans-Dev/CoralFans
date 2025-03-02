@@ -38,7 +38,7 @@ void registerCounterCommand(CommandPermissionLevel permission) {
             } else {
                 COMMAND_CHECK_PLAYER
                 auto hitrst = player->traceRay(5.25f, false, true, [](BlockSource const&, Block const& block, bool) {
-                    if (block.getMaterial().isLiquid()) return false;
+                    if (block.mLegacyBlock->mMaterial.mLiquid) return false;
                     return true;
                 });
                 if (!hitrst) return output.error("command.counter.print.error"_tr());
@@ -63,7 +63,7 @@ void registerCounterCommand(CommandPermissionLevel permission) {
             } else {
                 COMMAND_CHECK_PLAYER
                 auto hitrst = player->traceRay(5.25f, false, true, [](BlockSource const&, Block const& block, bool) {
-                    if (block.getMaterial().isLiquid()) return false;
+                    if (block.mLegacyBlock->mMaterial.mLiquid) return false;
                     return true;
                 });
                 if (!hitrst) return output.error("command.counter.print.error"_tr());

@@ -2,12 +2,11 @@
 #include "coral_fans/base/Macros.h"
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
-#include "ll/api/command/ParamTraits.h"
 #include "ll/api/command/runtime/ParamKind.h"
 #include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
-#include "ll/api/service/Bedrock.h"
 #include "mc/server/commands/CommandPermissionLevel.h"
+#include "mc/server/commands/CommandVersion.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/BlockSource.h"
@@ -34,9 +33,11 @@ void registerDataCommand(CommandPermissionLevel permission) {
             BlockPos blockPos;
             if (self["blockPos"].has_value())
                 blockPos = self["blockPos"].get<ll::command::ParamKind::BlockPos>().getBlockPos(
-                    player->getFeetPos(),
+                    CommandVersion::CurrentVersion(),
+                    origin,
                     {0, 0, 0}
                 );
+
             else {
                 const auto& hitrst = player->traceRay(5.25f, false, true);
                 if (!hitrst) return output.error("command.data.error"_tr());
@@ -87,8 +88,11 @@ void registerDataCommand(CommandPermissionLevel permission) {
         .optional("path", ll::command::ParamKind::String)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             COMMAND_CHECK_PLAYER
-            BlockPos blockPos =
-                self["blockPos"].get<ll::command::ParamKind::BlockPos>().getBlockPos(player->getFeetPos(), {0, 0, 0});
+            BlockPos blockPos = self["blockPos"].get<ll::command::ParamKind::BlockPos>().getBlockPos(
+                CommandVersion::CurrentVersion(),
+                origin,
+                {0, 0, 0}
+            );
             std::string path;
             if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>();
             auto rst = functions::getBlockNbt(0, player->getDimensionBlockSource(), blockPos, path);
@@ -104,8 +108,11 @@ void registerDataCommand(CommandPermissionLevel permission) {
         .optional("path", ll::command::ParamKind::String)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             COMMAND_CHECK_PLAYER
-            BlockPos blockPos =
-                self["blockPos"].get<ll::command::ParamKind::BlockPos>().getBlockPos(player->getFeetPos(), {0, 0, 0});
+            BlockPos blockPos = self["blockPos"].get<ll::command::ParamKind::BlockPos>().getBlockPos(
+                CommandVersion::CurrentVersion(),
+                origin,
+                {0, 0, 0}
+            );
             std::string path;
             if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>();
             auto rst = functions::getBlockNbt(1, player->getDimensionBlockSource(), blockPos, path);
@@ -175,7 +182,8 @@ void registerDataCommand(CommandPermissionLevel permission) {
             BlockPos blockPos;
             if (self["blockPos"].has_value())
                 blockPos = self["blockPos"].get<ll::command::ParamKind::BlockPos>().getBlockPos(
-                    player->getFeetPos(),
+                    CommandVersion::CurrentVersion(),
+                    origin,
                     {0, 0, 0}
                 );
             else {

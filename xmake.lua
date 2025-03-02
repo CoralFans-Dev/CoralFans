@@ -14,7 +14,7 @@ add_repositories("coralfansdev-repo https://github.com/CoralFans-Dev/xmake-repo.
 -- end
 
 add_requires(
-    "levilamina v1.0.0",
+    "levilamina v1.1.0", {configs = {target_type = "server"}},
     "levibuildscript",
     "bsci main"
 )

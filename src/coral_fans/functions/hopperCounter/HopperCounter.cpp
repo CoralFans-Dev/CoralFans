@@ -2,7 +2,6 @@
 #include "coral_fans/base/Macros.h"
 #include "coral_fans/base/Mod.h"
 #include "coral_fans/base/Utils.h"
-#include "ll/api/base/StdInt.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/memory/Hook.h"
 #include "ll/api/memory/Memory.h"
@@ -98,7 +97,10 @@ int HopperCounterManager::getViewChannel(BlockSource& blockSource, HitResult hit
     const auto&                                          dest = blockSource.getBlock(hitrst.mBlock);
     std::unordered_map<std::string, int>::const_iterator it;
     if (utils::removeMinecraftPrefix(dest.getTypeName()) == "hopper") {
-        const auto& block = blockSource.getBlock(hitrst.mBlock.neighbor((uchar)dest.getVariant()));
+        int      var            = dest.mLegacyBlock->getVariant(dest);
+        BlockPos pos            = hitrst.mBlock;
+        pos[(var / 2 + 1) % 3] += (var & 1) * 2 - 1;
+        const auto& block       = blockSource.getBlock(pos);
         it =
             functions::HopperCounterManager::HOPPER_COUNTER_MAP.find(utils::removeMinecraftPrefix(block.getTypeName()));
     } else
@@ -135,9 +137,13 @@ LL_TYPE_INSTANCE_HOOK(
         HOOK_HOPPER_RETURN
     }
     // get dest block
-    auto& blockActor = ll::memory::dAccess<BlockActor>(this, -200); // magic number!
-    auto& thisPos    = blockActor.getPosition();
-    auto& dest = ::hopperRegion->getBlock(thisPos.neighbor((uchar)(::hopperRegion->getBlock(thisPos).getVariant())));
+    auto&        blockActor  = ll::memory::dAccess<BlockActor>(this, -200); // magic number!
+    auto&        thisPos     = *blockActor.mPosition;
+    const Block& block       = hopperRegion->getBlock(thisPos);
+    int          var         = block.mLegacyBlock->getVariant(block);
+    BlockPos     pos         = thisPos;
+    pos[(var / 2 + 1) % 3]  += (var & 1) * 2 - 1;
+    auto& dest               = ::hopperRegion->getBlock(pos);
     // get iterator
     auto it = HopperCounterManager::HOPPER_COUNTER_MAP.find(utils::removeMinecraftPrefix(dest.getTypeName()));
     if (it == HopperCounterManager::HOPPER_COUNTER_MAP.end()) {

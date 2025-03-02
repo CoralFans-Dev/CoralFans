@@ -26,11 +26,8 @@ void registerTickCommand(CommandPermissionLevel permission) {
 
     // tick query
     tickCommand.overload().text("query").execute([](CommandOrigin const&, CommandOutput& output) {
-        output.success(
-            "command.tick.query.output"_tr(std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(
-                ProfilerLite::gProfilerLiteInstance().getServerTickTime()
-            ))
-        );
+        output.success("command.tick.query.output"_tr((ProfilerLite::gProfilerLiteInstance().mDebugRemoteServerTickTime)
+        ));
     });
 
     // tick freeze|reset
@@ -75,21 +72,17 @@ void registerTickCommand(CommandPermissionLevel permission) {
             output.success("command.tick.rate.success"_tr(rate));
         });
 
-    // tick step <int>
-    static auto stepFn = [](CommandOutput& output, int tick) {
-        if (!::Command::validRange(tick, 0, INT_MAX, output)) {
-            return;
-        }
-        auto mc = ll::service::getMinecraft();
-        if (mc.has_value()) mc->mSimTimer.stepTick(tick);
-        output.success("command.tick.step.output"_tr(tick));
-    };
-
     tickCommand.runtimeOverload()
         .text("step")
         .required("time", ll::command::ParamKind::Int)
         .execute([&](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
-            stepFn(output, self["time"].get<ll::command::ParamKind::Int>());
+            int tick = self["time"].get<ll::command::ParamKind::Int>();
+            if (!::Command::validRange(tick, 0, INT_MAX, output)) {
+                return;
+            }
+            auto mc = ll::service::getMinecraft();
+            if (mc.has_value()) mc->mSimTimer.mSteppingTick = tick;
+            output.success("command.tick.step.output"_tr(tick));
         });
 }
 } // namespace coral_fans::commands

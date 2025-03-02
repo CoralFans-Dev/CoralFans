@@ -1,9 +1,13 @@
+#include "FuncHook.h"
 #include "coral_fans/base/Mod.h"
 #include "coral_fans/base/Utils.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/Container.h"
+#include "mc/world/actor/player/Inventory.h"
 #include "mc/world/actor/player/Player.h"
+#include "mc/world/actor/player/PlayerInventory.h"
 #include "mc/world/events/BlockEventCoordinator.h"
+#include "mc/world/item/Item.h"
 #include "mc/world/item/ItemStack.h"
 
 
@@ -22,7 +26,8 @@ int searchBestToolInInv(Container& inv, int currentSlot, const Block* block, con
     if (!weapon && !block) return currentSlot;
     auto&    currentItem = inv.getItem(currentSlot);
     ToolInfo curInfo{
-        weapon ? currentItem.getAttackDamage() : currentItem.getDestroySpeed(*block),
+        weapon ? currentItem.mItem.get()->getAttackDamage()
+               : currentItem.mItem.get()->getDestroySpeed(currentItem, *block),
         currentSlot,
         currentItem.getMaxDamage() - currentItem.getDamageValue()
     };
@@ -30,7 +35,8 @@ int searchBestToolInInv(Container& inv, int currentSlot, const Block* block, con
     for (int i = 0; i < size; ++i) {
         auto& item = inv.getItem(i);
         if (item.mCount != 0) {
-            float value        = weapon ? item.getAttackDamage() : item.getDestroySpeed(*block);
+            float value        = weapon ? currentItem.mItem.get()->getAttackDamage()
+                                        : currentItem.mItem.get()->getDestroySpeed(currentItem, *block);
             short remainDamage = item.getMaxDamage() - item.getDamageValue();
             // skip low remainDamage tools
             if (remainDamage <= minDamage) continue;
@@ -67,7 +73,7 @@ LL_TYPE_INSTANCE_HOOK(
                           .getConfigDb()
                           ->get(std::format("functions.players.{}.autotool.mindamage", player.getUuid().asString()))
                           .value_or("1"));
-        int bestSlot = ::searchBestToolInInv(player.getInventory(), currentSlot, &block, minDamage, false);
+        int bestSlot = ::searchBestToolInInv(*player.mInventory->mInventory, currentSlot, &block, minDamage, false);
         if (bestSlot <= 8) {
             player.setSelectedSlot(bestSlot);
         } else {
@@ -82,10 +88,11 @@ LL_TYPE_INSTANCE_HOOK(
     CoralFansTweakersAutoToolHook2,
     ll::memory::HookPriority::Normal,
     Player,
-    &Player::$attack,
+    &Player::_attack,
     bool,
-    Actor&                    actor,
-    const ::ActorDamageCause& cause
+    Actor&                                         actor,
+    ::SharedTypes::Legacy::ActorDamageCause const& cause,
+    bool                                           doPredictiveSound
 ) {
     if (coral_fans::mod().getConfigDb()->get("functions.global.autotool") == "true"
         && coral_fans::mod().getConfigDb()->get(std::format("functions.players.{}.autotool", this->getUuid().asString())
@@ -96,7 +103,7 @@ LL_TYPE_INSTANCE_HOOK(
                           .getConfigDb()
                           ->get(std::format("functions.players.{}.autotool.mindamage", this->getUuid().asString()))
                           .value_or("1"));
-        int bestSlot = ::searchBestToolInInv(this->getInventory(), currentSlot, nullptr, minDamage, true);
+        int bestSlot = ::searchBestToolInInv(*this->mInventory->mInventory, currentSlot, nullptr, minDamage, true);
         if (bestSlot <= 8) {
             this->setSelectedSlot(bestSlot);
         } else {
@@ -104,7 +111,7 @@ LL_TYPE_INSTANCE_HOOK(
             this->refreshInventory();
         }
     }
-    return origin(actor, cause);
+    return origin(actor, cause, doPredictiveSound);
 }
 
 void hookTweakersAutoTool(bool hook) {

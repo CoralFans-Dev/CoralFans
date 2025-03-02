@@ -1,7 +1,7 @@
 #include "coral_fans/base/Utils.h"
 #include "ll/api/i18n/I18n.h"
-#include "mc/common/ActorUniqueID.h"
 #include "mc/deps/core/math/Color.h"
+#include "mc/legacy/ActorUniqueID.h"
 #include "mc/nbt/CompoundTag.h"
 #include "mc/nbt/CompoundTagVariant.h"
 #include "mc/nbt/Tag.h"
@@ -12,8 +12,8 @@
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/block/Block.h"
 #include "mc/world/level/block/actor/BlockActor.h"
+#include "mc/world/level/block/actor/BlockActorType.h"
 #include "mc/world/level/dimension/Dimension.h"
-#include "mc/world/level/material/Material.h"
 #include "mc/world/phys/AABB.h"
 #include "mc/world/redstone/circuit/ChunkCircuitComponentList.h"
 #include "mc/world/redstone/circuit/CircuitSceneGraph.h"
@@ -29,22 +29,17 @@ namespace coral_fans::functions {
 std::string getBlockData(BlockSource& blockSource, BlockPos blockPos) {
     using ll::i18n_literals::operator""_tr;
     const auto& block = blockSource.getBlock(blockPos);
-    const auto& m     = block.getMaterial();
     return "translate.data.info.block"_tr(
         blockPos.toString(),
         block.buildDescriptionName(),
         block.getTypeName(),
         block.getBlockItemId(),
-        block.getRuntimeId(),
-        block.getVariant(),
-        block.canInstatick(),
-        block.hasBlockEntity(),
-        block.isSolid(),
-        block.hasComparatorSignal() ? std::to_string(block.getComparatorSignal(blockSource, blockPos, 0)) : "-",
-        m.getBlocksMotion(),
-        m.isTopSolid(false, false),
-        m.isSolid(),
-        m.isSolidBlocking()
+        block.mLegacyBlock->getVariant(block),
+        block.mLegacyBlock->canInstatick(),
+        block.mLegacyBlock->mBlockEntityType != BlockActorType::Undefined,
+        block.mLegacyBlock->hasComparatorSignal()
+            ? std::to_string(block.mLegacyBlock->getComparatorSignal(blockSource, blockPos, block, 0))
+            : "-"
     );
 }
 
@@ -52,7 +47,7 @@ std::pair<std::string, bool> getBlockNbt(uint64 type, BlockSource& blockSource, 
     using ll::i18n_literals::operator""_tr;
     std::unique_ptr<CompoundTag> tag   = std::make_unique<CompoundTag>();
     const auto&                  block = blockSource.getBlock(blockPos);
-    if (type == 0) *tag = block.getSerializationId();
+    if (type == 0) *tag = block.mSerializationId;
     if (type == 1) {
         auto blockEntity = blockSource.getBlockEntity(blockPos);
         if (blockEntity) blockEntity->save(*tag, *SaveContextFactory::createCloneSaveContext());
@@ -89,8 +84,8 @@ std::pair<std::string, bool> getEntityNbt(Actor* actor, std::string path) {
 }
 
 std::pair<std::string, bool> showRedstoneComponentsInfo(Dimension& dimension, BlockPos& pos, uint64 type) {
-    auto&              circuitSys = dimension.getCircuitSystem();
-    CircuitSceneGraph& graph      = circuitSys.mSceneGraph;
+    auto&              circuitSys = dimension.mCircuitSystem;
+    CircuitSceneGraph& graph      = circuitSys->mSceneGraph;
     if (type == 0) {
         // chunk
         auto     chunkPos = utils::blockPosToChunkPos(pos);
@@ -110,7 +105,7 @@ std::pair<std::string, bool> showRedstoneComponentsInfo(Dimension& dimension, Bl
     if (!component) component = graph.getComponent(pos, CircuitComponentType::ProducerComponent);
     if (!component) component = graph.getComponent(pos, CircuitComponentType::BaseRailTransporter);
     /*
-
+in 1.21.50
 enum class CircuitComponentType : uint64 {
 Undefined              = 1,
 GroupMask              = 4294901760,    基础原件，铁轨，消费者，充能方块，生产者，红石粉，电容器的掩码，但是失效了
@@ -154,7 +149,9 @@ RepeaterCapacitor      = 2097156,       中继器，已包含在电容器中
                 component->isHalfPulse() ? "true" : "false",
                 component->mDirection,
                 // "magic_enum::enum_name(component->mDirection)",
-                block.hasComparatorSignal() ? std::to_string(block.getComparatorSignal(blockSource, pos, 0)) : "-"
+                block.mLegacyBlock->hasComparatorSignal()
+                    ? std::to_string(block.mLegacyBlock->getComparatorSignal(blockSource, pos, block, 0))
+                    : "-"
             ),
             true
         };
@@ -214,7 +211,7 @@ void highlightBlockEntity(Player* player, int radius, int time) {
             mce::Color::YELLOW()
         };
         for (auto blockActor : player->getDimensionBlockSource().fetchBlockEntities({origin - offset, origin + offset}))
-            if (blockActor) utils::shortHighligntBlock(dimid, blockActor->getPosition(), colors[colorindex], time);
+            if (blockActor) utils::shortHighligntBlock(dimid, blockActor->mPosition, colors[colorindex], time);
         colorindex = (colorindex + 1) % 13;
     }
 }

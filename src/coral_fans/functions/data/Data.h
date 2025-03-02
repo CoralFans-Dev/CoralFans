@@ -1,7 +1,9 @@
 #pragma once
 
+#include "mc/world/actor/player/Player.h"
 #include "mc/world/item/ItemStack.h"
 #include "mc/world/level/BlockSource.h"
+
 
 namespace coral_fans::functions {
 

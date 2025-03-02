@@ -48,9 +48,9 @@ void registerLogCommand(CommandPermissionLevel permission) {
             // https://github.com/glibcxx/figure_hack/blob/a46576ff8a5ed403eb366c89f4001fe86b5ec850/src/figure_hack/Commands/QueryPendingTick.h#L47
             // Authorized Use
             // Original License: LGPL-3.0
-            auto chunk = player->getDimension().getChunkSource().getExistingChunk(chunkPos);
-            if (chunk && chunk->isFullyLoaded()) {
-                BlockTickingQueue&                        pt            = chunk->getTickQueue();
+            auto chunk = player->getDimension().mBlockSource->get()->getChunk(chunkPos);
+            if (chunk && chunk->mLoadState.get() == ChunkState::Loaded) {
+                BlockTickingQueue&                        pt            = *chunk->mTickQueue;
                 std::vector<BlockTickingQueue::BlockTick> nextTickQueue = pt.mNextTickQueue->mC;
                 BlockTickingQueue::TickDataSet            copiedQueue;
                 copiedQueue.mC = std::move(nextTickQueue);
@@ -65,8 +65,8 @@ void registerLogCommand(CommandPermissionLevel permission) {
                         auto& blockTick = copiedQueue.top();
                         if (blockTick.mIsRemoved) {
                             output.success("command.log.success.pt.remove"_tr(
-                                blockTick.mData.pos->toString(),
-                                blockTick.mData.tick->tickID,
+                                blockTick.mData.pos.toString(),
+                                blockTick.mData.tick.tickID,
                                 blockTick.mData.priorityOffset,
                                 blockTick.mData.mBlock->getTypeName()
                             ));
@@ -77,8 +77,8 @@ void registerLogCommand(CommandPermissionLevel permission) {
                     for (; !copiedQueue.empty();) {
                         auto& blockTick = copiedQueue.top();
                         output.success("command.log.success.pt.info"_tr(
-                            blockTick.mData.pos->toString(),
-                            blockTick.mData.tick->tickID,
+                            blockTick.mData.pos.toString(),
+                            blockTick.mData.tick.tickID,
                             blockTick.mData.priorityOffset,
                             blockTick.mData.mBlock->getTypeName()
                         ));
@@ -93,11 +93,11 @@ void registerLogCommand(CommandPermissionLevel permission) {
             COMMAND_CHECK_PLAYER
             ChunkPos     chunkPos = utils::blockPosToChunkPos(player->getFeetBlockPos());
             BlockSource& region   = player->getDimensionBlockSource();
-            auto         chunk    = player->getDimension().getChunkSource().getExistingChunk(chunkPos);
-            if (chunk && chunk->isFullyLoaded()) {
-                BlockTickingQueue& pt = chunk->getRandomTickQueue();
+            auto         chunk    = player->getDimension().mBlockSource->get()->getChunk(chunkPos);
+            if (chunk && chunk->mLoadState.get() == ChunkState::Loaded) {
+                BlockTickingQueue& rpt = *chunk->mRandomTickQueue;
 
-                std::vector<BlockTickingQueue::BlockTick> nextTickQueue = pt.mNextTickQueue->mC;
+                std::vector<BlockTickingQueue::BlockTick> nextTickQueue = rpt.mNextTickQueue->mC;
                 BlockTickingQueue::TickDataSet            copiedQueue;
                 copiedQueue.mC = std::move(nextTickQueue);
                 if (!copiedQueue.empty()) {
@@ -111,8 +111,8 @@ void registerLogCommand(CommandPermissionLevel permission) {
                         auto& blockTick = copiedQueue.top();
                         if (blockTick.mIsRemoved) {
                             output.success("command.log.success.rpt.remove"_tr(
-                                blockTick.mData.pos->toString(),
-                                blockTick.mData.tick->tickID,
+                                blockTick.mData.pos.toString(),
+                                blockTick.mData.tick.tickID,
                                 blockTick.mData.priorityOffset,
                                 blockTick.mData.mBlock->getTypeName()
                             ));
@@ -123,8 +123,8 @@ void registerLogCommand(CommandPermissionLevel permission) {
                     for (; !copiedQueue.empty();) {
                         auto& blockTick = copiedQueue.top();
                         output.success("command.log.success.rpt.info"_tr(
-                            blockTick.mData.pos->toString(),
-                            blockTick.mData.tick->tickID,
+                            blockTick.mData.pos.toString(),
+                            blockTick.mData.tick.tickID,
                             blockTick.mData.priorityOffset,
                             blockTick.mData.mBlock->getTypeName()
                         ));

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "bsci/GeometryGroup.h"
-#include "mc/common/ActorUniqueID.h"
+#include "mc/legacy/ActorUniqueID.h"
 #include "mc/platform/UUID.h"
 #include "mc/world/actor/ai/village/Village.h"
 

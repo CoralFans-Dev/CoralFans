@@ -1,6 +1,5 @@
 #include "coral_fans/base/Mod.h"
 #include <functional>
-#include <string>
 
 namespace coral_fans::my_schedule {
 class MySchedule {

@@ -3,7 +3,6 @@
 #include "coral_fans/base/Utils.h"
 #include "ll/api/service/Bedrock.h"
 #include "mc/_HeaderOutputPredefine.h"
-#include "mc/resources/persona/color.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/ChunkPos.h"
@@ -13,12 +12,8 @@
 #include "mc/world/level/chunk/LevelChunk.h"
 #include "mc/world/level/chunk/LevelChunkVolumeData.h"
 #include "mc/world/level/dimension/Dimension.h"
-#include "mc/world/level/levelgen/v1/HardcodedSpawnAreaType.h"
-#include "mc/world/level/levelgen/v1/StructureSpawnRegistry.h"
-#include "mc/world/level/levelgen/v2/StructureSpawnOverride.h"
 #include "mc/world/phys/AABB.h"
 #include <memory>
-#include <string>
 #include <vector>
 
 
@@ -50,13 +45,13 @@ void HsaManager::drawHsa() {
         level->forEachPlayer([&](Player& player) {
             auto  originChunkPos = utils::blockPosToChunkPos(((const Actor&)player).getFeetBlockPos());
             int   dim            = ((const Actor&)player).getDimensionId();
-            auto& region         = ((const Actor&)player).getDimension().getChunkSource();
+            auto& region         = *((const Actor&)player).getDimension().mBlockSource;
             // chunks
             for (int _i = -radius; _i <= radius; ++_i) {
                 for (int j = -radius; j <= radius; ++j) {
                     ChunkPos chunkPos = ChunkPos(originChunkPos.x + _i, originChunkPos.z + j);
-                    auto     chunk    = region.getExistingChunk(chunkPos);
-                    if (chunk && chunk->isFullyLoaded()) {
+                    auto     chunk    = region->getChunk(chunkPos);
+                    if (chunk && chunk->mLoadState.get() == ChunkState::Loaded) {
                         ::std::vector<::BlockPos> hsa = chunk->mLevelChunkVolumeData->structureSpawnPos();
                         if (!hsa.size()) continue;
                         auto _it = mChunkLoaded[dim].find(chunkPos);
