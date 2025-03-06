@@ -69,11 +69,11 @@ void registerFuncCommand(CommandPermissionLevel permission) {
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
             if (coral_fans::mod().getConfigDb()->set("functions.global.droppernocost", isopen ? "true" : "false")) {
-                coral_fans::functions::droppernocost::droppernocostHook(isopen);
+                coral_fans::functions::droppernocostHook(isopen);
                 output.success("command.func.droppernocost.success"_tr(isopen ? "true" : "false"));
             } else output.error("command.func.droppernocost.error"_tr());
         });
-    coral_fans::functions::droppernocost::droppernocostHook(
+    coral_fans::functions::droppernocostHook(
         coral_fans::mod().getConfigDb()->get("functions.global.droppernocost") == "true"
     );
 

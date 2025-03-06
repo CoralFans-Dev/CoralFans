@@ -14,12 +14,6 @@
 #include <format>
 #include <string>
 
-namespace {
-
-thread_local BlockSource* hopperRegion;
-
-} // namespace
-
 namespace coral_fans::functions {
 
 void HopperCounterChannel::reset() {
@@ -113,12 +107,20 @@ LL_TYPE_INSTANCE_HOOK(
     CoralFansFunctionsHopperCounterHook1,
     ll::memory::HookPriority::Normal,
     HopperBlockActor,
-    &HopperBlockActor::$tick,
-    void,
-    BlockSource& region
+    &HopperBlockActor::_tryMoveItems,
+    bool,
+    ::BlockSource& region,
+    ::Container&   fromContainer,
+    ::Vec3 const&  pos,
+    int            attachedFace,
+    bool           canPushItems
 ) {
-    ::hopperRegion = &region;
-    origin(region);
+    HopperCounterManager::getInstance().region = &region;
+    HopperCounterManager::getInstance().pos    = pos;
+    HopperCounterManager::getInstance().mutex  = true;
+    bool ori                                   = origin(region, fromContainer, pos, attachedFace, canPushItems);
+    HopperCounterManager::getInstance().mutex  = false;
+    return ori;
 }
 
 LL_TYPE_INSTANCE_HOOK(
@@ -133,17 +135,16 @@ LL_TYPE_INSTANCE_HOOK(
     if (coral_fans::mod().getConfigDb()->get("functions.global.hoppercounter") != "true") {
         HOOK_HOPPER_RETURN
     }
-    if (!::hopperRegion) {
+    if (!HopperCounterManager::getInstance().mutex) {
         HOOK_HOPPER_RETURN
     }
     // get dest block
-    auto&        blockActor  = ll::memory::dAccess<BlockActor>(this, -200); // magic number!
-    auto&        thisPos     = *blockActor.mPosition;
-    const Block& block       = hopperRegion->getBlock(thisPos);
-    int          var         = block.mLegacyBlock->getVariant(block);
-    BlockPos     pos         = thisPos;
-    pos[(var / 2 + 1) % 3]  += (var & 1) * 2 - 1;
-    auto& dest               = ::hopperRegion->getBlock(pos);
+    // auto& blockActor = ll::memory::dAccess<BlockActor>(this, -200); // magic number!
+    BlockPos     pos        = HopperCounterManager::getInstance().pos;
+    const Block& block      = HopperCounterManager::getInstance().region->getBlock(pos);
+    int          var        = block.mLegacyBlock->getVariant(block);
+    pos[(var / 2 + 1) % 3] += (var & 1) * 2 - 1;
+    auto& dest              = HopperCounterManager::getInstance().region->getBlock(pos);
     // get iterator
     auto it = HopperCounterManager::HOPPER_COUNTER_MAP.find(utils::removeMinecraftPrefix(dest.getTypeName()));
     if (it == HopperCounterManager::HOPPER_COUNTER_MAP.end()) {

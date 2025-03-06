@@ -10,12 +10,21 @@
 #include "mc/world/level/Spawner.h"
 #include "mc/world/level/chunk/ChunkSource.h"
 #include "mc/world/level/chunk/LevelChunk.h"
+#include "mc/world/level/chunk/LevelChunkDataRegistry.h"
 #include "mc/world/level/chunk/LevelChunkVolumeData.h"
 #include "mc/world/level/dimension/Dimension.h"
 #include "mc/world/phys/AABB.h"
 #include <memory>
 #include <vector>
 
+
+#include "mc/world/level/chunk/ChunkBoundingBox.h"
+#include "mc/world/level/chunk/DynamicSpawnArea.h"
+#include "mc/world/level/chunk/FullStructureBoundingBox.h"
+#include "mc/world/level/chunk/StaticSpawnArea.h"
+#include "mc/world/level/chunk/StructureKey.h"
+#include "mc/world/level/chunk/StructureType.h"
+#include "mc/world/level/levelgen/v2/StructureSpawnOverride.h"
 
 namespace {
 

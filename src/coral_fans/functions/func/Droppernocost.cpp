@@ -6,9 +6,7 @@
 #include "mc/world/level/block/actor/DispenserBlockActor.h"
 
 
-namespace coral_fans::functions::droppernocost {
-int  _slot, _count;
-bool mutex = false, mutex2 = true;
+namespace coral_fans::functions {
 
 // droppernocost
 LL_TYPE_INSTANCE_HOOK(
@@ -20,11 +18,11 @@ LL_TYPE_INSTANCE_HOOK(
     int slot,
     int count
 ) {
-    if (mutex) {
+    if (FuncDropNoCostManager::getInstance().mutex) {
         origin(slot, count);
-        mutex = false;
+        FuncDropNoCostManager::getInstance().mutex = false;
     } else {
-        _slot = slot, _count = count;
+        FuncDropNoCostManager::getInstance()._slot = slot, FuncDropNoCostManager::getInstance()._count = count;
     }
 }
 
@@ -36,8 +34,8 @@ LL_TYPE_INSTANCE_HOOK(
     bool,
     ::ItemStack const& item
 ) {
-    mutex = true;
-    this->removeItem(_slot, _count);
+    FuncDropNoCostManager::getInstance().mutex = true;
+    this->removeItem(FuncDropNoCostManager::getInstance()._slot, FuncDropNoCostManager::getInstance()._count);
     return origin(item);
 }
 
@@ -53,7 +51,7 @@ LL_TYPE_INSTANCE_HOOK(
     ::Vec3 const&  pos,
     uchar          face
 ) {
-    mutex2 = false;
+    FuncDropNoCostManager::getInstance().mutex2 = false;
     return origin(region, container, slot, pos, face);
 }
 
@@ -66,8 +64,8 @@ LL_TYPE_INSTANCE_HOOK(
     int                slot,
     ::ItemStack const& item
 ) {
-    if (mutex2) origin(slot, item);
-    else mutex2 = true;
+    if (FuncDropNoCostManager::getInstance().mutex2) origin(slot, item);
+    else FuncDropNoCostManager::getInstance().mutex2 = true;
 }
 
 void droppernocostHook(bool bl) {
@@ -83,4 +81,4 @@ void droppernocostHook(bool bl) {
         CoralFansTweakersDropperNoCostHook4::unhook();
     }
 }
-} // namespace coral_fans::functions::droppernocost
+} // namespace coral_fans::functions

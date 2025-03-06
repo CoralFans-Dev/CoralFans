@@ -15,6 +15,7 @@
 #include "mc/world/actor/Actor.h"
 #include "mc/world/actor/ai/village/POIInstance.h"
 #include "mc/world/actor/ai/village/Village.h"
+#include "mc/world/actor/ai/village/VillageManager.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/Tick.h"
@@ -92,6 +93,8 @@ void CFVillageManager::insertVillage(Village* village, int dimid) {
         {village, dimid}
     });
 }
+
+void CFVillageManager::removeVillage(Village& village) { this->mVidVillageMap.erase(this->getVid(village.mUniqueID)); }
 
 void CFVillageManager::clearParticle() { coral_fans::mod().getGeometryGroup()->remove(this->mParticleId); }
 
@@ -293,9 +296,26 @@ LL_TYPE_INSTANCE_HOOK(
     origin(tick, region);
 }
 
+LL_TYPE_INSTANCE_HOOK(
+    CoralFansVillageRemoveHook,
+    ll::memory::HookPriority::Normal,
+    VillageManager,
+    &VillageManager::_removeVillage,
+    void,
+    ::Village& village
+) {
+    coral_fans::mod().getVillageManager().removeVillage(village);
+    origin(village);
+}
+
 void hookVillage(bool hook) {
-    if (hook) CoralFansVillageTickHook::hook();
-    else CoralFansVillageTickHook::unhook();
+    if (hook) {
+        CoralFansVillageTickHook::hook();
+        CoralFansVillageRemoveHook::hook();
+    } else {
+        CoralFansVillageTickHook::unhook();
+        CoralFansVillageRemoveHook::unhook();
+    }
 }
 
 } // namespace coral_fans::functions
