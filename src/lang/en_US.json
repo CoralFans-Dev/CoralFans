@@ -245,7 +245,12 @@
         },
         "village": {
             "cannotget": "cannot get village info",
-            "info": "VID: {}\nUUID: {}\n- Center: {}\n- Bounds: [{}, {}]\n- Radius: {}\n- Dwellers: {} / {} / {} / {}\nPOIs: [Bed, Alarm, Jobsite] (§aPos§r, §bOwner count§r, §dCapacity§r, §eRadius§r, Weight)\n"
+            "info": "VID: {}\nUUID: {}\n- Center: {}\n- Bounds: [{}, {}]\n- Radius: {}\n- Dwellers: {} / {} / {} / {}\nVillager list\n",
+            "villagerInfo": "[{}] villager position:{}\n  POI:\n",
+            "villagerPOIType1": "    bed:       ",
+            "villagerPOIType2": "    alarm      ",
+            "villagerPOIType3": "    jobSite:   ",
+            "villagerPOIInfo": "position: {}  owner count: {} max capacity: {} radius: {} weight: {}\n"
         },
         "containerreader": {
             "null": "Container is null",

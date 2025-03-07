@@ -47,7 +47,7 @@ public:
     static int getViewChannel(BlockSource&, HitResult);
 
     static HopperCounterManager& getInstance() {
-        static HopperCounterManager instance; // 唯一实例
+        static HopperCounterManager instance;
         return instance;
     }
 };

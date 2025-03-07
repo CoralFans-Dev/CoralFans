@@ -245,7 +245,12 @@
         },
         "village": {
             "cannotget": "无法获取村庄信息",
-            "info": "VID: {}\nUUID: {}\n- 中心: {}\n- 边界: [{}, {}]\n- 半径: {}\n- 居民: {} / {} / {} / {}\n兴趣点: [床, 钟, 工作方块] (§a坐标§r, §b所有者数量§r, §d最大容量§r, §e半径§r, 权重)\n"
+            "info": "VID: {}\nUUID: {}\n- 中心: {}\n- 边界: [{}, {}]\n- 半径: {}\n- 居民: {} / {} / {} / {}\n村民列表：\n",
+            "villagerInfo": "[{}] 村民坐标：{}\n  POI：\n",
+            "villagerPOIType1": "    床：       ",
+            "villagerPOIType2": "    钟：       ",
+            "villagerPOIType3": "    工作方块： ",
+            "villagerPOIInfo": "坐标：{} 所有者数量：{} 最大容量：{} 半径：{} 权重：{}\n"
         },
         "containerreader": {
             "null": "容器为空",

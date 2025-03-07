@@ -250,16 +250,44 @@ std::pair<std::string, bool> CFVillageManager::getVillageInfo(std::string id) {
         dwellerCountArray[2],
         dwellerCountArray[3]
     );
+    int  i     = 0;
+    auto level = ll::service::getLevel();
     for (auto& villager : ::getDwellerPoiMap(village)) {
-        for (int index = 0; index < 3; ++index) {
-            if (index == 0) {
-                retstr += "|";
-            }
-            auto poi = villager.second[index].lock();
-            if (poi) retstr += std::format(" §a{}§r, §e{:.1f}§r |", *poi->mPosition, poi->mRadius);
-            else retstr += " §7(x)§r |";
-            if (index == 2) retstr += "\n";
-        }
+        i++;
+        retstr    += "translate.village.villagerInfo"_tr(i, level->fetchEntity(villager.first, false)->getFeetPos());
+        retstr    += "translate.village.villagerPOIType1"_tr();
+        auto poi1  = villager.second[0].lock();
+        if (poi1)
+            retstr += "translate.village.villagerPOIInfo"_tr(
+                *poi1->mPosition,
+                poi1->mOwnerCount,
+                poi1->mOwnerCapacity,
+                poi1->mRadius,
+                poi1->mWeight
+            );
+        else retstr += " §7(x)§r\n";
+        retstr    += "translate.village.villagerPOIType2"_tr();
+        auto poi2  = villager.second[1].lock();
+        if (poi2)
+            retstr += "translate.village.villagerPOIInfo"_tr(
+                *poi2->mPosition,
+                poi2->mOwnerCount,
+                poi2->mOwnerCapacity,
+                poi2->mRadius,
+                poi2->mWeight
+            );
+        else retstr += " §7(x)§r\n";
+        retstr    += "translate.village.villagerPOIType3"_tr();
+        auto poi3  = villager.second[2].lock();
+        if (poi3)
+            retstr += "translate.village.villagerPOIInfo"_tr(
+                *poi3->mPosition,
+                poi3->mOwnerCount,
+                poi3->mOwnerCapacity,
+                poi3->mRadius,
+                poi3->mWeight
+            );
+        else retstr += " §7(x)§r\n";
     }
     return {retstr, true};
 }
