@@ -41,7 +41,7 @@ struct Shortcut {
 };
 
 struct Config {
-    int         version    = 3;
+    int         version    = 4;
     std::string locateName = "zh_CN";
 
     int cfhudRefreshTime = 20;

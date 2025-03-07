@@ -14,7 +14,7 @@ void registerCoralfansCommand() {
                         .getOrCreateCommand("coralfans", "CoralFans Mod", CommandPermissionLevel::Any);
 
     // version
-    command.overload().text("version").execute([](CommandOrigin const&, CommandOutput&) {
+    command.overload().text("version").execute([](CommandOrigin const&, CommandOutput& output) {
 #ifdef VERSION
         output.success(VERSION);
 #endif

@@ -13,6 +13,7 @@
 #include "mc/world/level/Level.h"
 #include "mc/world/level/TickNextTickData.h"
 #include "mc/world/level/chunk/ChunkSource.h"
+#include "mc/world/level/chunk/ChunkState.h"
 #include "mc/world/level/chunk/LevelChunk.h"
 #include "mc/world/level/dimension/Dimension.h"
 
@@ -31,9 +32,9 @@ void registerCalculateCommand(CommandPermissionLevel permission) {
         COMMAND_CHECK_PLAYER
         ChunkPos     chunkPos = utils::blockPosToChunkPos(player->getFeetBlockPos());
         BlockSource& region   = player->getDimensionBlockSource();
-        auto         chunk    = player->getDimension().getChunkSource().getExistingChunk(chunkPos);
-        if (chunk && chunk->isFullyLoaded()) {
-            BlockTickingQueue&                        pt            = chunk->getTickQueue();
+        auto         chunk    = player->getDimension().mBlockSource->get()->getChunk(chunkPos);
+        if (chunk && chunk->mLoadState.get() == ChunkState::Loaded) {
+            BlockTickingQueue&                        pt            = *chunk->mTickQueue;
             std::vector<BlockTickingQueue::BlockTick> nextTickQueue = pt.mNextTickQueue->mC;
             BlockTickingQueue::TickDataSet            copiedQueue;
             copiedQueue.mC = std::move(nextTickQueue);
@@ -49,7 +50,7 @@ void registerCalculateCommand(CommandPermissionLevel permission) {
                     auto& blockTick = copiedQueue.top();
                     if (blockTick.mIsRemoved) {
                         std::pair<unsigned long long, std::string> tem = {
-                            blockTick.mData.tick->tickID,
+                            blockTick.mData.tick.tickID,
                             blockTick.mData.mBlock->getTypeName()
                         };
                         auto it = cal.find(tem);
@@ -70,16 +71,9 @@ void registerCalculateCommand(CommandPermissionLevel permission) {
                 copiedQueue.mC = std::move(nextTickQueue);
                 std::map<std::pair<unsigned long long, std::string>, int> cal2;
                 for (; !copiedQueue.empty();) {
-                    auto& blockTick = copiedQueue.top();
-                    // output.success(
-                    //     "  {}: tick time {}, priority {}, {}",
-                    //     blockTick.mData.mPos.toString(),
-                    // blockTick.mData.mTick.t,
-                    //     blockTick.mData.mPriorityOffset,
-                    //     blockTick.mData.mBlock->getName().getString()
-                    // );
-                    std::pair<unsigned long long, std::string> tem = {
-                        blockTick.mData.tick->tickID,
+                    auto&                                      blockTick = copiedQueue.top();
+                    std::pair<unsigned long long, std::string> tem       = {
+                        blockTick.mData.tick.tickID,
                         blockTick.mData.mBlock->getTypeName()
                     };
                     auto it = cal2.find(tem);

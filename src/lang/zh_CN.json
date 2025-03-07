@@ -245,7 +245,12 @@
         },
         "village": {
             "cannotget": "无法获取村庄信息",
-            "info": "VID: {}\nUUID: {}\n- 中心: {}\n- 边界: [{}, {}]\n- 半径: {}\n- 居民: {} / {} / {} / {}\n兴趣点: [床, 钟, 工作方块] (§a坐标§r, §b所有者数量§r, §d最大容量§r, §e半径§r, 权重)\n"
+            "info": "VID: {}\nUUID: {}\n- 中心: {}\n- 边界: [{}, {}]\n- 半径: {}\n- 居民: {} / {} / {} / {}\n村民列表：\n",
+            "villagerInfo": "[{}] 村民坐标：{}\n  POI：\n",
+            "villagerPOIType1": "    床：       ",
+            "villagerPOIType2": "    钟：       ",
+            "villagerPOIType3": "    工作方块： ",
+            "villagerPOIInfo": "坐标：{} 所有者数量：{} 最大容量：{} 半径：{} 权重：{}\n"
         },
         "containerreader": {
             "null": "容器为空",
@@ -253,7 +258,7 @@
         },
         "data": {
             "info": {
-                "block": "- §b位置: §a{}§r\n- §b名称: §a{}§r\n- §b类型名: §a{}§r\n- §bID: §a{}§r\n- §bRTID: §a{}§r\n- §b特殊值: §a{}§r\n- §bCanInstanceTick: §a{}§r\n- §bHasBlockEntity: §a{}§r\n- §bIsSolid: §a{}§r\n- §b比较器输出: §a{}§r\n- §b材质:§r\n - §bMotion: §a{}§r\n - §bTopSolid: §a{}§r\n - §bIsSolid: §a{}§r\n - §bIsSolidBlocking: §a{}§r",
+                "block": "- §b位置: §a{}§r\n- §b名称: §a{}§r\n- §b类型名: §a{}§r\n- §bID: §a{}§r\n- §b特殊值: §a{}§r\n- §bCanInstanceTick: §a{}§r\n- §bHasBlockEntity: §a{}§r\n- §b比较器输出: §a{}§r\n",
                 "entity": "- §bNameTag: §a{}§r\n- §bTypeName: §a{}§r\n- §bUID: §a{}§r\n- §bPos: §a{}§r\n- §bDeltaPos: §a{}§r\n- §bAABB: §a{}§r\n- §bSurface: §a{}§r\n",
                 "redstone": {
                     "signal": {

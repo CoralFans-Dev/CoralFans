@@ -1,5 +1,6 @@
 #include "coral_fans/base/Mod.h"
-
+#include "coral_fans/functions/func/Droppernocost.h"
+#include "coral_fans/functions/func/FuncHook.h"
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/command/runtime/ParamKind.h"
@@ -10,6 +11,7 @@
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/server/commands/CommandPermissionLevel.h"
 #include <string>
+
 
 namespace coral_fans::commands {
 void registerFuncCommand(CommandPermissionLevel permission) {
@@ -66,10 +68,14 @@ void registerFuncCommand(CommandPermissionLevel permission) {
         .required("isopen", ll::command::ParamKind::Bool)
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
-            if (coral_fans::mod().getConfigDb()->set("functions.global.droppernocost", isopen ? "true" : "false"))
+            if (coral_fans::mod().getConfigDb()->set("functions.global.droppernocost", isopen ? "true" : "false")) {
+                coral_fans::functions::droppernocostHook(isopen);
                 output.success("command.func.droppernocost.success"_tr(isopen ? "true" : "false"));
-            else output.error("command.func.droppernocost.error"_tr());
+            } else output.error("command.func.droppernocost.error"_tr());
         });
+    coral_fans::functions::droppernocostHook(
+        coral_fans::mod().getConfigDb()->get("functions.global.droppernocost") == "true"
+    );
 
     // safeexplode
     funcCommand.runtimeOverload()
@@ -88,10 +94,15 @@ void registerFuncCommand(CommandPermissionLevel permission) {
         .required("isopen", ll::command::ParamKind::Bool)
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
-            if (coral_fans::mod().getConfigDb()->set("functions.global.autotool", isopen ? "true" : "false"))
+            if (coral_fans::mod().getConfigDb()->set("functions.global.autotool", isopen ? "true" : "false")) {
                 output.success("command.func.autotool.success"_tr(isopen ? "true" : "false"));
-            else output.error("command.func.autotool.error"_tr());
+                coral_fans::functions::hookTweakersAutoTool(isopen);
+            } else output.error("command.func.autotool.error"_tr());
         });
+    coral_fans::functions::hookTweakersAutoTool(
+        coral_fans::mod().getConfigDb()->get("functions.global.autotool") == "true"
+    );
+
 
     // hoppercounter
     funcCommand.runtimeOverload()
@@ -133,10 +144,12 @@ void registerFuncCommand(CommandPermissionLevel permission) {
         .required("isopen", ll::command::ParamKind::Bool)
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
-            if (coral_fans::mod().getConfigDb()->set("functions.global.autototem", isopen ? "true" : "false"))
+            if (coral_fans::mod().getConfigDb()->set("functions.global.autototem", isopen ? "true" : "false")) {
                 output.success("command.func.autototem.success"_tr(isopen ? "true" : "false"));
-            else output.error("command.func.autototem.error"_tr());
+                coral_fans::functions::autoTotemHook(isopen);
+            } else output.error("command.func.autototem.error"_tr());
         });
+    coral_fans::functions::autoTotemHook(coral_fans::mod().getConfigDb()->get("functions.global.autototem") == "true");
 
     // autoitem
     funcCommand.runtimeOverload()
@@ -144,10 +157,12 @@ void registerFuncCommand(CommandPermissionLevel permission) {
         .required("isopen", ll::command::ParamKind::Bool)
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
-            if (coral_fans::mod().getConfigDb()->set("functions.global.autoitem", isopen ? "true" : "false"))
+            if (coral_fans::mod().getConfigDb()->set("functions.global.autoitem", isopen ? "true" : "false")) {
                 output.success("command.func.autoitem.success"_tr(isopen ? "true" : "false"));
-            else output.error("command.func.autoitem.error"_tr());
+                coral_fans::functions::autoItemHook(isopen);
+            } else output.error("command.func.autoitem.error"_tr());
         });
+    coral_fans::functions::autoItemHook(coral_fans::mod().getConfigDb()->get("functions.global.autoitem") == "true");
 
     // fastdrop
     funcCommand.runtimeOverload()

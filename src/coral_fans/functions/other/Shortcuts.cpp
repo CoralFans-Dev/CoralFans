@@ -110,7 +110,7 @@ void registerShortcutsListener() {
                             command = ll::string_utils::replaceAll(
                                 command,
                                 "{blockvariant}",
-                                std::to_string(event.block()->getVariant())
+                                std::to_string(event.block()->mLegacyBlock->getVariant(event.block()))
                             );
                             command =
                                 ll::string_utils::replaceAll(command, "{blockx}", std::to_string(event.blockPos().x));
@@ -123,7 +123,7 @@ void registerShortcutsListener() {
                                 std::make_unique<PlayerCommandOrigin>(PlayerCommandOrigin(event.self())),
                                 CommandVersion::CurrentVersion()
                             );
-                            mc->getCommands().executeCommand(context, false);
+                            mc->mCommands->executeCommand(context, false);
                         }
                     cancel |= shortcut.prevent;
                 }
@@ -173,7 +173,7 @@ void registerShortcutsListener() {
                             std::make_unique<PlayerCommandOrigin>(PlayerCommandOrigin(event.self())),
                             CommandVersion::CurrentVersion()
                         );
-                        mc->getCommands().executeCommand(context, false);
+                        mc->mCommands->executeCommand(context, false);
                     }
                 cancel |= shortcut.prevent;
             }
@@ -223,7 +223,7 @@ void registerShortcutsListener() {
                                 std::make_unique<PlayerCommandOrigin>(PlayerCommandOrigin(event.self())),
                                 CommandVersion::CurrentVersion()
                             );
-                            mc->getCommands().executeCommand(context, false);
+                            mc->mCommands->executeCommand(context, false);
                         }
                     cancel |= shortcut.prevent;
                 }
@@ -253,7 +253,7 @@ void registerShortcutsCommand() {
                         std::make_unique<PlayerCommandOrigin>(PlayerCommandOrigin(*player)),
                         CommandVersion::CurrentVersion()
                     );
-                    mc->getCommands().executeCommand(context, false);
+                    mc->mCommands->executeCommand(context, false);
                 }
         });
     }

@@ -16,6 +16,52 @@ void registerMineruleCommand(CommandPermissionLevel permission) {
     auto& mineruleCommand = ll::command::CommandRegistrar::getInstance()
                                 .getOrCreateCommand("minerule", "command.minerule.description"_tr(), permission);
 
+    // mineruleCommand.runtimeOverload()
+    //     .text("fuck_bedrock_no_drop")
+    //     .required("isopen", ll::command::ParamKind::Bool)
+    //     .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+    //         bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
+    //         if (isopen) {
+    //             if (coral_fans::mod().getConfigDb()->set("minerule.bedrockDrop", "true")) {
+    //                 output.success("command.minerule.bedrockDrop.success.true"_tr());
+    //                 coral_fans::functions::DropHookManager::getInstance().bedrockDrop = true;
+    //                 functions::dropHook();
+    //             } else output.error("command.minerule.bedrockDrop.error"_tr());
+    //         } else {
+    //             if (coral_fans::mod().getConfigDb()->set("minerule.bedrockDrop", "false")) {
+    //                 output.success("command.minerule.bedrockDrop.success.false"_tr());
+    //                 coral_fans::functions::DropHookManager::getInstance().bedrockDrop = false;
+    //                 functions::dropHook();
+    //             } else output.error("command.minerule.bedrockDrop.error"_tr());
+    //         }
+    //     });
+
+    // mineruleCommand.runtimeOverload()
+    //     .text("fuck_movingBlock_no_drop")
+    //     .required("isopen", ll::command::ParamKind::Bool)
+    //     .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+    //         bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
+    //         if (isopen) {
+    //             if (coral_fans::mod().getConfigDb()->set("minerule.movingBlockDrop", "true")) {
+    //                 output.success("command.minerule.movingBlockDrop.success.true"_tr());
+    //                 coral_fans::functions::DropHookManager::getInstance().mbDrop = true;
+    //                 functions::dropHook();
+    //             } else output.error("command.minerule.movingBlockDrop.error"_tr());
+    //         } else {
+    //             if (coral_fans::mod().getConfigDb()->set("minerule.movingBlockDrop", "false")) {
+    //                 output.success("command.minerule.movingBlockDrop.success.false"_tr());
+    //                 coral_fans::functions::DropHookManager::getInstance().mbDrop = false;
+    //                 functions::dropHook();
+    //             } else output.error("command.minerule.movingBlockDrop.error"_tr());
+    //         }
+    //     });
+
+    // coral_fans::functions::DropHookManager::getInstance().bedrockDrop =
+    //     coral_fans::mod().getConfigDb()->get("minerule.bedrockDrop") == "true";
+    // coral_fans::functions::DropHookManager::getInstance().mbDrop =
+    //     coral_fans::mod().getConfigDb()->get("minerule.movingBlockDrop") == "true";
+    // functions::dropHook();
+
     mineruleCommand.runtimeOverload()
         .text("fuck_bedrock_no_drop")
         .required("isopen", ll::command::ParamKind::Bool)
@@ -24,16 +70,16 @@ void registerMineruleCommand(CommandPermissionLevel permission) {
             if (isopen) {
                 if (coral_fans::mod().getConfigDb()->set("minerule.bedrockDrop", "true")) {
                     output.success("command.minerule.bedrockDrop.success.true"_tr());
-                    functions::bedrockDropHook(true);
+                    coral_fans::functions::bedrockDropHook(true);
                 } else output.error("command.minerule.bedrockDrop.error"_tr());
             } else {
                 if (coral_fans::mod().getConfigDb()->set("minerule.bedrockDrop", "false")) {
                     output.success("command.minerule.bedrockDrop.success.false"_tr());
-                    functions::bedrockDropHook(false);
+                    coral_fans::functions::bedrockDropHook(false);
                 } else output.error("command.minerule.bedrockDrop.error"_tr());
             }
         });
-    functions::bedrockDropHook(mod().getConfigDb()->get("minerule.bedrockDrop") == "true");
+    functions::bedrockDropHook(coral_fans::mod().getConfigDb()->get("minerule.bedrockDrop") == "true");
 
     mineruleCommand.runtimeOverload()
         .text("fuck_movingBlock_no_drop")
@@ -43,17 +89,16 @@ void registerMineruleCommand(CommandPermissionLevel permission) {
             if (isopen) {
                 if (coral_fans::mod().getConfigDb()->set("minerule.movingBlockDrop", "true")) {
                     output.success("command.minerule.movingBlockDrop.success.true"_tr());
-                    functions::mbDropHook(true);
+                    coral_fans::functions::mbDropHook(true);
                 } else output.error("command.minerule.movingBlockDrop.error"_tr());
             } else {
                 if (coral_fans::mod().getConfigDb()->set("minerule.movingBlockDrop", "false")) {
                     output.success("command.minerule.movingBlockDrop.success.false"_tr());
-                    functions::mbDropHook(false);
+                    coral_fans::functions::mbDropHook(false);
                 } else output.error("command.minerule.movingBlockDrop.error"_tr());
             }
         });
-
-    functions::mbDropHook(mod().getConfigDb()->get("minerule.movingBlockDrop") == "true");
+    functions::bedrockDropHook(coral_fans::mod().getConfigDb()->get("minerule.movingBlockDrop") == "true");
 
     mineruleCommand.runtimeOverload()
         .text("replicated_portal_sand_farm")

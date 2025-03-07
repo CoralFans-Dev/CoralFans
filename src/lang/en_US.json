@@ -245,7 +245,12 @@
         },
         "village": {
             "cannotget": "cannot get village info",
-            "info": "VID: {}\nUUID: {}\n- Center: {}\n- Bounds: [{}, {}]\n- Radius: {}\n- Dwellers: {} / {} / {} / {}\nPOIs: [Bed, Alarm, Jobsite] (§aPos§r, §bOwner count§r, §dCapacity§r, §eRadius§r, Weight)\n"
+            "info": "VID: {}\nUUID: {}\n- Center: {}\n- Bounds: [{}, {}]\n- Radius: {}\n- Dwellers: {} / {} / {} / {}\nVillager list\n",
+            "villagerInfo": "[{}] villager position:{}\n  POI:\n",
+            "villagerPOIType1": "    bed:       ",
+            "villagerPOIType2": "    alarm      ",
+            "villagerPOIType3": "    jobSite:   ",
+            "villagerPOIInfo": "position: {}  owner count: {} max capacity: {} radius: {} weight: {}\n"
         },
         "containerreader": {
             "null": "Container is null",
@@ -253,7 +258,7 @@
         },
         "data": {
             "info": {
-                "block": "- §bPos: §a{}§r\n- §bName: §a{}§r\n- §bTypeName: §a{}§r\n- §bID: §a{}§r\n- §bRTID: §a{}§r\n- §bVariant: §a{}§r\n- §bCanInstanceTick: §a{}§r\n- §bHasBlockEntity: §a{}§r\n- §bIsSolid: §a{}§r\n- §bComparatorSignal: §a{}§r\n- §bMaterial:§r\n - §bMotion: §a{}§r\n - §bTopSolid: §a{}§r\n - §bIsSolid: §a{}§r\n - §bIsSolidBlocking: §a{}§r",
+                "block": "- §bPos: §a{}§r\n- §bName: §a{}§r\n- §bTypeName: §a{}§r\n- §bID: §a{}§r\n- §bVariant: §a{}§r\n- §bCanInstanceTick: §a{}§r\n- §bHasBlockEntity: §a{}§r\n- §bComparatorSignal: §a{}§r\n",
                 "entity": "- §bNameTag: §a{}§r\n- §bTypeName: §a{}§r\n- §bUID: §a{}§r\n- §bPos: §a{}§r\n- §bDeltaPos: §a{}§r\n- §bAABB: §a{}§r\n- §bSurface: §a{}§r\n",
                 "redstone": {
                     "signal": {

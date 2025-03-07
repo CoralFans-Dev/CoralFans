@@ -1,4 +1,3 @@
-#include "coral_fans/base/Mod.h"
 #include "coral_fans/base/MySchedule.h"
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
@@ -6,12 +5,10 @@
 #include "ll/api/command/runtime/RuntimeCommand.h"
 #include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
-#include "ll/api/io/Logger.h"
 #include "ll/api/service/Bedrock.h"
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/server/commands/CommandPermissionLevel.h"
 #include "mc/server/commands/CommandRegistry.h"
-#include "mc/util/ProfilerLite.h"
 #include "mc/util/Timer.h"
 #include "mc/world/Minecraft.h"
 
@@ -23,15 +20,6 @@ void registerTickCommand(CommandPermissionLevel permission) {
     // reg cmd
     auto& tickCommand = ll::command::CommandRegistrar::getInstance()
                             .getOrCreateCommand("tick", "command.tick.description"_tr(), permission);
-
-    // tick query
-    tickCommand.overload().text("query").execute([](CommandOrigin const&, CommandOutput& output) {
-        output.success(
-            "command.tick.query.output"_tr(std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(
-                ProfilerLite::gProfilerLiteInstance().getServerTickTime()
-            ))
-        );
-    });
 
     // tick freeze|reset
     ll::command::CommandRegistrar::getInstance().tryRegisterRuntimeEnum(
@@ -75,21 +63,17 @@ void registerTickCommand(CommandPermissionLevel permission) {
             output.success("command.tick.rate.success"_tr(rate));
         });
 
-    // tick step <int>
-    static auto stepFn = [](CommandOutput& output, int tick) {
-        if (!::Command::validRange(tick, 0, INT_MAX, output)) {
-            return;
-        }
-        auto mc = ll::service::getMinecraft();
-        if (mc.has_value()) mc->mSimTimer.stepTick(tick);
-        output.success("command.tick.step.output"_tr(tick));
-    };
-
     tickCommand.runtimeOverload()
         .text("step")
         .required("time", ll::command::ParamKind::Int)
         .execute([&](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
-            stepFn(output, self["time"].get<ll::command::ParamKind::Int>());
+            int tick = self["time"].get<ll::command::ParamKind::Int>();
+            if (!::Command::validRange(tick, 0, INT_MAX, output)) {
+                return;
+            }
+            auto mc = ll::service::getMinecraft();
+            if (mc.has_value()) mc->mSimTimer.mSteppingTick = tick;
+            output.success("command.tick.step.output"_tr(tick));
         });
 }
 } // namespace coral_fans::commands

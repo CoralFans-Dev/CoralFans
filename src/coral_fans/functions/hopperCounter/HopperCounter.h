@@ -30,6 +30,10 @@ private:
 
 public:
     const static std::unordered_map<std::string, int> HOPPER_COUNTER_MAP;
+    BlockSource*                                      region;
+    BlockPos                                          pos;
+    bool                                              mutex = false;
+
     HopperCounterManager() {
         for (int i = 0; i < 16; ++i) this->channels.emplace_back(i);
     }
@@ -41,6 +45,11 @@ public:
     }
     void       tick();
     static int getViewChannel(BlockSource&, HitResult);
+
+    static HopperCounterManager& getInstance() {
+        static HopperCounterManager instance;
+        return instance;
+    }
 };
 
 } // namespace coral_fans::functions

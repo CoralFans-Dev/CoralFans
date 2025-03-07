@@ -7,20 +7,21 @@
 #include "ll/api/memory/Hook.h"
 #include "ll/api/memory/Memory.h"
 #include "ll/api/service/Bedrock.h"
-#include "mc/common/ActorUniqueID.h"
 #include "mc/deps/core/math/Color.h"
 #include "mc/deps/core/math/Vec3.h"
 #include "mc/deps/core/string/HashedString.h"
+#include "mc/legacy/ActorUniqueID.h"
 #include "mc/platform/UUID.h"
 #include "mc/world/actor/Actor.h"
 #include "mc/world/actor/ai/village/POIInstance.h"
 #include "mc/world/actor/ai/village/Village.h"
+#include "mc/world/actor/ai/village/VillageManager.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/Tick.h"
 #include "mc/world/level/levelgen/structure/BoundingBox.h"
 #include "mc/world/phys/AABB.h"
-
+#include <math.h>
 
 #include <array>
 #include <format>
@@ -72,6 +73,12 @@ inline std::array<unsigned long long, 4> getDwellerCount(Village* v) {
 } // namespace
 
 namespace coral_fans::functions {
+float getApproximateRadius(AABB& bound) {
+    float x = bound.max.x - bound.min.x;
+    float z = bound.max.z - bound.min.z;
+    if (fabs(x - z) >= 0.00000011920929f) return (x + z) * 0.3f;
+    else return 1.414213562373f * x;
+}
 
 int CFVillageManager::getVid(mce::UUID uuid) {
     if (auto it = this->mUuidVidMap.find(uuid); it != this->mUuidVidMap.end()) return it->second;
@@ -82,10 +89,12 @@ int CFVillageManager::getVid(mce::UUID uuid) {
 void CFVillageManager::insertVillage(Village* village, int dimid) {
     if (!village) return;
     this->mVidVillageMap.insert({
-        this->getVid(village->getUniqueID()),
+        this->getVid(village->mUniqueID),
         {village, dimid}
     });
 }
+
+void CFVillageManager::removeVillage(Village& village) { this->mVidVillageMap.erase(this->getVid(village.mUniqueID)); }
 
 void CFVillageManager::clearParticle() { coral_fans::mod().getGeometryGroup()->remove(this->mParticleId); }
 
@@ -108,7 +117,7 @@ void CFVillageManager::heavyTick() {
             if (this->mShowBounds) {
                 auto ids = std::array{
                     this->mParticleId,
-                    mod.getGeometryGroup()->box(kv.second.second, kv.second.first->getBounds())
+                    mod.getGeometryGroup()->box(kv.second.second, kv.second.first->mBounds)
                 };
                 this->mParticleId = mod.getGeometryGroup()->merge(ids);
             }
@@ -116,7 +125,7 @@ void CFVillageManager::heavyTick() {
                 auto ids = std::array{
                     this->mParticleId,
                     mod.getGeometryGroup()
-                        ->box(kv.second.second, kv.second.first->getRaidBounds(), mce::Color::ORANGE())
+                        ->box(kv.second.second, kv.second.first->mStaticRaidBounds, mce::Color::ORANGE())
                 };
                 this->mParticleId = mod.getGeometryGroup()->merge(ids);
             }
@@ -125,7 +134,8 @@ void CFVillageManager::heavyTick() {
                     this->mParticleId,
                     mod.getGeometryGroup()->box(
                         kv.second.second,
-                        {kv.second.first->getCenter() - Vec3{8, 6, 8}, kv.second.first->getCenter() + Vec3{9, 7, 9}},
+                        {kv.second.first->mBounds->center() - Vec3{8, 6, 8},
+                                        kv.second.first->mBounds->center() + Vec3{9, 7, 9}},
                         mce::Color::BLUE()
                     )
                 };
@@ -136,7 +146,7 @@ void CFVillageManager::heavyTick() {
                     this->mParticleId,
                     mod.getGeometryGroup()->box(
                         kv.second.second,
-                        {kv.second.first->getCenter(), kv.second.first->getCenter() + Vec3{1, 1, 1}},
+                        {kv.second.first->mBounds->center(), kv.second.first->mBounds->center() + Vec3{1, 1, 1}},
                         mce::Color::RED()
                     )
                 };
@@ -147,8 +157,8 @@ void CFVillageManager::heavyTick() {
                     this->mParticleId,
                     mod.getGeometryGroup()->box(
                         kv.second.second,
-                        {kv.second.first->getBounds().min - Vec3{64, 64, 64},
-                                        kv.second.first->getBounds().max + Vec3{64, 64, 64}},
+                        {kv.second.first->mBounds->min - Vec3{64, 64, 64},
+                                        kv.second.first->mBounds->max + Vec3{64, 64, 64}},
                         mce::Color::PINK()
                     )
                 };
@@ -169,7 +179,7 @@ void CFVillageManager::heavyTick() {
                                     ids.emplace_back(mod.getGeometryGroup()->line(
                                         villager->getDimensionId(),
                                         villager->getHeadPos(),
-                                        poi->getPosition().center(),
+                                        poi->mPosition->center(),
                                         colors[i]
                                     ));
                                 }
@@ -188,18 +198,18 @@ std::string CFVillageManager::listTickingVillages() {
     std::string retstr;
     for (auto& kv : this->mVidVillageMap) {
         if (!kv.second.first) continue;
-        auto   dwellerCountArray  = ::getDwellerCount(kv.second.first);
-        float* approximateRadius  = (float*)&kv.second.first->mUnkbc5c53;
-        retstr                   += std::format(
+        auto  dwellerCountArray  = ::getDwellerCount(kv.second.first);
+        float approximateRadius  = getApproximateRadius(*kv.second.first->mBounds);
+        retstr                  += std::format(
             "- §a[{}]§r §b[{}]§r r: {} p: {} g: {} b: {} §6[{}, {}]§r\n",
             kv.first,
-            kv.second.first->getCenter(),
-            *approximateRadius,
+            kv.second.first->mBounds->center(),
+            approximateRadius,
             dwellerCountArray[0], // Villager
             dwellerCountArray[1], // IronGolem
             kv.second.first->getBedPOICount(),
-            kv.second.first->getBounds().min,
-            kv.second.first->getBounds().max
+            kv.second.first->mBounds->min,
+            kv.second.first->mBounds->max
         );
     }
     return retstr;
@@ -212,7 +222,7 @@ void CFVillageManager::refreshCommandSoftEnum() {
     for (auto& v : this->mVidVillageMap) {
         if (v.second.first) {
             vids.push_back(std::to_string(v.first));
-            uuids.push_back(v.second.first->getUniqueID().asString().substr(0, 8) + "...");
+            uuids.push_back(v.second.first->mUniqueID->asString().substr(0, 8) + "...");
         }
     }
     vids.insert(vids.end(), uuids.begin(), uuids.end());
@@ -227,29 +237,57 @@ std::pair<std::string, bool> CFVillageManager::getVillageInfo(std::string id) {
     Village* village = this->mVidVillageMap[vid].first;
     if (!village) return {"translate.village.cannotget"_tr(), false};
     auto        dwellerCountArray = ::getDwellerCount(village);
-    float*      approximateRadius = (float*)&village->mUnkbc5c53;
+    float       approximateRadius = getApproximateRadius(*village->mBounds);
     std::string retstr            = "translate.village.info"_tr(
         vid,
-        village->getUniqueID().asString(),
-        village->getCenter().toString(),
-        village->getBounds().min.toString(),
-        village->getBounds().max.toString(),
-        *approximateRadius,
+        village->mUniqueID->asString(),
+        village->mBounds->center().toString(),
+        village->mBounds->min.toString(),
+        village->mBounds->max.toString(),
+        approximateRadius,
         dwellerCountArray[0],
         dwellerCountArray[1],
         dwellerCountArray[2],
         dwellerCountArray[3]
     );
+    int  i     = 0;
+    auto level = ll::service::getLevel();
     for (auto& villager : ::getDwellerPoiMap(village)) {
-        for (int index = 0; index < 3; ++index) {
-            if (index == 0) {
-                retstr += "|";
-            }
-            auto poi = villager.second[index].lock();
-            if (poi) retstr += std::format(" §a{}§r, §e{:.1f}§r |", poi->getPosition(), poi->getRadius());
-            else retstr += " §7(x)§r |";
-            if (index == 2) retstr += "\n";
-        }
+        i++;
+        retstr    += "translate.village.villagerInfo"_tr(i, level->fetchEntity(villager.first, false)->getFeetPos());
+        retstr    += "translate.village.villagerPOIType1"_tr();
+        auto poi1  = villager.second[0].lock();
+        if (poi1)
+            retstr += "translate.village.villagerPOIInfo"_tr(
+                *poi1->mPosition,
+                poi1->mOwnerCount,
+                poi1->mOwnerCapacity,
+                poi1->mRadius,
+                poi1->mWeight
+            );
+        else retstr += " §7(x)§r\n";
+        retstr    += "translate.village.villagerPOIType2"_tr();
+        auto poi2  = villager.second[1].lock();
+        if (poi2)
+            retstr += "translate.village.villagerPOIInfo"_tr(
+                *poi2->mPosition,
+                poi2->mOwnerCount,
+                poi2->mOwnerCapacity,
+                poi2->mRadius,
+                poi2->mWeight
+            );
+        else retstr += " §7(x)§r\n";
+        retstr    += "translate.village.villagerPOIType3"_tr();
+        auto poi3  = villager.second[2].lock();
+        if (poi3)
+            retstr += "translate.village.villagerPOIInfo"_tr(
+                *poi3->mPosition,
+                poi3->mOwnerCount,
+                poi3->mOwnerCapacity,
+                poi3->mRadius,
+                poi3->mWeight
+            );
+        else retstr += " §7(x)§r\n";
     }
     return {retstr, true};
 }
@@ -264,9 +302,7 @@ std::pair<std::string, bool> CFVillageManager::getVillagerInfo(ActorUniqueID aui
             retstr += "VID: " + std::to_string(v.first);
             for (int i = 0; i < 3; i++) {
                 const auto& poi = it->second[i].lock();
-                if (poi)
-                    retstr +=
-                        std::format("\n{}: {}, {:.2f}", poi->getName().mStr, poi->getPosition(), poi->getRadius());
+                if (poi) retstr += std::format("\n{}: {}, {:.2f}", poi->mName->mStr, *poi->mPosition, poi->mRadius);
             }
             return {retstr, true};
         }
@@ -288,9 +324,26 @@ LL_TYPE_INSTANCE_HOOK(
     origin(tick, region);
 }
 
+LL_TYPE_INSTANCE_HOOK(
+    CoralFansVillageRemoveHook,
+    ll::memory::HookPriority::Normal,
+    VillageManager,
+    &VillageManager::_removeVillage,
+    void,
+    ::Village& village
+) {
+    coral_fans::mod().getVillageManager().removeVillage(village);
+    origin(village);
+}
+
 void hookVillage(bool hook) {
-    if (hook) CoralFansVillageTickHook::hook();
-    else CoralFansVillageTickHook::unhook();
+    if (hook) {
+        CoralFansVillageTickHook::hook();
+        CoralFansVillageRemoveHook::hook();
+    } else {
+        CoralFansVillageTickHook::unhook();
+        CoralFansVillageRemoveHook::unhook();
+    }
 }
 
 } // namespace coral_fans::functions

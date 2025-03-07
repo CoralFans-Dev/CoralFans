@@ -1,13 +1,12 @@
 #include "coral_fans/base/Macros.h"
 #include "coral_fans/base/Mod.h"
-#include "coral_fans/base/MySchedule.h"
 #include "coral_fans/base/Utils.h"
 
 #include "ll/api/memory/Hook.h"
-#include "mc/entity/systems/EntitySystems.h"
 #include "mc/world/actor/Actor.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/BlockTickingQueue.h"
+#include "mc/world/level/EntitySystemsManager.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/TickNextTickData.h"
 #include "mc/world/level/chunk/LevelChunk.h"
@@ -20,8 +19,6 @@ namespace coral_fans::functions {
 
 // main game tick
 LL_TYPE_INSTANCE_HOOK(CoralFansTickLevelTickHook, ll::memory::HookPriority::Normal, Level, &Level::$tick, void) {
-    my_schedule::MySchedule::getSchedule().update();
-
     auto& mod  = coral_fans::mod();
     auto& prof = mod.getProfiler();
     PROF_TIMER(level, { origin(); })
@@ -42,19 +39,20 @@ LL_TYPE_INSTANCE_HOOK(
     CoralFansTickLevelChunkTickHook,
     ll::memory::HookPriority::Normal,
     LevelChunk,
-    &LevelChunk::tick,
+    &LevelChunk::tickImpl,
     void,
-    BlockSource& tickRegion,
-    Tick const&  tick
+    BlockSource&            tickRegion,
+    Tick const&             tick,
+    ::std::function<void()> spawnerCallback
 ) {
     auto&      prof     = coral_fans::mod().getProfiler();
     const auto dimid    = tickRegion.getDimensionId();
-    auto&      chunkPos = this->getPosition();
+    auto&      chunkPos = this->mPosition;
     if (prof.profiling) {
-        PROF_TIMER(chunk, { origin(tickRegion, tick); })
+        PROF_TIMER(chunk, { origin(tickRegion, tick, spawnerCallback); })
         prof.chunkInfo.totalTickTime += time_chunk;
         prof.chunkInfo.chunk_counter[static_cast<int>(dimid)][chunkPos].push_back(time_chunk);
-    } else origin(tickRegion, tick);
+    } else origin(tickRegion, tick, spawnerCallback);
 }
 
 // LevelChunk tickBlocks
@@ -142,16 +140,15 @@ LL_TYPE_INSTANCE_HOOK(
 LL_TYPE_INSTANCE_HOOK(
     CoralFansTickEntitySystemsTickHook,
     ll::memory::HookPriority::Normal,
-    EntitySystems,
-    &EntitySystems::tick,
-    void,
-    EntityRegistry& registry
+    EntitySystemsManager,
+    &EntitySystemsManager::tickEntitySystems,
+    void
 ) {
     auto& prof = coral_fans::mod().getProfiler();
     if (prof.profiling) {
-        PROF_TIMER(entity, { origin(registry); })
+        PROF_TIMER(entity, { origin(); })
         prof.entitySystemTickTime += time_entity;
-    } else origin(registry);
+    } else origin();
 }
 
 // redstone stuff

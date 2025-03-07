@@ -11,7 +11,6 @@
 #include "coral_fans/base/Mod.h"
 #include "coral_fans/base/MySchedule.h"
 #include "coral_fans/commands/Commands.h"
-#include "coral_fans/functions/func/AutoItem.h"
 #include "coral_fans/functions/func/ContainerReader.h"
 #include "coral_fans/functions/other/HookRegister.h"
 #include "coral_fans/functions/other/Shortcuts.h"
@@ -97,7 +96,7 @@ bool CoralFans::enable() {
     functions::registerContainerReader();
 
     // register autoitem
-    coral_fans::functions::registerAutoItemListener();
+    // coral_fans::functions::registerAutoItemListener();
 
     return true;
 }

@@ -60,12 +60,12 @@ void registerContainerReader() {
             auto&       bs = ev.self().getDimension().getBlockSourceFromMainChunkSource();
             const auto& bl = bs.getBlock(ev.blockPos());
             auto*       ba = bs.getBlockEntity(ev.blockPos());
-            if (bl.isContainerBlock() && ba) {
-                auto type = ba->getType();
+            if (bl.mLegacyBlock->isContainerBlock() && ba) {
+                auto type = ba->mType;
                 if (type == BlockActorType::Chest || type == BlockActorType::ShulkerBox) {
                     // chest or shulker_box, check if can be open
                     auto cba = reinterpret_cast<ChestBlockActor*>(ba);
-                    if (!cba->canOpen(bs)) {
+                    if (!cba->_canOpenThis(bs)) {
                         // cannot open, send content to player
                         ::SendContentToPlayer(ev.self(), ba->getContainer());
                     }
