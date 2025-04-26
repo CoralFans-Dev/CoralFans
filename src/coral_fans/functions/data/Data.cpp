@@ -1,7 +1,7 @@
 #include "coral_fans/base/Utils.h"
 #include "ll/api/i18n/I18n.h"
+#include "mc/common/ActorUniqueID.h"
 #include "mc/deps/core/math/Color.h"
-#include "mc/legacy/ActorUniqueID.h"
 #include "mc/nbt/CompoundTag.h"
 #include "mc/nbt/CompoundTagVariant.h"
 #include "mc/nbt/Tag.h"
@@ -34,11 +34,11 @@ std::string getBlockData(BlockSource& blockSource, BlockPos blockPos) {
         block.buildDescriptionName(),
         block.getTypeName(),
         block.getBlockItemId(),
-        block.mLegacyBlock->getVariant(block),
-        block.mLegacyBlock->canInstatick(),
-        block.mLegacyBlock->mBlockEntityType != BlockActorType::Undefined,
-        block.mLegacyBlock->hasComparatorSignal()
-            ? std::to_string(block.mLegacyBlock->getComparatorSignal(blockSource, blockPos, block, 0))
+        block.mLegacyBlock.get()->getVariant(block),
+        block.mLegacyBlock.get()->canInstatick(),
+        block.mLegacyBlock.get()->mBlockEntityType != BlockActorType::Undefined,
+        block.mLegacyBlock.get()->hasComparatorSignal()
+            ? std::to_string(block.mLegacyBlock.get()->getComparatorSignal(blockSource, blockPos, block, 0))
             : "-"
     );
 }
@@ -149,8 +149,8 @@ RepeaterCapacitor      = 2097156,       中继器，已包含在电容器中
                 component->isHalfPulse() ? "true" : "false",
                 component->mDirection,
                 // "magic_enum::enum_name(component->mDirection)",
-                block.mLegacyBlock->hasComparatorSignal()
-                    ? std::to_string(block.mLegacyBlock->getComparatorSignal(blockSource, pos, block, 0))
+                block.mLegacyBlock.get()->hasComparatorSignal()
+                    ? std::to_string(block.mLegacyBlock.get()->getComparatorSignal(blockSource, pos, block, 0))
                     : "-"
             ),
             true

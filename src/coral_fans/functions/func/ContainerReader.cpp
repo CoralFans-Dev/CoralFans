@@ -60,7 +60,7 @@ void registerContainerReader() {
             auto&       bs = ev.self().getDimension().getBlockSourceFromMainChunkSource();
             const auto& bl = bs.getBlock(ev.blockPos());
             auto*       ba = bs.getBlockEntity(ev.blockPos());
-            if (bl.mLegacyBlock->isContainerBlock() && ba) {
+            if (bl.isContainerBlock() && ba) {
                 auto type = ba->mType;
                 if (type == BlockActorType::Chest || type == BlockActorType::ShulkerBox) {
                     // chest or shulker_box, check if can be open

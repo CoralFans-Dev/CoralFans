@@ -2,7 +2,7 @@
 #include "coral_fans/base/Mod.h"
 #include "coral_fans/base/Utils.h"
 #include "coral_fans/functions/data/Data.h"
-#include "coral_fans/functions/hopperCounter/HopperCounter.h"
+#include "coral_fans/functions/func/FuncManager.h"
 
 #include "ll/api/base/StdInt.h"
 #include "ll/api/i18n/I18n.h"
@@ -125,7 +125,7 @@ void HudHelper::tick() {
                     if (hitrst.mType == HitResultType::Tile) {
                         const auto& bl = blockSource.getBlock(hitrst.mBlock);
                         auto*       ba = blockSource.getBlockEntity(hitrst.mBlock);
-                        if (bl.mLegacyBlock->isContainerBlock() && ba) {
+                        if (bl.isContainerBlock() && ba) {
                             auto* container = ba->getContainer();
                             if (container) {
                                 std::map<std::string, int> items;

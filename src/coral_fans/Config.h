@@ -12,20 +12,21 @@ struct CommandConfigStruct {
 };
 
 struct CommandStruct {
-    CommandConfigStruct tick      = {true, CommandPermissionLevel::GameDirectors};
-    CommandConfigStruct func      = {true, CommandPermissionLevel::GameDirectors};
-    CommandConfigStruct self      = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct hsa       = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct counter   = {true, CommandPermissionLevel::GameDirectors};
-    CommandConfigStruct prof      = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct slime     = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct village   = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct rotate    = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct data      = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct cfhud     = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct log       = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct calculate = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct minerule  = {true, CommandPermissionLevel::Admin};
+    CommandConfigStruct tick       = {true, CommandPermissionLevel::GameDirectors};
+    CommandConfigStruct func       = {true, CommandPermissionLevel::GameDirectors};
+    CommandConfigStruct self       = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct hsa        = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct counter    = {true, CommandPermissionLevel::GameDirectors};
+    CommandConfigStruct prof       = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct slime      = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct village    = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct rotate     = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct data       = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct cfhud      = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct log        = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct calculate  = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct minerule   = {true, CommandPermissionLevel::GameDirectors};
+    CommandConfigStruct freecamera = {true, CommandPermissionLevel::Any};
 };
 
 struct Shortcut {

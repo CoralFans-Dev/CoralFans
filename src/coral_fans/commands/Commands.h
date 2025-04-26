@@ -18,4 +18,5 @@ void registerCfhudCommand(CommandPermissionLevel);
 void registerLogCommand(CommandPermissionLevel);
 void registerCalculateCommand(CommandPermissionLevel);
 void registerMineruleCommand(CommandPermissionLevel);
+void registerFreeCameraCommand(CommandPermissionLevel);
 } // namespace coral_fans::commands

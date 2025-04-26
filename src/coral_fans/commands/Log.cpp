@@ -65,8 +65,8 @@ void registerLogCommand(CommandPermissionLevel permission) {
                         auto& blockTick = copiedQueue.top();
                         if (blockTick.mIsRemoved) {
                             output.success("command.log.success.pt.remove"_tr(
-                                blockTick.mData.pos.toString(),
-                                blockTick.mData.tick.tickID,
+                                blockTick.mData.pos->toString(),
+                                blockTick.mData.tick->tickID,
                                 blockTick.mData.priorityOffset,
                                 blockTick.mData.mBlock->getTypeName()
                             ));
@@ -77,8 +77,8 @@ void registerLogCommand(CommandPermissionLevel permission) {
                     for (; !copiedQueue.empty();) {
                         auto& blockTick = copiedQueue.top();
                         output.success("command.log.success.pt.info"_tr(
-                            blockTick.mData.pos.toString(),
-                            blockTick.mData.tick.tickID,
+                            blockTick.mData.pos->toString(),
+                            blockTick.mData.tick->tickID,
                             blockTick.mData.priorityOffset,
                             blockTick.mData.mBlock->getTypeName()
                         ));
@@ -111,8 +111,8 @@ void registerLogCommand(CommandPermissionLevel permission) {
                         auto& blockTick = copiedQueue.top();
                         if (blockTick.mIsRemoved) {
                             output.success("command.log.success.rpt.remove"_tr(
-                                blockTick.mData.pos.toString(),
-                                blockTick.mData.tick.tickID,
+                                blockTick.mData.pos->toString(),
+                                blockTick.mData.tick->tickID,
                                 blockTick.mData.priorityOffset,
                                 blockTick.mData.mBlock->getTypeName()
                             ));
@@ -123,8 +123,8 @@ void registerLogCommand(CommandPermissionLevel permission) {
                     for (; !copiedQueue.empty();) {
                         auto& blockTick = copiedQueue.top();
                         output.success("command.log.success.rpt.info"_tr(
-                            blockTick.mData.pos.toString(),
-                            blockTick.mData.tick.tickID,
+                            blockTick.mData.pos->toString(),
+                            blockTick.mData.tick->tickID,
                             blockTick.mData.priorityOffset,
                             blockTick.mData.mBlock->getTypeName()
                         ));

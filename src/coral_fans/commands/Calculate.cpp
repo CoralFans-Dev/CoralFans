@@ -50,7 +50,7 @@ void registerCalculateCommand(CommandPermissionLevel permission) {
                     auto& blockTick = copiedQueue.top();
                     if (blockTick.mIsRemoved) {
                         std::pair<unsigned long long, std::string> tem = {
-                            blockTick.mData.tick.tickID,
+                            blockTick.mData.tick->tickID,
                             blockTick.mData.mBlock->getTypeName()
                         };
                         auto it = cal.find(tem);
@@ -73,7 +73,7 @@ void registerCalculateCommand(CommandPermissionLevel permission) {
                 for (; !copiedQueue.empty();) {
                     auto&                                      blockTick = copiedQueue.top();
                     std::pair<unsigned long long, std::string> tem       = {
-                        blockTick.mData.tick.tickID,
+                        blockTick.mData.tick->tickID,
                         blockTick.mData.mBlock->getTypeName()
                     };
                     auto it = cal2.find(tem);

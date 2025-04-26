@@ -1,4 +1,3 @@
-#include "FuncHook.h"
 #include "coral_fans/base/Mod.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/nbt/CompoundTag.h"
@@ -20,7 +19,7 @@ LL_TYPE_INSTANCE_HOOK(
 ) {
     if (coral_fans::mod().getConfigDb()->get("functions.players." + this->getUuid().asString() + ".autototem")
         == "true") {
-        auto& inv  = *this->mInventory->mInventory;
+        auto& inv  = this->getInventory();
         int   size = inv.getContainerSize();
         for (int i = 0; i < size; i++) {
             const ItemStack& item = inv.getItem(i);

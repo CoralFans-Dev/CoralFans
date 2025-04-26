@@ -1,4 +1,3 @@
-#include "FuncHook.h"
 #include "coral_fans/base/Mod.h"
 #include "coral_fans/base/Utils.h"
 #include "ll/api/memory/Hook.h"
@@ -60,7 +59,7 @@ int searchBestToolInInv(Container& inv, int currentSlot, const Block* block, con
 namespace coral_fans::functions {
 
 LL_STATIC_HOOK(
-    CoralFansTweakersAutoToolHook1,
+    CoralFansAutoToolHook1,
     ll::memory::HookPriority::Normal,
     &ServerPlayerBlockUseHandler::onStartDestroyBlock,
     void,
@@ -76,8 +75,8 @@ LL_STATIC_HOOK(
                           .getConfigDb()
                           ->get(std::format("functions.players.{}.autotool.mindamage", player.getUuid().asString()))
                           .value_or("1"));
-        const Block& block = player.getDimensionBlockSourceConst().getBlock(pos);
-        int bestSlot = ::searchBestToolInInv(*player.mInventory->mInventory, currentSlot, &block, minDamage, false);
+        const Block& block    = player.getDimensionBlockSourceConst().getBlock(pos);
+        int          bestSlot = ::searchBestToolInInv(player.getInventory(), currentSlot, &block, minDamage, false);
         if (bestSlot <= 8) {
             player.setSelectedSlot(bestSlot);
         } else {
@@ -89,14 +88,14 @@ LL_STATIC_HOOK(
 }
 
 LL_TYPE_INSTANCE_HOOK(
-    CoralFansTweakersAutoToolHook2,
+    CoralFansAutoToolHook2,
     ll::memory::HookPriority::Normal,
     Player,
     &Player::_attack,
     bool,
-    Actor&                                         actor,
-    ::SharedTypes::Legacy::ActorDamageCause const& cause,
-    bool                                           doPredictiveSound
+    Actor&                  actor,
+    ActorDamageCause const& cause,
+    bool                    doPredictiveSound
 ) {
     if (coral_fans::mod().getConfigDb()->get(std::format("functions.players.{}.autotool", this->getUuid().asString()))
         == "true") {
@@ -106,7 +105,7 @@ LL_TYPE_INSTANCE_HOOK(
                           .getConfigDb()
                           ->get(std::format("functions.players.{}.autotool.mindamage", this->getUuid().asString()))
                           .value_or("1"));
-        int bestSlot = ::searchBestToolInInv(*this->mInventory->mInventory, currentSlot, nullptr, minDamage, true);
+        int bestSlot = ::searchBestToolInInv(this->getInventory(), currentSlot, nullptr, minDamage, true);
         if (bestSlot <= 8) {
             this->setSelectedSlot(bestSlot);
         } else {
@@ -117,13 +116,13 @@ LL_TYPE_INSTANCE_HOOK(
     return origin(actor, cause, doPredictiveSound);
 }
 
-void hookTweakersAutoTool(bool hook) {
+void hookAutoTool(bool hook) {
     if (hook) {
-        CoralFansTweakersAutoToolHook1::hook();
-        CoralFansTweakersAutoToolHook2::hook();
+        CoralFansAutoToolHook1::hook();
+        CoralFansAutoToolHook2::hook();
     } else {
-        CoralFansTweakersAutoToolHook1::unhook();
-        CoralFansTweakersAutoToolHook2::unhook();
+        CoralFansAutoToolHook1::unhook();
+        CoralFansAutoToolHook2::unhook();
     }
 }
 

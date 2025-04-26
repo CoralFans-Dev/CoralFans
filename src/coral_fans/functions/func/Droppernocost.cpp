@@ -1,4 +1,4 @@
-#include "coral_fans/functions/func/Droppernocost.h"
+#include "FuncManager.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/Container.h"
 #include "mc/world/item/FertilizerItem.h"
@@ -10,7 +10,7 @@ namespace coral_fans::functions {
 
 // droppernocost
 LL_TYPE_INSTANCE_HOOK(
-    CoralFansTweakersDropperNoCostHook,
+    CoralFansDropperNoCostHook,
     ll::memory::HookPriority::Normal,
     Container,
     &Container::$removeItem,
@@ -27,7 +27,7 @@ LL_TYPE_INSTANCE_HOOK(
 }
 
 LL_TYPE_INSTANCE_HOOK(
-    CoralFansTweakersDropperNoCostHook2,
+    CoralFansDropperNoCostHook2,
     ll::memory::HookPriority::Normal,
     Container,
     &Container::$addItemToFirstEmptySlot,
@@ -40,7 +40,7 @@ LL_TYPE_INSTANCE_HOOK(
 }
 
 LL_TYPE_INSTANCE_HOOK(
-    CoralFansTweakersDropperNoCostHook3,
+    CoralFansDropperNoCostHook3,
     ll::memory::HookPriority::Normal,
     FertilizerItem,
     &FertilizerItem ::$dispense,
@@ -56,7 +56,7 @@ LL_TYPE_INSTANCE_HOOK(
 }
 
 LL_TYPE_INSTANCE_HOOK(
-    CoralFansTweakersDropperNoCostHook4,
+    CoralFansDropperNoCostHook4,
     ll::memory::HookPriority::Normal,
     DispenserBlockActor,
     &DispenserBlockActor ::$setItem,
@@ -68,17 +68,17 @@ LL_TYPE_INSTANCE_HOOK(
     else FuncDropNoCostManager::getInstance().mutex2 = true;
 }
 
-void droppernocostHook(bool bl) {
+void FuncDropNoCostManager::droppernocostHook(bool bl) {
     if (bl) {
-        CoralFansTweakersDropperNoCostHook::hook();
-        CoralFansTweakersDropperNoCostHook2::hook();
-        CoralFansTweakersDropperNoCostHook3::hook();
-        CoralFansTweakersDropperNoCostHook4::hook();
+        CoralFansDropperNoCostHook::hook();
+        CoralFansDropperNoCostHook2::hook();
+        CoralFansDropperNoCostHook3::hook();
+        CoralFansDropperNoCostHook4::hook();
     } else {
-        CoralFansTweakersDropperNoCostHook::unhook();
-        CoralFansTweakersDropperNoCostHook2::unhook();
-        CoralFansTweakersDropperNoCostHook3::unhook();
-        CoralFansTweakersDropperNoCostHook4::unhook();
+        CoralFansDropperNoCostHook::unhook();
+        CoralFansDropperNoCostHook2::unhook();
+        CoralFansDropperNoCostHook3::unhook();
+        CoralFansDropperNoCostHook4::unhook();
     }
 }
 } // namespace coral_fans::functions

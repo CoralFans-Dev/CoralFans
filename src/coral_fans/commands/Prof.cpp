@@ -36,6 +36,8 @@ void registerProfCommand(CommandPermissionLevel permission) {
             coral_fans::mod().getProfiler().start(numberOfTick, type);
             output.success("command.prof.success"_tr());
         });
+
+    coral_fans::functions::hookTick(true);
 }
 
 } // namespace coral_fans::commands

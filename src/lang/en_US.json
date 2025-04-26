@@ -3,6 +3,11 @@
         "error": {
             "checkPlayer": "Only players can run this command"
         },
+        "freecamera": {
+            "description": "Enable or disable freecamera mode.",
+            "enabled": "Freecamera mode enabled.",
+            "disabled": "Freecamera mode disabled."
+        },
         "func": {
             "description": "Globally controls functions of CoralFans Mod",
             "forceopen": {
@@ -59,6 +64,10 @@
             "nopickup": {
                 "success": "globally set nopickup \"{}\"",
                 "error": "failed to globally set nopickup"
+            },
+            "portaldisabled": {
+                "success": "globally set portaldisabled \"{}\"",
+                "error": "failed to globally set portaldisabled"
             }
         },
         "self": {
@@ -94,6 +103,10 @@
             "nopickup": {
                 "success": "set nopickup \"{}\"",
                 "error": "failed to set nopickup"
+            },
+            "portaldisabled": {
+                "success": "set portaldisabled \"{}\"",
+                "error": "failed to set portaldisabled"
             }
         },
         "tick": {

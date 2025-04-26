@@ -1,7 +1,7 @@
 #include "coral_fans/base/Macros.h"
 #include "coral_fans/base/Mod.h"
 
-#include "coral_fans/functions/hopperCounter/HopperCounter.h"
+#include "coral_fans/functions/func/FuncManager.h"
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/command/runtime/ParamKind.h"
@@ -38,7 +38,7 @@ void registerCounterCommand(CommandPermissionLevel permission) {
             } else {
                 COMMAND_CHECK_PLAYER
                 auto hitrst = player->traceRay(5.25f, false, true, [](BlockSource const&, Block const& block, bool) {
-                    if (block.mLegacyBlock->mMaterial.mLiquid) return false;
+                    if (block.getMaterial().isLiquid()) return false;
                     return true;
                 });
                 if (!hitrst) return output.error("command.counter.print.error"_tr());
@@ -63,7 +63,7 @@ void registerCounterCommand(CommandPermissionLevel permission) {
             } else {
                 COMMAND_CHECK_PLAYER
                 auto hitrst = player->traceRay(5.25f, false, true, [](BlockSource const&, Block const& block, bool) {
-                    if (block.mLegacyBlock->mMaterial.mLiquid) return false;
+                    if (block.getMaterial().isLiquid()) return false;
                     return true;
                 });
                 if (!hitrst) return output.error("command.counter.print.error"_tr());

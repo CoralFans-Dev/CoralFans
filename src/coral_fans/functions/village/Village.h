@@ -1,7 +1,7 @@
 #pragma once
 
 #include "bsci/GeometryGroup.h"
-#include "mc/legacy/ActorUniqueID.h"
+#include "mc/common/ActorUniqueID.h"
 #include "mc/platform/UUID.h"
 #include "mc/world/actor/ai/village/Village.h"
 
@@ -41,8 +41,9 @@ public:
     void                         refreshCommandSoftEnum();
     std::pair<std::string, bool> getVillageInfo(std::string);
     std::pair<std::string, bool> getVillagerInfo(ActorUniqueID);
-};
 
+    static void hookVillage(bool);
+};
 } // namespace coral_fans::functions
 // #pragma once
 

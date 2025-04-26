@@ -86,14 +86,14 @@ void shortHighligntBlock(int dimid, BlockPos const& blockPos, mce::Color const& 
 
 void swapItemInContainer(Player* player, int slot1, int slot2) {
     if (player) {
-        auto&     container = player->mInventory;
+        auto&     container = player->getInventory();
         ItemStack i1, i2;
-        i1 = (slot1 == -1) ? player->getOffhandSlot() : container->mInventory->getItem(slot1);
-        i2 = (slot2 == -1) ? player->getOffhandSlot() : container->mInventory->getItem(slot2);
+        i1 = (slot1 == -1) ? player->getOffhandSlot() : container.getItem(slot1);
+        i2 = (slot2 == -1) ? player->getOffhandSlot() : container.getItem(slot2);
         if (slot1 == -1) player->setOffhandSlot(i2);
-        else container->mInventory->setItem(slot1, i2);
+        else container.setItem(slot1, i2);
         if (slot2 == -1) player->setOffhandSlot(i1);
-        else container->mInventory->setItem(slot2, i1);
+        else container.setItem(slot2, i1);
     }
 }
 } // namespace coral_fans::utils

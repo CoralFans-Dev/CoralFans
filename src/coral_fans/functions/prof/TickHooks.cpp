@@ -39,20 +39,19 @@ LL_TYPE_INSTANCE_HOOK(
     CoralFansTickLevelChunkTickHook,
     ll::memory::HookPriority::Normal,
     LevelChunk,
-    &LevelChunk::tickImpl,
+    &LevelChunk::tick,
     void,
-    BlockSource&            tickRegion,
-    Tick const&             tick,
-    ::std::function<void()> spawnerCallback
+    BlockSource& tickRegion,
+    Tick const&  tick
 ) {
     auto&      prof     = coral_fans::mod().getProfiler();
     const auto dimid    = tickRegion.getDimensionId();
     auto&      chunkPos = this->mPosition;
     if (prof.profiling) {
-        PROF_TIMER(chunk, { origin(tickRegion, tick, spawnerCallback); })
+        PROF_TIMER(chunk, { origin(tickRegion, tick); })
         prof.chunkInfo.totalTickTime += time_chunk;
         prof.chunkInfo.chunk_counter[static_cast<int>(dimid)][chunkPos].push_back(time_chunk);
-    } else origin(tickRegion, tick, spawnerCallback);
+    } else origin(tickRegion, tick);
 }
 
 // LevelChunk tickBlocks
@@ -99,7 +98,7 @@ LL_TYPE_INSTANCE_HOOK(
     int          max,
     bool         instaTick_
 ) {
-    max = std::stoi(coral_fans::mod().getConfigDb()->get("functions.global.maxpt").value_or(std::to_string(max)));
+    max        = coral_fans::functions::MaxPtManager::getInstance().maxpt;
     auto& prof = coral_fans::mod().getProfiler();
     if (prof.profiling) {
         bool res;
@@ -249,6 +248,8 @@ void hookTick(bool hook) {
         CoralFansTickLevelChunkTickHook::hook();
         CoralFansTickLevelChunkTickBlocksHook::hook();
         CoralFansTickLevelChunkTickBlockEntitiesHook::hook();
+        coral_fans::functions::MaxPtManager::getInstance().maxpt =
+            std::stoi(coral_fans::mod().getConfigDb()->get("functions.global.maxpt").value_or("100"));
         CoralFansTickBlockTickingQueueTickPendingTicksHook::hook();
         CoralFansTickDimensionTickHook::hook();
         CoralFansTickEntitySystemsTickHook::hook();

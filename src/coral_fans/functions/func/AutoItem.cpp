@@ -1,4 +1,3 @@
-#include "FuncHook.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/nbt/CompoundTag.h"
 #include "mc/world/Container.h"
@@ -26,7 +25,7 @@ LL_TYPE_INSTANCE_HOOK(
     std::string name = item.getTypeName();
     origin(item, itemUseMethod, consumeItem);
     if (item == ItemStack::EMPTY_ITEM()) {
-        Container& inv          = *this->mInventory->mInventory;
+        Container& inv          = this->getInventory();
         int        size         = inv.getContainerSize();
         int        selectedSlot = this->getSelectedItemSlot();
         for (int i = 0; i < size; i++) {

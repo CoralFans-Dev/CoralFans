@@ -3,7 +3,7 @@
 // #include "bsci/GeometryGroup.h"
 #include "coral_fans/Config.h"
 #include "coral_fans/CoralFans.h"
-#include "coral_fans/functions/hopperCounter/HopperCounter.h"
+#include "coral_fans/functions/func/FuncManager.h"
 #include "coral_fans/functions/hsa/Hsa.h"
 #include "coral_fans/functions/hud/Hud.h"
 #include "coral_fans/functions/prof/Prof.h"

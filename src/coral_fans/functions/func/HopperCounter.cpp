@@ -1,10 +1,9 @@
-#include "coral_fans/functions/hopperCounter/HopperCounter.h"
+#include "FuncManager.h"
 #include "coral_fans/base/Macros.h"
 #include "coral_fans/base/Mod.h"
 #include "coral_fans/base/Utils.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/memory/Hook.h"
-#include "ll/api/memory/Memory.h"
 #include "mc/world/item/ItemStack.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/Level.h"
@@ -91,7 +90,7 @@ int HopperCounterManager::getViewChannel(BlockSource& blockSource, HitResult hit
     const auto&                                          dest = blockSource.getBlock(hitrst.mBlock);
     std::unordered_map<std::string, int>::const_iterator it;
     if (utils::removeMinecraftPrefix(dest.getTypeName()) == "hopper") {
-        int      var            = dest.mLegacyBlock->getVariant(dest);
+        int      var            = dest.getVariant();
         BlockPos pos            = hitrst.mBlock;
         pos[(var / 2 + 1) % 3] += (var & 1) * 2 - 1;
         const auto& block       = blockSource.getBlock(pos);
@@ -132,9 +131,6 @@ LL_TYPE_INSTANCE_HOOK(
     int                slot,
     ::ItemStack const& item
 ) {
-    if (coral_fans::mod().getConfigDb()->get("functions.global.hoppercounter") != "true") {
-        HOOK_HOPPER_RETURN
-    }
     if (!HopperCounterManager::getInstance().mutex) {
         HOOK_HOPPER_RETURN
     }
@@ -142,7 +138,7 @@ LL_TYPE_INSTANCE_HOOK(
     // auto& blockActor = ll::memory::dAccess<BlockActor>(this, -200); // magic number!
     BlockPos     pos        = HopperCounterManager::getInstance().pos;
     const Block& block      = HopperCounterManager::getInstance().region->getBlock(pos);
-    int          var        = block.mLegacyBlock->getVariant(block);
+    int          var        = block.getVariant();
     pos[(var / 2 + 1) % 3] += (var & 1) * 2 - 1;
     auto& dest              = HopperCounterManager::getInstance().region->getBlock(pos);
     // get iterator

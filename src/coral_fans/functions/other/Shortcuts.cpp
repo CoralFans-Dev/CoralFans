@@ -110,7 +110,7 @@ void registerShortcutsListener() {
                             command = ll::string_utils::replaceAll(
                                 command,
                                 "{blockvariant}",
-                                std::to_string(event.block()->mLegacyBlock->getVariant(event.block()))
+                                std::to_string(event.block()->getVariant())
                             );
                             command =
                                 ll::string_utils::replaceAll(command, "{blockx}", std::to_string(event.blockPos().x));
