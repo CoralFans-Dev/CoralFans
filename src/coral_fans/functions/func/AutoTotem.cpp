@@ -1,4 +1,3 @@
-#include "FuncHook.h"
 #include "coral_fans/base/Mod.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/nbt/CompoundTag.h"

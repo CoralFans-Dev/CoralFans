@@ -41,8 +41,9 @@ public:
     void                         refreshCommandSoftEnum();
     std::pair<std::string, bool> getVillageInfo(std::string);
     std::pair<std::string, bool> getVillagerInfo(ActorUniqueID);
-};
 
+    static void hookVillage(bool);
+};
 } // namespace coral_fans::functions
 // #pragma once
 

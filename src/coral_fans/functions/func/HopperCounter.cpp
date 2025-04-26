@@ -1,10 +1,9 @@
-#include "coral_fans/functions/hopperCounter/HopperCounter.h"
+#include "FuncManager.h"
 #include "coral_fans/base/Macros.h"
 #include "coral_fans/base/Mod.h"
 #include "coral_fans/base/Utils.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/memory/Hook.h"
-#include "ll/api/memory/Memory.h"
 #include "mc/world/item/ItemStack.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/Level.h"
@@ -132,9 +131,6 @@ LL_TYPE_INSTANCE_HOOK(
     int                slot,
     ::ItemStack const& item
 ) {
-    if (coral_fans::mod().getConfigDb()->get("functions.global.hoppercounter") != "true") {
-        HOOK_HOPPER_RETURN
-    }
     if (!HopperCounterManager::getInstance().mutex) {
         HOOK_HOPPER_RETURN
     }

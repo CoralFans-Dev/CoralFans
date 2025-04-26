@@ -3,6 +3,11 @@
         "error": {
             "checkPlayer": "当前指令仅玩家可执行"
         },
+        "freecamera": {
+            "description": "开启或关闭自由视角模式。",
+            "enabled": "自由视角模式已启用。",
+            "disabled": "自由视角模式已禁用。"
+        },
         "func": {
             "description": "全局控制CoralFans Mod的功能",
             "forceopen": {
@@ -59,6 +64,10 @@
             "nopickup": {
                 "success": "全局设置 nopickup \"{}\"",
                 "error": "全局设置 nopickup 失败"
+            },
+            "portaldisabled": {
+                "success": "全局设置 portaldisabled \"{}\"",
+                "error": "全局设置 portaldisabled 失败"
             }
         },
         "self": {
@@ -94,6 +103,10 @@
             "nopickup": {
                 "success": "设置 nopickup \"{}\"",
                 "error": "设置 nopickup 失败"
+            },
+            "portaldisabled": {
+                "success": "设置 portaldisabled \"{}\"",
+                "error": "设置 portaldisabled 失败"
             }
         },
         "tick": {

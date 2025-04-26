@@ -11,8 +11,7 @@
 #include "coral_fans/base/Mod.h"
 #include "coral_fans/base/MySchedule.h"
 #include "coral_fans/commands/Commands.h"
-#include "coral_fans/functions/func/ContainerReader.h"
-#include "coral_fans/functions/other/HookRegister.h"
+#include "coral_fans/functions/func/FuncManager.h"
 #include "coral_fans/functions/other/Shortcuts.h"
 
 
@@ -63,9 +62,6 @@ bool CoralFans::enable() {
     logger.debug("Enabling...");
     auto& mod = coral_fans::mod();
 
-    // register hooks
-    functions::hookAll(true);
-
     // register commands
     commands::registerCoralfansCommand();
     if (mod.getConfig().command.tick.enabled) commands::registerTickCommand(mod.getConfig().command.tick.permission);
@@ -84,10 +80,11 @@ bool CoralFans::enable() {
     if (mod.getConfig().command.cfhud.enabled) commands::registerCfhudCommand(mod.getConfig().command.cfhud.permission);
     if (mod.getConfig().command.log.enabled) commands::registerLogCommand(mod.getConfig().command.log.permission);
     if (mod.getConfig().command.calculate.enabled)
-        commands::registerCalculateCommand(mod.getConfig().command.log.permission);
+        commands::registerCalculateCommand(mod.getConfig().command.calculate.permission);
     if (mod.getConfig().command.minerule.enabled)
-        commands::registerMineruleCommand(mod.getConfig().command.log.permission);
-
+        commands::registerMineruleCommand(mod.getConfig().command.minerule.permission);
+    if (mod.getConfig().command.freecamera.enabled)
+        commands::registerFreeCameraCommand(mod.getConfig().command.freecamera.permission);
     // register shortcuts
     functions::registerShortcutsListener();
     functions::registerShortcutsCommand();
@@ -105,15 +102,8 @@ bool CoralFans::disable() {
     getSelf().getLogger().debug("Disabling...");
     auto& mod = coral_fans::mod();
 
-    // remove listeners
-    for (const auto& listener : mod.getEventListeners()) mod.getEventBus().removeListener(listener);
-
-    // remove hooks
-    functions::hookAll(false);
-
-    // remove tasks
-    my_schedule::MySchedule::getSchedule();
-
+    // // remove listeners
+    // for (const auto& listener : mod.getEventListeners()) mod.getEventBus().removeListener(listener);
     return true;
 }
 

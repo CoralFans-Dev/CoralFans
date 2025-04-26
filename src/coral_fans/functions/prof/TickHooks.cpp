@@ -99,7 +99,7 @@ LL_TYPE_INSTANCE_HOOK(
     int          max,
     bool         instaTick_
 ) {
-    max = std::stoi(coral_fans::mod().getConfigDb()->get("functions.global.maxpt").value_or(std::to_string(max)));
+    max        = coral_fans::functions::MaxPtManager::getInstance().maxpt;
     auto& prof = coral_fans::mod().getProfiler();
     if (prof.profiling) {
         bool res;
@@ -249,6 +249,8 @@ void hookTick(bool hook) {
         CoralFansTickLevelChunkTickHook::hook();
         CoralFansTickLevelChunkTickBlocksHook::hook();
         CoralFansTickLevelChunkTickBlockEntitiesHook::hook();
+        coral_fans::functions::MaxPtManager::getInstance().maxpt =
+            std::stoi(coral_fans::mod().getConfigDb()->get("functions.global.maxpt").value_or("100"));
         CoralFansTickBlockTickingQueueTickPendingTicksHook::hook();
         CoralFansTickDimensionTickHook::hook();
         CoralFansTickEntitySystemsTickHook::hook();

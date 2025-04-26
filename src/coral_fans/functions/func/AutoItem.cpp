@@ -1,4 +1,3 @@
-#include "FuncHook.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/nbt/CompoundTag.h"
 #include "mc/world/Container.h"
