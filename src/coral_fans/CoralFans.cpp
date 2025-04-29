@@ -100,7 +100,7 @@ bool CoralFans::enable() {
 
 bool CoralFans::disable() {
     getSelf().getLogger().debug("Disabling...");
-    auto& mod = coral_fans::mod();
+    // auto& mod = coral_fans::mod();
 
     // // remove listeners
     // for (const auto& listener : mod.getEventListeners()) mod.getEventBus().removeListener(listener);
