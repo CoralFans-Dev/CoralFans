@@ -31,9 +31,10 @@ void registerSelfCommand(CommandPermissionLevel permission) {
             if (coral_fans::mod().getConfigDb()->set(
                     std::format("functions.players.{}.noclip", player->getUuid().asString()),
                     (isopen & global) ? "true" : "false"
-                ))
+                )) {
                 output.success("command.self.noclip.success"_tr((isopen & global) ? "true" : "false"));
-            else output.error("command.self.noclip.error"_tr());
+                player->setAbility(::AbilitiesIndex::NoClip, isopen);
+            } else output.error("command.self.noclip.error"_tr());
         });
 
     // self autotool <bool>
@@ -146,6 +147,22 @@ void registerSelfCommand(CommandPermissionLevel permission) {
                 ))
                 output.success("command.self.nopickup.success"_tr((isopen & global) ? "true" : "false"));
             else output.error("command.self.nopickup.error"_tr());
+        });
+
+    // self portaldisabled <bool>
+    selfCommand.runtimeOverload()
+        .text("portaldisabled")
+        .required("isopen", ll::command::ParamKind::Bool)
+        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            COMMAND_CHECK_PLAYER
+            bool       isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
+            const auto global = coral_fans::mod().getConfigDb()->get("functions.global.portaldisabled") == "true";
+            if (coral_fans::mod().getConfigDb()->set(
+                    std::format("functions.players.{}.portaldisabled", player->getUuid().asString()),
+                    (isopen & global) ? "true" : "false"
+                ))
+                output.success("command.self.portaldisabled.success"_tr((isopen & global) ? "true" : "false"));
+            else output.error("command.self.portaldisabled.error"_tr());
         });
 }
 } // namespace coral_fans::commands

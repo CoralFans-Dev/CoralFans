@@ -336,7 +336,7 @@ LL_TYPE_INSTANCE_HOOK(
     origin(village);
 }
 
-void hookVillage(bool hook) {
+void CFVillageManager::hookVillage(bool hook) {
     if (hook) {
         CoralFansVillageTickHook::hook();
         CoralFansVillageRemoveHook::hook();
@@ -345,5 +345,4 @@ void hookVillage(bool hook) {
         CoralFansVillageRemoveHook::unhook();
     }
 }
-
 } // namespace coral_fans::functions

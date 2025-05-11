@@ -109,4 +109,5 @@ struct Profiler {
     void        stop();
 };
 
+void hookTick(bool);
 } // namespace coral_fans::functions

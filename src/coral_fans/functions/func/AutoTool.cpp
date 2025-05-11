@@ -1,4 +1,3 @@
-#include "FuncHook.h"
 #include "coral_fans/base/Mod.h"
 #include "coral_fans/base/Utils.h"
 #include "ll/api/memory/Hook.h"
@@ -60,7 +59,7 @@ int searchBestToolInInv(Container& inv, int currentSlot, const Block* block, con
 namespace coral_fans::functions {
 
 LL_STATIC_HOOK(
-    CoralFansTweakersAutoToolHook1,
+    CoralFansAutoToolHook1,
     ll::memory::HookPriority::Normal,
     &ServerPlayerBlockUseHandler::onStartDestroyBlock,
     void,
@@ -89,7 +88,7 @@ LL_STATIC_HOOK(
 }
 
 LL_TYPE_INSTANCE_HOOK(
-    CoralFansTweakersAutoToolHook2,
+    CoralFansAutoToolHook2,
     ll::memory::HookPriority::Normal,
     Player,
     &Player::_attack,
@@ -117,13 +116,13 @@ LL_TYPE_INSTANCE_HOOK(
     return origin(actor, cause, doPredictiveSound);
 }
 
-void hookTweakersAutoTool(bool hook) {
+void hookAutoTool(bool hook) {
     if (hook) {
-        CoralFansTweakersAutoToolHook1::hook();
-        CoralFansTweakersAutoToolHook2::hook();
+        CoralFansAutoToolHook1::hook();
+        CoralFansAutoToolHook2::hook();
     } else {
-        CoralFansTweakersAutoToolHook1::unhook();
-        CoralFansTweakersAutoToolHook2::unhook();
+        CoralFansAutoToolHook1::unhook();
+        CoralFansAutoToolHook2::unhook();
     }
 }
 

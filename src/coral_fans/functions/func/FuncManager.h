@@ -1,5 +1,4 @@
 #pragma once
-
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/phys/HitResult.h"
 #include <map>
@@ -8,6 +7,31 @@
 #include <vector>
 
 namespace coral_fans::functions {
+
+// void registerAutoItemListener();
+void autoItemHook(bool);
+void autoTotemHook(bool);
+void hookAutoTool(bool);
+void registerContainerReader();
+void forceOpenHook(bool);
+void forcePlaceHook(uint64);
+void safeExplodeHook(bool);
+void hookFunctionsHopperCounter(bool);
+void fastDropHook(bool);
+void noPickUpHook(bool);
+void portalDisabledHook(bool);
+
+class FuncDropNoCostManager {
+public:
+    int  _slot, _count;
+    bool mutex = false, mutex2 = true;
+
+    static FuncDropNoCostManager& getInstance() {
+        static FuncDropNoCostManager instance;
+        return instance;
+    }
+    static void droppernocostHook(bool);
+};
 
 class HopperCounterChannel {
 private:
@@ -52,4 +76,12 @@ public:
     }
 };
 
+class MaxPtManager {
+public:
+    int                  maxpt;
+    static MaxPtManager& getInstance() {
+        static MaxPtManager instance;
+        return instance;
+    }
+};
 } // namespace coral_fans::functions

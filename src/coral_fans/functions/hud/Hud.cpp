@@ -2,7 +2,7 @@
 #include "coral_fans/base/Mod.h"
 #include "coral_fans/base/Utils.h"
 #include "coral_fans/functions/data/Data.h"
-#include "coral_fans/functions/hopperCounter/HopperCounter.h"
+#include "coral_fans/functions/func/FuncManager.h"
 
 #include "ll/api/base/StdInt.h"
 #include "ll/api/i18n/I18n.h"

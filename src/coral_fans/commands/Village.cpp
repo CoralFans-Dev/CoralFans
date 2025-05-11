@@ -1,3 +1,4 @@
+#include "coral_fans/functions/village/Village.h"
 #include "coral_fans/base/Macros.h"
 #include "coral_fans/base/Mod.h"
 #include "ll/api/command/CommandHandle.h"
@@ -98,6 +99,8 @@ void registerVillageCommand(CommandPermissionLevel permission) {
             else return output.error(rst.first);
         }
     });
+
+    coral_fans::functions::CFVillageManager::hookVillage(true);
 }
 
 } // namespace coral_fans::commands
