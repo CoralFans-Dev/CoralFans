@@ -1,3 +1,4 @@
+#include "coral_fans/functions/village/Village.h"
 #include "coral_fans/base/Macros.h"
 #include "coral_fans/base/Mod.h"
 #include "ll/api/command/CommandHandle.h"
@@ -21,25 +22,23 @@ void registerVillageCommand(CommandPermissionLevel permission) {
                                .getOrCreateCommand("village", "command.village.description"_tr(), permission);
 
     // village show <bounds|raid|spawn|center|poi|bind> <bool>
-    ll::command::CommandRegistrar::getInstance().tryRegisterEnum(
+    ll::command::CommandRegistrar::getInstance().tryRegisterRuntimeEnum(
         "villageShowType",
         {
             {"bounds", 0},
-            {"raid", 1},
-            {"spawn", 2},
+            {"raid",   1},
+            {"spawn",  2},
             {"center", 3},
-            {"poi", 4},
-            {"bind", 5}
-        },
-        Bedrock::type_id<CommandRegistry, std::pair<std::string,uint64>>(),
-        &CommandRegistry::parse<std::pair<std::string,uint64>>
+            {"poi",    4},
+            {"bind",   5}
+    }
     );
     villageCommand.runtimeOverload()
         .text("show")
         .required("type", ll::command::ParamKind::Enum, "villageShowType")
         .required("enable", ll::command::ParamKind::Bool)
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
-            switch (self["type"].get<ll::command::ParamKind::Enum>().second) {
+            switch (self["type"].get<ll::command::ParamKind::Enum>().index) {
             case 0:
                 coral_fans::mod().getVillageManager().setShowBounds(self["enable"].get<ll::command::ParamKind::Bool>());
                 break;
@@ -64,7 +63,7 @@ void registerVillageCommand(CommandPermissionLevel permission) {
                 break;
             }
             output.success("command.village.show.output"_tr(
-                self["type"].get<ll::command::ParamKind::Enum>().first,
+                self["type"].get<ll::command::ParamKind::Enum>().name,
                 self["enable"].get<ll::command::ParamKind::Bool>() ? "true" : "false"
             ));
         });
@@ -100,6 +99,8 @@ void registerVillageCommand(CommandPermissionLevel permission) {
             else return output.error(rst.first);
         }
     });
+
+    coral_fans::functions::CFVillageManager::hookVillage(true);
 }
 
 } // namespace coral_fans::commands

@@ -23,5 +23,4 @@ void registerCoralfansCommand() {
 #endif
     });
 }
-
 } // namespace coral_fans::commands

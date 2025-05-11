@@ -1,5 +1,13 @@
 {
     "command": {
+        "error": {
+            "checkPlayer": "当前指令仅玩家可执行"
+        },
+        "freecamera": {
+            "description": "开启或关闭自由视角模式。",
+            "enabled": "自由视角模式已启用。",
+            "disabled": "自由视角模式已禁用。"
+        },
         "func": {
             "description": "全局控制CoralFans Mod的功能",
             "forceopen": {
@@ -56,6 +64,10 @@
             "nopickup": {
                 "success": "全局设置 nopickup \"{}\"",
                 "error": "全局设置 nopickup 失败"
+            },
+            "portaldisabled": {
+                "success": "全局设置 portaldisabled \"{}\"",
+                "error": "全局设置 portaldisabled 失败"
             }
         },
         "self": {
@@ -91,6 +103,10 @@
             "nopickup": {
                 "success": "设置 nopickup \"{}\"",
                 "error": "设置 nopickup 失败"
+            },
+            "portaldisabled": {
+                "success": "设置 portaldisabled \"{}\"",
+                "error": "设置 portaldisabled 失败"
             }
         },
         "tick": {
@@ -167,14 +183,58 @@
             "description": "打印信息",
             "error": {
                 "nulllevel": "空的Level值",
-                "nopt": "无计划刻"
+                "nopt": "当前区块无计划刻",
+                "norpt": "当前区块无随机计划刻"
             },
             "success": {
                 "pt": {
                     "title": "[{}] 区块 {} 有 {} 个计划刻 ->",
-                    "remove": " {}: 删除",
-                    "info": " {}: tick time {}, 优先级 {}, {}"
+                    "remove": " 移除 {}: 目标游戏刻 {}, 优先级 {}, {}",
+                    "info": " {}: 目标游戏刻 {}, 优先级 {}, {}"
+                },
+                "rpt": {
+                    "title": "[{}] 区块 {} 有 {} 个随机计划刻 ->",
+                    "remove": " 移除 {}: 随机计划刻 {}, 优先级 {}, {}",
+                    "info": " {}: 随机计划刻 {}, 优先级 {}, {}"
                 }
+            }
+        },
+        "calculate": {
+            "description": "统计信息",
+            "error": {
+                "nopt": "当前区块无计划刻"
+            },
+            "success": {
+                "pt": {
+                    "title": "[{}] 区块 {} 有 {} 个计划刻 ->",
+                    "remove": " 移除 {}: 目标游戏刻 {}, 数量 {}",
+                    "info": " {}: 目标游戏刻 {}, 数量 {}"
+                }
+            }
+        },
+        "minerule": {
+            "description": "我的规矩就是规矩",
+            "bedrockDrop": {
+                "success": {
+                    "true": "基岩版没有基岩，就像ojng没有ma\n恭喜你打开了基岩掉落功能",
+                    "false": "成功关闭基岩掉落功能"
+                },
+                "error": "设置 bedrockDrop 失败"
+            },
+            "movingBlockDrop": {
+                "success": {
+                    "true": "成功开启mb掉落功能",
+                    "false": "成功关闭mb掉落功能"
+                },
+                "error": "设置 movingBlockDrop 失败"
+            },
+            "replicated_portal_sand_farm": {
+                "success": "设置 replicated_portal_sand_farm \"{}\"",
+                "error": "设置 replicated_portal_sand_farm 失败"
+            },
+            "remove_portal_pigzombie_cd": {
+                "success": "设置 remove_portal_pigzombie_cd \"{}\"",
+                "error": "设置 remove_portal_pigzombie_cd 失败"
             }
         }
     },
@@ -198,7 +258,12 @@
         },
         "village": {
             "cannotget": "无法获取村庄信息",
-            "info": "VID: {}\nUUID: {}\n- 中心: {}\n- 边界: [{}, {}]\n- 半径: {}\n- 居民: {} / {} / {} / {}\n兴趣点: [床, 钟, 工作方块] (§a坐标§r, §b所有者数量§r, §d最大容量§r, §e半径§r, 权重)\n"
+            "info": "VID: {}\nUUID: {}\n- 中心: {}\n- 边界: [{}, {}]\n- 半径: {}\n- 居民: {} / {} / {} / {}\n村民列表：\n",
+            "villagerInfo": "[{}] 村民坐标：{}\n  POI：\n",
+            "villagerPOIType1": "    床：       ",
+            "villagerPOIType2": "    钟：       ",
+            "villagerPOIType3": "    工作方块： ",
+            "villagerPOIInfo": "坐标：{} 所有者数量：{} 最大容量：{} 半径：{} 权重：{}\n"
         },
         "containerreader": {
             "null": "容器为空",
@@ -206,7 +271,7 @@
         },
         "data": {
             "info": {
-                "block": "- §b位置: §a{}§r\n- §b名称: §a{}§r\n- §b类型名: §a{}§r\n- §bID: §a{}§r\n- §bRTID: §a{}§r\n- §b特殊值: §a{}§r\n- §bCanInstanceTick: §a{}§r\n- §bHasBlockEntity: §a{}§r\n- §bIsSolid: §a{}§r\n- §b比较器输出: §a{}§r\n- §b材质:§r\n - §bMotion: §a{}§r\n - §bTopSolid: §a{}§r\n - §bIsSolid: §a{}§r\n - §bIsSolidBlocking: §a{}§r\n - §bTranslucency: §a{}§r",
+                "block": "- §b位置: §a{}§r\n- §b名称: §a{}§r\n- §b类型名: §a{}§r\n- §bID: §a{}§r\n- §b特殊值: §a{}§r\n- §bCanInstanceTick: §a{}§r\n- §bHasBlockEntity: §a{}§r\n- §b比较器输出: §a{}§r\n",
                 "entity": "- §bNameTag: §a{}§r\n- §bTypeName: §a{}§r\n- §bUID: §a{}§r\n- §bPos: §a{}§r\n- §bDeltaPos: §a{}§r\n- §bAABB: §a{}§r\n- §bSurface: §a{}§r\n",
                 "redstone": {
                     "signal": {

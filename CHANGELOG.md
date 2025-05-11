@@ -5,6 +5,61 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.1] - 2025-4-22
+
+### Added
+
++ Add command FreeCamera (Thanks for GroupMountain)
++ Add command func/self PortalDisabled
+
+### Fixed
+
++ Fix a bug about the permission level of commmand minerule
+
+## [2.2.0] - 2025-3-7
+
+### Added
+
++ Adapted to 1.21.60
+
+### Fixed
+
++ Fix a bug that the village function may crash BDS when village is removed
+
+### Removed
+
++ Remove command tick query
+
+## [2.1.1] - 2025-4-20
+
+### Added
+
++ Add command FreeCamera (Thanks for GroupMountain)
++ Add command func/self PortalDisabled
+
+### Fixed
+
++ Fix a bug that the village function may crash BDS when village is removed
++ Fix a bug about the permission level of commmand minerule
+
+## [2.1.0] - 2025-2-25
+
+### Added
+
++ Adapted to 1.21.50
++ Added minerule command.
++ Added calculate command.
++ Added log rpt command.
+
+### Changed
+
++ Thanks for Mojang, now hsa command only show the top side of Hsa.
+
+### Fixed
+
++ Fix a bug that may cause lse not work correct.
++ Fix a bug when set tick rate repeatly.
+
 ## [2.0.0] - 2024-10-12
 
 ### Added

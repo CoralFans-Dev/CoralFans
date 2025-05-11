@@ -1,3 +1,4 @@
+#include "coral_fans/base/MySchedule.h"
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/command/runtime/ParamKind.h"
@@ -5,12 +6,12 @@
 #include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/service/Bedrock.h"
-// #include "mc/network/packet/LevelEventPacket.h"
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/server/commands/CommandPermissionLevel.h"
-#include "mc/util/ProfilerLite.h"
+#include "mc/server/commands/CommandRegistry.h"
 #include "mc/util/Timer.h"
 #include "mc/world/Minecraft.h"
+
 
 namespace coral_fans::commands {
 void registerTickCommand(CommandPermissionLevel permission) {
@@ -20,31 +21,20 @@ void registerTickCommand(CommandPermissionLevel permission) {
     auto& tickCommand = ll::command::CommandRegistrar::getInstance()
                             .getOrCreateCommand("tick", "command.tick.description"_tr(), permission);
 
-    // tick query
-    tickCommand.overload().text("query").execute([](CommandOrigin const&, CommandOutput& output) {
-        output.success(
-            "command.tick.query.output"_tr(std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(
-                ProfilerLite::gProfilerLiteInstance.getServerTickTime()
-            ))
-        );
-    });
-
     // tick freeze|reset
-    ll::command::CommandRegistrar::getInstance().tryRegisterEnum(
+    ll::command::CommandRegistrar::getInstance().tryRegisterRuntimeEnum(
         "tickFreezeType",
         {
-            {"reset", 0},
+            {"reset",  0},
             {"freeze", 1}
-        },
-        Bedrock::type_id<CommandRegistry, std::pair<std::string,uint64>>(),
-        &CommandRegistry::parse<std::pair<std::string,uint64>>
+    }
     );
     tickCommand.runtimeOverload()
         .required("tickFreezeType", ll::command::ParamKind::Enum, "tickFreezeType")
         .execute([&](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             bool       pause = false;
             const auto val   = self["tickFreezeType"].get<ll::command::ParamKind::Enum>();
-            switch (val.second) {
+            switch (val.index) {
             case 1:
                 pause = true;
                 break;
@@ -55,7 +45,7 @@ void registerTickCommand(CommandPermissionLevel permission) {
             // LevelEventPacket{LevelEvent::SimTimeStep, origin.getWorldPosition(), pause}.sendToClients();
             auto mc = ll::service::getMinecraft();
             if (mc.has_value()) mc->setSimTimePause(pause);
-            output.success("command.tick.set.output"_tr(val.first));
+            output.success("command.tick.set.output"_tr(val.name));
         });
 
     // tick rate <float>
@@ -67,49 +57,23 @@ void registerTickCommand(CommandPermissionLevel permission) {
             if (rate < 0) output.error("command.tick.rate.error"_tr());
             // LevelEventPacket{LevelEvent::SimTimeScale, {rate / 20}, rate > 0}.sendToClients();
             auto mc = ll::service::getMinecraft();
+
+            mc->setSimTimePause(false);
             if (mc.has_value()) mc->setSimTimeScale(rate / 20.0f);
             output.success("command.tick.rate.success"_tr(rate));
         });
 
-    // tick step <int>
-    static auto stepFn = [](CommandOutput& output, int tick) {
-        if (!::Command::validRange(tick, 0, INT_MAX, output)) {
-            return;
-        }
-        auto mc = ll::service::getMinecraft();
-        if (mc.has_value()) {
-            // Minecraft.mSimTimer
-            auto* timer = ll::memory::dAccess<Timer*>(mc.as_ptr(), 0xD8); // this+0xd8
-            timer->stepTick(tick);
-        }
-        output.success("command.tick.step.output"_tr(tick));
-    };
     tickCommand.runtimeOverload()
         .text("step")
         .required("time", ll::command::ParamKind::Int)
         .execute([&](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
-            stepFn(output, self["time"].get<ll::command::ParamKind::Int>());
-        });
-    tickCommand.runtimeOverload()
-        .text("step")
-        .required("time", ll::command::ParamKind::Int)
-        .postfix("t")
-        .execute([&](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
-            stepFn(output, self["time"].get<ll::command::ParamKind::Int>());
-        });
-    tickCommand.runtimeOverload()
-        .text("step")
-        .required("time", ll::command::ParamKind::Int)
-        .postfix("s")
-        .execute([&](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
-            stepFn(output, self["time"].get<ll::command::ParamKind::Int>() * 20);
-        });
-    tickCommand.runtimeOverload()
-        .text("step")
-        .required("time", ll::command::ParamKind::Int)
-        .postfix("d")
-        .execute([&](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
-            stepFn(output, self["time"].get<ll::command::ParamKind::Int>() * 24000);
+            int tick = self["time"].get<ll::command::ParamKind::Int>();
+            if (!::Command::validRange(tick, 0, INT_MAX, output)) {
+                return;
+            }
+            auto mc = ll::service::getMinecraft();
+            if (mc.has_value()) mc->mSimTimer.mSteppingTick = tick;
+            output.success("command.tick.step.output"_tr(tick));
         });
 }
 } // namespace coral_fans::commands

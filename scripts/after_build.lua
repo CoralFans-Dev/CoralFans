@@ -103,8 +103,10 @@ function pack_mod(target,mod_define)
         end
 
         -- Copy i18n files.
-        local langfile = path.join(os.projectdir(), "src", "lang")
-        os.cp(langfile, path.join(outputdir, "lang"))
+        local orilangfile = path.join(os.projectdir(), "src", "lang")
+        local langfile = path.join(outputdir, "lang")
+        os.rm(langfile)
+        os.cp(orilangfile, langfile)
 
         formattedmanifest = string_formatter(manifest, mod_define)
         io.writefile(manifestfile,formattedmanifest)

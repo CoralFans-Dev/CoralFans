@@ -7,10 +7,16 @@ add_repositories("coralfansdev-repo https://github.com/CoralFans-Dev/xmake-repo.
 -- add_requires("levilamina x.x.x") for a specific version
 -- add_requires("levilamina develop") to use develop version
 -- please note that you should add bdslibrary yourself if using dev version
+-- if is_config("target_type", "server") then
+--     add_requires("levilamina 1.0.0-rc.1", {configs = {target_type = "server"}})
+-- else
+--     add_requires("levilamina 1.0.0-rc.1", {configs = {target_type = "client"}})
+-- end
+
 add_requires(
-    "levilamina",
-    "bsci",
-    "timewheel"
+    "levilamina 1.1.1", {configs = {target_type = "server"}},
+    "levibuildscript",
+    "bsci main"
 )
 
 if not has_config("vs_runtime") then
@@ -18,6 +24,7 @@ if not has_config("vs_runtime") then
 end
 
 target("CoralFans") -- Change this to your mod name.
+    add_rules("@levibuildscript/linkrule")
     add_cxflags(
         "/EHa",
         "/utf-8",
@@ -36,8 +43,7 @@ target("CoralFans") -- Change this to your mod name.
     add_includedirs("src")
     add_packages(
         "levilamina",
-        "bsci",
-        "timewheel"
+        "bsci"
     )
     add_shflags("/DELAYLOAD:bedrock_server.dll") -- To use symbols provided by SymbolProvider.
     set_exceptions("none") -- To avoid conflicts with /EHa.

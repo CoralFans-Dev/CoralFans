@@ -11,16 +11,16 @@ jobs:
 
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
-          xmake-version: "2.9.3"
+          xmake-version: "2.9.8"
 
       - run: |
           xmake repo -u
 
       - run: |
-          xmake f -a x64 -m release -p windows -y
+          xmake f -a x64 -m release -p windows -v -y
 
       - run: |
-          xmake -w -y
+          xmake -v -y
 
       - uses: actions/upload-artifact@v4
         with:

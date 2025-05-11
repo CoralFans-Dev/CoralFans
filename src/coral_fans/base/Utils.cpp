@@ -1,21 +1,18 @@
 #pragma once
 
 #include "coral_fans/base/Mod.h"
-
+#include "coral_fans/base/MySchedule.h"
 #include "ll/api/i18n/I18n.h"
-#include "mc/deps/core/mce/Color.h"
-#include "mc/nbt/ByteTag.h"
 #include "mc/nbt/CompoundTag.h"
 #include "mc/nbt/CompoundTagVariant.h"
 #include "mc/nbt/ListTag.h"
-#include "mc/nbt/StringTag.h"
 #include "mc/world/Container.h"
+#include "mc/world/actor/player/Inventory.h"
 #include "mc/world/actor/player/Player.h"
+#include "mc/world/actor/player/PlayerInventory.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/ChunkPos.h"
-
 #include <memory>
-#include <optional>
 #include <string>
 
 namespace coral_fans::utils {
@@ -83,51 +80,20 @@ std::string removeMinecraftPrefix(std::string const& s) { return s.find("minecra
 
 void shortHighligntBlock(int dimid, BlockPos const& blockPos, mce::Color const& color, int time) {
     auto& mod = coral_fans::mod();
-    auto  s   = mod.getGeometryGroup()->box(dimid, {blockPos, blockPos + BlockPos::ONE}, color);
-    mod.getScheduler().add(time, [&, s](unsigned long long) {
-        mod.getGeometryGroup()->remove(s);
-        return false;
-    });
+    auto  s   = mod.getGeometryGroup()->box(dimid, {blockPos, blockPos + BlockPos::ONE()}, color);
+    my_schedule::MySchedule::getSchedule().add(time, [&, s]() { mod.getGeometryGroup()->remove(s); });
 }
 
 void swapItemInContainer(Player* player, int slot1, int slot2) {
     if (player) {
-        auto&     container = player->getInventory();
+        auto&     container = player->mInventory;
         ItemStack i1, i2;
-        i1 = (slot1 == -1) ? player->getOffhandSlot().clone() : container.getItem(slot1).clone();
-        i2 = (slot2 == -1) ? player->getOffhandSlot().clone() : container.getItem(slot2).clone();
+        i1 = (slot1 == -1) ? player->getOffhandSlot() : container->mInventory->getItem(slot1);
+        i2 = (slot2 == -1) ? player->getOffhandSlot() : container->mInventory->getItem(slot2);
         if (slot1 == -1) player->setOffhandSlot(i2);
-        else container.setItem(slot1, i2);
+        else container->mInventory->setItem(slot1, i2);
         if (slot2 == -1) player->setOffhandSlot(i1);
-        else container.setItem(slot2, i1);
+        else container->mInventory->setItem(slot2, i1);
     }
 }
-
-std::optional<std::pair<CompoundTag, CompoundTag>>
-getItemFromShulkerBox(std::unique_ptr<CompoundTag> tag, ItemStack const& itemStack, bool replace, int minCount) {
-    if (tag && (*tag)["Name"].is_string() && (*tag)["Name"].get<StringTag>().ends_with("_shulker_box")
-        && (*tag).contains("tag")) {
-        auto list = (*tag)["tag"]["Items"].get<ListTag>();
-        for (unsigned long long i = 0; i < list.size(); ++i) {
-            auto* item = list.getCompound(i);
-            if (!item) continue;
-            if ((*item)["Name"].is_string()
-                && removeMinecraftPrefix((*item)["Name"].get<StringTag>())
-                       == removeMinecraftPrefix(itemStack.getTypeName())
-                && (*item)["Count"].is_number() && (*item)["Count"].get<ByteTag>().data > minCount) {
-                CompoundTag ret = *item;
-                if (replace) {
-                    list[i]                            = itemStack.save();
-                    list[i].get<CompoundTag>()["Slot"] = ret["Slot"];
-                } else list.erase(i);
-                (*tag)["tag"]["Items"] = list;
-                return {
-                    {*tag, ret}
-                };
-            }
-        }
-    }
-    return std::nullopt;
-}
-
 } // namespace coral_fans::utils
