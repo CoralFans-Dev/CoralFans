@@ -3,7 +3,6 @@
 #include "bsci/GeometryGroup.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/ChunkPos.h"
-#include "mc/world/level/chunk/LevelChunk.h"
 
 #include <unordered_map>
 #include <vector>

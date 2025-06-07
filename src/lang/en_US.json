@@ -72,9 +72,9 @@
         },
         "self": {
             "description": "Controls functions of CoralFans Mod",
+            "unuse": "this function is not avaliable",
             "noclip": {
-                "success": "set noclip \"{}\"",
-                "error": "failed to set noclip"
+                "success": "set noclip \"{}\""
             },
             "autotool": {
                 "success": "set autotool \"{}\"",

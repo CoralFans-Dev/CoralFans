@@ -1,7 +1,7 @@
+// from https://github.com/GroupMountain/FreeCamera
 #include "FreeCamera.h"
 #include "ll/api/memory/Hook.h"
 #include "ll/api/service/Bedrock.h"
-#include "mc/deps/core/math/Vec3.h"
 #include "mc/legacy/ActorUniqueID.h"
 #include "mc/network/ServerNetworkHandler.h"
 #include "mc/network/packet/AddPlayerPacket.h"
@@ -36,14 +36,14 @@ void SendFakePlayerPacket(Player* pl) {
     pkt1.mUuid            = randomUuid;
     pl->sendNetworkPacket(pkt1);
     // Update Skin
-    // auto skin = SerializedSkin(pl->getConnectionRequest());
+    auto skin = SerializedSkin(pl->getConnectionRequest());
 
-    // auto pkt2                  = PlayerSkinPacket();
-    // pkt2.mUUID                 = randomUuid;
-    // pkt2.mSkin                 = skin;
-    // pkt2.mLocalizedNewSkinName = "";
-    // pkt2.mLocalizedOldSkinName = "";
-    // pkt2.sendTo(*pl);
+    auto pkt2                  = PlayerSkinPacket();
+    pkt2.mUUID                 = randomUuid;
+    pkt2.mSkin                 = skin;
+    pkt2.mLocalizedNewSkinName = "";
+    pkt2.mLocalizedOldSkinName = "";
+    pkt2.sendTo(*pl);
 
 
     // gmlib::network::GMBinaryStream bs;

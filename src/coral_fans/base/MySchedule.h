@@ -30,7 +30,6 @@ public:
         now++;
         now &= 0x7f;
         while (schduleList[now] && !schduleList[now]->left_circle_time) {
-            // schduleList[now]->task();
             try {
                 schduleList[now]->task(); // 执行任务
             } catch (const std::exception& e) {

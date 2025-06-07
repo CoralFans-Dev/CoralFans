@@ -3,6 +3,7 @@
 #include "mc/scripting/modules/minecraft/events/ScriptBlockGlobalEventListener.h"
 #include "mc/util/Randomize.h"
 #include "mc/world/item/ItemStack.h"
+#include "mc/world/level/BlockPos.h"
 #include "mc/world/level/Explosion.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/Spawner.h"
@@ -13,16 +14,9 @@
 #include "mc/world/level/block/ResourceDropsContext.h"
 #include "mc/world/level/block/actor/MovingBlockActor.h"
 #include "mc/world/level/block/components/BlockComponentDirectData.h"
-
-#include "ll/api/service/Bedrock.h"
-#include "mc/deps/core/math/Vec3.h"
-#include "mc/world/level/BlockPos.h"
-
-
 #include "mc/world/level/dimension/Dimension.h"
-
-
 #include <mc/world/level/BlockSource.h>
+
 
 
 namespace coral_fans::functions {

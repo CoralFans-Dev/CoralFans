@@ -65,6 +65,17 @@ void registerCfhudCommand(CommandPermissionLevel permission) {
                 output.success("command.cfhud.success"_tr());
             else output.error("command.cfhud.error.seterror"_tr());
         });
+
+    // cfhud removeall
+    cfhudCommand.runtimeOverload()
+        .text("removeall")
+        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const&) {
+            COMMAND_CHECK_PLAYER
+            auto& mod = coral_fans::mod();
+            if (mod.getConfigDb()->set("functions.players." + player->getUuid().asString() + ".cfhud.hud", "0"))
+                output.success("command.cfhud.success"_tr());
+            else output.error("command.cfhud.error.seterror"_tr());
+        });
 }
 
 } // namespace coral_fans::commands

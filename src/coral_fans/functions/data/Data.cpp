@@ -3,7 +3,6 @@
 #include "mc/deps/core/math/Color.h"
 #include "mc/legacy/ActorUniqueID.h"
 #include "mc/nbt/CompoundTag.h"
-#include "mc/nbt/CompoundTagVariant.h"
 #include "mc/nbt/Tag.h"
 #include "mc/world/actor/Actor.h"
 #include "mc/world/item/ItemStack.h"

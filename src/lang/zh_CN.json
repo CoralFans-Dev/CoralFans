@@ -72,9 +72,9 @@
         },
         "self": {
             "description": "控制CoralFans Mod的功能",
+            "unuse": "未启用该功能",
             "noclip": {
-                "success": "设置 noclip \"{}\"",
-                "error": "设置 noclip 失败"
+                "success": "设置 noclip \"{}\""
             },
             "autotool": {
                 "success": "设置 autotool \"{}\"",

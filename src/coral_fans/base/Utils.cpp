@@ -10,6 +10,7 @@
 #include "mc/world/actor/player/Inventory.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/actor/player/PlayerInventory.h"
+#include "mc/world/item/ItemStack.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/ChunkPos.h"
 #include <memory>
@@ -85,15 +86,21 @@ void shortHighligntBlock(int dimid, BlockPos const& blockPos, mce::Color const& 
 }
 
 void swapItemInContainer(Player* player, int slot1, int slot2) {
-    if (player) {
-        auto&     container = player->mInventory;
-        ItemStack i1, i2;
-        i1 = (slot1 == -1) ? player->getOffhandSlot() : container->mInventory->getItem(slot1);
-        i2 = (slot2 == -1) ? player->getOffhandSlot() : container->mInventory->getItem(slot2);
-        if (slot1 == -1) player->setOffhandSlot(i2);
-        else container->mInventory->setItem(slot1, i2);
-        if (slot2 == -1) player->setOffhandSlot(i1);
-        else container->mInventory->setItem(slot2, i1);
+    if (player && slot1 != slot2) {
+        auto& inventory = player->mInventory->mInventory;
+        if (slot1 == -1) {
+            ItemStack tem = player->getOffhandSlot();
+            player->setOffhandSlot(inventory->getItem(slot2));
+            inventory->setItem(slot2, tem);
+        } else if (slot2 == -1) {
+            ItemStack tem = player->getOffhandSlot();
+            player->setOffhandSlot(inventory->getItem(slot1));
+            inventory->setItem(slot1, tem);
+        } else {
+            ItemStack tem = inventory->getItem(slot1);
+            inventory->setItem(slot1, inventory->getItem(slot2));
+            inventory->setItem(slot2, tem);
+        }
     }
 }
 } // namespace coral_fans::utils

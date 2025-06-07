@@ -1,19 +1,14 @@
 #include "coral_fans/CoralFans.h"
-
-#include <memory>
-
 #include "bsci/GeometryGroup.h"
-#include "ll/api/mod/RegisterHelper.h"
-
-#include "ll/api/Config.h"
-#include "ll/api/i18n/I18n.h"
-
 #include "coral_fans/base/Mod.h"
 #include "coral_fans/base/MySchedule.h"
 #include "coral_fans/commands/Commands.h"
 #include "coral_fans/functions/func/FuncManager.h"
-#include "coral_fans/functions/other/Shortcuts.h"
-
+#include "coral_fans/functions/shortcuts/Shortcuts.h"
+#include "ll/api/Config.h"
+#include "ll/api/i18n/I18n.h"
+#include "ll/api/mod/RegisterHelper.h"
+#include <memory>
 
 namespace coral_fans {
 
@@ -85,25 +80,15 @@ bool CoralFans::enable() {
         commands::registerMineruleCommand(mod.getConfig().command.minerule.permission);
     if (mod.getConfig().command.freecamera.enabled)
         commands::registerFreeCameraCommand(mod.getConfig().command.freecamera.permission);
-    // register shortcuts
-    functions::registerShortcutsListener();
-    functions::registerShortcutsCommand();
-
     // register containerreader
     functions::registerContainerReader();
-
-    // register autoitem
-    // coral_fans::functions::registerAutoItemListener();
-
+    // register shortcuts when first player join (确保其他所有插件的指令已被注册)
+    functions::ShortcutsManager::getInstance().waitToRegisterShortcuts();
     return true;
 }
 
 bool CoralFans::disable() {
     getSelf().getLogger().debug("Disabling...");
-    // auto& mod = coral_fans::mod();
-
-    // // remove listeners
-    // for (const auto& listener : mod.getEventListeners()) mod.getEventBus().removeListener(listener);
     return true;
 }
 

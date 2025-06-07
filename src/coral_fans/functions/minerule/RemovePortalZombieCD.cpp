@@ -23,11 +23,11 @@ LL_TYPE_STATIC_HOOK(
 ) {
     Vec3 _pos = pos;
     while (_pos.y-- > 1) {
-        if (region.canProvideSupport(_pos, 1, ::BlockSupportType(2))
+        if (region.canProvideSupport(_pos, 1, ::BlockSupportType::Any)
             // && !region.isSolidBlockingBlock(_pos.x, _pos.y + 1, pos.z)
             // 源码中的判定条件，但是据我所知没有任何一个固体方块不给上方提供支持，所以源码中这条判定完全是多余的
         ) {
-            if (axis == PortalAxis(2)) {
+            if (axis == PortalAxis::Z) {
                 _pos.x += 1.5f;
                 _pos.z += 0.5f;
             } else {
@@ -37,7 +37,7 @@ LL_TYPE_STATIC_HOOK(
             _pos.y += 1.1f;
             ll::service::getLevel()
                 ->getSpawner()
-                .spawnMob(region, ActorDefinitionIdentifier(ActorType(68388)), nullptr, _pos, false, true, false);
+                .spawnMob(region, ActorDefinitionIdentifier(ActorType::PigZombie), nullptr, _pos, false, true, false);
             return;
         }
     }

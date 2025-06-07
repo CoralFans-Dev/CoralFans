@@ -72,7 +72,7 @@ void registerTickCommand(CommandPermissionLevel permission) {
                 return;
             }
             auto mc = ll::service::getMinecraft();
-            if (mc.has_value()) mc->mSimTimer.mSteppingTick = tick;
+            if (mc.has_value()) mc->mSimTimer.mSteppingTick = (float)tick;
             output.success("command.tick.step.output"_tr(tick));
         });
 }

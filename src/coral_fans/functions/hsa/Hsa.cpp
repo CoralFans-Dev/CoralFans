@@ -10,21 +10,10 @@
 #include "mc/world/level/Spawner.h"
 #include "mc/world/level/chunk/ChunkSource.h"
 #include "mc/world/level/chunk/LevelChunk.h"
-#include "mc/world/level/chunk/LevelChunkDataRegistry.h"
 #include "mc/world/level/chunk/LevelChunkVolumeData.h"
 #include "mc/world/level/dimension/Dimension.h"
-#include "mc/world/phys/AABB.h"
 #include <memory>
 #include <vector>
-
-
-#include "mc/world/level/chunk/ChunkBoundingBox.h"
-#include "mc/world/level/chunk/DynamicSpawnArea.h"
-#include "mc/world/level/chunk/FullStructureBoundingBox.h"
-#include "mc/world/level/chunk/StaticSpawnArea.h"
-#include "mc/world/level/chunk/StructureKey.h"
-#include "mc/world/level/chunk/StructureType.h"
-#include "mc/world/level/levelgen/v2/StructureSpawnOverride.h"
 
 namespace {
 
@@ -52,9 +41,9 @@ void HsaManager::drawHsa() {
     auto level = ll::service::getLevel();
     if (level.has_value()) {
         level->forEachPlayer([&](Player& player) {
-            auto  originChunkPos = utils::blockPosToChunkPos(((const Actor&)player).getFeetBlockPos());
-            int   dim            = ((const Actor&)player).getDimensionId();
-            auto& region         = *((const Actor&)player).getDimension().mBlockSource;
+            ChunkPos originChunkPos = utils::blockPosToChunkPos(((const Actor&)player).getFeetBlockPos());
+            int      dim            = ((const Actor&)player).getDimensionId();
+            auto&    region         = *((const Actor&)player).getDimension().mBlockSource;
             // chunks
             for (int _i = -radius; _i <= radius; ++_i) {
                 for (int j = -radius; j <= radius; ++j) {
@@ -62,12 +51,12 @@ void HsaManager::drawHsa() {
                     auto     chunk    = region->getChunk(chunkPos);
                     if (chunk && chunk->mLoadState.get() == ChunkState::Loaded) {
                         ::std::vector<::BlockPos> hsa = chunk->mLevelChunkVolumeData->structureSpawnPos();
-                        if (!hsa.size()) continue;
+                        if (!hsa.size()) continue; // hsa数量为0则跳过
                         auto _it = mChunkLoaded[dim].find(chunkPos);
                         if (!(_it == mChunkLoaded[dim].end())) {
                             _it->second = true;
                             continue;
-                        }
+                        } // hsa已显示则跳过
                         mChunkLoaded[dim][chunkPos] = true;
                         std::unordered_map<BlockPos, short>     count;
                         std::vector<bsci::GeometryGroup::GeoId> geometryGroup;
