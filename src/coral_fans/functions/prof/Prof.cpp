@@ -5,6 +5,7 @@
 #include "mc/world/level/ChunkPos.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <format>
 #include <numeric>
 
@@ -20,47 +21,70 @@ std::vector<std::pair<std::string, uint64>> Profiler::TypeVec = {
 // from trapdoor-ll
 
 long long MSPTInfo::mean() const {
-    return this->values.empty()
-             ? 0
-             : std::accumulate(values.begin(), values.end(), 0ll) / static_cast<long long>(values.size());
+    uint8_t right = 20;
+    if (!values[index]) {
+        if (!index) return 0ll;
+        right = index;
+    }
+    return std::accumulate(values, values + right, 0ll) / 20;
 }
 
 void MSPTInfo::push(long long value) {
-    this->values.push_back(value);
-    if (this->values.size() > 20) this->values.pop_front();
+    this->values[index] = value;
+    index               = ++index % 20;
 }
 
 long long MSPTInfo::min() const {
-    if (this->values.empty()) return 0;
+    uint8_t right = 20;
+    if (!values[index]) {
+        if (!index) return 0;
+        right = index;
+    }
     auto min = this->values[0];
-    for (auto v : this->values)
-        if (min > v) min = v;
+    for (int i = 1; i < right; i++)
+        if (min > values[i]) min = values[i];
     return min;
 }
 
 std::pair<long long, long long> MSPTInfo::pairs() const {
-    long long v1 = 0, v1count = 0;
-    long long v2 = 0, v2count = 0;
-    for (unsigned long long i = 0; i < values.size(); ++i) {
-        if (i % 2 == 0) {
-            v1 += values[i];
-            v1count++;
-        } else {
-            v2 += values[i];
-            v2count++;
+    long long v1 = 0;
+    long long v2 = 0;
+    if (!values[index]) {
+        uint8_t v1count = 0, v2count = 0;
+        if (index % 2) {
+            v1      += values[0];
+            v1count  = 1;
         }
+        for (uint8_t i = v1count; i < index; i += 2) {
+            v2 += values[i];
+            v1 += values[i + 1];
+        }
+        v1count = (index + 1) % 2;
+        v2count = index % 2;
+        if (v1count) v1 /= v1count;
+        if (v2count) v2 /= v2count;
+        return {v1, v2};
+    } else {
+        for (uint8_t i = 0; i < 20; i += 2) {
+            v1 += values[i];
+            v2 += values[i + 1];
+        }
+        v1 /= 10;
+        v2 /= 10;
     }
-    if (v1count != 0) v1 /= v1count;
-    if (v2count != 0) v2 /= v2count;
     if (v1 > v2) std::swap(v1, v2);
     return {v1, v2};
 }
 
 long long MSPTInfo::max() const {
-    if (values.empty()) return 0;
-    auto max = values[0];
-    for (auto v : values)
-        if (max < v) max = v;
+    uint8_t right = 20;
+    if (!values[index]) {
+        if (!index) return 0;
+        right = index;
+    }
+    auto max = this->values[0];
+    for (int i = 1; i < right; i++)
+        if (max < values[i]) max = values[i];
     return max;
 }
 

@@ -3,7 +3,7 @@
 #include "ll/api/base/StdInt.h"
 #include "mc/world/level/ChunkPos.h"
 
-#include <deque>
+#include <cstdint>
 #include <map>
 #include <string>
 #include <utility>
@@ -14,7 +14,8 @@ namespace coral_fans::functions {
 // from trapdoor-ll
 
 struct MSPTInfo {
-    std::deque<long long>                         values;
+    unsigned long long                            values[20] = {0};
+    uint8_t                                       index      = 0;
     [[nodiscard]] long long                       mean() const;
     void                                          push(long long value);
     [[nodiscard]] long long                       min() const;
@@ -72,7 +73,7 @@ struct RedstoneProfileInfo {
         pendingRemove = 0;
     }
 
-    [[nodiscard]] inline long long sum() const { return signalUpdate + pendingAdd + pendingRemove + pendingUpdate; }
+    [[nodiscard]] inline long long sum() const { return signalUpdate + pendingAdd + pendingUpdate; }
 };
 
 // normal profile
@@ -87,7 +88,7 @@ struct Profiler {
     static std::vector<std::pair<std::string, uint64>>    TypeVec;
     uint64                                                type         = Type::normal;
     bool                                                  profiling    = false;
-    long long                                             totalRound   = 100;
+    long long                                             totalRound   = 60;
     long long                                             currentRound = 0;
     ChunkProfileInfo                                      chunkInfo{};
     std::array<std::map<std::string, EntityInfo>, 3>      actorInfo{};

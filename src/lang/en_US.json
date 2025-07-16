@@ -251,7 +251,7 @@
             "theend": "TheEnd"
         },
         "profiler": {
-            "normal": "- MSPT: {:.3f} ms TPS: {} Chunks: {}\n- CoralFans: {:.3f} ms\n- Redstone: {:.3f} ms\n - Signal: {:.3f} ms\n - Add: {:.3f} ms\n - Update: {:.3f} ms\n - Remove: {:.3f} ms\n- Chunk (un)load & village: {:.3f} ms\n- EntitySystems: {:.3f} ms\n - Chunk tick: {:.3f} ms\n  - BlockEntities: {:.3f} ms\n  - RandomTick: {:.3f} ms\n  - PendingTick: {:.3f} ms\n",
+            "normal": "- MSPT: {:.3f} ms TPS: {} Chunks: {}\n- CoralFans: {:.3f} ms\n- Redstone: {:.3f} ms\n - Signal: {:.3f} ms\n - Add: {:.3f} ms\n - Update: {:.3f} ms\n  - Remove: {:.3f} ms\n- Chunk (un)load & village: {:.3f} ms\n- EntitySystems: {:.3f} ms\n - Chunk tick: {:.3f} ms\n  - BlockEntities: {:.3f} ms\n  - RandomTick: {:.3f} ms\n  - PendingTick: {:.3f} ms\n",
             "actor": {
                 "total": "Total {} ms\n"
             }

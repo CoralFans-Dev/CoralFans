@@ -132,10 +132,8 @@ LL_TYPE_INSTANCE_HOOK(
     NetworkIdentifier const&     id,
     PlayerAuthInputPacket const& pkt
 ) {
-    if (FreeCameraManager::getInstance().FreeCamList.contains(id.mGuid.g)) {
-        return;
-    } else {
-        return origin(id, pkt);
+    if (!FreeCameraManager::getInstance().FreeCamList.contains(id.mGuid.g)) {
+        origin(id, pkt);
     }
 }
 

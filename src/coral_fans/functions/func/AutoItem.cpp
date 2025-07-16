@@ -28,6 +28,7 @@ LL_TYPE_INSTANCE_HOOK(
         return origin(item, itemUseMethod, consumeItem);
     std::string name = item.getTypeName();
     if (name.ends_with("_shulker_box")) {
+        if (!this->mInventory->mInventory) return;
         Container& inv          = *this->mInventory->mInventory;
         int        size         = inv.getContainerSize();
         int        selectedSlot = this->getSelectedItemSlot();

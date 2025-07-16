@@ -251,7 +251,7 @@
             "theend": "末地"
         },
         "profiler": {
-            "normal": "- MSPT: {:.3f} ms TPS: {} Chunks: {}\n- CoralFans: {:.3f} ms\n- 红石系统: {:.3f} ms\n - 信号: {:.3f} ms\n - 增加: {:.3f} ms\n - 更新: {:.3f} ms\n - 删除: {:.3f} ms\n- 区块加（卸）载与村庄: {:.3f} ms\n- 实体系统: {:.3f} ms\n - 区块刻: {:.3f} ms\n  - 方块实体: {:.3f} ms\n  - 随机刻: {:.3f} ms\n  - 计划刻: {:.3f} ms\n",
+            "normal": "- MSPT: {:.3f} ms TPS: {} Chunks: {}\n- CoralFans: {:.3f} ms\n- 红石系统: {:.3f} ms\n - 信号: {:.3f} ms\n - 增加: {:.3f} ms\n - 更新: {:.3f} ms\n  - 删除: {:.3f} ms\n- 区块加（卸）载与村庄: {:.3f} ms\n- 实体系统: {:.3f} ms\n - 区块刻: {:.3f} ms\n  - 方块实体: {:.3f} ms\n  - 随机刻: {:.3f} ms\n  - 计划刻: {:.3f} ms\n",
             "actor": {
                 "total": "共计 {} ms\n"
             }
