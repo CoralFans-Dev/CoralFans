@@ -18,7 +18,6 @@
 #include <mc/world/level/BlockSource.h>
 
 
-
 namespace coral_fans::functions {
 LL_TYPE_INSTANCE_HOOK(
     CoralFansDropHook1,
@@ -52,8 +51,10 @@ LL_TYPE_STATIC_HOOK(
 ) {
     if (block.getTypeName() == "minecraft:moving_block") {
         MovingBlockActor* mba = (MovingBlockActor*)region.getBlockEntity(blockPos);
-        region.setBlock(blockPos, *mba->mWrappedBlock, 3, mba->mWrappedBlockActor, nullptr, nullptr);
-        return origin(region, blockPos, region.getBlock(blockPos), randomize, resourceDropsContext, itemStacks);
+        if (mba->mWrappedBlock->getTypeName() != "minecraft:moving_block") { // 防止mb的mb导致的无限循环
+            region.setBlock(blockPos, *mba->mWrappedBlock, 3, mba->mWrappedBlockActor, nullptr, nullptr);
+            return origin(region, blockPos, region.getBlock(blockPos), randomize, resourceDropsContext, itemStacks);
+        }
     }
     return origin(region, blockPos, block, randomize, resourceDropsContext, itemStacks);
 }
