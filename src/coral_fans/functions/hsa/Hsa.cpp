@@ -3,6 +3,7 @@
 #include "coral_fans/base/Utils.h"
 #include "ll/api/service/Bedrock.h"
 #include "mc/_HeaderOutputPredefine.h"
+#include "mc/deps/core/math/Color.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/ChunkPos.h"
@@ -27,11 +28,11 @@ void HsaManager::drawHsa() {
     static std::array colors{
         mce::Color::BLACK(),
         mce::Color::BLUE(),
-        mce::Color::CYAN(),
+        // mce::Color::CYAN(),
         mce::Color::GREEN(),
-        mce::Color::GREY(),
-        mce::Color::MINECOIN_GOLD(),
-        mce::Color::ORANGE(),
+        // mce::Color::GREY(),
+        // mce::Color::MINECOIN_GOLD(),
+        // mce::Color::ORANGE(),
         mce::Color::PINK(),
         mce::Color::PURPLE(),
         mce::Color::REBECCA_PURPLE(),
@@ -66,7 +67,7 @@ void HsaManager::drawHsa() {
                             if (it == count.end()) count[i] = 1;
                             else {
                                 _count     = it->second;
-                                it->second = (it->second + 1) % 12;
+                                it->second = (it->second + 1) % 8;
                             }
                             auto& mod = coral_fans::mod();
 

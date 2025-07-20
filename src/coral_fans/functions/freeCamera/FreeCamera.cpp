@@ -12,7 +12,6 @@
 #include "mc/network/packet/UpdatePlayerGameTypePacket.h"
 #include "mc/server/ServerPlayer.h"
 #include "mc/world/actor/Actor.h "
-#include "mc/world/actor/player/SerializedSkin.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/Tick.h"
 
@@ -36,11 +35,10 @@ void SendFakePlayerPacket(Player* pl) {
     pkt1.mUuid            = randomUuid;
     pl->sendNetworkPacket(pkt1);
     // Update Skin
-    auto skin = SerializedSkin(pl->getConnectionRequest());
 
     auto pkt2                  = PlayerSkinPacket();
     pkt2.mUUID                 = randomUuid;
-    pkt2.mSkin                 = skin;
+    pkt2.mSkin                 = *pl->mSkin;
     pkt2.mLocalizedNewSkinName = "";
     pkt2.mLocalizedOldSkinName = "";
     pkt2.sendTo(*pl);

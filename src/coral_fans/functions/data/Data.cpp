@@ -92,7 +92,7 @@ std::pair<std::string, bool> showRedstoneComponentsInfo(Dimension& dimension, Bl
         auto     iter = graph.mActiveComponentsPerChunk.find(chunkBlockPos);
         if (iter != graph.mActiveComponentsPerChunk.end())
             for (auto& c : std::vector<::ChunkCircuitComponentList::Item>(iter->second.mComponents))
-                utils::shortHighligntBlock((DimensionType)dimension.mId, c.mPos, mce::Color::CYAN(), 80);
+                utils::shortHighligntBlock((DimensionType)dimension.mId, c.mPos, mce::Color::BLUE(), 80);
         return {"", true};
     }
     using ll::i18n_literals::operator""_tr;
@@ -197,11 +197,11 @@ void highlightBlockEntity(Player* player, int radius, int time) {
         static std::array colors{
             mce::Color::BLACK(),
             mce::Color::BLUE(),
-            mce::Color::CYAN(),
+            // mce::Color::CYAN(),
             mce::Color::GREEN(),
-            mce::Color::GREY(),
-            mce::Color::MINECOIN_GOLD(),
-            mce::Color::ORANGE(),
+            // mce::Color::GREY(),
+            // mce::Color::MINECOIN_GOLD(),
+            // mce::Color::ORANGE(),
             mce::Color::PINK(),
             mce::Color::PURPLE(),
             mce::Color::REBECCA_PURPLE(),
@@ -211,7 +211,7 @@ void highlightBlockEntity(Player* player, int radius, int time) {
         };
         for (auto blockActor : player->getDimensionBlockSource().fetchBlockEntities({origin - offset, origin + offset}))
             if (blockActor) utils::shortHighligntBlock(dimid, blockActor->mPosition, colors[colorindex], time);
-        colorindex = (colorindex + 1) % 13;
+        colorindex = (colorindex + 1) % 9;
     }
 }
 

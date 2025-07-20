@@ -125,7 +125,7 @@ void CFVillageManager::heavyTick() {
                 auto ids = std::array{
                     this->mParticleId,
                     mod.getGeometryGroup()
-                        ->box(kv.second.second, kv.second.first->mStaticRaidBounds, mce::Color::ORANGE())
+                        ->box(kv.second.second, kv.second.first->mStaticRaidBounds, mce::Color::REBECCA_PURPLE())
                 };
                 this->mParticleId = mod.getGeometryGroup()->merge(ids);
             }
@@ -169,7 +169,7 @@ void CFVillageManager::heavyTick() {
                 if (level) {
                     auto                    ids = std::vector{this->mParticleId};
                     const static mce::Color colors[3] =
-                        {mce::Color::CYAN(), mce::Color::MINECOIN_GOLD(), mce::Color::GREEN()};
+                        {mce::Color::PURPLE(), mce::Color::WHITE(), mce::Color::GREEN()};
                     for (auto& item : ::getDwellerPoiMap(kv.second.first)) {
                         auto villager = level->fetchEntity(item.first, false);
                         if (villager) {
@@ -201,7 +201,7 @@ std::string CFVillageManager::listTickingVillages() {
         auto  dwellerCountArray  = ::getDwellerCount(kv.second.first);
         float approximateRadius  = getApproximateRadius(*kv.second.first->mBounds);
         retstr                  += std::format(
-            "- §a{}§r §b[{}]§r r: {} p: {} g: {} b: {} §6[{}, {}]§r\n",
+            "- §a[{}]§r §b{}§r r: {} p: {} g: {} b: {} §6[{}, {}]§r\n",
             kv.first,
             kv.second.first->mBounds->center().toJsonString(),
             approximateRadius,
