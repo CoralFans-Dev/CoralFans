@@ -22,12 +22,13 @@ void registerSlimeCommand(CommandPermissionLevel permission) {
     // slime show <bool>
     slimeCommand.runtimeOverload()
         .text("show")
-        .required("isopen", ll::command::ParamKind::Bool)
+        .optional("isopen", ll::command::ParamKind::Bool)
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
-            bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
-            if (!isopen) coral_fans::mod().getSlimeManager().remove();
-            coral_fans::mod().getSlimeManager().setShow(isopen);
-            output.success("command.slime.show.output"_tr(isopen ? "true" : "false"));
+            auto& slimeManager = coral_fans::mod().getSlimeManager();
+            if (self["isopen"].has_value()) slimeManager.mShow = self["isopen"].get<ll::command::ParamKind::Bool>();
+            else slimeManager.mShow = !slimeManager.mShow;
+            if (!slimeManager.mShow) slimeManager.remove();
+            output.success("command.slime.show.output"_tr(slimeManager.mShow ? "true" : "false"));
         });
 
     // slime check

@@ -29,6 +29,7 @@ struct CommandStruct {
     CommandConfigStruct calculate  = {true, CommandPermissionLevel::Any};
     CommandConfigStruct minerule   = {true, CommandPermissionLevel::GameDirectors};
     CommandConfigStruct freecamera = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct noclip     = {true, CommandPermissionLevel::Any};
 };
 
 struct Shortcut {

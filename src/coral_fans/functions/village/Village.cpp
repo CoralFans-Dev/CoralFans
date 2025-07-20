@@ -81,8 +81,8 @@ float getApproximateRadius(AABB& bound) {
 }
 
 int CFVillageManager::getVid(mce::UUID uuid) {
-    if (auto it = this->mUuidVidMap.find(uuid); it != this->mUuidVidMap.end()) return it->second;
-    this->mUuidVidMap[uuid] = this->mVidCounter++;
+    if (auto it = this->mUuidVidMap.find(uuid.asString()); it != this->mUuidVidMap.end()) return it->second;
+    this->mUuidVidMap[uuid.asString()] = this->mVidCounter++;
     return this->mVidCounter - 1;
 }
 
@@ -201,15 +201,15 @@ std::string CFVillageManager::listTickingVillages() {
         auto  dwellerCountArray  = ::getDwellerCount(kv.second.first);
         float approximateRadius  = getApproximateRadius(*kv.second.first->mBounds);
         retstr                  += std::format(
-            "- §a[{}]§r §b[{}]§r r: {} p: {} g: {} b: {} §6[{}, {}]§r\n",
+            "- §a{}§r §b[{}]§r r: {} p: {} g: {} b: {} §6[{}, {}]§r\n",
             kv.first,
-            kv.second.first->mBounds->center(),
+            kv.second.first->mBounds->center().toJsonString(),
             approximateRadius,
             dwellerCountArray[0], // Villager
             dwellerCountArray[1], // IronGolem
             kv.second.first->getBedPOICount(),
-            kv.second.first->mBounds->min,
-            kv.second.first->mBounds->max
+            kv.second.first->mBounds->min.toJsonString(),
+            kv.second.first->mBounds->max.toJsonString()
         );
     }
     return retstr;
@@ -222,7 +222,7 @@ void CFVillageManager::refreshCommandSoftEnum() {
     for (auto& v : this->mVidVillageMap) {
         if (v.second.first) {
             vids.push_back(std::to_string(v.first));
-            uuids.push_back(v.second.first->mUniqueID->asString().substr(0, 8) + "...");
+            uuids.push_back(v.second.first->mUniqueID->asString());
         }
     }
     vids.insert(vids.end(), uuids.begin(), uuids.end());
@@ -232,7 +232,7 @@ void CFVillageManager::refreshCommandSoftEnum() {
 std::pair<std::string, bool> CFVillageManager::getVillageInfo(std::string id) {
     using ll::i18n_literals::operator""_tr;
     int vid;
-    if (id.size() == 11) vid = this->mUuidVidMap[id.substr(0, 8)];
+    if (id[0] != '"') vid = this->mUuidVidMap[id];
     else vid = std::stoi(id);
     Village* village = this->mVidVillageMap[vid].first;
     if (!village) return {"translate.village.cannotget"_tr(), false};
@@ -241,9 +241,9 @@ std::pair<std::string, bool> CFVillageManager::getVillageInfo(std::string id) {
     std::string retstr            = "translate.village.info"_tr(
         vid,
         village->mUniqueID->asString(),
-        village->mBounds->center().toString(),
-        village->mBounds->min.toString(),
-        village->mBounds->max.toString(),
+        village->mBounds->center().toJsonString(),
+        village->mBounds->min.toJsonString(),
+        village->mBounds->max.toJsonString(),
         approximateRadius,
         dwellerCountArray[0],
         dwellerCountArray[1],
@@ -254,7 +254,10 @@ std::pair<std::string, bool> CFVillageManager::getVillageInfo(std::string id) {
     auto level = ll::service::getLevel();
     for (auto& villager : ::getDwellerPoiMap(village)) {
         i++;
-        retstr    += "translate.village.villagerInfo"_tr(i, level->fetchEntity(villager.first, false)->getFeetPos());
+        retstr += "translate.village.villagerInfo"_tr(
+            i,
+            level->fetchEntity(villager.first, false)->getFeetPos().toJsonString()
+        );
         retstr    += "translate.village.villagerPOIType1"_tr();
         auto poi1  = villager.second[0].lock();
         if (poi1)

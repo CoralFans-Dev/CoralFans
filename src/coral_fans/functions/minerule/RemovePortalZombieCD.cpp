@@ -35,9 +35,15 @@ LL_TYPE_STATIC_HOOK(
                 _pos.z += 1.5f;
             }
             _pos.y += 1.1f;
-            ll::service::getLevel()
-                ->getSpawner()
-                .spawnMob(region, ActorDefinitionIdentifier(ActorType::PigZombie), nullptr, _pos, false, true, false);
+            ll::service::getLevel()->getSpawner().spawnMob(
+                region,
+                ActorDefinitionIdentifier("minecraft:zombie_pigman"),
+                nullptr,
+                _pos,
+                false,
+                true,
+                false
+            );
             return;
         }
     }

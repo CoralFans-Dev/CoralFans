@@ -36,35 +36,51 @@ void registerVillageCommand(CommandPermissionLevel permission) {
     villageCommand.runtimeOverload()
         .text("show")
         .required("type", ll::command::ParamKind::Enum, "villageShowType")
-        .required("enable", ll::command::ParamKind::Bool)
+        .optional("enable", ll::command::ParamKind::Bool)
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            auto& villageManager = coral_fans::mod().getVillageManager();
+            bool  isopen         = false;
             switch (self["type"].get<ll::command::ParamKind::Enum>().index) {
             case 0:
-                coral_fans::mod().getVillageManager().setShowBounds(self["enable"].get<ll::command::ParamKind::Bool>());
+                if (self["enable"].has_value())
+                    villageManager.mShowBounds = self["enable"].get<ll::command::ParamKind::Bool>();
+                else villageManager.mShowBounds = !villageManager.mShowBounds;
+                isopen = villageManager.mShowBounds;
                 break;
             case 1:
-                coral_fans::mod().getVillageManager().setShowRaidBounds(
-                    self["enable"].get<ll::command::ParamKind::Bool>()
-                );
+                if (self["enable"].has_value())
+                    villageManager.mShowRaidBounds = self["enable"].get<ll::command::ParamKind::Bool>();
+                else villageManager.mShowRaidBounds = !villageManager.mShowRaidBounds;
+                isopen = villageManager.mShowRaidBounds;
                 break;
             case 2:
-                coral_fans::mod().getVillageManager().setShowIronSpawn(self["enable"].get<ll::command::ParamKind::Bool>(
-                ));
+                if (self["enable"].has_value())
+                    villageManager.mShowIronSpawn = self["enable"].get<ll::command::ParamKind::Bool>();
+                else villageManager.mShowIronSpawn = !villageManager.mShowIronSpawn;
+                isopen = villageManager.mShowIronSpawn;
                 break;
             case 3:
-                coral_fans::mod().getVillageManager().setShowCenter(self["enable"].get<ll::command::ParamKind::Bool>());
+                if (self["enable"].has_value())
+                    villageManager.mShowCenter = self["enable"].get<ll::command::ParamKind::Bool>();
+                else villageManager.mShowCenter = !villageManager.mShowCenter;
+                isopen = villageManager.mShowCenter;
                 break;
             case 4:
-                coral_fans::mod().getVillageManager().setShowPoiQuery(self["enable"].get<ll::command::ParamKind::Bool>()
-                );
+                if (self["enable"].has_value())
+                    villageManager.mShowPoiQuery = self["enable"].get<ll::command::ParamKind::Bool>();
+                else villageManager.mShowPoiQuery = !villageManager.mShowPoiQuery;
+                isopen = villageManager.mShowPoiQuery;
                 break;
             case 5:
-                coral_fans::mod().getVillageManager().setShowBind(self["enable"].get<ll::command::ParamKind::Bool>());
+                if (self["enable"].has_value())
+                    villageManager.mShowBind = self["enable"].get<ll::command::ParamKind::Bool>();
+                else villageManager.mShowBind = !villageManager.mShowBind;
+                isopen = villageManager.mShowBind;
                 break;
             }
             output.success("command.village.show.output"_tr(
                 self["type"].get<ll::command::ParamKind::Enum>().name,
-                self["enable"].get<ll::command::ParamKind::Bool>() ? "true" : "false"
+                isopen ? "true" : "false"
             ));
         });
 

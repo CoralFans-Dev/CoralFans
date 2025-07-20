@@ -18,10 +18,6 @@
                 "success": "globally set forceplace \"{}\"",
                 "error": "failed to globally set forceplace"
             },
-            "noclip": {
-                "success": "globally set noclip \"{}\"",
-                "error": "failed to globally set noclip"
-            },
             "droppernocost": {
                 "success": "globally set droppernocost \"{}\"",
                 "error": "failed to globally set droppernocost"
@@ -73,9 +69,6 @@
         "self": {
             "description": "Controls functions of CoralFans Mod",
             "unuse": "this function is not avaliable",
-            "noclip": {
-                "success": "set noclip \"{}\""
-            },
             "autotool": {
                 "success": "set autotool \"{}\"",
                 "error": "failed to set autotool",
@@ -236,6 +229,11 @@
                 "success": "set remove_portal_pigzombie_cd \"{}\"",
                 "error": "failed to set remove_portal_pigzombie_cd"
             }
+        },
+        "noclip": {
+            "description": "noclip in creative gamemode",
+            "enabled": "noclip enabled.",
+            "disabled": "noclip disabled."
         }
     },
     "translate": {
@@ -258,7 +256,7 @@
         },
         "village": {
             "cannotget": "cannot get village info",
-            "info": "VID: {}\nUUID: {}\n- Center: {}\n- Bounds: [{}, {}]\n- Radius: {}\n- Dwellers: {} / {} / {} / {}\nVillager list\n",
+            "info": "VID: {}\nUUID: {}\n- Center: {}\n- Bounds: {}, {}\n- Radius: {}\n- Dwellers: {} / {} / {} / {}\nVillager list\n",
             "villagerInfo": "[{}] villager position:{}\n  POI:\n",
             "villagerPOIType1": "    bed:       ",
             "villagerPOIType2": "    alarm      ",

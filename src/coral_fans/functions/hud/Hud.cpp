@@ -47,7 +47,7 @@ void HudHelper::tick() {
         if (level) {
             level->forEachPlayer([&](Player& player) {
                 if (mod.getConfigDb()->get("functions.players." + player.getUuid().asString() + ".cfhud.show")
-                    != "true")
+                    == "false")
                     return true;
                 unsigned long hud;
                 try {

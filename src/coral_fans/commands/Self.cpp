@@ -20,20 +20,6 @@ void registerSelfCommand(CommandPermissionLevel permission) {
     auto& selfCommand = ll::command::CommandRegistrar::getInstance()
                             .getOrCreateCommand("self", "command.self.description"_tr(), permission);
 
-    // self noclip <bool>
-    selfCommand.runtimeOverload()
-        .text("noclip")
-        .required("isopen", ll::command::ParamKind::Bool)
-        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
-            COMMAND_CHECK_PLAYER
-            bool       isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
-            const auto global = coral_fans::mod().getConfigDb()->get("functions.global.noclip") == "true";
-            if (global) output.success("command.self.noclip.success"_tr(isopen ? "true" : "false"));
-            else if (isopen == true) output.error("command.self.unuse"_tr());
-            else output.success("command.self.noclip.success"_tr("false"));
-            player->setAbility(::AbilitiesIndex::NoClip, isopen & global);
-        });
-
     // self autotool <bool>
     selfCommand.runtimeOverload()
         .text("autotool")
