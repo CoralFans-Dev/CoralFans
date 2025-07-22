@@ -11,7 +11,15 @@ jobs:
 
       - uses: xmake-io/github-action-setup-xmake@v1
         with:
-          xmake-version: "2.9.8"
+          xmake-version: "3.0.0"
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/AppData/Local/.xmake
+          key: xmake-${{ hashFiles('xmake.lua') }}
+          restore-keys: |
+            xmake-
 
       - run: |
           xmake repo -u

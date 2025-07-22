@@ -1,7 +1,7 @@
+// from https://github.com/GroupMountain/FreeCamera
 #include "FreeCamera.h"
 #include "ll/api/memory/Hook.h"
 #include "ll/api/service/Bedrock.h"
-#include "mc/deps/core/math/Vec3.h"
 #include "mc/legacy/ActorUniqueID.h"
 #include "mc/network/ServerNetworkHandler.h"
 #include "mc/network/packet/AddPlayerPacket.h"
@@ -12,7 +12,6 @@
 #include "mc/network/packet/UpdatePlayerGameTypePacket.h"
 #include "mc/server/ServerPlayer.h"
 #include "mc/world/actor/Actor.h "
-#include "mc/world/actor/player/SerializedSkin.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/Tick.h"
 
@@ -36,14 +35,13 @@ void SendFakePlayerPacket(Player* pl) {
     pkt1.mUuid            = randomUuid;
     pl->sendNetworkPacket(pkt1);
     // Update Skin
-    // auto skin = SerializedSkin(pl->getConnectionRequest());
 
-    // auto pkt2                  = PlayerSkinPacket();
-    // pkt2.mUUID                 = randomUuid;
-    // pkt2.mSkin                 = skin;
-    // pkt2.mLocalizedNewSkinName = "";
-    // pkt2.mLocalizedOldSkinName = "";
-    // pkt2.sendTo(*pl);
+    auto pkt2                  = PlayerSkinPacket();
+    pkt2.mUUID                 = randomUuid;
+    pkt2.mSkin                 = *pl->mSkin;
+    pkt2.mLocalizedNewSkinName = "";
+    pkt2.mLocalizedOldSkinName = "";
+    pkt2.sendTo(*pl);
 
 
     // gmlib::network::GMBinaryStream bs;
@@ -132,10 +130,8 @@ LL_TYPE_INSTANCE_HOOK(
     NetworkIdentifier const&     id,
     PlayerAuthInputPacket const& pkt
 ) {
-    if (FreeCameraManager::getInstance().FreeCamList.contains(id.mGuid.g)) {
-        return;
-    } else {
-        return origin(id, pkt);
+    if (!FreeCameraManager::getInstance().FreeCamList.contains(id.mGuid.g)) {
+        origin(id, pkt);
     }
 }
 

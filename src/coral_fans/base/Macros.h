@@ -1,5 +1,5 @@
 #define COMMAND_CHECK_PLAYER                                                                                           \
-    auto* entity = origin.getEntity();                                                                                 \
+    auto entity = origin.getEntity();                                                                                  \
     if (entity == nullptr || !entity->isType(ActorType::Player)) {                                                     \
         output.success("command.error.checkPlayer"_tr());                                                              \
         return;                                                                                                        \

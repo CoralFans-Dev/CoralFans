@@ -3,6 +3,7 @@
 #include "mc/scripting/modules/minecraft/events/ScriptBlockGlobalEventListener.h"
 #include "mc/util/Randomize.h"
 #include "mc/world/item/ItemStack.h"
+#include "mc/world/level/BlockPos.h"
 #include "mc/world/level/Explosion.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/Spawner.h"
@@ -13,15 +14,7 @@
 #include "mc/world/level/block/ResourceDropsContext.h"
 #include "mc/world/level/block/actor/MovingBlockActor.h"
 #include "mc/world/level/block/components/BlockComponentDirectData.h"
-
-#include "ll/api/service/Bedrock.h"
-#include "mc/deps/core/math/Vec3.h"
-#include "mc/world/level/BlockPos.h"
-
-
 #include "mc/world/level/dimension/Dimension.h"
-
-
 #include <mc/world/level/BlockSource.h>
 
 
@@ -58,8 +51,10 @@ LL_TYPE_STATIC_HOOK(
 ) {
     if (block.getTypeName() == "minecraft:moving_block") {
         MovingBlockActor* mba = (MovingBlockActor*)region.getBlockEntity(blockPos);
-        region.setBlock(blockPos, *mba->mWrappedBlock, 3, mba->mWrappedBlockActor, nullptr, nullptr);
-        return origin(region, blockPos, region.getBlock(blockPos), randomize, resourceDropsContext, itemStacks);
+        if (mba->mWrappedBlock->getTypeName() != "minecraft:moving_block") { // 防止mb的mb导致的无限循环
+            region.setBlock(blockPos, *mba->mWrappedBlock, 3, mba->mWrappedBlockActor, nullptr, nullptr);
+            return origin(region, blockPos, region.getBlock(blockPos), randomize, resourceDropsContext, itemStacks);
+        }
     }
     return origin(region, blockPos, block, randomize, resourceDropsContext, itemStacks);
 }

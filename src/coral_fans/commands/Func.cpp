@@ -52,17 +52,6 @@ void registerFuncCommand(CommandPermissionLevel permission) {
             } else output.error("command.func.forceplace.error"_tr());
         });
 
-    // func noclip <bool>
-    funcCommand.runtimeOverload()
-        .text("noclip")
-        .required("isopen", ll::command::ParamKind::Bool)
-        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
-            bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
-            if (coral_fans::mod().getConfigDb()->set("functions.global.noclip", isopen ? "true" : "false"))
-                output.success("command.func.noclip.success"_tr(isopen ? "true" : "false"));
-            else output.error("command.func.noclip.error"_tr());
-        });
-
     // func droppernocost <bool>
     funcCommand.runtimeOverload()
         .text("droppernocost")

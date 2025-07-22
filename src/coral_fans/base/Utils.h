@@ -1,7 +1,6 @@
 #pragma once
 
 #include "mc/nbt/CompoundTag.h"
-#include "mc/nbt/CompoundTagVariant.h"
 #include "mc/world/Container.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/level/BlockPos.h"

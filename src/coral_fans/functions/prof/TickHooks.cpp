@@ -3,6 +3,7 @@
 #include "coral_fans/base/Utils.h"
 
 #include "ll/api/memory/Hook.h"
+#include "mc/util/ProfilerLite.h"
 #include "mc/world/actor/Actor.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/BlockTickingQueue.h"
@@ -21,11 +22,11 @@ namespace coral_fans::functions {
 LL_TYPE_INSTANCE_HOOK(CoralFansTickLevelTickHook, ll::memory::HookPriority::Normal, Level, &Level::$tick, void) {
     auto& mod  = coral_fans::mod();
     auto& prof = mod.getProfiler();
-    PROF_TIMER(level, { origin(); })
-    PROF_TIMER(coralfans, { mod.tick(); })
-    if (prof.profiling) {
-        prof.gameSessionTickTime += (time_level + time_coralfans);
-        prof.gameSessionTicksBuffer.push_back(time_level + time_coralfans);
+    origin();
+    auto time_level = ProfilerLite::gProfilerLiteInstance().mDebugServerTickTime->count() / 1000;
+    PROF_TIMER(coralfans, { mod.tick(); }) if (prof.profiling) {
+        prof.gameSessionTickTime += time_level;
+        prof.gameSessionTicksBuffer.push_back(time_level);
         prof.coralfansSessionTickTime += time_coralfans;
         prof.currentRound++;
         if (prof.currentRound == prof.totalRound) {

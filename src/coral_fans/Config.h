@@ -1,8 +1,10 @@
 #pragma once
 
+// #include "coral_fans/functions/shortcuts/Shortcuts.h"
 #include "mc/server/commands/CommandPermissionLevel.h"
 #include <string>
 #include <vector>
+
 
 namespace coral_fans::config {
 
@@ -27,71 +29,95 @@ struct CommandStruct {
     CommandConfigStruct calculate  = {true, CommandPermissionLevel::Any};
     CommandConfigStruct minerule   = {true, CommandPermissionLevel::GameDirectors};
     CommandConfigStruct freecamera = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct noclip     = {true, CommandPermissionLevel::Any};
 };
 
 struct Shortcut {
-    bool                     enable;
-    std::string              type;
-    std::string              item;
-    std::string              block;
-    std::string              command;
-    std::string              description;
-    CommandPermissionLevel   permission;
-    bool                     prevent;
-    std::vector<std::string> actions;
+    struct UseOn {
+        bool                     enable;
+        std::string              item;
+        std::string              block     = "";
+        bool                     intercept = false;
+        std::vector<std::string> actions;
+    };
+
+    struct Use {
+        bool                     enable;
+        std::string              item;
+        bool                     intercept = false;
+        std::vector<std::string> actions;
+    };
+
+    struct Destroy {
+        bool                     enable;
+        std::string              item;
+        bool                     intercept = false;
+        std::vector<std::string> actions;
+    };
+
+    struct Command {
+        bool                     enable;
+        std::string              command     = "";
+        std::string              description = "";
+        CommandPermissionLevel   permission  = CommandPermissionLevel::Any;
+        std::vector<std::string> actions;
+    };
 };
 
 struct Config {
-    int         version    = 4;
+    int         version    = 5;
     std::string locateName = "zh_CN";
 
     int cfhudRefreshTime = 20;
 
     CommandStruct command;
 
-    std::vector<Shortcut> shortcuts = {
+
+    std::vector<Shortcut::UseOn> useons = {
         /* hoppercounter */
-        {.enable = true, .type = "useon", .item = "cactus", .block = "white_concrete", .actions = {"counter print"}},
-        {.enable = true, .type = "useon", .item = "cactus", .block = "orange_concrete", .actions = {"counter print"}},
-        {.enable = true, .type = "useon", .item = "cactus", .block = "magenta_concrete", .actions = {"counter print"}},
-        {.enable = true, .type = "useon", .item = "cactus", .block = "light_blue_concrete", .actions = {"counter print"}
-        },
-        {.enable = true, .type = "useon", .item = "cactus", .block = "yellow_concrete", .actions = {"counter print"}},
-        {.enable = true, .type = "useon", .item = "cactus", .block = "lime_concrete", .actions = {"counter print"}},
-        {.enable = true, .type = "useon", .item = "cactus", .block = "pink_concrete", .actions = {"counter print"}},
-        {.enable = true, .type = "useon", .item = "cactus", .block = "gray_concrete", .actions = {"counter print"}},
-        {.enable = true, .type = "useon", .item = "cactus", .block = "light_gray_concrete", .actions = {"counter print"}
-        },
-        {.enable = true, .type = "useon", .item = "cactus", .block = "cyan_concrete", .actions = {"counter print"}},
-        {.enable = true, .type = "useon", .item = "cactus", .block = "purple_concrete", .actions = {"counter print"}},
-        {.enable = true, .type = "useon", .item = "cactus", .block = "blue_concrete", .actions = {"counter print"}},
-        {.enable = true, .type = "useon", .item = "cactus", .block = "brown_concrete", .actions = {"counter print"}},
-        {.enable = true, .type = "useon", .item = "cactus", .block = "green_concrete", .actions = {"counter print"}},
-        {.enable = true, .type = "useon", .item = "cactus", .block = "red_concrete", .actions = {"counter print"}},
-        {.enable = true, .type = "useon", .item = "cactus", .block = "black_concrete", .actions = {"counter print"}},
+        {.enable = true, .item = "cactus", .block = "white_concrete",      .actions = {"counter print"}},
+        {.enable = true, .item = "cactus", .block = "orange_concrete",     .actions = {"counter print"}},
+        {.enable = true, .item = "cactus", .block = "magenta_concrete",    .actions = {"counter print"}},
+        {.enable = true, .item = "cactus", .block = "light_blue_concrete", .actions = {"counter print"}},
+        {.enable = true, .item = "cactus", .block = "yellow_concrete",     .actions = {"counter print"}},
+        {.enable = true, .item = "cactus", .block = "lime_concrete",       .actions = {"counter print"}},
+        {.enable = true, .item = "cactus", .block = "pink_concrete",       .actions = {"counter print"}},
+        {.enable = true, .item = "cactus", .block = "gray_concrete",       .actions = {"counter print"}},
+        {.enable = true, .item = "cactus", .block = "light_gray_concrete", .actions = {"counter print"}},
+        {.enable = true, .item = "cactus", .block = "cyan_concrete",       .actions = {"counter print"}},
+        {.enable = true, .item = "cactus", .block = "purple_concrete",     .actions = {"counter print"}},
+        {.enable = true, .item = "cactus", .block = "blue_concrete",       .actions = {"counter print"}},
+        {.enable = true, .item = "cactus", .block = "brown_concrete",      .actions = {"counter print"}},
+        {.enable = true, .item = "cactus", .block = "green_concrete",      .actions = {"counter print"}},
+        {.enable = true, .item = "cactus", .block = "red_concrete",        .actions = {"counter print"}},
+        {.enable = true, .item = "cactus", .block = "black_concrete",      .actions = {"counter print"}}
+    };
+
+    std::vector<Shortcut::Use> uses = {
         /* blockrotate */
-        {.enable = true, .type = "use", .item = "cactus", .prevent = true, .actions = {"rotate"}},
+        {.enable = true, .item = "cactus", .intercept = true, .actions = {"rotate"}}
+    };
+
+    std::vector<Shortcut::Destroy> destroys = {};
+
+    std::vector<Shortcut::Command> commands = {
         {.enable      = true,
-         .type        = "command",
          .command     = "r",
          .description = "rotate",
          .permission  = CommandPermissionLevel::Any,
-         .actions     = {"rotate"}},
+         .actions     = {"rotate"}                                         },
         /* fastcommand */
         {.enable      = false,
-         .type        = "command",
          .command     = "c",
          .description = "creative",
          .permission  = CommandPermissionLevel::GameDirectors,
-         .actions     = {"gamemode creative"}},
+         .actions     = {"gamemode creative"}                              },
         {.enable      = false,
-         .type        = "command",
          .command     = "s",
          .description = "spectator",
          .permission  = CommandPermissionLevel::GameDirectors,
-         .actions     = {"gamemode spectator"}},
+         .actions     = {"gamemode spectator"}                             },
         {.enable      = false,
-         .type        = "command",
          .command     = "q",
          .description = "suicide",
          .permission  = CommandPermissionLevel::GameDirectors,

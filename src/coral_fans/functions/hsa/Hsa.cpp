@@ -3,6 +3,7 @@
 #include "coral_fans/base/Utils.h"
 #include "ll/api/service/Bedrock.h"
 #include "mc/_HeaderOutputPredefine.h"
+#include "mc/deps/core/math/Color.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/ChunkPos.h"
@@ -10,21 +11,10 @@
 #include "mc/world/level/Spawner.h"
 #include "mc/world/level/chunk/ChunkSource.h"
 #include "mc/world/level/chunk/LevelChunk.h"
-#include "mc/world/level/chunk/LevelChunkDataRegistry.h"
 #include "mc/world/level/chunk/LevelChunkVolumeData.h"
 #include "mc/world/level/dimension/Dimension.h"
-#include "mc/world/phys/AABB.h"
 #include <memory>
 #include <vector>
-
-
-#include "mc/world/level/chunk/ChunkBoundingBox.h"
-#include "mc/world/level/chunk/DynamicSpawnArea.h"
-#include "mc/world/level/chunk/FullStructureBoundingBox.h"
-#include "mc/world/level/chunk/StaticSpawnArea.h"
-#include "mc/world/level/chunk/StructureKey.h"
-#include "mc/world/level/chunk/StructureType.h"
-#include "mc/world/level/levelgen/v2/StructureSpawnOverride.h"
 
 namespace {
 
@@ -38,11 +28,11 @@ void HsaManager::drawHsa() {
     static std::array colors{
         mce::Color::BLACK(),
         mce::Color::BLUE(),
-        mce::Color::CYAN(),
+        // mce::Color::CYAN(),
         mce::Color::GREEN(),
-        mce::Color::GREY(),
-        mce::Color::MINECOIN_GOLD(),
-        mce::Color::ORANGE(),
+        // mce::Color::GREY(),
+        // mce::Color::MINECOIN_GOLD(),
+        // mce::Color::ORANGE(),
         mce::Color::PINK(),
         mce::Color::PURPLE(),
         mce::Color::REBECCA_PURPLE(),
@@ -52,9 +42,9 @@ void HsaManager::drawHsa() {
     auto level = ll::service::getLevel();
     if (level.has_value()) {
         level->forEachPlayer([&](Player& player) {
-            auto  originChunkPos = utils::blockPosToChunkPos(((const Actor&)player).getFeetBlockPos());
-            int   dim            = ((const Actor&)player).getDimensionId();
-            auto& region         = *((const Actor&)player).getDimension().mBlockSource;
+            ChunkPos originChunkPos = utils::blockPosToChunkPos(((const Actor&)player).getFeetBlockPos());
+            int      dim            = ((const Actor&)player).getDimensionId();
+            auto&    region         = *((const Actor&)player).getDimension().mBlockSource;
             // chunks
             for (int _i = -radius; _i <= radius; ++_i) {
                 for (int j = -radius; j <= radius; ++j) {
@@ -62,12 +52,12 @@ void HsaManager::drawHsa() {
                     auto     chunk    = region->getChunk(chunkPos);
                     if (chunk && chunk->mLoadState.get() == ChunkState::Loaded) {
                         ::std::vector<::BlockPos> hsa = chunk->mLevelChunkVolumeData->structureSpawnPos();
-                        if (!hsa.size()) continue;
+                        if (!hsa.size()) continue; // hsa数量为0则跳过
                         auto _it = mChunkLoaded[dim].find(chunkPos);
                         if (!(_it == mChunkLoaded[dim].end())) {
                             _it->second = true;
                             continue;
-                        }
+                        } // hsa已显示则跳过
                         mChunkLoaded[dim][chunkPos] = true;
                         std::unordered_map<BlockPos, short>     count;
                         std::vector<bsci::GeometryGroup::GeoId> geometryGroup;
@@ -77,7 +67,7 @@ void HsaManager::drawHsa() {
                             if (it == count.end()) count[i] = 1;
                             else {
                                 _count     = it->second;
-                                it->second = (it->second + 1) % 12;
+                                it->second = (it->second + 1) % 8;
                             }
                             auto& mod = coral_fans::mod();
 

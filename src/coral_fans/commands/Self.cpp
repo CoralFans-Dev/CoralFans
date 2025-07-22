@@ -20,23 +20,6 @@ void registerSelfCommand(CommandPermissionLevel permission) {
     auto& selfCommand = ll::command::CommandRegistrar::getInstance()
                             .getOrCreateCommand("self", "command.self.description"_tr(), permission);
 
-    // self noclip <bool>
-    selfCommand.runtimeOverload()
-        .text("noclip")
-        .required("isopen", ll::command::ParamKind::Bool)
-        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
-            COMMAND_CHECK_PLAYER
-            bool       isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
-            const auto global = coral_fans::mod().getConfigDb()->get("functions.global.noclip") == "true";
-            if (coral_fans::mod().getConfigDb()->set(
-                    std::format("functions.players.{}.noclip", player->getUuid().asString()),
-                    (isopen & global) ? "true" : "false"
-                )) {
-                output.success("command.self.noclip.success"_tr((isopen & global) ? "true" : "false"));
-                player->setAbility(::AbilitiesIndex::NoClip, isopen);
-            } else output.error("command.self.noclip.error"_tr());
-        });
-
     // self autotool <bool>
     selfCommand.runtimeOverload()
         .text("autotool")
@@ -45,11 +28,12 @@ void registerSelfCommand(CommandPermissionLevel permission) {
             COMMAND_CHECK_PLAYER
             bool       isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
             const auto global = coral_fans::mod().getConfigDb()->get("functions.global.autotool") == "true";
-            if (coral_fans::mod().getConfigDb()->set(
-                    std::format("functions.players.{}.autotool", player->getUuid().asString()),
-                    (isopen & global) ? "true" : "false"
-                ))
-                output.success("command.self.autotool.success"_tr((isopen & global) ? "true" : "false"));
+            if (!global) output.error("command.self.unuse"_tr());
+            else if (coral_fans::mod().getConfigDb()->set(
+                         std::format("functions.players.{}.autotool", player->getUuid().asString()),
+                         isopen ? "true" : "false"
+                     ))
+                output.success("command.self.autotool.success"_tr(isopen ? "true" : "false"));
             else output.error("command.self.autotool.error"_tr());
         });
 
@@ -77,11 +61,12 @@ void registerSelfCommand(CommandPermissionLevel permission) {
             COMMAND_CHECK_PLAYER
             bool       isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
             const auto global = coral_fans::mod().getConfigDb()->get("functions.global.containerreader") == "true";
-            if (coral_fans::mod().getConfigDb()->set(
-                    std::format("functions.players.{}.containerreader", player->getUuid().asString()),
-                    (isopen & global) ? "true" : "false"
-                ))
-                output.success("command.self.containerreader.success"_tr((isopen & global) ? "true" : "false"));
+            if (!global) output.error("command.self.unuse"_tr());
+            else if (coral_fans::mod().getConfigDb()->set(
+                         std::format("functions.players.{}.containerreader", player->getUuid().asString()),
+                         isopen ? "true" : "false"
+                     ))
+                output.success("command.self.containerreader.success"_tr(isopen ? "true" : "false"));
             else output.error("command.self.containerreader.error"_tr());
         });
 
@@ -93,11 +78,12 @@ void registerSelfCommand(CommandPermissionLevel permission) {
             COMMAND_CHECK_PLAYER
             bool       isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
             const auto global = coral_fans::mod().getConfigDb()->get("functions.global.autototem") == "true";
-            if (coral_fans::mod().getConfigDb()->set(
-                    std::format("functions.players.{}.autototem", player->getUuid().asString()),
-                    (isopen & global) ? "true" : "false"
-                ))
-                output.success("command.self.autototem.success"_tr((isopen & global) ? "true" : "false"));
+            if (!global) output.error("command.self.unuse"_tr());
+            else if (coral_fans::mod().getConfigDb()->set(
+                         std::format("functions.players.{}.autototem", player->getUuid().asString()),
+                         isopen ? "true" : "false"
+                     ))
+                output.success("command.self.autototem.success"_tr(isopen ? "true" : "false"));
             else output.error("command.self.autototem.error"_tr());
         });
 
@@ -109,11 +95,12 @@ void registerSelfCommand(CommandPermissionLevel permission) {
             COMMAND_CHECK_PLAYER
             bool       isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
             const auto global = coral_fans::mod().getConfigDb()->get("functions.global.autoitem") == "true";
-            if (coral_fans::mod().getConfigDb()->set(
-                    std::format("functions.players.{}.autoitem", player->getUuid().asString()),
-                    (isopen & global) ? "true" : "false"
-                ))
-                output.success("command.self.autoitem.success"_tr((isopen & global) ? "true" : "false"));
+            if (!global) output.error("command.self.unuse"_tr());
+            else if (coral_fans::mod().getConfigDb()->set(
+                         std::format("functions.players.{}.autoitem", player->getUuid().asString()),
+                         isopen ? "true" : "false"
+                     ))
+                output.success("command.self.autoitem.success"_tr(isopen ? "true" : "false"));
             else output.error("command.self.autoitem.error"_tr());
         });
 
@@ -125,11 +112,12 @@ void registerSelfCommand(CommandPermissionLevel permission) {
             COMMAND_CHECK_PLAYER
             bool       isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
             const auto global = coral_fans::mod().getConfigDb()->get("functions.global.fastdrop") == "true";
-            if (coral_fans::mod().getConfigDb()->set(
-                    std::format("functions.players.{}.fastdrop", player->getUuid().asString()),
-                    (isopen & global) ? "true" : "false"
-                ))
-                output.success("command.self.fastdrop.success"_tr((isopen & global) ? "true" : "false"));
+            if (!global) output.error("command.self.unuse"_tr());
+            else if (coral_fans::mod().getConfigDb()->set(
+                         std::format("functions.players.{}.fastdrop", player->getUuid().asString()),
+                         isopen ? "true" : "false"
+                     ))
+                output.success("command.self.fastdrop.success"_tr(isopen ? "true" : "false"));
             else output.error("command.self.fastdrop.error"_tr());
         });
 
@@ -141,11 +129,12 @@ void registerSelfCommand(CommandPermissionLevel permission) {
             COMMAND_CHECK_PLAYER
             bool       isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
             const auto global = coral_fans::mod().getConfigDb()->get("functions.global.nopickup") == "true";
-            if (coral_fans::mod().getConfigDb()->set(
-                    std::format("functions.players.{}.nopickup", player->getUuid().asString()),
-                    (isopen & global) ? "true" : "false"
-                ))
-                output.success("command.self.nopickup.success"_tr((isopen & global) ? "true" : "false"));
+            if (!global) output.error("command.self.unuse"_tr());
+            else if (coral_fans::mod().getConfigDb()->set(
+                         std::format("functions.players.{}.nopickup", player->getUuid().asString()),
+                         isopen ? "true" : "false"
+                     ))
+                output.success("command.self.nopickup.success"_tr(isopen ? "true" : "false"));
             else output.error("command.self.nopickup.error"_tr());
         });
 
@@ -157,11 +146,12 @@ void registerSelfCommand(CommandPermissionLevel permission) {
             COMMAND_CHECK_PLAYER
             bool       isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
             const auto global = coral_fans::mod().getConfigDb()->get("functions.global.portaldisabled") == "true";
-            if (coral_fans::mod().getConfigDb()->set(
-                    std::format("functions.players.{}.portaldisabled", player->getUuid().asString()),
-                    (isopen & global) ? "true" : "false"
-                ))
-                output.success("command.self.portaldisabled.success"_tr((isopen & global) ? "true" : "false"));
+            if (!global) output.error("command.self.unuse"_tr());
+            else if (coral_fans::mod().getConfigDb()->set(
+                         std::format("functions.players.{}.portaldisabled", player->getUuid().asString()),
+                         isopen ? "true" : "false"
+                     ))
+                output.success("command.self.portaldisabled.success"_tr(isopen ? "true" : "false"));
             else output.error("command.self.portaldisabled.error"_tr());
         });
 }

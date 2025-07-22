@@ -18,10 +18,6 @@
                 "success": "全局设置 forceplace \"{}\"",
                 "error": "全局设置 forceplace 失败"
             },
-            "noclip": {
-                "success": "全局设置 noclip \"{}\"",
-                "error": "全局设置 noclip 失败"
-            },
             "droppernocost": {
                 "success": "全局设置 droppernocost \"{}\"",
                 "error": "全局设置 droppernocost 失败"
@@ -72,10 +68,7 @@
         },
         "self": {
             "description": "控制CoralFans Mod的功能",
-            "noclip": {
-                "success": "设置 noclip \"{}\"",
-                "error": "设置 noclip 失败"
-            },
+            "unuse": "未启用该功能",
             "autotool": {
                 "success": "设置 autotool \"{}\"",
                 "error": "设置 autotool 失败",
@@ -236,6 +229,11 @@
                 "success": "设置 remove_portal_pigzombie_cd \"{}\"",
                 "error": "设置 remove_portal_pigzombie_cd 失败"
             }
+        },
+        "noclip": {
+            "description": "创造模式穿墙",
+            "enabled": "创造模式穿墙已启用。",
+            "disabled": "创造模式穿墙已禁用。"
         }
     },
     "translate": {
@@ -251,14 +249,14 @@
             "theend": "末地"
         },
         "profiler": {
-            "normal": "- MSPT: {:.3f} ms TPS: {} Chunks: {}\n- CoralFans: {:.3f} ms\n- 红石系统: {:.3f} ms\n - 信号: {:.3f} ms\n - 增加: {:.3f} ms\n - 更新: {:.3f} ms\n - 删除: {:.3f} ms\n- 区块加（卸）载与村庄: {:.3f} ms\n- 实体系统: {:.3f} ms\n - 区块刻: {:.3f} ms\n  - 方块实体: {:.3f} ms\n  - 随机刻: {:.3f} ms\n  - 计划刻: {:.3f} ms\n",
+            "normal": "- MSPT: {:.3f} ms TPS: {} Chunks: {}\n- CoralFans: {:.3f} ms\n- 红石系统: {:.3f} ms\n - 信号: {:.3f} ms\n - 增加: {:.3f} ms\n - 更新: {:.3f} ms\n  - 删除: {:.3f} ms\n- 区块加（卸）载与村庄: {:.3f} ms\n- 实体系统: {:.3f} ms\n - 区块刻: {:.3f} ms\n  - 方块实体: {:.3f} ms\n  - 随机刻: {:.3f} ms\n  - 计划刻: {:.3f} ms\n",
             "actor": {
                 "total": "共计 {} ms\n"
             }
         },
         "village": {
             "cannotget": "无法获取村庄信息",
-            "info": "VID: {}\nUUID: {}\n- 中心: {}\n- 边界: [{}, {}]\n- 半径: {}\n- 居民: {} / {} / {} / {}\n村民列表：\n",
+            "info": "VID: {}\nUUID: {}\n- 中心: {}\n- 边界: {}, {}\n- 半径: {}\n- 居民: {} / {} / {} / {}\n村民列表：\n",
             "villagerInfo": "[{}] 村民坐标：{}\n  POI：\n",
             "villagerPOIType1": "    床：       ",
             "villagerPOIType2": "    钟：       ",
@@ -271,7 +269,7 @@
         },
         "data": {
             "info": {
-                "block": "- §b位置: §a{}§r\n- §b名称: §a{}§r\n- §b类型名: §a{}§r\n- §bID: §a{}§r\n- §b特殊值: §a{}§r\n- §bCanInstanceTick: §a{}§r\n- §bHasBlockEntity: §a{}§r\n- §b比较器输出: §a{}§r\n",
+                "block": "- §b位置: §a{}§r\n- §b名称: §a{}§r\n- §b类型名: §a{}§r\n- §bID: §a{}§r\n- §b变种值: §a{}§r\n- §bCanInstanceTick: §a{}§r\n- §bHasBlockEntity: §a{}§r\n- §b比较器输出: §a{}§r\n",
                 "entity": "- §bNameTag: §a{}§r\n- §bTypeName: §a{}§r\n- §bUID: §a{}§r\n- §bPos: §a{}§r\n- §bDeltaPos: §a{}§r\n- §bAABB: §a{}§r\n- §bSurface: §a{}§r\n",
                 "redstone": {
                     "signal": {
