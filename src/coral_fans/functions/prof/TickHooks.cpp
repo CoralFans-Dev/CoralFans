@@ -24,7 +24,8 @@ LL_TYPE_INSTANCE_HOOK(CoralFansTickLevelTickHook, ll::memory::HookPriority::Norm
     auto& prof = mod.getProfiler();
     origin();
     auto time_level = ProfilerLite::gProfilerLiteInstance().mDebugServerTickTime->count() / 1000;
-    PROF_TIMER(coralfans, { mod.tick(); }) if (prof.profiling) {
+    PROF_TIMER(coralfans, { mod.tick(); })
+    if (prof.profiling) {
         prof.gameSessionTickTime += time_level;
         prof.gameSessionTicksBuffer.push_back(time_level);
         prof.coralfansSessionTickTime += time_coralfans;

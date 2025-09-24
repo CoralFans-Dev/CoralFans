@@ -6,11 +6,17 @@ class MySchedule {
 private:
     int now = 0;
     struct SchduleUnit {
-        int                   left_circle_time;
-        SchduleUnit*          next = nullptr;
-        std::function<void()> task;
+        int                             interval;
+        int                             count;
+        int                             left_circle_time;
+        SchduleUnit*                    next = nullptr;
+        std::function<bool(int&, int&)> task;
 
-        SchduleUnit(int circle_time, std::function<void()> _task) : left_circle_time(circle_time), task(_task) {}
+        SchduleUnit(int delay, int times, int circle_time, std::function<bool(int& interval, int& count)> _task)
+        : interval(delay),
+          count(times),
+          left_circle_time(circle_time),
+          task(_task) {}
         void insert_after(SchduleUnit* unit) {
             unit->next = this->next;
             this->next = unit;
@@ -31,13 +37,26 @@ public:
         now &= 0x7f;
         while (schduleList[now] && !schduleList[now]->left_circle_time) {
             try {
-                schduleList[now]->task(); // 执行任务
+                SchduleUnit* unit = schduleList[now];
+                if (schduleList[now]->task(schduleList[now]->interval, schduleList[now]->count)) {
+                    schduleList[now] = unit->next;
+                    int slot         = (unit->interval + now) & 0x7f;
+                    int circle_time  = unit->interval >> 7;
+                    if (!schduleList[slot]) {
+                        schduleList[slot] = unit;
+                        return;
+                    }
+                    SchduleUnit* tem = schduleList[slot];
+                    while (tem->next && tem->next->left_circle_time <= circle_time) tem = tem->next;
+                    tem->insert_after(unit);
+                } else {
+                    schduleList[now] = unit->next;
+                    delete unit;
+                }
+                // this->add(schduleList[now]->task, schduleList[now]->interval, schduleList[now]->count);
             } catch (const std::exception& e) {
                 mod().getLogger().error("Exception occurred while executing task: {}", e.what());
             }
-            SchduleUnit* tem = schduleList[now];
-            schduleList[now] = tem->next;
-            delete tem;
         }
         SchduleUnit* tem = schduleList[now];
         while (tem) {
@@ -46,16 +65,16 @@ public:
         }
     }
 
-    void add(int t, std::function<void()> task) {
-        int slot        = (t + now) & 0x7f;
-        int circle_time = t >> 7;
+    void add(std::function<bool(int&, int&)> task, int delay = 1, int times = 0) {
+        int slot        = (delay + now) & 0x7f;
+        int circle_time = delay >> 7;
         if (!schduleList[slot]) {
-            schduleList[slot] = new SchduleUnit(circle_time, task);
+            schduleList[slot] = new SchduleUnit(delay, times, circle_time, task);
             return;
         }
         SchduleUnit* tem = schduleList[slot];
         while (tem->next && tem->next->left_circle_time <= circle_time) tem = tem->next;
-        tem->insert_after(new SchduleUnit(circle_time, task));
+        tem->insert_after(new SchduleUnit(delay, times, circle_time, task));
     }
 
     MySchedule(const MySchedule&)            = delete;

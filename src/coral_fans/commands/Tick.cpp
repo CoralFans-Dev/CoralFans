@@ -1,3 +1,4 @@
+#include "Commands.h"
 #include "coral_fans/base/MySchedule.h"
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
@@ -6,11 +7,15 @@
 #include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/service/Bedrock.h"
+#include "mc/network/packet/TextPacket.h"
+#include "mc/platform/UUID.h"
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/server/commands/CommandPermissionLevel.h"
 #include "mc/server/commands/CommandRegistry.h"
+#include "mc/util/ProfilerLite.h"
 #include "mc/util/Timer.h"
 #include "mc/world/Minecraft.h"
+#include "mc/world/level/Level.h"
 
 
 namespace coral_fans::commands {
@@ -63,12 +68,42 @@ void registerTickCommand(CommandPermissionLevel permission) {
             output.success("command.tick.rate.success"_tr(rate));
         });
 
+    // tick query [int]
+    tickCommand.runtimeOverload()
+        .text("query")
+        .optional("times", ll::command::ParamKind::Int)
+        .execute([&](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            int tick = self["times"].has_value() ? self["times"].get<ll::command::ParamKind::Int>() : 1;
+            if (!::Command::validRange(tick, 0, INT_MAX, output)) {
+                return;
+            }
+            auto player = tryGetPlayer(origin);
+            my_schedule::MySchedule::getSchedule().add(
+                [uuid = player.has_value() ? player.value()->getUuid().asString() : "", tick](int&, int& count) {
+                    if (uuid != "") {
+                        TextPacket::createRawMessage(
+                            "command.tick.query.output"_tr(
+                                ProfilerLite::gProfilerLiteInstance().mDebugServerTickTime->count() / 1000000.0
+                            )
+                        )
+                            .sendTo(*ll::service::getLevel()->getPlayer(mce::UUID(uuid)));
+                    } else
+                        coral_fans::mod().getLogger().info("command.tick.query.output"_tr(
+                            ProfilerLite::gProfilerLiteInstance().mDebugServerTickTime->count() / 1000000.0
+                        ));
+                    count++;
+                    return tick > count;
+                }
+            );
+        });
+
+    // tick step <int>
     tickCommand.runtimeOverload()
         .text("step")
         .required("time", ll::command::ParamKind::Int)
         .execute([&](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             int tick = self["time"].get<ll::command::ParamKind::Int>();
-            if (!::Command::validRange(tick, 0, INT_MAX, output)) {
+            if (!::Command::validRange(tick, 1, INT_MAX, output)) {
                 return;
             }
             auto mc = ll::service::getMinecraft();

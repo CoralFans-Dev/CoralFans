@@ -8,8 +8,7 @@
 #include "mc/world/level/Level.h"
 #include "mc/world/level/Spawner.h"
 #include "mc/world/level/block/Block.h"
-#include "mc/world/level/block/BlockLegacy.h"
-#include "mc/world/level/block/CachedComponentData.h"
+#include "mc/world/level/block/BlockType.h"
 #include "mc/world/level/block/ResourceDrops.h"
 #include "mc/world/level/block/ResourceDropsContext.h"
 #include "mc/world/level/block/actor/MovingBlockActor.h"
@@ -22,8 +21,8 @@ namespace coral_fans::functions {
 LL_TYPE_INSTANCE_HOOK(
     CoralFansDropHook1,
     ll::memory::HookPriority::Normal,
-    BlockLegacy,
-    &BlockLegacy::getResourceDrops,
+    BlockType,
+    &BlockType::getResourceDrops,
     ResourceDrops,
     ::Block const&                block,
     ::Randomize&                  randomize,
@@ -62,8 +61,8 @@ LL_TYPE_STATIC_HOOK(
 LL_TYPE_INSTANCE_HOOK(
     CoralFansDropHook3,
     HookPriority::Normal,
-    BlockLegacy,
-    &BlockLegacy ::spawnResources,
+    BlockType,
+    &BlockType ::spawnResources,
     void,
     ::BlockSource&                region,
     ::BlockPos const&             pos,
@@ -75,7 +74,7 @@ LL_TYPE_INSTANCE_HOOK(
         MovingBlockActor* mba = (MovingBlockActor*)region.getBlockEntity(pos);
         region.setBlock(pos, *mba->mWrappedBlock, 3, mba->mWrappedBlockActor, nullptr, nullptr);
         const Block& newBlock = region.getBlock(pos);
-        return newBlock.mLegacyBlock->spawnResources(region, pos, newBlock, randomize, resourceDropsContext);
+        return newBlock.mBlockType->spawnResources(region, pos, newBlock, randomize, resourceDropsContext);
     }
     return origin(region, pos, block, randomize, resourceDropsContext);
 }

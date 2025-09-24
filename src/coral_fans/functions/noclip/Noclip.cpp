@@ -18,7 +18,13 @@ LL_TYPE_INSTANCE_HOOK(
     if (gameType == ::GameType::Creative
         && coral_fans::mod().getConfigDb()->get(std::format("noclip.players.{}", this->getUuid().asString())) == "T") {
         this->setAbility(::AbilitiesIndex::Flying, true);
-        my_schedule::MySchedule::getSchedule().add(3, [this]() { this->setAbility(::AbilitiesIndex::NoClip, true); });
+        my_schedule::MySchedule::getSchedule().add(
+            [this](int&, int&) {
+                this->setAbility(::AbilitiesIndex::NoClip, true);
+                return false;
+            },
+            3
+        );
     }
 }
 

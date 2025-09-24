@@ -29,8 +29,8 @@ LL_TYPE_INSTANCE_HOOK(
                 auto list  = (*tag)["tag"]["Items"].get<ListTag>();
                 int  _size = list.size();
                 for (int _i = 0; _i < _size; _i++) {
-                    auto itemTag = list.getCompound(_i);
-                    if ((*itemTag)["Name"].get<StringTag>() == "minecraft:totem_of_undying") {
+                    auto& itemTag = list[_i].get<CompoundTag>();
+                    if (itemTag["Name"].get<StringTag>() == "minecraft:totem_of_undying") {
                         list.erase(list.begin() + _i);
                         (*tag)["tag"]["Items"] = list;
                         inv.setItem(i, ItemStack::fromTag(*tag));

@@ -30,11 +30,15 @@ void registerNoclipCommand(CommandPermissionLevel permission) {
         );
         if (enable) {
             player->setAbility(::AbilitiesIndex::Flying, true);
-            my_schedule::MySchedule::getSchedule().add(3, [player, output]() {
-                if (player) {
-                    player->setAbility(::AbilitiesIndex::NoClip, true);
-                }
-            });
+            my_schedule::MySchedule::getSchedule().add(
+                [player, output](int&, int&) {
+                    if (player) {
+                        player->setAbility(::AbilitiesIndex::NoClip, true);
+                    }
+                    return false;
+                },
+                3
+            );
             output.success("command.noclip.enabled"_tr());
         } else {
             player->setAbility(::AbilitiesIndex::NoClip, false);

@@ -1,6 +1,7 @@
 #include "coral_fans/base/Mod.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/nbt/CompoundTag.h"
+#include "mc/nbt/CompoundTagVariant.h"
 #include "mc/world/Container.h"
 #include "mc/world/actor/Mob.h"
 #include "mc/world/actor/player/Inventory.h"
@@ -61,9 +62,9 @@ LL_TYPE_INSTANCE_HOOK(
                     auto list  = (*tag)["tag"]["Items"].get<ListTag>();
                     int  _size = list.size();
                     for (int _i = 0; _i < _size; _i++) {
-                        auto itemTag = list.getCompound(_i);
-                        if ((*itemTag)["Name"].get<StringTag>() == name) {
-                            item = ItemStack::fromTag(*itemTag);
+                        auto& itemTag = list[_i].get<CompoundTag>();
+                        if (itemTag["Name"].get<StringTag>() == name) {
+                            item = ItemStack::fromTag(itemTag);
                             list.erase(list.begin() + _i);
                             (*tag)["tag"]["Items"] = list;
                             inv.setItem(i, ItemStack::fromTag(*tag));

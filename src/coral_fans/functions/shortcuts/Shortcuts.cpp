@@ -113,7 +113,7 @@ void ShortcutsManager::registerShortcutsListener() {
                             command = ll::string_utils::replaceAll(
                                 command,
                                 "{blockvariant}",
-                                std::to_string(event.block()->mLegacyBlock->getVariant(event.block()))
+                                std::to_string(event.block()->mBlockType->getVariant(event.block()))
                             );
                             command =
                                 ll::string_utils::replaceAll(command, "{blockx}", std::to_string(event.blockPos().x));
@@ -126,7 +126,7 @@ void ShortcutsManager::registerShortcutsListener() {
                                 std::make_unique<PlayerCommandOrigin>(PlayerCommandOrigin(event.self())),
                                 CommandVersion::CurrentVersion()
                             );
-                            mc->mCommands->executeCommand(context, false);
+                            [[maybe_unused]] MCRESULT unused = mc->mCommands->executeCommand(context, false);
                         }
                     }
                     cancel |= useon.intercept;

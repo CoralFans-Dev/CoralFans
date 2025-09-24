@@ -105,7 +105,7 @@
         "tick": {
             "description": "控制或查询游戏刻状态",
             "query": {
-                "output": "{} 每 tick"
+                "output": "{}ms 每 tick"
             },
             "set": {
                 "output": "设置 tick {}"

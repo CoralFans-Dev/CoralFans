@@ -39,8 +39,8 @@ void SlimeManager::tick() {
                                 coral_fans::mod().getGeometryGroup()->box(
                                     0,
                                     BoundingBox{
-                                        {(originChunkPos.x + i) * 16, -64, (originChunkPos.z + j) * 16},
-                                        {(originChunkPos.x + i) * 16 + 15, 320, (originChunkPos.z + j) * 16 + 15}
+                                        {(originChunkPos.x + i) * 16 + 0.5, -64, (originChunkPos.z + j) * 16 + 0.5},
+                                        {(originChunkPos.x + i) * 16 + 14.5, 320, (originChunkPos.z + j) * 16 + 14.5}
                                     },
                                     mce::Color::GREEN()
                                 );

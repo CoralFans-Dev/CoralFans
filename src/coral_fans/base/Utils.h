@@ -9,7 +9,7 @@
 
 namespace coral_fans::utils {
 
-std::pair<std::string, bool> getNbtFromTag(CompoundTag const, std::string const&);
+std::pair<std::string, bool> getNbtFromTag(CompoundTag&, std::string const&);
 
 ChunkPos blockPosToChunkPos(BlockPos const& blockPos);
 

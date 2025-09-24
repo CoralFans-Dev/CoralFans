@@ -28,10 +28,11 @@ struct PathNode {
 
 bool parsePath(std::string const& path, std::vector<PathNode>& vec) {
     for (auto key : ll::string_utils::splitByPattern(path, ".")) {
-        if (key.ends_with(']')) try {
+        if (key.ends_with(')')) try {
+                int index = (int)key.find('(');
                 vec.emplace_back(PathNode{
-                    std::string{key.substr(0, key.find('['))},
-                    std::stoi(std::string{key.substr(key.find('[') + 1, key.length() - key.find('[') - 2)}),
+                    std::string{key.substr(0, index)},
+                    std::stoi(std::string{key.substr(index + 1, key.length() - index - 2)}),
                     true
                 });
             } catch (...) {
@@ -44,27 +45,32 @@ bool parsePath(std::string const& path, std::vector<PathNode>& vec) {
 
 } // namespace
 
-std::pair<std::string, bool> getNbtFromTag(CompoundTag const tag, std::string const& path) {
+std::pair<std::string, bool> getNbtFromTag(CompoundTag& tag, std::string const& path) {
     using ll::i18n_literals::operator""_tr;
-    std::vector<PathNode>           nodes;
-    std::vector<CompoundTagVariant> tags;
+    std::vector<PathNode> nodes;
     if (!parsePath(path, nodes)) return {"translate.data.error.cannotparse"_tr(), false};
     try {
-        tags.emplace_back(tag[nodes[0].id]);
+        auto it = tag.mTags.find(nodes[0].id);
+        if (it == tag.mTags.end()) return {"translate.data.error.geterror"_tr(), false};
+        CompoundTagVariant& tagVariant = it->second;
         if (nodes[0].useIndex) {
-            if (tags.back().is_array() && tags.back().get<ListTag>().getCompound(nodes[0].index))
-                tags.emplace_back(*(tags.back().get<ListTag>().getCompound(nodes[0].index)));
-            else return {"translate.data.error.notanarray"_tr(), false};
-        }
-        for (unsigned long long i = 1; i < nodes.size(); ++i) {
-            tags.emplace_back(tags.back()[nodes[i].id]);
-            if (nodes[i].useIndex) {
-                if (tags.back().is_array() && tags.back().get<ListTag>().getCompound(nodes[i].index))
-                    tags.emplace_back(*(tags.back().get<ListTag>().getCompound(nodes[i].index)));
-                else return {"translate.data.error.notanarray"_tr(), false};
+            if (tagVariant.is_array()) {
+                auto& list = tagVariant.get<ListTag>();
+                if (nodes[0].index >= list.size()) return {"translate.data.error.geterror"_tr(), false};
+                tagVariant = std::move(list[nodes[0].index]);
             }
         }
-        return {tags.back().toSnbt(SnbtFormat::PrettyChatPrint), true};
+        for (unsigned long long i = 1; i < nodes.size(); i++) {
+            tagVariant = std::move(tagVariant[nodes[i].id]);
+            if (nodes[i].useIndex) {
+                if (tagVariant.is_array()) {
+                    auto& list = tagVariant.get<ListTag>();
+                    if (nodes[i].index >= list.size()) return {"translate.data.error.geterror"_tr(), false};
+                    tagVariant = std::move(list[nodes[i].index]);
+                }
+            }
+        }
+        return {tagVariant.toSnbt(SnbtFormat::PrettyChatPrint), true};
     } catch (...) {
         return {"translate.data.error.geterror"_tr(), false};
     }
@@ -82,7 +88,13 @@ std::string removeMinecraftPrefix(std::string const& s) { return s.find("minecra
 void shortHighligntBlock(int dimid, BlockPos const& blockPos, mce::Color const& color, int time) {
     auto& mod = coral_fans::mod();
     auto  s   = mod.getGeometryGroup()->box(dimid, {blockPos, blockPos + BlockPos::ONE()}, color);
-    my_schedule::MySchedule::getSchedule().add(time, [&, s]() { mod.getGeometryGroup()->remove(s); });
+    my_schedule::MySchedule::getSchedule().add(
+        [&, s](int&, int&) {
+            mod.getGeometryGroup()->remove(s);
+            return false;
+        },
+        time
+    );
 }
 
 void swapItemInContainer(Player* player, int slot1, int slot2) {

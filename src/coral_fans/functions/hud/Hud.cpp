@@ -125,7 +125,7 @@ void HudHelper::tick() {
                     if (hitrst.mType == HitResultType::Tile) {
                         const auto& bl = blockSource.getBlock(hitrst.mBlock);
                         auto*       ba = blockSource.getBlockEntity(hitrst.mBlock);
-                        if (bl.mLegacyBlock->isContainerBlock() && ba) {
+                        if (bl.mBlockType->isContainerBlock() && ba) {
                             auto* container = ba->getContainer();
                             if (container) {
                                 std::map<std::string, int> items;

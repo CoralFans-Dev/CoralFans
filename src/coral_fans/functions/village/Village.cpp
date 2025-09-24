@@ -203,13 +203,13 @@ std::string CFVillageManager::listTickingVillages() {
         retstr                  += std::format(
             "- §a[{}]§r §b{}§r r: {} p: {} g: {} b: {} §6[{}, {}]§r\n",
             kv.first,
-            kv.second.first->mBounds->center().toJsonString(),
+            kv.second.first->mBounds->center().toString(),
             approximateRadius,
             dwellerCountArray[0], // Villager
             dwellerCountArray[1], // IronGolem
             kv.second.first->getBedPOICount(),
-            kv.second.first->mBounds->min.toJsonString(),
-            kv.second.first->mBounds->max.toJsonString()
+            kv.second.first->mBounds->min.toString(),
+            kv.second.first->mBounds->max.toString()
         );
     }
     return retstr;
@@ -241,9 +241,9 @@ std::pair<std::string, bool> CFVillageManager::getVillageInfo(std::string id) {
     std::string retstr            = "translate.village.info"_tr(
         vid,
         village->mUniqueID->asString(),
-        village->mBounds->center().toJsonString(),
-        village->mBounds->min.toJsonString(),
-        village->mBounds->max.toJsonString(),
+        village->mBounds->center().toString(),
+        village->mBounds->min.toString(),
+        village->mBounds->max.toString(),
         approximateRadius,
         dwellerCountArray[0],
         dwellerCountArray[1],
@@ -254,10 +254,8 @@ std::pair<std::string, bool> CFVillageManager::getVillageInfo(std::string id) {
     auto level = ll::service::getLevel();
     for (auto& villager : ::getDwellerPoiMap(village)) {
         i++;
-        retstr += "translate.village.villagerInfo"_tr(
-            i,
-            level->fetchEntity(villager.first, false)->getFeetPos().toJsonString()
-        );
+        retstr +=
+            "translate.village.villagerInfo"_tr(i, level->fetchEntity(villager.first, false)->getFeetPos().toString());
         retstr    += "translate.village.villagerPOIType1"_tr();
         auto poi1  = villager.second[0].lock();
         if (poi1)

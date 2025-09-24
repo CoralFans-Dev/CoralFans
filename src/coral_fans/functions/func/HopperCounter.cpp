@@ -90,7 +90,7 @@ int HopperCounterManager::getViewChannel(BlockSource& blockSource, HitResult hit
     const auto&                                          dest = blockSource.getBlock(hitrst.mBlock);
     std::unordered_map<std::string, int>::const_iterator it;
     if (utils::removeMinecraftPrefix(dest.getTypeName()) == "hopper") {
-        int      var            = dest.mLegacyBlock->getVariant(dest);
+        int      var            = dest.mBlockType->getVariant(dest);
         BlockPos pos            = hitrst.mBlock;
         pos[(var / 2 + 1) % 3] += (var & 1) * 2 - 1;
         const auto& block       = blockSource.getBlock(pos);
@@ -138,7 +138,7 @@ LL_TYPE_INSTANCE_HOOK(
     // auto& blockActor = ll::memory::dAccess<BlockActor>(this, -200); // magic number!
     BlockPos     pos        = HopperCounterManager::getInstance().pos;
     const Block& block      = HopperCounterManager::getInstance().region->getBlock(pos);
-    int          var        = block.mLegacyBlock->getVariant(block);
+    int          var        = block.mBlockType->getVariant(block);
     pos[(var / 2 + 1) % 3] += (var & 1) * 2 - 1;
     auto& dest              = HopperCounterManager::getInstance().region->getBlock(pos);
     // get iterator

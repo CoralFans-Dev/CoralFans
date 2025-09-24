@@ -33,11 +33,11 @@ std::string getBlockData(BlockSource& blockSource, BlockPos blockPos) {
         block.buildDescriptionName(),
         block.getTypeName(),
         block.getBlockItemId(),
-        block.mLegacyBlock->getVariant(block),
-        block.mLegacyBlock->canInstatick(),
-        block.mLegacyBlock->mBlockEntityType != BlockActorType::Undefined,
-        block.mLegacyBlock->hasComparatorSignal()
-            ? std::to_string(block.mLegacyBlock->getComparatorSignal(blockSource, blockPos, block, 0))
+        block.mBlockType->getVariant(block),
+        block.mBlockType->canInstatick(),
+        block.mBlockType->mBlockEntityType != BlockActorType::Undefined,
+        block.mBlockType->hasComparatorSignal()
+            ? std::to_string(block.mBlockType->getComparatorSignal(blockSource, blockPos, block, 0))
             : "-"
     );
 }
@@ -148,8 +148,8 @@ RepeaterCapacitor      = 2097156,       中继器，已包含在电容器中
                 component->isHalfPulse() ? "true" : "false",
                 component->mDirection,
                 // "magic_enum::enum_name(component->mDirection)",
-                block.mLegacyBlock->hasComparatorSignal()
-                    ? std::to_string(block.mLegacyBlock->getComparatorSignal(blockSource, pos, block, 0))
+                block.mBlockType->hasComparatorSignal()
+                    ? std::to_string(block.mBlockType->getComparatorSignal(blockSource, pos, block, 0))
                     : "-"
             ),
             true
