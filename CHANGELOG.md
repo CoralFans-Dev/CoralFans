@@ -5,14 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.6.0] - 2025-7-20
+## [2.7.0] - 2025-10.4
+
+### Added
+
++ Adapted to 1.21.111
+
+## [2.6.0] - 2025-9-26
 
 ### Added
 
 + Adapted to 1.21.102
 + Added back command "tick query [time]"
 
-## [2.5.0] - 2025-7-20
+## [2.5.0] - 2025-8-26
 
 ### Added
 
