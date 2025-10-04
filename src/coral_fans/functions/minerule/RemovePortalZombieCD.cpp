@@ -7,6 +7,8 @@
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/Spawner.h"
+#include "mc/world/level/block/Block.h"
+#include "mc/world/level/block/BlockSupportType.h"
 #include "mc/world/level/block/PortalBlock.h"
 
 
@@ -23,7 +25,8 @@ LL_TYPE_STATIC_HOOK(
 ) {
     Vec3 _pos = pos;
     while (_pos.y-- > 1) {
-        if (region.canProvideSupport(_pos, 1, ::BlockSupportType::Any)
+        auto& block = region.getBlock(_pos);
+        if (block.mBlockType->canProvideSupport(block, 1, BlockSupportType::Any)
             // && !region.isSolidBlockingBlock(_pos.x, _pos.y + 1, pos.z)
             // 源码中的判定条件，但是据我所知没有任何一个固体方块不给上方提供支持，所以源码中这条判定完全是多余的
         ) {

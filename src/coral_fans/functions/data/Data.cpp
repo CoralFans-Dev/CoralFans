@@ -96,13 +96,16 @@ std::pair<std::string, bool> showRedstoneComponentsInfo(Dimension& dimension, Bl
         return {"", true};
     }
     using ll::i18n_literals::operator""_tr;
-    auto* component = graph.getComponent(pos, CircuitComponentType::CapacitorComponent);
-    if (!component) component = graph.getComponent(pos, CircuitComponentType::ConsumerComponent);
-    if (!component) component = graph.getComponent(pos, CircuitComponentType::TransporterComponent);
-    if (!component) component = graph.getComponent(pos, CircuitComponentType::PoweredBlockComponent);
-    if (!component) component = graph.getComponent(pos, CircuitComponentType::PoweredBlockComponent);
-    if (!component) component = graph.getComponent(pos, CircuitComponentType::ProducerComponent);
-    if (!component) component = graph.getComponent(pos, CircuitComponentType::BaseRailTransporter);
+    auto it = graph.mAllComponents.find(pos);
+    if (it == graph.mAllComponents.end()) return {"translate.data.error.nocircuitcomponent"_tr(), false};
+    auto component = it->second.get();
+    // auto* component = graph.getComponent(pos, CircuitComponentType::CapacitorComponent);
+    // if (!component) component = graph.getComponent(pos, CircuitComponentType::ConsumerComponent);
+    // if (!component) component = graph.getComponent(pos, CircuitComponentType::TransporterComponent);
+    // if (!component) component = graph.getComponent(pos, CircuitComponentType::PoweredBlockComponent);
+    // if (!component) component = graph.getComponent(pos, CircuitComponentType::PoweredBlockComponent);
+    // if (!component) component = graph.getComponent(pos, CircuitComponentType::ProducerComponent);
+    // if (!component) component = graph.getComponent(pos, CircuitComponentType::BaseRailTransporter);
     /*
 in 1.21.50
 enum class CircuitComponentType : uint64 {
@@ -122,7 +125,6 @@ RedstoneTorchCapacitor = 2097155,       红石火把
 RepeaterCapacitor      = 2097156,       中继器，已包含在电容器中
 };
 */
-    if (!component) return {"translate.data.error.nocircuitcomponent"_tr(), false};
     if (type == 1) {
         // signal
         std::string retstr = "translate.data.info.redstone.signal.title"_tr(component->getStrength());
@@ -158,9 +160,9 @@ RepeaterCapacitor      = 2097156,       中继器，已包含在电容器中
     if (type == 3) {
         // conn
         utils::shortHighligntBlock((DimensionType)dimension.mId, pos, mce::Color::GREEN(), 80); // highlight self
-        auto it = graph.mPowerAssociationMap.find(pos);
-        if (it != graph.mPowerAssociationMap.end())
-            for (auto& c : it->second.mComponents)
+        auto _it = graph.mPowerAssociationMap.find(pos);
+        if (_it != graph.mPowerAssociationMap.end())
+            for (auto& c : _it->second.mComponents)
                 utils::shortHighligntBlock(
                     (DimensionType)dimension.mId,
                     c.mPos,

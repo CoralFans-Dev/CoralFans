@@ -37,19 +37,16 @@ void registerTickCommand(CommandPermissionLevel permission) {
     tickCommand.runtimeOverload()
         .required("tickFreezeType", ll::command::ParamKind::Enum, "tickFreezeType")
         .execute([&](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
-            bool       pause = false;
-            const auto val   = self["tickFreezeType"].get<ll::command::ParamKind::Enum>();
-            switch (val.index) {
-            case 1:
-                pause = true;
-                break;
-            case 0:
-                pause = false;
-                break;
-            }
+            const auto val = self["tickFreezeType"].get<ll::command::ParamKind::Enum>();
             // LevelEventPacket{LevelEvent::SimTimeStep, origin.getWorldPosition(), pause}.sendToClients();
             auto mc = ll::service::getMinecraft();
-            if (mc.has_value()) mc->setSimTimePause(pause);
+            if (mc.has_value()) {
+                if (val.index) mc->setSimTimePause(true);
+                else {
+                    mc->setSimTimePause(false);
+                    mc->setSimTimeScale(1.0f);
+                }
+            }
             output.success("command.tick.set.output"_tr(val.name));
         });
 

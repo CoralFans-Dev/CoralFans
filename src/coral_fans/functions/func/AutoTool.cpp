@@ -34,7 +34,7 @@ int searchBestToolInInv(Container& inv, int currentSlot, const Block* block, con
             weapon ? currentItem.mItem.get()->getAttackDamage()
                    : currentItem.mItem.get()->getDestroySpeed(currentItem, *block),
             currentSlot,
-            currentItem.getMaxDamage() - currentItem.getDamageValue()
+            currentItem.mItem->getMaxDamage() - currentItem.getDamageValue()
         };
     }
     int size = inv.getContainerSize();
@@ -43,7 +43,7 @@ int searchBestToolInInv(Container& inv, int currentSlot, const Block* block, con
         if (item != ItemStack::EMPTY_ITEM()) {
             float value =
                 weapon ? item.mItem.get()->getAttackDamage() : item.mItem.get()->getDestroySpeed(currentItem, *block);
-            short remainDamage = item.getMaxDamage() - item.getDamageValue();
+            short remainDamage = item.mItem->getMaxDamage() - item.getDamageValue();
             // skip low remainDamage tools
             if (remainDamage <= minDamage) continue;
             if (value > curInfo.value) {

@@ -3,13 +3,7 @@
 
 namespace coral_fans::functions {
 // safeexplode
-LL_TYPE_INSTANCE_HOOK(
-    CoralFansSafeExplodeHook,
-    ll::memory::HookPriority::Normal,
-    Explosion,
-    &Explosion::explode,
-    bool
-) {
+LL_TYPE_INSTANCE_HOOK(CoralFansSafeExplodeHook, ll::memory::HookPriority::Normal, Explosion, &Explosion::explode, bool, ::IRandom&) {
     return false;
 }
 

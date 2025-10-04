@@ -177,12 +177,13 @@ void rotateBlock(Player* player, BlockPos blockPos) {
         if (blockEntity) {
             std ::unique_ptr<CompoundTag> blockEntityTag = std ::make_unique<CompoundTag>();
             blockEntity->save(*blockEntityTag, *SaveContextFactory ::createCloneSaveContext());
-            blockSource.getChunkAt(blockPos)->removeBlockEntity(blockPos);
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, nullptr);
             return;
         } else {
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, nullptr, nullptr);
             return;
         }
@@ -198,12 +199,13 @@ void rotateBlock(Player* player, BlockPos blockPos) {
         if (blockEntity) {
             std ::unique_ptr<CompoundTag> blockEntityTag = std ::make_unique<CompoundTag>();
             blockEntity->save(*blockEntityTag, *SaveContextFactory ::createCloneSaveContext());
-            blockSource.getChunkAt(blockPos)->removeBlockEntity(blockPos);
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, nullptr);
             return;
         } else {
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, nullptr, nullptr);
             return;
         }
@@ -219,12 +221,13 @@ void rotateBlock(Player* player, BlockPos blockPos) {
         if (blockEntity) {
             std ::unique_ptr<CompoundTag> blockEntityTag = std ::make_unique<CompoundTag>();
             blockEntity->save(*blockEntityTag, *SaveContextFactory ::createCloneSaveContext());
-            blockSource.getChunkAt(blockPos)->removeBlockEntity(blockPos);
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, nullptr);
             return;
         } else {
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, nullptr, nullptr);
             return;
         }
@@ -240,12 +243,13 @@ void rotateBlock(Player* player, BlockPos blockPos) {
         if (blockEntity) {
             std ::unique_ptr<CompoundTag> blockEntityTag = std ::make_unique<CompoundTag>();
             blockEntity->save(*blockEntityTag, *SaveContextFactory ::createCloneSaveContext());
-            blockSource.getChunkAt(blockPos)->removeBlockEntity(blockPos);
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, nullptr);
             return;
         } else {
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, nullptr, nullptr);
             return;
         }
@@ -261,12 +265,13 @@ void rotateBlock(Player* player, BlockPos blockPos) {
         if (blockEntity) {
             std ::unique_ptr<CompoundTag> blockEntityTag = std ::make_unique<CompoundTag>();
             blockEntity->save(*blockEntityTag, *SaveContextFactory ::createCloneSaveContext());
-            blockSource.getChunkAt(blockPos)->removeBlockEntity(blockPos);
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, nullptr);
             return;
         } else {
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, nullptr, nullptr);
             return;
         }
@@ -282,12 +287,13 @@ void rotateBlock(Player* player, BlockPos blockPos) {
         if (blockEntity) {
             std ::unique_ptr<CompoundTag> blockEntityTag = std ::make_unique<CompoundTag>();
             blockEntity->save(*blockEntityTag, *SaveContextFactory ::createCloneSaveContext());
-            blockSource.getChunkAt(blockPos)->removeBlockEntity(blockPos);
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, nullptr);
             return;
         } else {
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, nullptr, nullptr);
             return;
         }
@@ -303,12 +309,13 @@ void rotateBlock(Player* player, BlockPos blockPos) {
         if (blockEntity) {
             std ::unique_ptr<CompoundTag> blockEntityTag = std ::make_unique<CompoundTag>();
             blockEntity->save(*blockEntityTag, *SaveContextFactory ::createCloneSaveContext());
-            blockSource.getChunkAt(blockPos)->removeBlockEntity(blockPos);
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, nullptr);
             return;
         } else {
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, nullptr, nullptr);
             return;
         }
@@ -324,12 +331,13 @@ void rotateBlock(Player* player, BlockPos blockPos) {
         if (blockEntity) {
             std ::unique_ptr<CompoundTag> blockEntityTag = std ::make_unique<CompoundTag>();
             blockEntity->save(*blockEntityTag, *SaveContextFactory ::createCloneSaveContext());
-            blockSource.getChunkAt(blockPos)->removeBlockEntity(blockPos);
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, nullptr);
             return;
         } else {
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, nullptr, nullptr);
             return;
         }
@@ -345,12 +353,13 @@ void rotateBlock(Player* player, BlockPos blockPos) {
         if (blockEntity) {
             std ::unique_ptr<CompoundTag> blockEntityTag = std ::make_unique<CompoundTag>();
             blockEntity->save(*blockEntityTag, *SaveContextFactory ::createCloneSaveContext());
-            blockSource.getChunkAt(blockPos)->removeBlockEntity(blockPos);
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, nullptr);
             return;
         } else {
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, nullptr, nullptr);
             return;
         }
@@ -366,12 +375,13 @@ void rotateBlock(Player* player, BlockPos blockPos) {
         if (blockEntity) {
             std ::unique_ptr<CompoundTag> blockEntityTag = std ::make_unique<CompoundTag>();
             blockEntity->save(*blockEntityTag, *SaveContextFactory ::createCloneSaveContext());
-            blockSource.getChunkAt(blockPos)->removeBlockEntity(blockPos);
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, nullptr);
             return;
         } else {
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, nullptr, nullptr);
             return;
         }
@@ -387,12 +397,13 @@ void rotateBlock(Player* player, BlockPos blockPos) {
         if (blockEntity) {
             std ::unique_ptr<CompoundTag> blockEntityTag = std ::make_unique<CompoundTag>();
             blockEntity->save(*blockEntityTag, *SaveContextFactory ::createCloneSaveContext());
-            blockSource.getChunkAt(blockPos)->removeBlockEntity(blockPos);
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, nullptr);
             return;
         } else {
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, nullptr, nullptr);
             return;
         }
@@ -408,12 +419,13 @@ void rotateBlock(Player* player, BlockPos blockPos) {
         if (blockEntity) {
             std ::unique_ptr<CompoundTag> blockEntityTag = std ::make_unique<CompoundTag>();
             blockEntity->save(*blockEntityTag, *SaveContextFactory ::createCloneSaveContext());
-            blockSource.getChunkAt(blockPos)->removeBlockEntity(blockPos);
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, nullptr);
             return;
         } else {
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, nullptr, nullptr);
             return;
         }
@@ -429,12 +441,13 @@ void rotateBlock(Player* player, BlockPos blockPos) {
         if (blockEntity) {
             std ::unique_ptr<CompoundTag> blockEntityTag = std ::make_unique<CompoundTag>();
             blockEntity->save(*blockEntityTag, *SaveContextFactory ::createCloneSaveContext());
-            blockSource.getChunkAt(blockPos)->removeBlockEntity(blockPos);
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, nullptr);
             return;
         } else {
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, nullptr, nullptr);
             return;
         }
@@ -450,12 +463,13 @@ void rotateBlock(Player* player, BlockPos blockPos) {
         if (blockEntity) {
             std ::unique_ptr<CompoundTag> blockEntityTag = std ::make_unique<CompoundTag>();
             blockEntity->save(*blockEntityTag, *SaveContextFactory ::createCloneSaveContext());
-            blockSource.getChunkAt(blockPos)->removeBlockEntity(blockPos);
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, nullptr);
             return;
         } else {
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, nullptr, nullptr);
             return;
         }
@@ -471,12 +485,13 @@ void rotateBlock(Player* player, BlockPos blockPos) {
         if (blockEntity) {
             std ::unique_ptr<CompoundTag> blockEntityTag = std ::make_unique<CompoundTag>();
             blockEntity->save(*blockEntityTag, *SaveContextFactory ::createCloneSaveContext());
-            blockSource.getChunkAt(blockPos)->removeBlockEntity(blockPos);
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, nullptr);
             return;
         } else {
-            blockSource.setBlock(blockPos, Block ::tryGetFromRegistry("minecraft:air"), 3, nullptr, nullptr);
+            blockSource
+                .setBlock(blockPos, Block ::tryGetFromRegistry(HashedString("minecraft:air")), 3, nullptr, nullptr);
             blockSource.setBlock(blockPos, newBlock, 3, nullptr, nullptr);
             return;
         }
