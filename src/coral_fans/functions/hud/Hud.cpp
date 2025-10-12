@@ -7,7 +7,6 @@
 #include "ll/api/base/StdInt.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/service/Bedrock.h"
-#include "magic_enum.hpp"
 #include "mc/common/Brightness.h"
 #include "mc/network/packet/TextPacket.h"
 #include "mc/network/packet/TextPacketType.h"
@@ -93,7 +92,7 @@ void HudHelper::tick() {
                         delta.x * 20,
                         delta.y * 20,
                         delta.z * 20,
-                        magic_enum::enum_name(biome.getBiomeType())
+                        biome.mHash->c_str()
                     );
                 }
                 if (hud & (1 << HudHelper::HudType::redstone)) {

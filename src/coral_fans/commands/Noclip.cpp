@@ -6,11 +6,13 @@
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/i18n/I18n.h"
+#include "ll/api/service/Bedrock.h"
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/world/actor/player/AbilitiesIndex.h"
 #include "mc/world/actor/player/LayeredAbilities.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/level/GameType.h"
+#include "mc/world/level/Level.h"
 
 
 namespace coral_fans::commands {
@@ -31,10 +33,15 @@ void registerNoclipCommand(CommandPermissionLevel permission) {
         if (enable) {
             player->setAbility(::AbilitiesIndex::Flying, true);
             my_schedule::MySchedule::getSchedule().add(
-                [player, output](int&, int&) {
-                    if (player) {
-                        player->setAbility(::AbilitiesIndex::NoClip, true);
-                    }
+                [playername = player->mName.get()](int&, int&) {
+                    auto level = ll::service::getLevel();
+                    if (!level.has_value()) return false;
+                    Player* pl = nullptr;
+                    level->forEachPlayer([&pl, playername](Player& player) {
+                        if (player.mName.get() == playername) pl = &player;
+                        return false;
+                    });
+                    if (pl) pl->setAbility(::AbilitiesIndex::NoClip, true);
                     return false;
                 },
                 3
