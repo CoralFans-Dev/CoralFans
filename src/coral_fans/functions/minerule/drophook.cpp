@@ -8,6 +8,7 @@
 #include "mc/world/level/Level.h"
 #include "mc/world/level/Spawner.h"
 #include "mc/world/level/block/Block.h"
+#include "mc/world/level/block/BlockChangeContext.h"
 #include "mc/world/level/block/BlockType.h"
 #include "mc/world/level/block/ResourceDrops.h"
 #include "mc/world/level/block/ResourceDropsContext.h"
@@ -51,7 +52,7 @@ LL_TYPE_STATIC_HOOK(
     if (block.getTypeName() == "minecraft:moving_block") {
         MovingBlockActor* mba = (MovingBlockActor*)region.getBlockEntity(blockPos);
         if (mba->mWrappedBlock->getTypeName() != "minecraft:moving_block") { // 防止mb的mb导致的无限循环
-            region.setBlock(blockPos, *mba->mWrappedBlock, 3, mba->mWrappedBlockActor, nullptr, nullptr);
+            region.setBlock(blockPos, *mba->mWrappedBlock, 3, mba->mWrappedBlockActor, nullptr, BlockChangeContext());
             return origin(region, blockPos, region.getBlock(blockPos), randomize, resourceDropsContext, itemStacks);
         }
     }
@@ -72,7 +73,7 @@ LL_TYPE_INSTANCE_HOOK(
 ) {
     if (block.getTypeName() == "minecraft:moving_block") {
         MovingBlockActor* mba = (MovingBlockActor*)region.getBlockEntity(pos);
-        region.setBlock(pos, *mba->mWrappedBlock, 3, mba->mWrappedBlockActor, nullptr, nullptr);
+        region.setBlock(pos, *mba->mWrappedBlock, 3, mba->mWrappedBlockActor, nullptr, BlockChangeContext());
         const Block& newBlock = region.getBlock(pos);
         return newBlock.mBlockType->spawnResources(region, pos, newBlock, randomize, resourceDropsContext);
     }

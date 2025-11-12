@@ -33,7 +33,7 @@ LL_TYPE_STATIC_HOOK(
             if (axis == PortalAxis::Z) {
                 _pos.x += 1.5f;
                 _pos.z += 0.5f;
-            } else {
+            } else if (axis == PortalAxis::X) {
                 _pos.x += 0.5f;
                 _pos.z += 1.5f;
             }
