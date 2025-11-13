@@ -30,6 +30,9 @@ jobs:
       - run: |
           xmake -v -y build
 
+      - run: |
+          xmake -v -y
+
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ github.event.repository.name }}-windows-x64-${{ github.sha }}
