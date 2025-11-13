@@ -199,7 +199,7 @@ LL_TYPE_INSTANCE_HOOK(
         if (item == ItemStack::EMPTY_ITEM()) {
             inv->setItem(selectedSlot, ItemStack::EMPTY_ITEM());
             auto res = autoItemByItemName(inv, selectedSlot, name);
-            if (res.has_value()) item = res.value();
+            if (res.has_value()) item = std::move(res.value());
         }
     }
 }
