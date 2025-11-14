@@ -34,9 +34,12 @@ target("CoralFans") -- Change this to your mod name.
         "/w44296",
         "/w45263",
         "/w44738",
-        "/w45204"
+        "/w45204",
+        "/Zm2000",
+        "/wd4100",
+        {force = true}
     )
-    add_defines("NOMINMAX", "UNICODE")
+    add_defines("NOMINMAX", "UNICODE","_AMD64_")
     add_defines("COMMITID=\"$(shell git rev-parse HEAD)\"")
     add_defines("VERSION=\"$(shell git describe --tags --abbrev=0 --always)\"")
     add_files("src/**.cpp")

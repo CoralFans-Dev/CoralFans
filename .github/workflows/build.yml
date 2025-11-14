@@ -1,6 +1,14 @@
 on:
   pull_request:
+    paths:
+      - .github/workflows/build.yml
+      - src/**
+      - xmake.lua
   push:
+    paths:
+      - .github/workflows/build.yml
+      - src/**
+      - xmake.lua
   workflow_dispatch:
   
 jobs:
@@ -25,10 +33,7 @@ jobs:
           xmake repo -u
 
       - run: |
-          xmake f -a x64 -m release -p windows -v -y --toolchain=msvc
-
-      - run: |
-          xmake -v -y build
+          xmake f -a x64 -m release -p windows -v -y 
 
       - run: |
           xmake -v -y
