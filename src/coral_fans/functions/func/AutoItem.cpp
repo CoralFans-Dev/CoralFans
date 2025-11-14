@@ -65,7 +65,7 @@ std::optional<ItemStack> handleBundle(
                 }
                 weight.data -= newItem.mCount * 64 / newItem.mItem->mMaxStackSize;
                 inv->setItem(handlingSlot, ItemStack::fromTag(*originTag));
-                return newItem;
+                return std::move(newItem);
             } else if (weight.data - newItem.mCount * 64 / newItem.mItem->mMaxStackSize
                                + selectedItem.mCount * 64 / selectedItem.mItem->mMaxStackSize
                            > 68
@@ -89,7 +89,7 @@ std::optional<ItemStack> handleBundle(
                 weight.data -= newItem.mCount * 64 / newItem.mItem->mMaxStackSize;
                 inv->setItem(handlingSlot, ItemStack::fromTag(*originTag));
                 inv->swapSlots(firstEmptySlot, selectedSlot);
-                return newItem;
+                return std::move(newItem);
             } else if (auto slotIt = itemTag.mTags.find("Slot"); slotIt != itemTag.mTags.end()) {
                 auto selectedTag           = selectedItem.save(*SaveContextFactory::createCloneSaveContext());
                 selectedTag->mTags["Slot"] = slotIt->second.get<ByteTag>();
@@ -97,7 +97,7 @@ std::optional<ItemStack> handleBundle(
                 weight.data                = weight.data - newItem.mCount * 64 / newItem.mItem->mMaxStackSize
                             + selectedItem.mCount * 64 / selectedItem.mItem->mMaxStackSize;
                 inv->setItem(handlingSlot, ItemStack::fromTag(*originTag));
-                return newItem;
+                return std::move(newItem);
             }
         } else if (name == "") return std::nullopt;
     }
@@ -134,30 +134,33 @@ autoItemByItemName(::std::unique_ptr<Inventory>& inv, int selectedSlot, const st
             auto& temCompoundTag = (*it1).second.get<CompoundTag>().mTags;
             auto  it2            = temCompoundTag.find("Items");
             if (it2 == temCompoundTag.end()) continue;
-            auto& list  = it2->second.get<ListTag>();
-            int   _size = list.size();
-            for (int _i = 0; _i < _size; _i++) {
+            auto& list = it2->second.get<ListTag>();
+            int   size = list.size();
+            for (int _i = 0; _i < size; _i++) {
                 auto& itemTag = list[_i].get<CompoundTag>();
                 if (auto nameIt = itemTag.mTags.find("Name"); nameIt != itemTag.mTags.end()) {
                     auto name = nameIt->second.get<StringTag>();
                     if (name == targetName) {
                         if (selectedItem == ItemStack::EMPTY_ITEM()) {
-                            inv->setItem(selectedSlot, ItemStack::fromTag(itemTag));
+                            auto newItemTag = itemTag;
                             list.erase(list.begin() + _i);
-                            return ItemStack::fromTag(*tag);
+                            inv->setItem(slot, ItemStack::fromTag(*tag));
+                            return ItemStack::fromTag(newItemTag);
                         } else if (selectedItemName.ends_with("_shulker_box")) {
                             int firstEmptySlot = inv->getFirstEmptySlot();
                             if (firstEmptySlot == -1) break;
+                            auto newItemTag = itemTag;
                             list.erase(list.begin() + _i);
                             inv->setItem(slot, ItemStack::fromTag(*tag));
                             inv->swapSlots(firstEmptySlot, selectedSlot);
-                            return ItemStack::fromTag(itemTag);
+                            return ItemStack::fromTag(newItemTag);
                         } else if (auto slotIt = itemTag.mTags.find("Slot"); slotIt != itemTag.mTags.end()) {
                             auto selectedTag = selectedItem.save(*SaveContextFactory::createCloneSaveContext());
                             selectedTag->mTags["Slot"] = slotIt->second.get<ByteTag>();
-                            inv->setItem(selectedSlot, ItemStack::fromTag(itemTag));
-                            list[_i] = CompoundTagVariant(selectedTag->mTags);
-                            return ItemStack::fromTag(itemTag);
+                            auto newItemTag            = itemTag;
+                            list[_i]                   = CompoundTagVariant(selectedTag->mTags);
+                            inv->setItem(slot, ItemStack::fromTag(*tag));
+                            return ItemStack::fromTag(newItemTag);
                         }
                     } else if (name.ends_with("bundle"))
                         return handleBundle(inv, selectedSlot, targetName, slot, tag, itemTag.mTags);
@@ -178,10 +181,11 @@ LL_TYPE_INSTANCE_HOOK(
     ::ItemUseMethod  itemUseMethod,
     bool             consumeItem
 ) {
-    if ((coral_fans::mod().getConfigDb()->get(std::format("functions.players.{}.autoitem", this->getUuid().asString()))
-         == "false")
-        || this->isCreative())
-        return origin(item, itemUseMethod, consumeItem);
+    // if ((coral_fans::mod().getConfigDb()->get(std::format("functions.players.{}.autoitem",
+    // this->getUuid().asString()))
+    //      == "false")
+    //     || this->isCreative())
+    //     return origin(item, itemUseMethod, consumeItem);
     std::string name = item.getTypeName();
     if (!this->mInventory->mInventory) return;
     auto& inv          = this->mInventory->mInventory;
@@ -213,10 +217,11 @@ LL_TYPE_INSTANCE_HOOK(
     ::BlockPos const& position,
     bool              withData
 ) {
-    if ((coral_fans::mod().getConfigDb()->get(std::format("functions.players.{}.autoitem", this->getUuid().asString()))
-         == "false")
-        || this->isCreative())
-        return origin(position, withData);
+    // if ((coral_fans::mod().getConfigDb()->get(std::format("functions.players.{}.autoitem",
+    // this->getUuid().asString()))
+    //      == "false")
+    //     || this->isCreative())
+    //     return origin(position, withData);
     auto& region     = this->getDimensionBlockSource();
     auto  targetItem = region.getBlock(position).asItemInstance(region, position, withData);
     auto  targetName = targetItem.getTypeName();
@@ -236,6 +241,7 @@ LL_TYPE_INSTANCE_HOOK(
     } else {
         auto res = autoItemByItemName(inv, selectedSlot, targetName);
         if (res.has_value()) {
+            mod().getLogger().info(res.value().toString());
             inv->setItem(selectedSlot, res.value());
             this->refreshInventory();
         }
