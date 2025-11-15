@@ -181,11 +181,10 @@ LL_TYPE_INSTANCE_HOOK(
     ::ItemUseMethod  itemUseMethod,
     bool             consumeItem
 ) {
-    // if ((coral_fans::mod().getConfigDb()->get(std::format("functions.players.{}.autoitem",
-    // this->getUuid().asString()))
-    //      == "false")
-    //     || this->isCreative())
-    //     return origin(item, itemUseMethod, consumeItem);
+    if ((coral_fans::mod().getConfigDb()->get(std::format("functions.players.{}.autoitem", this->getUuid().asString()))
+         == "false")
+        || this->isCreative())
+        return origin(item, itemUseMethod, consumeItem);
     std::string name = item.getTypeName();
     if (!this->mInventory->mInventory) return;
     auto& inv          = this->mInventory->mInventory;
@@ -217,11 +216,10 @@ LL_TYPE_INSTANCE_HOOK(
     ::BlockPos const& position,
     bool              withData
 ) {
-    // if ((coral_fans::mod().getConfigDb()->get(std::format("functions.players.{}.autoitem",
-    // this->getUuid().asString()))
-    //      == "false")
-    //     || this->isCreative())
-    //     return origin(position, withData);
+    if ((coral_fans::mod().getConfigDb()->get(std::format("functions.players.{}.autoitem", this->getUuid().asString()))
+         == "false")
+        || this->isCreative())
+        return origin(position, withData);
     auto& region     = this->getDimensionBlockSource();
     auto  targetItem = region.getBlock(position).asItemInstance(region, position, withData);
     auto  targetName = targetItem.getTypeName();
