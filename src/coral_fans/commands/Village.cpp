@@ -18,11 +18,11 @@ void registerVillageCommand(CommandPermissionLevel permission) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
-    auto& villageCommand = ll::command::CommandRegistrar::getInstance()
+    auto& villageCommand = ll::command::CommandRegistrar::getInstance(false)
                                .getOrCreateCommand("village", "command.village.description"_tr(), permission);
 
     // village show <bounds|raid|spawn|center|poi|bind> <bool>
-    ll::command::CommandRegistrar::getInstance().tryRegisterRuntimeEnum(
+    ll::command::CommandRegistrar::getInstance(false).tryRegisterRuntimeEnum(
         "villageShowType",
         {
             {"bounds", 0},
@@ -90,7 +90,7 @@ void registerVillageCommand(CommandPermissionLevel permission) {
     });
 
     // village info <id: softenum>
-    ll::command::CommandRegistrar::getInstance().tryRegisterSoftEnum("villageid", {});
+    ll::command::CommandRegistrar::getInstance(false).tryRegisterSoftEnum("villageid", {});
     villageCommand.runtimeOverload()
         .text("info")
         .required("id", ll::command::ParamKind::SoftEnum, "villageid")

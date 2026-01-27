@@ -16,7 +16,7 @@ void registerCalculateCommand(CommandPermissionLevel permission) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
-    auto& calculateCommand = ll::command::CommandRegistrar::getInstance()
+    auto& calculateCommand = ll::command::CommandRegistrar::getInstance(false)
                                  .getOrCreateCommand("calculate", "command.calculate.description"_tr(), permission);
     calculateCommand.runtimeOverload().text("pt").execute(
         [](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const&) {

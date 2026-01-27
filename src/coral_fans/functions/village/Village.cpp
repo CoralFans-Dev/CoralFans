@@ -226,7 +226,7 @@ void CFVillageManager::refreshCommandSoftEnum() {
         }
     }
     vids.insert(vids.end(), uuids.begin(), uuids.end());
-    ll::command::CommandRegistrar::getInstance().setSoftEnumValues("villageid", vids);
+    ll::command::CommandRegistrar::getInstance(false).setSoftEnumValues("villageid", vids);
 }
 
 std::pair<std::string, bool> CFVillageManager::getVillageInfo(std::string id) {

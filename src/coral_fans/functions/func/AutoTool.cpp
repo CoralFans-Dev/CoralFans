@@ -91,11 +91,10 @@ LL_TYPE_INSTANCE_HOOK(
     CoralFansAutoToolHook2,
     ll::memory::HookPriority::Normal,
     Player,
-    &Player::_attack,
+    &Player::$attack,
     bool,
-    Actor&                                         actor,
-    ::SharedTypes::Legacy::ActorDamageCause const& cause,
-    bool                                           doPredictiveSound
+    ::Actor&                                       actor,
+    ::SharedTypes::Legacy::ActorDamageCause const& cause
 ) {
     if (coral_fans::mod().getConfigDb()->get(std::format("functions.players.{}.autotool", this->getUuid().asString()))
         == "true") {
@@ -113,7 +112,7 @@ LL_TYPE_INSTANCE_HOOK(
             this->refreshInventory();
         }
     }
-    return origin(actor, cause, doPredictiveSound);
+    return origin(actor, cause);
 }
 
 void hookAutoTool(bool hook) {

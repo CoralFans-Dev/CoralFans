@@ -123,7 +123,10 @@ void ShortcutsManager::registerShortcutsListener() {
                                 ll::string_utils::replaceAll(command, "{blockz}", std::to_string(event.blockPos().z));
                             CommandContext context = CommandContext(
                                 command,
-                                std::make_unique<PlayerCommandOrigin>(PlayerCommandOrigin(event.self())),
+                                std::make_unique<PlayerCommandOrigin>(
+                                    event.self().getLevel(),
+                                    event.self().getOrCreateUniqueID()
+                                ),
                                 CommandVersion::CurrentVersion()
                             );
                             [[maybe_unused]] MCRESULT unused = mc->mCommands->executeCommand(context, false);
@@ -174,7 +177,10 @@ void ShortcutsManager::registerShortcutsListener() {
                         );
                         CommandContext context = CommandContext(
                             command,
-                            std::make_unique<PlayerCommandOrigin>(PlayerCommandOrigin(event.self())),
+                            std::make_unique<PlayerCommandOrigin>(
+                                event.self().getLevel(),
+                                event.self().getOrCreateUniqueID()
+                            ),
                             CommandVersion::CurrentVersion()
                         );
                         mc->mCommands->executeCommand(context, false);
@@ -224,7 +230,10 @@ void ShortcutsManager::registerShortcutsListener() {
                                 ll::string_utils::replaceAll(command, "{itemaux}", std::to_string(item.getAuxValue()));
                             CommandContext context = CommandContext(
                                 command,
-                                std::make_unique<PlayerCommandOrigin>(PlayerCommandOrigin(event.self())),
+                                std::make_unique<PlayerCommandOrigin>(
+                                    event.self().getLevel(),
+                                    event.self().getOrCreateUniqueID()
+                                ),
                                 CommandVersion::CurrentVersion()
                             );
                             mc->mCommands->executeCommand(context, false);
@@ -240,7 +249,7 @@ void ShortcutsManager::registerShortcutsListener() {
 void ShortcutsManager::registerShortcutsCommand() {
     using ll::i18n_literals::operator""_tr;
     for (auto& _command : commands) {
-        auto& cmd = ll::command::CommandRegistrar::getInstance()
+        auto& cmd = ll::command::CommandRegistrar::getInstance(false)
                         .getOrCreateCommand(_command.command, _command.description, _command.permission);
         cmd.overload().execute([&](CommandOrigin const& origin, CommandOutput& output) {
             COMMAND_CHECK_PLAYER
@@ -253,7 +262,7 @@ void ShortcutsManager::registerShortcutsCommand() {
                     command = ll::string_utils::replaceAll(command, "{selfz}", std::to_string(player->getPosition().z));
                     CommandContext context = CommandContext(
                         command,
-                        std::make_unique<PlayerCommandOrigin>(PlayerCommandOrigin(*player)),
+                        std::make_unique<PlayerCommandOrigin>(player->getLevel(), player->getOrCreateUniqueID()),
                         CommandVersion::CurrentVersion()
                     );
                     mc->mCommands->executeCommand(context, false);

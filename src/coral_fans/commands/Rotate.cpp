@@ -15,7 +15,7 @@ void registerRotateCommand(CommandPermissionLevel permission) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
-    auto& rotateCommand = ll::command::CommandRegistrar::getInstance()
+    auto& rotateCommand = ll::command::CommandRegistrar::getInstance(false)
                               .getOrCreateCommand("rotate", "command.rotate.description"_tr(), permission);
 
     rotateCommand.overload().execute([](CommandOrigin const& origin, CommandOutput& output) {

@@ -13,9 +13,9 @@
 #include "mc/world/level/block/actor/BlockActor.h"
 #include "mc/world/level/chunk/LevelChunk.h"
 
-
 #include <string>
 #include <unordered_map>
+
 
 namespace {
 
@@ -183,10 +183,16 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource
-                .setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, BlockChangeContext());
+            blockSource.setBlock(
+                blockPos,
+                newBlock,
+                3,
+                BlockActor ::create(*blockEntityTag),
+                nullptr,
+                BlockChangeContext(false)
+            );
             return;
         } else {
             blockSource.setBlock(
@@ -194,9 +200,9 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext());
+            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext(false));
             return;
         }
     } else if (states.contains("torch_facing_direction")) {
@@ -216,10 +222,16 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource
-                .setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, BlockChangeContext());
+            blockSource.setBlock(
+                blockPos,
+                newBlock,
+                3,
+                BlockActor ::create(*blockEntityTag),
+                nullptr,
+                BlockChangeContext(false)
+            );
             return;
         } else {
             blockSource.setBlock(
@@ -227,9 +239,9 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext());
+            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext(false));
             return;
         }
     } else if (states.contains("ground_sign_direction")) {
@@ -249,10 +261,16 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource
-                .setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, BlockChangeContext());
+            blockSource.setBlock(
+                blockPos,
+                newBlock,
+                3,
+                BlockActor ::create(*blockEntityTag),
+                nullptr,
+                BlockChangeContext(false)
+            );
             return;
         } else {
             blockSource.setBlock(
@@ -260,9 +278,9 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext());
+            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext(false));
             return;
         }
     } else if (states.contains("minecraft:cardinal_direction")) {
@@ -282,10 +300,16 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource
-                .setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, BlockChangeContext());
+            blockSource.setBlock(
+                blockPos,
+                newBlock,
+                3,
+                BlockActor ::create(*blockEntityTag),
+                nullptr,
+                BlockChangeContext(false)
+            );
             return;
         } else {
             blockSource.setBlock(
@@ -293,9 +317,9 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext());
+            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext(false));
             return;
         }
     } else if (states.contains("minecraft:facing_direction")) {
@@ -315,10 +339,16 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource
-                .setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, BlockChangeContext());
+            blockSource.setBlock(
+                blockPos,
+                newBlock,
+                3,
+                BlockActor ::create(*blockEntityTag),
+                nullptr,
+                BlockChangeContext(false)
+            );
             return;
         } else {
             blockSource.setBlock(
@@ -326,9 +356,9 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext());
+            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext(false));
             return;
         }
     } else if (states.contains("facing_direction")) {
@@ -348,10 +378,16 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource
-                .setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, BlockChangeContext());
+            blockSource.setBlock(
+                blockPos,
+                newBlock,
+                3,
+                BlockActor ::create(*blockEntityTag),
+                nullptr,
+                BlockChangeContext(false)
+            );
             return;
         } else {
             blockSource.setBlock(
@@ -359,9 +395,9 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext());
+            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext(false));
             return;
         }
     } else if (states.contains("pillar_axis")) {
@@ -381,10 +417,16 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource
-                .setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, BlockChangeContext());
+            blockSource.setBlock(
+                blockPos,
+                newBlock,
+                3,
+                BlockActor ::create(*blockEntityTag),
+                nullptr,
+                BlockChangeContext(false)
+            );
             return;
         } else {
             blockSource.setBlock(
@@ -392,9 +434,9 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext());
+            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext(false));
             return;
         }
     } else if (states.contains("portal_axis")) {
@@ -414,10 +456,16 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource
-                .setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, BlockChangeContext());
+            blockSource.setBlock(
+                blockPos,
+                newBlock,
+                3,
+                BlockActor ::create(*blockEntityTag),
+                nullptr,
+                BlockChangeContext(false)
+            );
             return;
         } else {
             blockSource.setBlock(
@@ -425,9 +473,9 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext());
+            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext(false));
             return;
         }
     } else if (states.contains("minecraft:vertical_half")) {
@@ -447,10 +495,16 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource
-                .setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, BlockChangeContext());
+            blockSource.setBlock(
+                blockPos,
+                newBlock,
+                3,
+                BlockActor ::create(*blockEntityTag),
+                nullptr,
+                BlockChangeContext(false)
+            );
             return;
         } else {
             blockSource.setBlock(
@@ -458,9 +512,9 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext());
+            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext(false));
             return;
         }
     } else if (states.contains("direction")) {
@@ -480,10 +534,16 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource
-                .setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, BlockChangeContext());
+            blockSource.setBlock(
+                blockPos,
+                newBlock,
+                3,
+                BlockActor ::create(*blockEntityTag),
+                nullptr,
+                BlockChangeContext(false)
+            );
             return;
         } else {
             blockSource.setBlock(
@@ -491,9 +551,9 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext());
+            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext(false));
             return;
         }
     } else if (states.contains("minecraft:block_face")) {
@@ -513,10 +573,16 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource
-                .setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, BlockChangeContext());
+            blockSource.setBlock(
+                blockPos,
+                newBlock,
+                3,
+                BlockActor ::create(*blockEntityTag),
+                nullptr,
+                BlockChangeContext(false)
+            );
             return;
         } else {
             blockSource.setBlock(
@@ -524,9 +590,9 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext());
+            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext(false));
             return;
         }
     } else if (states.contains("rail_direction")) {
@@ -546,10 +612,16 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource
-                .setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, BlockChangeContext());
+            blockSource.setBlock(
+                blockPos,
+                newBlock,
+                3,
+                BlockActor ::create(*blockEntityTag),
+                nullptr,
+                BlockChangeContext(false)
+            );
             return;
         } else {
             blockSource.setBlock(
@@ -557,9 +629,9 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext());
+            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext(false));
             return;
         }
     } else if (states.contains("orientation")) {
@@ -579,10 +651,16 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource
-                .setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, BlockChangeContext());
+            blockSource.setBlock(
+                blockPos,
+                newBlock,
+                3,
+                BlockActor ::create(*blockEntityTag),
+                nullptr,
+                BlockChangeContext(false)
+            );
             return;
         } else {
             blockSource.setBlock(
@@ -590,9 +668,9 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext());
+            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext(false));
             return;
         }
     } else if (states.contains("coral_direction")) {
@@ -612,10 +690,16 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource
-                .setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, BlockChangeContext());
+            blockSource.setBlock(
+                blockPos,
+                newBlock,
+                3,
+                BlockActor ::create(*blockEntityTag),
+                nullptr,
+                BlockChangeContext(false)
+            );
             return;
         } else {
             blockSource.setBlock(
@@ -623,9 +707,9 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext());
+            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext(false));
             return;
         }
     } else if (states.contains("weirdo_direction")) {
@@ -645,10 +729,16 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource
-                .setBlock(blockPos, newBlock, 3, BlockActor ::create(*blockEntityTag), nullptr, BlockChangeContext());
+            blockSource.setBlock(
+                blockPos,
+                newBlock,
+                3,
+                BlockActor ::create(*blockEntityTag),
+                nullptr,
+                BlockChangeContext(false)
+            );
             return;
         } else {
             blockSource.setBlock(
@@ -656,9 +746,9 @@ void rotateBlock(Player* player, BlockPos blockPos) {
                 Block ::tryGetFromRegistry(HashedString("minecraft:air")),
                 3,
                 nullptr,
-                BlockChangeContext()
+                BlockChangeContext(false)
             );
-            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext());
+            blockSource.setBlock(blockPos, newBlock, 3, nullptr, BlockChangeContext(false));
             return;
         }
     }

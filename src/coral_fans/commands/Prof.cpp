@@ -18,10 +18,10 @@ void registerProfCommand(CommandPermissionLevel permission) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
-    auto& profCommand = ll::command::CommandRegistrar::getInstance()
+    auto& profCommand = ll::command::CommandRegistrar::getInstance(false)
                             .getOrCreateCommand("prof", "command.prof.description"_tr(), permission);
 
-    ll::command::CommandRegistrar::getInstance().tryRegisterRuntimeEnum("profType", functions::Profiler::TypeVec);
+    ll::command::CommandRegistrar::getInstance(false).tryRegisterRuntimeEnum("profType", functions::Profiler::TypeVec);
     profCommand.runtimeOverload()
         .optional("type", ll::command::ParamKind::Enum, "profType")
         .optional("numberOfTick", ll::command::ParamKind::Int)

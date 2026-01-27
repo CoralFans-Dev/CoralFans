@@ -10,7 +10,7 @@ namespace coral_fans::commands {
 
 void registerCoralfansCommand() {
     // reg cmd
-    auto& command = ll::command::CommandRegistrar::getInstance()
+    auto& command = ll::command::CommandRegistrar::getInstance(false)
                         .getOrCreateCommand("coralfans", "CoralFans Mod", CommandPermissionLevel::Any);
 
     // version

@@ -23,11 +23,11 @@ void registerTickCommand(CommandPermissionLevel permission) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
-    auto& tickCommand = ll::command::CommandRegistrar::getInstance()
+    auto& tickCommand = ll::command::CommandRegistrar::getInstance(false)
                             .getOrCreateCommand("tick", "command.tick.description"_tr(), permission);
 
     // tick freeze|reset
-    ll::command::CommandRegistrar::getInstance().tryRegisterRuntimeEnum(
+    ll::command::CommandRegistrar::getInstance(false).tryRegisterRuntimeEnum(
         "tickFreezeType",
         {
             {"reset",  0},

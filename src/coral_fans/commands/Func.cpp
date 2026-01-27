@@ -17,7 +17,7 @@ void registerFuncCommand(CommandPermissionLevel permission) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
-    auto& funcCommand = ll::command::CommandRegistrar::getInstance()
+    auto& funcCommand = ll::command::CommandRegistrar::getInstance(false)
                             .getOrCreateCommand("func", "command.func.description"_tr(), permission);
 
     // func forceopen <bool>
@@ -33,7 +33,7 @@ void registerFuncCommand(CommandPermissionLevel permission) {
         });
 
     // func forceplace normal|entity|all
-    ll::command::CommandRegistrar::getInstance().tryRegisterRuntimeEnum(
+    ll::command::CommandRegistrar::getInstance(false).tryRegisterRuntimeEnum(
         "forceplaceLevel",
         {
             {"normal", 0},

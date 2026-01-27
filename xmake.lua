@@ -14,9 +14,9 @@ add_repositories("coralfansdev-repo https://github.com/CoralFans-Dev/xmake-repo.
 -- end
 
 if is_config("target_type", "server") then
-    add_requires("levilamina 1.7.3", {configs = {target_type = "server"}})
+    add_requires("levilamina 1.9.1", {configs = {target_type = "server"}})
 else
-    add_requires("levilamina 1.7.3", {configs = {target_type = "client"}})
+    add_requires("levilamina 1.9.1", {configs = {target_type = "client"}})
 end
 
 
@@ -65,6 +65,15 @@ target("CoralFans") -- Change this to your mod name.
     set_kind("shared")
     set_languages("c++20")
     set_symbols("debug")
+    if is_config("target_type", "server") then
+        add_defines("LL_PLAT_S")
+    --  add_includedirs("src-server")
+    --  add_files("src-server/**.cpp")
+    else
+        add_defines("LL_PLAT_C")
+    --  add_includedirs("src-client")
+    --  add_files("src-client/**.cpp")
+    end
 
     after_build(function (target)
         local mod_packer = import("scripts.after_build")

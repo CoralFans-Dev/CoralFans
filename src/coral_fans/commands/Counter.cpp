@@ -22,7 +22,7 @@ void registerCounterCommand(CommandPermissionLevel permission) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
-    auto& counterCommand = ll::command::CommandRegistrar::getInstance()
+    auto& counterCommand = ll::command::CommandRegistrar::getInstance(false)
                                .getOrCreateCommand("counter", "command.counter.description"_tr(), permission);
 
     // count print <int>

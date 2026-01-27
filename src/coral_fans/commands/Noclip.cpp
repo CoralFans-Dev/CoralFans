@@ -19,7 +19,7 @@ namespace coral_fans::commands {
 void registerNoclipCommand(CommandPermissionLevel permission) {
     using ll::i18n_literals::operator""_tr;
 
-    auto& cmd = ll::command::CommandRegistrar::getInstance()
+    auto& cmd = ll::command::CommandRegistrar::getInstance(false)
                     .getOrCreateCommand("noclip", "command.noclip.description"_tr(), permission);
     cmd.overload().execute([&](CommandOrigin const& origin, CommandOutput& output) {
         COMMAND_CHECK_PLAYER

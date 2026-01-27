@@ -28,7 +28,7 @@ void registerLogCommand(CommandPermissionLevel permission) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
-    auto& logCommand = ll::command::CommandRegistrar::getInstance()
+    auto& logCommand = ll::command::CommandRegistrar::getInstance(false)
                            .getOrCreateCommand("log", "command.log.description"_tr(), permission);
 
     logCommand.runtimeOverload()

@@ -9,6 +9,7 @@
 #include "ll/api/service/Bedrock.h"
 #include "mc/common/Brightness.h"
 #include "mc/network/packet/TextPacket.h"
+#include "mc/network/packet/TextPacketPayload.h"
 #include "mc/network/packet/TextPacketType.h"
 #include "mc/util/ProfilerLite.h"
 #include "mc/world/actor/player/Player.h"
@@ -151,9 +152,8 @@ void HudHelper::tick() {
                 }
                 if (msg.ends_with('\n')) msg = msg.substr(0, msg.length() - 1);
                 if (!msg.empty()) {
-                    auto pkt     = TextPacket();
-                    pkt.mType    = TextPacketType::Tip;
-                    pkt.mMessage = msg;
+                    auto pkt  = TextPacket();
+                    pkt.mBody = TextPacketPayload::MessageOnly(TextPacketType::Tip, msg);
                     player.sendNetworkPacket(pkt);
                 }
                 return true;

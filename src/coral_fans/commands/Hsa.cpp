@@ -15,7 +15,7 @@ void registerHsaCommand(CommandPermissionLevel permission) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
-    auto& hsaCommand = ll::command::CommandRegistrar::getInstance()
+    auto& hsaCommand = ll::command::CommandRegistrar::getInstance(false)
                            .getOrCreateCommand("hsa", "command.hsa.description"_tr(), permission);
 
     // hsa show <bool>

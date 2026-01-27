@@ -17,7 +17,7 @@ void registerSelfCommand(CommandPermissionLevel permission) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
-    auto& selfCommand = ll::command::CommandRegistrar::getInstance()
+    auto& selfCommand = ll::command::CommandRegistrar::getInstance(false)
                             .getOrCreateCommand("self", "command.self.description"_tr(), permission);
 
     // self autotool <bool>

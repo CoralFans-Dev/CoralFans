@@ -17,7 +17,7 @@ namespace coral_fans::commands {
 void registerCfhudCommand(CommandPermissionLevel permission) {
     using ll::i18n_literals::operator""_tr;
     // reg cmd
-    auto& cfhudCommand = ll::command::CommandRegistrar::getInstance()
+    auto& cfhudCommand = ll::command::CommandRegistrar::getInstance(false)
                              .getOrCreateCommand("cfhud", "command.cfhud.description"_tr(), permission);
 
     // cfhud show <bool>
@@ -35,14 +35,17 @@ void registerCfhudCommand(CommandPermissionLevel permission) {
         });
 
     // cfhud <add|remove> <mspt|base|redstone|village>
-    ll::command::CommandRegistrar::getInstance().tryRegisterRuntimeEnum(
+    ll::command::CommandRegistrar::getInstance(false).tryRegisterRuntimeEnum(
         "cfhudActionType",
         {
             {"add",    0},
             {"remove", 1}
     }
     );
-    ll::command::CommandRegistrar::getInstance().tryRegisterRuntimeEnum("cfhudType", functions::HudHelper::HudTypeVec);
+    ll::command::CommandRegistrar::getInstance(false).tryRegisterRuntimeEnum(
+        "cfhudType",
+        functions::HudHelper::HudTypeVec
+    );
     cfhudCommand.runtimeOverload()
         .required("action", ll::command::ParamKind::Enum, "cfhudActionType")
         .required("hud", ll::command::ParamKind::Enum, "cfhudType")

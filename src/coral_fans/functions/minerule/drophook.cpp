@@ -30,8 +30,9 @@ LL_TYPE_INSTANCE_HOOK(
     ::ResourceDropsContext const& resourceDropsContext
 ) {
     if (block.getTypeName() == "minecraft:bedrock") {
-        std::vector<ItemStack> a{ItemStack("bedrock", 1, 0, nullptr)};
-        return ResourceDrops(a);
+        ItemStack itemStack;
+        itemStack.reinit("bedrock", 1, 0);
+        return ResourceDrops(std::vector<ItemStack>{std::move(itemStack)});
     }
     return origin(block, randomize, resourceDropsContext);
 }
@@ -52,7 +53,14 @@ LL_TYPE_STATIC_HOOK(
     if (block.getTypeName() == "minecraft:moving_block") {
         MovingBlockActor* mba = (MovingBlockActor*)region.getBlockEntity(blockPos);
         if (mba->mWrappedBlock->getTypeName() != "minecraft:moving_block") { // 防止mb的mb导致的无限循环
-            region.setBlock(blockPos, *mba->mWrappedBlock, 3, mba->mWrappedBlockActor, nullptr, BlockChangeContext());
+            region.setBlock(
+                blockPos,
+                *mba->mWrappedBlock,
+                3,
+                mba->mWrappedBlockActor,
+                nullptr,
+                BlockChangeContext(false)
+            );
             return origin(region, blockPos, region.getBlock(blockPos), randomize, resourceDropsContext, itemStacks);
         }
     }
@@ -73,9 +81,11 @@ LL_TYPE_INSTANCE_HOOK(
 ) {
     if (block.getTypeName() == "minecraft:moving_block") {
         MovingBlockActor* mba = (MovingBlockActor*)region.getBlockEntity(pos);
-        region.setBlock(pos, *mba->mWrappedBlock, 3, mba->mWrappedBlockActor, nullptr, BlockChangeContext());
-        const Block& newBlock = region.getBlock(pos);
-        return newBlock.mBlockType->spawnResources(region, pos, newBlock, randomize, resourceDropsContext);
+        if (mba->mWrappedBlock->getTypeName() != "minecraft:moving_block") { // 防止mb的mb导致的无限循环
+            region.setBlock(pos, *mba->mWrappedBlock, 3, mba->mWrappedBlockActor, nullptr, BlockChangeContext(false));
+            const Block& newBlock = region.getBlock(pos);
+            return newBlock.mBlockType->spawnResources(region, pos, newBlock, randomize, resourceDropsContext);
+        }
     }
     return origin(region, pos, block, randomize, resourceDropsContext);
 }

@@ -16,7 +16,7 @@ void registerSlimeCommand(CommandPermissionLevel permission) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
-    auto& slimeCommand = ll::command::CommandRegistrar::getInstance()
+    auto& slimeCommand = ll::command::CommandRegistrar::getInstance(false)
                              .getOrCreateCommand("slime", "command.slime.description"_tr(), permission);
 
     // slime show <bool>

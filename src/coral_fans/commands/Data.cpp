@@ -5,6 +5,7 @@
 #include "ll/api/command/runtime/ParamKind.h"
 #include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
+#include "mc/server/commands/CommandOutput.h"
 #include "mc/server/commands/CommandPermissionLevel.h"
 #include "mc/server/commands/CommandVersion.h"
 #include "mc/world/actor/player/Player.h"
@@ -21,7 +22,7 @@ void registerDataCommand(CommandPermissionLevel permission) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
-    auto& dataCommand = ll::command::CommandRegistrar::getInstance()
+    auto& dataCommand = ll::command::CommandRegistrar::getInstance(false)
                             .getOrCreateCommand("data", "command.data.description"_tr(), permission);
 
     // block [blockPos: x y z]
@@ -164,7 +165,7 @@ void registerDataCommand(CommandPermissionLevel permission) {
         });
 
     // redstone <signal|info|chunk|conn> [blockPos: x y z]
-    ll::command::CommandRegistrar::getInstance().tryRegisterRuntimeEnum(
+    ll::command::CommandRegistrar::getInstance(false).tryRegisterRuntimeEnum(
         "redstoneType",
         {
             {"chunk",  0},
