@@ -5,7 +5,6 @@
 #include "mc/legacy/ActorUniqueID.h"
 #include "mc/network/ServerNetworkHandler.h"
 #include "mc/network/packet/AddPlayerPacket.h"
-#include "mc/network/packet/PlayerInputTick.h"
 #include "mc/network/packet/PlayerSkinPacket.h"
 #include "mc/network/packet/RemoveActorPacket.h"
 #include "mc/network/packet/UpdateAbilitiesPacket.h"

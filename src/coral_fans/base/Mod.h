@@ -34,7 +34,6 @@ private:
     functions::HudHelper                  mHudHelper;
 
 public:
-public:
     inline std::unique_ptr<ll::data::KeyValueDB>& getConfigDb() { return this->mConfigDb; }
     inline config::Config&                        getConfig() { return this->mConfig; }
     inline std::unique_ptr<bsci::GeometryGroup>&  getGeometryGroup() { return this->mGeometryGroup; }

@@ -1,7 +1,5 @@
 #include "coral_fans/base/Mod.h"
-#include "coral_fans/functions/minerule/Drophook.h"
-#include "coral_fans/functions/minerule/PortalSandFarm.h"
-#include "coral_fans/functions/minerule/RemovePortalZombieCD.h"
+#include "coral_fans/functions/minerule/MineruleManager.h"
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/command/runtime/RuntimeOverload.h"
@@ -16,74 +14,100 @@ void registerMineruleCommand(CommandPermissionLevel permission) {
     auto& mineruleCommand = ll::command::CommandRegistrar::getInstance()
                                 .getOrCreateCommand("minerule", "command.minerule.description"_tr(), permission);
 
+    auto& mineruleManager = coral_fans::functions::MineruleManager::getInstance();
+
     mineruleCommand.runtimeOverload()
         .text("fuck_bedrock_no_drop")
         .required("isopen", ll::command::ParamKind::Bool)
-        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
-            bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
-            if (isopen) {
-                if (coral_fans::mod().getConfigDb()->set("minerule.bedrockDrop", "true")) {
-                    output.success("command.minerule.bedrockDrop.success.true"_tr());
-                    coral_fans::functions::bedrockDropHook(true);
-                } else output.error("command.minerule.bedrockDrop.error"_tr());
-            } else {
-                if (coral_fans::mod().getConfigDb()->set("minerule.bedrockDrop", "false")) {
-                    output.success("command.minerule.bedrockDrop.success.false"_tr());
-                    coral_fans::functions::bedrockDropHook(false);
-                } else output.error("command.minerule.bedrockDrop.error"_tr());
+        .execute(
+            [&mineruleManager](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
+                if (isopen) {
+                    if (coral_fans::mod().getConfigDb()->set("minerule.bedrockDrop", "true")) {
+                        output.success("command.minerule.bedrockDrop.success.true"_tr());
+                        mineruleManager.bedrockDropHook(true);
+                    } else output.error("command.minerule.bedrockDrop.error"_tr());
+                } else {
+                    if (coral_fans::mod().getConfigDb()->set("minerule.bedrockDrop", "false")) {
+                        output.success("command.minerule.bedrockDrop.success.false"_tr());
+                        mineruleManager.bedrockDropHook(false);
+                    } else output.error("command.minerule.bedrockDrop.error"_tr());
+                }
             }
-        });
-    functions::bedrockDropHook(coral_fans::mod().getConfigDb()->get("minerule.bedrockDrop") == "true");
+        );
+    mineruleManager.bedrockDropHook(coral_fans::mod().getConfigDb()->get("minerule.bedrockDrop") == "true");
 
     mineruleCommand.runtimeOverload()
         .text("fuck_movingBlock_no_drop")
         .required("isopen", ll::command::ParamKind::Bool)
-        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
-            bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
-            if (isopen) {
-                if (coral_fans::mod().getConfigDb()->set("minerule.movingBlockDrop", "true")) {
-                    output.success("command.minerule.movingBlockDrop.success.true"_tr());
-                    coral_fans::functions::mbDropHook(true);
-                } else output.error("command.minerule.movingBlockDrop.error"_tr());
-            } else {
-                if (coral_fans::mod().getConfigDb()->set("minerule.movingBlockDrop", "false")) {
-                    output.success("command.minerule.movingBlockDrop.success.false"_tr());
-                    coral_fans::functions::mbDropHook(false);
-                } else output.error("command.minerule.movingBlockDrop.error"_tr());
+        .execute(
+            [&mineruleManager](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
+                if (isopen) {
+                    if (coral_fans::mod().getConfigDb()->set("minerule.movingBlockDrop", "true")) {
+                        output.success("command.minerule.movingBlockDrop.success.true"_tr());
+                        mineruleManager.mbDropHook(true);
+                    } else output.error("command.minerule.movingBlockDrop.error"_tr());
+                } else {
+                    if (coral_fans::mod().getConfigDb()->set("minerule.movingBlockDrop", "false")) {
+                        output.success("command.minerule.movingBlockDrop.success.false"_tr());
+                        mineruleManager.mbDropHook(false);
+                    } else output.error("command.minerule.movingBlockDrop.error"_tr());
+                }
             }
-        });
-    functions::mbDropHook(coral_fans::mod().getConfigDb()->get("minerule.movingBlockDrop") == "true");
+        );
+    mineruleManager.mbDropHook(coral_fans::mod().getConfigDb()->get("minerule.movingBlockDrop") == "true");
 
     mineruleCommand.runtimeOverload()
-        .text("replicated_portal_sand_farm")
+        .text("restore_portal_sand_farm")
         .required("isopen", ll::command::ParamKind::Bool)
-        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+        .execute([&mineruleManager](
+                     CommandOrigin const&,
+                     CommandOutput&                     output,
+                     ll::command::RuntimeCommand const& self
+                 ) {
             bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
-            if (coral_fans::mod().getConfigDb()->set(
-                    "minerule.replicated_portal_sand_farm",
-                    isopen ? "true" : "false"
-                )) {
-                output.success("command.minerule.replicated_portal_sand_farm.success"_tr(isopen ? "true" : "false"));
-                functions::hook_portal_sand_farm(isopen);
-            } else output.error("command.minerule.replicated_portal_sand_farm.error"_tr());
+            if (coral_fans::mod().getConfigDb()->set("minerule.restore_portal_sand_farm", isopen ? "true" : "false")) {
+                output.success("command.minerule.restore_portal_sand_farm.success"_tr(isopen ? "true" : "false"));
+                mineruleManager.portalSandFarmHook(isopen);
+            } else output.error("command.minerule.restore_portal_sand_farm.error"_tr());
         });
 
-    functions::hook_portal_sand_farm(mod().getConfigDb()->get("minerule.replicated_portal_sand_farm") == "true");
+    mineruleManager.portalSandFarmHook(mod().getConfigDb()->get("minerule.restore_portal_sand_farm") == "true");
 
     mineruleCommand.runtimeOverload()
         .text("remove_portal_pigzombie_cd")
         .required("isopen", ll::command::ParamKind::Bool)
-        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+        .execute(
+            [&mineruleManager](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
+                if (coral_fans::mod().getConfigDb()->set(
+                        "minerule.remove_portal_pigzombie_cd",
+                        isopen ? "true" : "false"
+                    )) {
+                    output.success("command.minerule.remove_portal_pigzombie_cd.success"_tr(isopen ? "true" : "false"));
+                    mineruleManager.portalSpawnHook(isopen);
+                } else output.error("command.minerule.remove_portal_pigzombie_cd.error"_tr());
+            }
+        );
+
+    mineruleManager.portalSpawnHook(mod().getConfigDb()->get("minerule.remove_portal_pigzombie_cd") == "true");
+
+    mineruleCommand.runtimeOverload()
+        .text("restore_ancillary_broken")
+        .required("isopen", ll::command::ParamKind::Bool)
+        .execute([&mineruleManager](
+                     CommandOrigin const&,
+                     CommandOutput&                     output,
+                     ll::command::RuntimeCommand const& self
+                 ) {
             bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
-            if (coral_fans::mod().getConfigDb()->set(
-                    "minerule.remove_portal_pigzombie_cd",
-                    isopen ? "true" : "false"
-                )) {
-                output.success("command.minerule.remove_portal_pigzombie_cd.success"_tr(isopen ? "true" : "false"));
-                functions::portal_spawn_hook(isopen);
-            } else output.error("command.minerule.remove_portal_pigzombie_cd.error"_tr());
+            if (coral_fans::mod().getConfigDb()->set("minerule.restore_ancillary_broken", isopen ? "true" : "false")) {
+                output.success("command.minerule.restore_ancillary_broken.success"_tr(isopen ? "true" : "false"));
+                mineruleManager.restoreAncillaryBrokenHook(isopen);
+            } else output.error("command.minerule.restore_ancillary_broken.error"_tr());
         });
 
-    functions::portal_spawn_hook(mod().getConfigDb()->get("minerule.remove_portal_pigzombie_cd") == "true");
+    mineruleManager.restoreAncillaryBrokenHook(mod().getConfigDb()->get("minerule.restore_ancillary_broken") == "true");
 }
 } // namespace coral_fans::commands

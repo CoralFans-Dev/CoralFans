@@ -1,4 +1,4 @@
-#include "coral_fans/functions/minerule/PortalSandFarm.h"
+#include "MineruleManager.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/item/FallingBlockActor.h"
 
@@ -20,7 +20,7 @@ LL_TYPE_INSTANCE_HOOK(
     return origin(pos, shouldStopRiding, cause, sourceEntityType, keepVelocity);
 }
 
-void hook_portal_sand_farm(bool bl) {
+void MineruleManager::portalSandFarmHook(bool bl) {
     bl ? CoralFansportalSandFarmHook::hook() : CoralFansportalSandFarmHook::unhook();
 }
 

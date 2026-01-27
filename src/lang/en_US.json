@@ -221,13 +221,17 @@
                 },
                 "error": "failed to set movingBlock"
             },
-            "replicated_portal_sand_farm": {
-                "success": "set replicated_portal_sand_farm \"{}\"",
-                "error": "failed to set replicated_portal_sand_farm"
+            "restore_portal_sand_farm": {
+                "success": "set restore_portal_sand_farm \"{}\"",
+                "error": "failed to set restore_portal_sand_farm"
             },
             "remove_portal_pigzombie_cd": {
                 "success": "set remove_portal_pigzombie_cd \"{}\"",
                 "error": "failed to set remove_portal_pigzombie_cd"
+            },
+            "restore_ancillary_broken": {
+                "success": "set restore_ancillary_broken \"{}\"",
+                "error": "failed to set restore_ancillary_broken"
             }
         },
         "noclip": {

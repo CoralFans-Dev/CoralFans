@@ -135,7 +135,7 @@ autoItemByItemName(::std::unique_ptr<Inventory>& inv, int selectedSlot, const st
             auto  it2            = temCompoundTag.find("Items");
             if (it2 == temCompoundTag.end()) continue;
             auto& list = it2->second.get<ListTag>();
-            int   size = list.size();
+            size       = list.size();
             for (int _i = 0; _i < size; _i++) {
                 auto& itemTag = list[_i].get<CompoundTag>();
                 if (auto nameIt = itemTag.mTags.find("Name"); nameIt != itemTag.mTags.end()) {

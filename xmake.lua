@@ -13,8 +13,14 @@ add_repositories("coralfansdev-repo https://github.com/CoralFans-Dev/xmake-repo.
 --     add_requires("levilamina 1.0.0-rc.1", {configs = {target_type = "client"}})
 -- end
 
+if is_config("target_type", "server") then
+    add_requires("levilamina 1.7.3", {configs = {target_type = "server"}})
+else
+    add_requires("levilamina 1.7.3", {configs = {target_type = "client"}})
+end
+
+
 add_requires(
-    "levilamina 1.7.3", {configs = {target_type = "server"}},
     "levibuildscript",
     "bsci main"
 )
@@ -22,6 +28,12 @@ add_requires(
 if not has_config("vs_runtime") then
     set_runtimes("MD")
 end
+
+option("target_type")
+    set_default("server")
+    set_showmenu(true)
+    set_values("server", "client")
+option_end()
 
 target("CoralFans") -- Change this to your mod name.
     add_rules("@levibuildscript/linkrule")

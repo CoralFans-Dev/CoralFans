@@ -1,4 +1,4 @@
-#include "coral_fans/functions/minerule/RemovePortalZombieCD.h"
+#include "MineruleManager.h"
 #include "ll/api/memory/Hook.h"
 #include "ll/api/service/Bedrock.h"
 #include "mc/deps/core/math/Vec3.h"
@@ -52,7 +52,7 @@ LL_TYPE_STATIC_HOOK(
     }
 }
 
-void portal_spawn_hook(bool bl) {
+void MineruleManager::portalSpawnHook(bool bl) {
     bl ? CoralFansportalPortalZombieHook::hook() : CoralFansportalPortalZombieHook ::unhook();
 }
 } // namespace coral_fans::functions

@@ -202,6 +202,11 @@
                     "title": "[{}] 区块 {} 有 {} 个计划刻 ->",
                     "remove": " 移除 {}: 目标游戏刻 {}, 数量 {}",
                     "info": " {}: 目标游戏刻 {}, 数量 {}"
+                },
+                "pt2": {
+                    "title": "[{}] 区块 {} 有 {} 个计划刻 ->",
+                    "remove": " 移除 {}: 坐标 {}, 数量 {}",
+                    "info": " {}: 坐标 {}, 数量 {}"
                 }
             }
         },
@@ -216,18 +221,22 @@
             },
             "movingBlockDrop": {
                 "success": {
-                    "true": "成功开启mb掉落功能",
-                    "false": "成功关闭mb掉落功能"
+                    "true": "已开启mb掉落功能",
+                    "false": "已关闭mb掉落功能"
                 },
                 "error": "设置 movingBlockDrop 失败"
             },
-            "replicated_portal_sand_farm": {
-                "success": "设置 replicated_portal_sand_farm \"{}\"",
-                "error": "设置 replicated_portal_sand_farm 失败"
+            "restore_portal_sand_farm": {
+                "success": "设置 restore_portal_sand_farm \"{}\"",
+                "error": "设置 restore_portal_sand_farm 失败"
             },
             "remove_portal_pigzombie_cd": {
                 "success": "设置 remove_portal_pigzombie_cd \"{}\"",
                 "error": "设置 remove_portal_pigzombie_cd 失败"
+            },
+            "restore_ancillary_broken": {
+                "success": "设置 restore_ancillary_broken \"{}\"",
+                "error": "设置 restore_ancillary_broken 失败"
             }
         },
         "noclip": {
