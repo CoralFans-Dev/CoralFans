@@ -5,7 +5,6 @@
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/memory/Hook.h"
-#include "ll/api/memory/Memory.h"
 #include "ll/api/service/Bedrock.h"
 #include "mc/deps/core/math/Color.h"
 #include "mc/deps/core/math/Vec3.h"
@@ -25,7 +24,6 @@
 
 #include <array>
 #include <format>
-#include <functional>
 #include <memory>
 #include <span>
 #include <string>
@@ -37,36 +35,13 @@ struct CFAUIDCmp {
     bool operator()(const ActorUniqueID& a, const ActorUniqueID& b) const { return a.getHash() == b.getHash(); }
 };
 
-/*
-version: BDS 1.21.3.01
-from Village::_tryAddPoiToVillage(ActorUniqueID const &,std::weak_ptr<POIInstance>)
-pseudocode line 108
-(96 * 1)
-*/
-constexpr unsigned long long DWELLER_POI_MAP_OFFSET = 96;
 // from trapdoor-ll
-using DwellerPoiMapType =
-    std::unordered_map<ActorUniqueID, std::array<std::weak_ptr<POIInstance>, 3>, std::hash<ActorUniqueID>, CFAUIDCmp>;
-inline DwellerPoiMapType& getDwellerPoiMap(Village* v) {
-    return ll::memory::dAccess<DwellerPoiMapType>(v, DWELLER_POI_MAP_OFFSET);
-}
-
-/*
-version: BDS 1.21.3.01
-from Village::addVillager(PlayerInventory **this, const struct ActorUniqueID *a2)
-pseudocode line 61
-(20 * 8)
-*/
-constexpr unsigned long long DWELLER_TICK_MAP_OFFSET = 160;
-// from trapdoor-ll
-using DwellerTickMapType = std::array<std::unordered_map<ActorUniqueID, Village::DwellerData>, 4>;
-inline DwellerTickMapType& getDwellerTickMap(Village* v) {
-    return ll::memory::dAccess<DwellerTickMapType>(v, DWELLER_TICK_MAP_OFFSET);
-}
+using DwellerPoiMapType = std::unordered_map<ActorUniqueID, std::array<std::weak_ptr<POIInstance>, 3>>;
+inline DwellerPoiMapType& getDwellerPoiMap(Village* v) { return *v->mClaimedPOIs; }
 
 // from trapdoor-ll
 inline std::array<unsigned long long, 4> getDwellerCount(Village* v) {
-    auto& map = getDwellerTickMap(v);
+    auto& map = *v->mDwellers;
     return {map[0].size(), map[1].size(), map[2].size(), map[3].size()};
 }
 
