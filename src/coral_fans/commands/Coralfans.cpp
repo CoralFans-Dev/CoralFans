@@ -15,8 +15,8 @@ void registerCoralfansCommand() {
 
     // version
     command.overload().text("version").execute([](CommandOrigin const&, CommandOutput& output) {
-#ifdef VERSION
-        output.success(VERSION);
+#ifdef CF_VERSION
+        output.success(CF_VERSION);
 #endif
 #ifdef COMMITID
         output.success("Commit ID: {}", COMMITID);

@@ -39,9 +39,9 @@ std::optional<ItemStack> handleBundle(
     auto& weight = weightIt->second.get<IntTag>();
     auto  it2    = temCompoundTag.find("storage_item_component_content");
     if (it2 == temCompoundTag.end()) return std::nullopt;
-    auto& list = it2->second.get<ListTag>();
-    int   size = list.size();
-    for (int i = 0; i < size; i++) {
+    auto&  list = it2->second.get<ListTag>();
+    size_t size = list.size();
+    for (size_t i = 0; i < size; i++) {
         auto& itemTag = list[i].get<CompoundTag>();
         auto  nameIt  = itemTag.mTags.find("Name");
         if (nameIt == itemTag.mTags.end()) continue;
@@ -108,7 +108,7 @@ std::optional<ItemStack>
 autoItemByItemName(::std::unique_ptr<Inventory>& inv, int selectedSlot, const std::string& targetName) {
     auto&            selectedItem     = inv->getItem(selectedSlot);
     auto             selectedItemName = selectedItem.getTypeName();
-    int              size             = inv->getContainerSize();
+    int              size             = static_cast<int>(inv->getContainerSize());
     std::vector<int> containerSlots;
     if (targetName == selectedItemName) return std::nullopt;
     for (int i = 0; i < size; i++) {
@@ -135,7 +135,7 @@ autoItemByItemName(::std::unique_ptr<Inventory>& inv, int selectedSlot, const st
             auto  it2            = temCompoundTag.find("Items");
             if (it2 == temCompoundTag.end()) continue;
             auto& list = it2->second.get<ListTag>();
-            size       = list.size();
+            size       = static_cast<int>(list.size());
             for (int _i = 0; _i < size; _i++) {
                 auto& itemTag = list[_i].get<CompoundTag>();
                 if (auto nameIt = itemTag.mTags.find("Name"); nameIt != itemTag.mTags.end()) {

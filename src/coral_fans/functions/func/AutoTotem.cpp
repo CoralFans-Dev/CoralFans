@@ -26,9 +26,9 @@ LL_TYPE_INSTANCE_HOOK(
             if (item.getTypeName().ends_with("_shulker_box")) {
                 auto tag = item.save(*SaveContextFactory::createCloneSaveContext());
                 if (!tag->contains("tag")) continue;
-                auto list  = (*tag)["tag"]["Items"].get<ListTag>();
-                int  _size = list.size();
-                for (int _i = 0; _i < _size; _i++) {
+                auto   list  = (*tag)["tag"]["Items"].get<ListTag>();
+                size_t _size = list.size();
+                for (size_t _i = 0; _i < _size; _i++) {
                     auto& itemTag = list[_i].get<CompoundTag>();
                     if (itemTag["Name"].get<StringTag>() == "minecraft:totem_of_undying") {
                         list.erase(list.begin() + _i);
