@@ -86,7 +86,7 @@ void registerVillageCommand(CommandPermissionLevel permission) {
 
     // village list
     villageCommand.overload().text("list").execute([](CommandOrigin const&, CommandOutput& output) {
-        output.success(coral_fans::mod().getVillageManager().listTickingVillages());
+        // output.success(coral_fans::mod().getVillageManager().listVillages());
     });
 
     // village info <id: softenum>
