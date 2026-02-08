@@ -1,7 +1,7 @@
 #define COMMAND_CHECK_PLAYER                                                                                           \
     auto entity = origin.getEntity();                                                                                  \
     if (entity == nullptr || !entity->isType(ActorType::Player)) {                                                     \
-        output.success("command.error.checkPlayer"_tr());                                                              \
+        output.error("command.error.checkPlayer"_tr());                                                                \
         return;                                                                                                        \
     }                                                                                                                  \
     auto* player = static_cast<Player*>(entity);

@@ -47,7 +47,7 @@ public:
     inline functions::CFVillageManager&      getVillageManager() { return this->mVillageManager; }
 
 public:
-    void tick();
+    void tick(const Tick&);
 };
 
 CoralFansMod& mod();

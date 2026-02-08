@@ -250,7 +250,8 @@
         "dimension": {
             "overworld": "Overworld",
             "nether": "Nether",
-            "theend": "TheEnd"
+            "theend": "TheEnd",
+            "unknown": "Undefined Dimension"
         },
         "profiler": {
             "normal": "- MSPT: {:.3f} ms TPS: {} Chunks: {}\n- CoralFans: {:.3f} ms\n- Redstone: {:.3f} ms\n - Signal: {:.3f} ms\n - Add: {:.3f} ms\n - Update: {:.3f} ms\n  - Remove: {:.3f} ms\n- Chunk (un)load & village: {:.3f} ms\n- EntitySystems: {:.3f} ms\n - Chunk tick: {:.3f} ms\n  - BlockEntities: {:.3f} ms\n  - RandomTick: {:.3f} ms\n  - PendingTick: {:.3f} ms\n",
@@ -259,8 +260,11 @@
             }
         },
         "village": {
-            "cannotget": "cannot get village info",
-            "info": "VID: {}\nUUID: {}\n- Center: {}\n- Bounds: {}, {}\n- Radius: {}\n- Dwellers: {} / {} / {} / {}\nVillager list\n",
+            "villageHasBeenRemoved": "- §a[{}]§r the village has been removed",
+            "notExist": "corresponding village does not exist",
+            "villageInfo": "- §a[{}]§r§b position {} dimension: {}§r radius: {} village count: {} ironGolem count: {} bed count: {}§6 village bounds[{}, {}]§r\n",
+            "cannotget": "cannot get villager info",
+            "info": "VID: {}\nUUID: {}\n- Center: {}\n- Dimension: {}\n- Bounds: {}, {}\n- Radius: {}\n- Dwellers: {} / {} / {} / {}\nVillager list\n",
             "villagerInfo": "[{}] villager position:{}\n  POI:\n",
             "villagerPOIType1": "    bed:       ",
             "villagerPOIType2": "    alarm      ",

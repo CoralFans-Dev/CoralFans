@@ -19,15 +19,24 @@ public:
     Village*                   mVillagePtr;
     Tick                       mLastTick;
     AABB                       mOldBounds;
-    bsci::GeometryGroup::GeoId mBoundsGeoId;
-    bsci::GeometryGroup::GeoId mRaidBoundsGeoId;
-    bsci::GeometryGroup::GeoId mIronSpawnGeoId;
-    bsci::GeometryGroup::GeoId mCenterGeoId;
-    bsci::GeometryGroup::GeoId mPoiQueryGeoId;
-    bsci::GeometryGroup::GeoId mBindGeoId;
+    AABB                       mOldRaidBounds;
+    bsci::GeometryGroup::GeoId mBoundsGeoId     = {0};
+    bsci::GeometryGroup::GeoId mRaidBoundsGeoId = {0};
+    bsci::GeometryGroup::GeoId mIronSpawnGeoId  = {0};
+    bsci::GeometryGroup::GeoId mCenterGeoId     = {0};
+    bsci::GeometryGroup::GeoId mPoiQueryGeoId   = {0};
+    bsci::GeometryGroup::GeoId mBindGeoId       = {0};
 
 public:
-    CFTickingVillageData(Village*, Tick&, AABB&);
+    CFTickingVillageData(Village*, Tick&);
+
+public:
+    void showBounds();
+    void showRaidBounds();
+    void showIronSpawn();
+    void showCenter();
+    void showPoiQuery();
+    void showBind();
 };
 
 class CFVillageManager {
@@ -40,7 +49,7 @@ private:
     // std::map<int, std::pair<Village*, int>>              mVidVillageMap;
     bsci::GeometryGroup::GeoId mParticleId;
 
-public:
+private:
     bool mShowBounds     = false;
     bool mShowRaidBounds = false;
     bool mShowIronSpawn  = false;
@@ -49,19 +58,31 @@ public:
     bool mShowBind       = false;
 
 public:
-    void addVillage(Village*);
-    void handleVillageTick(Village*, Tick&, AABB&);
-    void removeVillage(Village*);
-    void tick();
+    void setShowBounds(bool);
+    void setShowRaidBounds(bool);
+    void setShowIronSpawn(bool);
+    void setShowCenter(bool);
+    void setShowPoiQuery(bool);
+    void setShowBind(bool);
+    bool getShowBounds();
+    bool getShowRaidBounds();
+    bool getShowIronSpawn();
+    bool getShowCenter();
+    bool getShowPoiQuery();
+    bool getShowBind();
 
-    // int                          getVid(mce::UUID);
+public:
+    void                         addVillage(Village*);
+    void                         handleVillageTick(Village*, Tick&);
+    void                         removeVillage(Village*);
+    void                         tick(const Tick&);
+    std::vector<std::string>     listVillages();
+    std::string                  listTickingVillages();
+    std::pair<std::string, bool> getVillageInfo(int);
+    int                          getVillageId(Village*);
+
     // void                         insertVillage(Village*, int);
     // void                         clearParticle();
-    // void                         lightTick();
-    // void                         heavyTick();
-    std::string listVillages();
-    // void                         refreshCommandSoftEnum();
-    std::pair<std::string, bool> getVillageInfo(std::string);
     std::pair<std::string, bool> getVillagerInfo(ActorUniqueID);
 
     static void hookVillage(bool);

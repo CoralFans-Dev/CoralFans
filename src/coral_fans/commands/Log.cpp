@@ -6,6 +6,7 @@
 #include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/service/Bedrock.h"
+#include "mc/network/packet/TextPacket.h"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/server/commands/CommandPermissionLevel.h"
@@ -56,32 +57,35 @@ void registerLogCommand(CommandPermissionLevel permission) {
                 copiedQueue.mC = std::move(nextTickQueue);
                 if (!copiedQueue.empty()) {
                     BlockTickingQueue::TickDataSet activeQueue;
-                    output.success("command.log.success.pt.title"_tr(
-                        region.getLevel().getCurrentTick().tickID - 1,
-                        chunkPos.toString(),
-                        copiedQueue.size()
-                    ));
+                    TextPacket::createRawMessage("command.log.success.pt.title"_tr(
+                                                     region.getLevel().getCurrentTick().tickID - 1,
+                                                     chunkPos.toString(),
+                                                     copiedQueue.size()
+                                                 ))
+                        .sendTo(*player);
                     for (; !copiedQueue.empty();) {
                         auto& blockTick = copiedQueue.top();
                         if (blockTick.mIsRemoved) {
-                            output.success("command.log.success.pt.remove"_tr(
-                                blockTick.mData.pos.toString(),
-                                blockTick.mData.tick.tickID,
-                                blockTick.mData.priorityOffset,
-                                blockTick.mData.mBlock->getTypeName()
-                            ));
+                            TextPacket::createRawMessage("command.log.success.pt.remove"_tr(
+                                                             blockTick.mData.pos.toString(),
+                                                             blockTick.mData.tick.tickID,
+                                                             blockTick.mData.priorityOffset,
+                                                             blockTick.mData.mBlock->getTypeName()
+                                                         ))
+                                .sendTo(*player);
                         } else nextTickQueue.emplace_back(blockTick);
                         (void)copiedQueue.pop();
                     }
                     copiedQueue.mC = std::move(nextTickQueue);
                     for (; !copiedQueue.empty();) {
                         auto& blockTick = copiedQueue.top();
-                        output.success("command.log.success.pt.info"_tr(
-                            blockTick.mData.pos.toString(),
-                            blockTick.mData.tick.tickID,
-                            blockTick.mData.priorityOffset,
-                            blockTick.mData.mBlock->getTypeName()
-                        ));
+                        TextPacket::createRawMessage("command.log.success.pt.info"_tr(
+                                                         blockTick.mData.pos.toString(),
+                                                         blockTick.mData.tick.tickID,
+                                                         blockTick.mData.priorityOffset,
+                                                         blockTick.mData.mBlock->getTypeName()
+                                                     ))
+                            .sendTo(*player);
                         (void)copiedQueue.pop();
                     }
                 } else output.error("command.log.error.nopt"_tr());
@@ -102,32 +106,35 @@ void registerLogCommand(CommandPermissionLevel permission) {
                 copiedQueue.mC = std::move(nextTickQueue);
                 if (!copiedQueue.empty()) {
                     BlockTickingQueue::TickDataSet activeQueue;
-                    output.success("command.log.success.rpt.title"_tr(
-                        region.getLevel().getCurrentTick().tickID - 1,
-                        chunkPos.toString(),
-                        copiedQueue.size()
-                    ));
+                    TextPacket::createRawMessage("command.log.success.rpt.title"_tr(
+                                                     region.getLevel().getCurrentTick().tickID - 1,
+                                                     chunkPos.toString(),
+                                                     copiedQueue.size()
+                                                 ))
+                        .sendTo(*player);
                     for (; !copiedQueue.empty();) {
                         auto& blockTick = copiedQueue.top();
                         if (blockTick.mIsRemoved) {
-                            output.success("command.log.success.rpt.remove"_tr(
-                                blockTick.mData.pos.toString(),
-                                blockTick.mData.tick.tickID,
-                                blockTick.mData.priorityOffset,
-                                blockTick.mData.mBlock->getTypeName()
-                            ));
+                            TextPacket::createRawMessage("command.log.success.rpt.remove"_tr(
+                                                             blockTick.mData.pos.toString(),
+                                                             blockTick.mData.tick.tickID,
+                                                             blockTick.mData.priorityOffset,
+                                                             blockTick.mData.mBlock->getTypeName()
+                                                         ))
+                                .sendTo(*player);
                         } else nextTickQueue.emplace_back(blockTick);
                         (void)copiedQueue.pop();
                     }
                     copiedQueue.mC = std::move(nextTickQueue);
                     for (; !copiedQueue.empty();) {
                         auto& blockTick = copiedQueue.top();
-                        output.success("command.log.success.rpt.info"_tr(
-                            blockTick.mData.pos.toString(),
-                            blockTick.mData.tick.tickID,
-                            blockTick.mData.priorityOffset,
-                            blockTick.mData.mBlock->getTypeName()
-                        ));
+                        TextPacket::createRawMessage("command.log.success.rpt.info"_tr(
+                                                         blockTick.mData.pos.toString(),
+                                                         blockTick.mData.tick.tickID,
+                                                         blockTick.mData.priorityOffset,
+                                                         blockTick.mData.mBlock->getTypeName()
+                                                     ))
+                            .sendTo(*player);
                         (void)copiedQueue.pop();
                     }
                 } else output.error("command.log.error.norpt"_tr());

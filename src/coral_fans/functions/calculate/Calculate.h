@@ -4,6 +4,6 @@
 
 
 namespace coral_fans::functions {
-void calculatePt(Player* player, CommandOutput& output);
-void calculatePt2(Player* player, CommandOutput& output);
+void calculatePt(Player* player);
+void calculatePt2(Player* player);
 } // namespace coral_fans::functions

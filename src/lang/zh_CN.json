@@ -255,7 +255,8 @@
         "dimension": {
             "overworld": "主世界",
             "nether": "下界",
-            "theend": "末地"
+            "theend": "末地",
+            "unknown": "未定义维度"
         },
         "profiler": {
             "normal": "- MSPT: {:.3f} ms TPS: {} Chunks: {}\n- CoralFans: {:.3f} ms\n- 红石系统: {:.3f} ms\n - 信号: {:.3f} ms\n - 增加: {:.3f} ms\n - 更新: {:.3f} ms\n  - 删除: {:.3f} ms\n- 区块加（卸）载与村庄: {:.3f} ms\n- 实体系统: {:.3f} ms\n - 区块刻: {:.3f} ms\n  - 方块实体: {:.3f} ms\n  - 随机刻: {:.3f} ms\n  - 计划刻: {:.3f} ms\n",
@@ -264,9 +265,13 @@
             }
         },
         "village": {
-            "cannotget": "无法获取村庄信息",
-            "info": "VID: {}\nUUID: {}\n- 中心: {}\n- 边界: {}, {}\n- 半径: {}\n- 居民: {} / {} / {} / {}\n村民列表：\n",
+            "villageHasBeenRemoved": "- §a[{}]§r 该村庄已被移除",
+            "villageInfo": "- §a[{}]§r§b 坐标：{} 维度：{}§r 半径：{} 村民数量：{} 铁傀儡数量：{} 床数: {}§6 村庄范围[{}, {}]§r\n",
+            "notExist": "不存在对应村庄",
+            "cannotgetvillager": "无法获取村民信息",
+            "info": "VID: {}\nUUID: {}\n- 中心: {}\n- 维度: {}\n- 边界: {}, {}\n- 半径: {}\n- 居民: {} / {} / {} / {}\n村民列表：\n",
             "villagerInfo": "[{}] 村民坐标：{}\n  POI：\n",
+            "villagerInfo2": "所属村庄VID: {}\n  坐标：{}\n  POI：\n",
             "villagerPOIType1": "    床：       ",
             "villagerPOIType2": "    钟：       ",
             "villagerPOIType3": "    工作方块： ",

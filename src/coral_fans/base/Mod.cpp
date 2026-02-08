@@ -3,13 +3,12 @@
 
 namespace coral_fans {
 
-void CoralFansMod::tick() {
-    this->getHopperCounterManager().tick(); // light 1
-    this->getHsaManager().tick();           // heavy 80
-    this->getSlimeManager().tick();         // heavy 80
-    this->getVillageManager().lightTick();  // light 20
-    this->getVillageManager().heavyTick();  // heavy 40
-    this->mHudHelper.tick();                // light 20
+void CoralFansMod::tick(const Tick& currentTick) {
+    this->getHopperCounterManager().tick();      // light 1
+    this->getHsaManager().tick();                // heavy 80
+    this->getSlimeManager().tick();              // heavy 80
+    this->getVillageManager().tick(currentTick); // light 10
+    this->mHudHelper.tick();                     // light 20
     my_schedule::MySchedule::getSchedule().update();
 }
 

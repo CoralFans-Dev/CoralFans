@@ -1,6 +1,6 @@
 #include "Calculate.h"
 #include "ll/api/i18n/I18n.h"
-#include "mc/server/commands/CommandOutput.h"
+#include "mc/network/packet/TextPacket.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/BlockTickingQueue.h"
 #include "mc/world/level/ChunkPos.h"
@@ -12,7 +12,7 @@
 
 
 namespace coral_fans::functions {
-void calculatePt(Player* player, CommandOutput& output) {
+void calculatePt(Player* player) {
     using ll::i18n_literals::operator""_tr;
     ChunkPos     chunkPos = ChunkPos(player->getFeetBlockPos());
     BlockSource& region   = player->getDimensionBlockSource();
@@ -24,11 +24,12 @@ void calculatePt(Player* player, CommandOutput& output) {
         copiedQueue.mC = std::move(nextTickQueue);
         if (!copiedQueue.empty()) {
             BlockTickingQueue::TickDataSet activeQueue;
-            output.success("command.calculate.success.pt.title"_tr(
-                region.getLevel().getCurrentTick().tickID - 1,
-                chunkPos.toString(),
-                copiedQueue.size()
-            ));
+            TextPacket::createRawMessage("command.calculate.success.pt.title"_tr(
+                                             region.getLevel().getCurrentTick().tickID - 1,
+                                             chunkPos.toString(),
+                                             copiedQueue.size()
+                                         ))
+                .sendTo(*player);
             std::map<std::pair<unsigned long long, std::string>, int> cal;
             for (; !copiedQueue.empty();) {
                 auto& blockTick = copiedQueue.top();
@@ -47,7 +48,10 @@ void calculatePt(Player* player, CommandOutput& output) {
                 (void)copiedQueue.pop();
             }
             for (auto it = cal.begin(); it != cal.end(); ++it) {
-                output.success("command.calculate.success.pt.remove"_tr(it->first.second, it->first.first, it->second));
+                TextPacket::createRawMessage(
+                    "command.calculate.success.pt.remove"_tr(it->first.second, it->first.first, it->second)
+                )
+                    .sendTo(*player);
             }
 
             copiedQueue.mC = std::move(nextTickQueue);
@@ -65,13 +69,16 @@ void calculatePt(Player* player, CommandOutput& output) {
                 (void)copiedQueue.pop();
             }
             for (auto it = cal2.begin(); it != cal2.end(); ++it) {
-                output.success("command.calculate.success.pt.info"_tr(it->first.second, it->first.first, it->second));
+                TextPacket::createRawMessage(
+                    "command.calculate.success.pt.info"_tr(it->first.second, it->first.first, it->second)
+                )
+                    .sendTo(*player);
             }
-        } else output.error("command.calculate.error.nopt"_tr());
+        } else TextPacket::createRawMessage("command.calculate.error.nopt"_tr()).sendTo(*player);
     }
 }
 
-void calculatePt2(Player* player, CommandOutput& output) {
+void calculatePt2(Player* player) {
     using ll::i18n_literals::operator""_tr;
     ChunkPos     chunkPos = ChunkPos(player->getFeetBlockPos());
     BlockSource& region   = player->getDimensionBlockSource();
@@ -83,29 +90,13 @@ void calculatePt2(Player* player, CommandOutput& output) {
         copiedQueue.mC = std::move(nextTickQueue);
         if (!copiedQueue.empty()) {
             BlockTickingQueue::TickDataSet activeQueue;
-            output.success("command.calculate.success.pt2.title"_tr(
-                region.getLevel().getCurrentTick().tickID - 1,
-                chunkPos.toString(),
-                copiedQueue.size()
-            ));
-            // std::map<std::pair<unsigned long long, std::string>, int> cal;
+            TextPacket::createRawMessage("command.calculate.success.pt2.title"_tr(
+                                             region.getLevel().getCurrentTick().tickID - 1,
+                                             chunkPos.toString(),
+                                             copiedQueue.size()
+                                         ))
+                .sendTo(*player);
             std::map<std::pair<BlockPos, std::string>, int> cal;
-            // for (; !copiedQueue.empty();) {
-            //     auto& blockTick = copiedQueue.top();
-            //     if (blockTick.mIsRemoved) {
-            //         std::pair<unsigned long long, std::string> tem = {
-            //             blockTick.mData.tick.tickID,
-            //             blockTick.mData.mBlock->getTypeName()
-            //         };
-            //         auto it = cal.find(tem);
-            //         if (it != cal.end()) {
-            //             it->second++;
-            //         } else {
-            //             cal.emplace(tem, 1);
-            //         }
-            //     } else nextTickQueue.emplace_back(blockTick);
-            //     (void)copiedQueue.pop();
-            // }
             while (!copiedQueue.empty()) {
                 auto& blockTick = copiedQueue.top();
                 if (blockTick.mIsRemoved) {
@@ -120,14 +111,11 @@ void calculatePt2(Player* player, CommandOutput& output) {
                 } else nextTickQueue.emplace_back(blockTick);
                 (void)copiedQueue.pop();
             }
-            // for (auto it = cal.begin(); it != cal.end(); ++it) {
-            //     output.success("command.calculate.success.pt.remove"_tr(it->first.second, it->first.first,
-            //     it->second));
-            // }
             for (auto it = cal.begin(); it != cal.end(); ++it) {
-                output.success(
+                TextPacket::createRawMessage(
                     "command.calculate.success.pt2.remove"_tr(it->first.second, it->first.first.toString(), it->second)
-                );
+                )
+                    .sendTo(*player);
             }
 
             copiedQueue.mC = std::move(nextTickQueue);
@@ -143,9 +131,12 @@ void calculatePt2(Player* player, CommandOutput& output) {
                 (void)copiedQueue.pop();
             }
             for (auto it = cal2.begin(); it != cal2.end(); ++it) {
-                output.success("command.calculate.success.pt2.info"_tr(it->first.second, it->first.first, it->second));
+                TextPacket::createRawMessage(
+                    "command.calculate.success.pt2.info"_tr(it->first.second, it->first.first, it->second)
+                )
+                    .sendTo(*player);
             }
-        } else output.error("command.calculate.error.nopt"_tr());
+        } else TextPacket::createRawMessage("command.calculate.error.nopt"_tr()).sendTo(*player);
     }
 }
 } // namespace coral_fans::functions

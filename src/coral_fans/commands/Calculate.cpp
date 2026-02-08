@@ -21,14 +21,14 @@ void registerCalculateCommand(CommandPermissionLevel permission) {
     calculateCommand.runtimeOverload().text("pt").execute(
         [](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const&) {
             COMMAND_CHECK_PLAYER
-            functions::calculatePt(player, output);
+            functions::calculatePt(player);
         }
     );
 
     calculateCommand.runtimeOverload().text("pt2").execute(
         [](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const&) {
             COMMAND_CHECK_PLAYER
-            functions::calculatePt2(player, output);
+            functions::calculatePt2(player);
         }
     );
 }
