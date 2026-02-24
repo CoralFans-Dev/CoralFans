@@ -18,24 +18,25 @@
 namespace {
 
 struct ToolInfo {
-    float value;
-    int   slot;
-    short remainDamage;
+    float value        = 0;
+    int   slot         = -1;
+    short remainDamage = 0;
 };
 
 int searchBestToolInInv(Container& inv, int currentSlot, const Block* block, const int minDamage, bool weapon) {
     if (!weapon && !block) return currentSlot;
     auto&    currentItem = inv.getItem(currentSlot);
     ToolInfo curInfo;
-    if (currentItem == ItemStack::EMPTY_ITEM()) {
-        curInfo = {0, currentSlot, 0};
-    } else {
-        curInfo = {
-            weapon ? currentItem.mItem.get()->getAttackDamage()
-                   : currentItem.mItem.get()->getDestroySpeed(currentItem, *block),
-            currentSlot,
-            currentItem.mItem->getMaxDamage() - currentItem.getDamageValue()
-        };
+    if (currentItem != ItemStack::EMPTY_ITEM()) {
+        short currentRemainDamage = currentItem.mItem->getMaxDamage() - currentItem.getDamageValue();
+        if (currentRemainDamage > minDamage) {
+            curInfo = {
+                weapon ? currentItem.mItem.get()->getAttackDamage()
+                       : currentItem.mItem.get()->getDestroySpeed(currentItem, *block),
+                currentSlot,
+                currentRemainDamage
+            };
+        }
     }
     int size = inv.getContainerSize();
     for (int i = 0; i < size; ++i) {
@@ -77,11 +78,11 @@ LL_STATIC_HOOK(
                           .value_or("1"));
         const Block& block = player.getDimensionBlockSourceConst().getBlock(pos);
         int bestSlot = ::searchBestToolInInv(*player.mInventory->mInventory, currentSlot, &block, minDamage, false);
-        if (bestSlot <= 8) {
-            player.setSelectedSlot(bestSlot);
-        } else {
+        if (bestSlot > 8) {
             utils::swapItemInContainer(&player, currentSlot, bestSlot);
             player.refreshInventory();
+        } else if (bestSlot >= 0) {
+            player.setSelectedSlot(bestSlot);
         }
     }
     return origin(player, pos, face);
@@ -105,11 +106,11 @@ LL_TYPE_INSTANCE_HOOK(
                           ->get(std::format("functions.players.{}.autotool.mindamage", this->getUuid().asString()))
                           .value_or("1"));
         int bestSlot = ::searchBestToolInInv(*this->mInventory->mInventory, currentSlot, nullptr, minDamage, true);
-        if (bestSlot <= 8) {
-            this->setSelectedSlot(bestSlot);
-        } else {
+        if (bestSlot > 8) {
             utils::swapItemInContainer(this, currentSlot, bestSlot);
             this->refreshInventory();
+        } else if (bestSlot >= 0) {
+            this->setSelectedSlot(bestSlot);
         }
     }
     return origin(actor, cause);

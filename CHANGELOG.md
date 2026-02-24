@@ -5,12 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.9.1] - 2026-2-24
+
+### Fixed
+
++ Fixed a bug where using the rotate command on containers would additionally drop container contents due to Mojang API changes
++ Fixed a bug where autoTool couldn't correctly switch tools when tool durability was too low
++ Fixed a bug in autotool where using the first water bucket in the inventory would consume the empty bucket if restocking was triggered
+
+### Changed
+
++ Adjusted the color of HSA boxes, and now displays the overlap count of HSA points
+
 ## [2.9.0] - 2026-2-8
 
 ### Added
 
 + Adapted to 1.21.132
 + refactor village
++ Added calculate pt2, by pt's position
++ Added a new minerule commanf to restore ancillary broken 
 
 ## [2.8.0] - 2025-11.12
 

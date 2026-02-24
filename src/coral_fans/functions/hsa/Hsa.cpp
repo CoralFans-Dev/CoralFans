@@ -25,20 +25,6 @@ static const int radius = 5;
 namespace coral_fans::functions {
 
 void HsaManager::drawHsa() {
-    static std::array colors{
-        mce::Color::BLACK(),
-        mce::Color::BLUE(),
-        // mce::Color::CYAN(),
-        mce::Color::GREEN(),
-        // mce::Color::GREY(),
-        // mce::Color::MINECOIN_GOLD(),
-        // mce::Color::ORANGE(),
-        mce::Color::PINK(),
-        mce::Color::PURPLE(),
-        mce::Color::REBECCA_PURPLE(),
-        mce::Color::RED(),
-        mce::Color::YELLOW()
-    };
     auto level = ll::service::getLevel();
     if (level.has_value()) {
         level->forEachPlayer([&](Player& player) {
@@ -53,42 +39,86 @@ void HsaManager::drawHsa() {
                     if (chunk && chunk->mLoadState.get() == ChunkState::Loaded) {
                         ::std::vector<::BlockPos> hsa = chunk->mLevelChunkVolumeData->structureSpawnPos();
                         if (!hsa.size()) continue; // hsa数量为0则跳过
-                        auto _it = mChunkLoaded[dim].find(chunkPos);
-                        if (!(_it == mChunkLoaded[dim].end())) {
-                            _it->second = true;
-                            continue;
-                        } // hsa已显示则跳过
-                        mChunkLoaded[dim][chunkPos] = true;
-                        std::unordered_map<BlockPos, short>     count;
-                        std::vector<bsci::GeometryGroup::GeoId> geometryGroup;
-                        for (auto i : hsa) {
-                            auto  it     = count.find(i);
-                            short _count = 0;
-                            if (it == count.end()) count[i] = 1;
-                            else {
-                                _count     = it->second;
-                                it->second = (it->second + 1) % 8;
+                        auto [iter, inserted] = this->mParticleMap.try_emplace(std::make_pair(chunkPos, dim));
+                        iter->second.second   = true;
+                        if (inserted) {
+                            std::unordered_map<BlockPos, int> hsaCount;
+                            for (auto& pos : hsa) {
+                                auto [it, inserted2] = hsaCount.try_emplace(pos);
+                                if (inserted2) it->second = 1;
+                                else it->second++;
+                                coral_fans::mod().getLogger().info(
+                                    "Found HSA at position {}, count: {}",
+                                    pos,
+                                    it->second
+                                );
                             }
-                            auto& mod = coral_fans::mod();
-
-                            auto color = colors[_count];
-                            auto ids   = std::array{
-                                mod.getGeometryGroup()
-                                    ->line(dim, {i.x, i.y, i.z}, {i.x, i.y + 1, i.z}, mce::Color::WHITE()),
-                                mod.getGeometryGroup()->line(dim, {i.x + 1, i.y, i.z}, {i.x + 1, i.y + 1, i.z}, color),
-                                mod.getGeometryGroup()->line(dim, {i.x, i.y, i.z + 1}, {i.x, i.y + 1, i.z + 1}, color),
-                                mod.getGeometryGroup()
-                                    ->line(dim, {i.x + 1, i.y, i.z + 1}, {i.x + 1, i.y + 1, i.z + 1}, color),
-                                mod.getGeometryGroup()->line(dim, {i.x, i.y + 1, i.z}, {i.x + 1, i.y + 1, i.z}, color),
-                                mod.getGeometryGroup()->line(dim, {i.x, i.y + 1, i.z}, {i.x, i.y + 1, i.z + 1}, color),
-                                mod.getGeometryGroup()
-                                    ->line(dim, {i.x + 1, i.y + 1, i.z}, {i.x + 1, i.y + 1, i.z + 1}, color),
-                                mod.getGeometryGroup()
-                                    ->line(dim, {i.x, i.y + 1, i.z + 1}, {i.x + 1, i.y + 1, i.z + 1}, color),
-                            };
-                            geometryGroup.push_back(mod.getGeometryGroup()->merge(ids));
+                            std::vector<bsci::GeometryGroup::GeoId> geoIdList;
+                            for (auto& [pos, count] : hsaCount) {
+                                auto& geometryGroup = coral_fans::mod().getGeometryGroup();
+                                auto  ids           = std::vector{
+                                    geometryGroup->line(
+                                        dim,
+                                        {pos.x, pos.y, pos.z},
+                                        {pos.x, pos.y + 1, pos.z},
+                                        mce::Color::WHITE()
+                                    ),
+                                    geometryGroup->line(
+                                        dim,
+                                        {pos.x + 1, pos.y, pos.z},
+                                        {pos.x + 1, pos.y + 1, pos.z},
+                                        mce::Color::BLUE()
+                                    ),
+                                    geometryGroup->line(
+                                        dim,
+                                        {pos.x, pos.y, pos.z + 1},
+                                        {pos.x, pos.y + 1, pos.z + 1},
+                                        mce::Color::BLUE()
+                                    ),
+                                    geometryGroup->line(
+                                        dim,
+                                        {pos.x + 1, pos.y, pos.z + 1},
+                                        {pos.x + 1, pos.y + 1, pos.z + 1},
+                                        mce::Color::BLUE()
+                                    ),
+                                    geometryGroup->line(
+                                        dim,
+                                        {pos.x, pos.y + 1, pos.z},
+                                        {pos.x + 1, pos.y + 1, pos.z},
+                                        mce::Color::BLUE()
+                                    ),
+                                    geometryGroup->line(
+                                        dim,
+                                        {pos.x, pos.y + 1, pos.z},
+                                        {pos.x, pos.y + 1, pos.z + 1},
+                                        mce::Color::BLUE()
+                                    ),
+                                    geometryGroup->line(
+                                        dim,
+                                        {pos.x + 1, pos.y + 1, pos.z},
+                                        {pos.x + 1, pos.y + 1, pos.z + 1},
+                                        mce::Color::BLUE()
+                                    ),
+                                    geometryGroup->line(
+                                        dim,
+                                        {pos.x, pos.y + 1, pos.z + 1},
+                                        {pos.x + 1, pos.y + 1, pos.z + 1},
+                                        mce::Color::BLUE()
+                                    ),
+                                };
+                                if (count > 1) {
+                                    ids.push_back(geometryGroup->text(
+                                        dim,
+                                        {pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f},
+                                        "x" + std::to_string(count),
+                                        mce::Color::WHITE(),
+                                        1.0f
+                                    ));
+                                }
+                                geoIdList.push_back(geometryGroup->merge(ids));
+                            }
+                            iter->second.first = std::move(geoIdList);
                         }
-                        mParticleMap[dim][chunkPos] = geometryGroup;
                     }
                 }
             }
@@ -109,30 +139,22 @@ void HsaManager::tick() {
 }
 
 void HsaManager::remove() {
-    for (int dim = 0; dim < 3; dim++) {
-        for (auto i : mParticleMap[dim]) {
-            for (auto j : i.second) coral_fans::mod().getGeometryGroup()->remove(j);
-        }
-        mParticleMap[dim].clear();
-        mChunkLoaded[dim].clear();
+    for (auto i : mParticleMap) {
+        for (auto j : i.second.first) coral_fans::mod().getGeometryGroup()->remove(j);
     }
+    mParticleMap.clear();
 }
 
 void HsaManager::runtimeRemove() {
-    for (int dim = 0; dim < 3; dim++) {
-        auto it = mChunkLoaded[dim].begin();
-        while (it != mChunkLoaded[dim].end()) {
-            if (!it->second) {
-                auto geometryGroup = mParticleMap[dim].find(it->first);
-                for (auto j : geometryGroup->second) coral_fans::mod().getGeometryGroup()->remove(j);
-                mParticleMap[dim].erase(geometryGroup);
-                it = mChunkLoaded[dim].erase(it);
-            } else {
-                it->second = false;
-                it++;
-            }
+    std::erase_if(mParticleMap, [](auto& data) {
+        if (!data.second.second) {
+            for (auto j : data.second.first) coral_fans::mod().getGeometryGroup()->remove(j);
+            return true;
+        } else {
+            data.second.second = false;
+            return false;
         }
-    }
+    });
 }
 
 } // namespace coral_fans::functions

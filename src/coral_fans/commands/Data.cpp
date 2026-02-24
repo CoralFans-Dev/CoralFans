@@ -5,6 +5,7 @@
 #include "ll/api/command/runtime/ParamKind.h"
 #include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
+#include "mc/network/packet/TextPacket.h"
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/server/commands/CommandPermissionLevel.h"
 #include "mc/server/commands/CommandVersion.h"
@@ -44,7 +45,8 @@ void registerDataCommand(CommandPermissionLevel permission) {
                 if (!hitrst) return output.error("command.data.error"_tr());
                 blockPos = hitrst.mBlock;
             }
-            output.success(functions::getBlockData(player->getDimensionBlockSource(), blockPos));
+            TextPacket::createRawMessage(functions::getBlockData(player->getDimensionBlockSource(), blockPos))
+                .sendTo(*player);
         });
 
     // block nbt [path]
@@ -60,7 +62,7 @@ void registerDataCommand(CommandPermissionLevel permission) {
             std::string path;
             if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>();
             auto rst = functions::getBlockNbt(0, player->getDimensionBlockSource(), blockPos, path);
-            if (rst.second) output.success(rst.first);
+            if (rst.second) TextPacket::createRawMessage(rst.first).sendTo(*player);
             else output.error(rst.first);
         });
 
@@ -77,7 +79,7 @@ void registerDataCommand(CommandPermissionLevel permission) {
             std::string path;
             if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>();
             auto rst = functions::getBlockNbt(1, player->getDimensionBlockSource(), blockPos, path);
-            if (rst.second) output.success(rst.first);
+            if (rst.second) TextPacket::createRawMessage(rst.first).sendTo(*player);
             else output.error(rst.first);
         });
 
@@ -97,7 +99,7 @@ void registerDataCommand(CommandPermissionLevel permission) {
             std::string path;
             if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>();
             auto rst = functions::getBlockNbt(0, player->getDimensionBlockSource(), blockPos, path);
-            if (rst.second) output.success(rst.first);
+            if (rst.second) TextPacket::createRawMessage(rst.first).sendTo(*player);
             else output.error(rst.first);
         });
 
@@ -117,7 +119,7 @@ void registerDataCommand(CommandPermissionLevel permission) {
             std::string path;
             if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>();
             auto rst = functions::getBlockNbt(1, player->getDimensionBlockSource(), blockPos, path);
-            if (rst.second) output.success(rst.first);
+            if (rst.second) TextPacket::createRawMessage(rst.first).sendTo(*player);
             else output.error(rst.first);
         });
 
@@ -143,7 +145,7 @@ void registerDataCommand(CommandPermissionLevel permission) {
             const auto& hitrst = player->traceRay(5.25f, true, false);
             if (!hitrst) return output.error("command.data.error"_tr());
             auto rst = functions::getEntityData(hitrst.getEntity());
-            if (rst.second) output.success(rst.first);
+            if (rst.second) TextPacket::createRawMessage(rst.first).sendTo(*player);
             else output.error(rst.first);
         }
     );
@@ -160,7 +162,7 @@ void registerDataCommand(CommandPermissionLevel permission) {
             const auto& hitrst = player->traceRay(5.25f, true, false);
             if (!hitrst) return output.error("command.data.error"_tr());
             auto rst = functions::getEntityNbt(hitrst.getEntity(), path);
-            if (rst.second) output.success(rst.first);
+            if (rst.second) TextPacket::createRawMessage(rst.first).sendTo(*player);
             else output.error(rst.first);
         });
 
@@ -197,7 +199,7 @@ void registerDataCommand(CommandPermissionLevel permission) {
                 blockPos,
                 self["redstoneType"].get<ll::command::ParamKind::Enum>().index
             );
-            if (rst.second) output.success(rst.first);
+            if (rst.second) TextPacket::createRawMessage(rst.first).sendTo(*player);
             else output.error(rst.first);
         });
 
@@ -211,7 +213,7 @@ void registerDataCommand(CommandPermissionLevel permission) {
             std::string path;
             if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>();
             auto rst = functions::getItemNbt(player->getSelectedItem(), path);
-            if (rst.second) output.success(rst.first);
+            if (rst.second) TextPacket::createRawMessage(rst.first).sendTo(*player);
             else output.error(rst.first);
         });
 
@@ -225,7 +227,8 @@ void registerDataCommand(CommandPermissionLevel permission) {
             for (const auto& i : actors) {
                 if (i && i->isType(ActorType::Player)) {
                     Player* pl = static_cast<Player*>(i);
-                    output.success("{} = {}", pl->getRealName(), pl->getUuid().asString());
+                    TextPacket::createRawMessage(std::format("{} = {}", pl->getRealName(), pl->getUuid().asString()))
+                        .sendTo(*pl);
                 }
             }
         });

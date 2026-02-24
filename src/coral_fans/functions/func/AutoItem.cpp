@@ -200,9 +200,11 @@ LL_TYPE_INSTANCE_HOOK(
     } else {
         origin(item, itemUseMethod, consumeItem);
         if (item == ItemStack::EMPTY_ITEM()) {
+            auto selectedItem = inv->getItem(selectedSlot);
             inv->setItem(selectedSlot, ItemStack::EMPTY_ITEM());
             auto res = autoItemByItemName(inv, selectedSlot, name);
             if (res.has_value()) item = std::move(res.value());
+            inv->setItem(selectedSlot, selectedItem);
         }
     }
 }
@@ -239,7 +241,6 @@ LL_TYPE_INSTANCE_HOOK(
     } else {
         auto res = autoItemByItemName(inv, selectedSlot, targetName);
         if (res.has_value()) {
-            mod().getLogger().info(res.value().toString());
             inv->setItem(selectedSlot, res.value());
             this->refreshInventory();
         }

@@ -13,7 +13,7 @@ end
 
 add_requires(
     "levibuildscript",
-    "bsci main"
+    "bsci v0.2.0"
 )
 
 if not has_config("vs_runtime") then
