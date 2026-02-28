@@ -221,33 +221,33 @@ void HsaManager::drawChunk(DimensionType dimId, ChunkPos chunkPos) {
 // }
 
 void HsaManager::tick() {
-    static int gt = 0, gt2 = 1;
-    if (!mShow) return;
-    if (!gt) {
-        drawHsa();
-        if (!gt2) runtimeRemove();
-        gt2 = (gt2 + 1) % 15;
-    }
-    gt = (gt + 1) % 80;
+    // static int gt = 0, gt2 = 1;
+    // if (!mShow) return;
+    // if (!gt) {
+    //     drawHsa();
+    //     if (!gt2) runtimeRemove();
+    //     gt2 = (gt2 + 1) % 15;
+    // }
+    // gt = (gt + 1) % 80;
 }
 
 void HsaManager::remove() {
-    for (auto i : mParticleMap) {
-        for (auto j : i.second.first) coral_fans::mod().getGeometryGroup()->remove(j);
-    }
-    mParticleMap.clear();
+    // for (auto i : mParticleMap) {
+    //     for (auto j : i.second.first) coral_fans::mod().getGeometryGroup()->remove(j);
+    // }
+    // mParticleMap.clear();
 }
 
 void HsaManager::runtimeRemove() {
-    std::erase_if(mParticleMap, [](auto& data) {
-        if (!data.second.second) {
-            for (auto j : data.second.first) coral_fans::mod().getGeometryGroup()->remove(j);
-            return true;
-        } else {
-            data.second.second = false;
-            return false;
-        }
-    });
+    // std::erase_if(mParticleMap, [](auto& data) {
+    //     if (!data.second.second) {
+    //         for (auto j : data.second.first) coral_fans::mod().getGeometryGroup()->remove(j);
+    //         return true;
+    //     } else {
+    //         data.second.second = false;
+    //         return false;
+    //     }
+    // });
 }
 
 } // namespace coral_fans::functions
