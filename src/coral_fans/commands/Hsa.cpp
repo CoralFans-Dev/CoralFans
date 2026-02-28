@@ -24,10 +24,10 @@ void registerHsaCommand(CommandPermissionLevel permission) {
         .optional("isopen", ll::command::ParamKind::Bool)
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             auto& hsaManager = coral_fans::mod().getHsaManager();
-            if (self["isopen"].has_value()) hsaManager.mShow = self["isopen"].get<ll::command::ParamKind::Bool>();
-            else hsaManager.mShow = !hsaManager.mShow;
-            if (!hsaManager.mShow) hsaManager.remove();
-            output.success("command.hsa.show.output"_tr(hsaManager.mShow ? "true" : "false"));
+            if (self["isopen"].has_value()) hsaManager.hsaShow = self["isopen"].get<ll::command::ParamKind::Bool>();
+            else hsaManager.hsaShow = !hsaManager.hsaShow;
+            if (!hsaManager.hsaShow) hsaManager.remove();
+            output.success("command.hsa.show.output"_tr(hsaManager.hsaShow ? "true" : "false"));
         });
 }
 } // namespace coral_fans::commands

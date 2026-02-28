@@ -15,6 +15,8 @@
 #include "ll/api/event/EventBus.h"
 #include "ll/api/event/ListenerBase.h"
 #include "ll/api/io/Logger.h"
+#include "mc/_HeaderOutputPredefine.h"
+#include "mc/world/level/ChunkPos.h"
 #include <memory>
 
 
@@ -48,6 +50,7 @@ public:
 
 public:
     void tick(const Tick&);
+    void onChunkLoaded(DimensionType, ChunkPos);
 };
 
 CoralFansMod& mod();
