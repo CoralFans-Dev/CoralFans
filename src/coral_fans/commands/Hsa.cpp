@@ -1,13 +1,17 @@
+#include "coral_fans/base/Macros.h"
 #include "coral_fans/base/Mod.h"
 
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
+#include "ll/api/command/runtime/ParamKind.h"
 #include "ll/api/command/runtime/RuntimeCommand.h"
 #include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
+#include "mc/network/packet/TextPacket.h"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/server/commands/CommandPermissionLevel.h"
+#include "mc/world/level/ChunkPos.h"
 
 
 namespace coral_fans::commands {
@@ -18,16 +22,66 @@ void registerHsaCommand(CommandPermissionLevel permission) {
     auto& hsaCommand = ll::command::CommandRegistrar::getInstance(false)
                            .getOrCreateCommand("hsa", "command.hsa.description"_tr(), permission);
 
-    // hsa show <bool>
+    // hsa show [bool]
     hsaCommand.runtimeOverload()
         .text("show")
         .optional("isopen", ll::command::ParamKind::Bool)
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             auto& hsaManager = coral_fans::mod().getHsaManager();
-            if (self["isopen"].has_value()) hsaManager.hsaShow = self["isopen"].get<ll::command::ParamKind::Bool>();
-            else hsaManager.hsaShow = !hsaManager.hsaShow;
-            if (!hsaManager.hsaShow) hsaManager.remove();
-            output.success("command.hsa.show.output"_tr(hsaManager.hsaShow ? "true" : "false"));
+            if (self["isopen"].has_value()) hsaManager.setHsaShow(self["isopen"].get<ll::command::ParamKind::Bool>());
+            else hsaManager.setHsaShow(!hsaManager.getHsaShow());
+            output.success("command.hsa.show.output"_tr(hsaManager.getHsaShow() ? "true" : "false"));
+        });
+
+    // hsa structure show [bool]
+    hsaCommand.runtimeOverload()
+        .text("structure")
+        .text("show")
+        .optional("isopen", ll::command::ParamKind::Bool)
+        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            auto& hsaManager = coral_fans::mod().getHsaManager();
+            if (self["isopen"].has_value())
+                hsaManager.setStructureShow(self["isopen"].get<ll::command::ParamKind::Bool>());
+            else hsaManager.setStructureShow(!hsaManager.getStructureShow());
+            output.success("command.hsa.structure.show.output"_tr(hsaManager.getStructureShow() ? "true" : "false"));
+        });
+
+    // hsa list
+    hsaCommand.runtimeOverload().text("list").execute(
+        [](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            COMMAND_CHECK_PLAYER
+            auto hsa = coral_fans::mod().getHsaManager().listChunkHsa(
+                player->getDimensionBlockSource(),
+                ChunkPos(player->getPosition())
+            );
+            for (auto& pos : hsa) {
+                TextPacket::createRawMessage(std::format("[{}, {}, {}]", pos.x, pos.y, pos.z)).sendTo(*player);
+            }
+        }
+    );
+
+    // hsa structure list
+    hsaCommand.runtimeOverload()
+        .text("structure")
+        .text("list")
+        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            COMMAND_CHECK_PLAYER
+            auto hsa = coral_fans::mod().getHsaManager().listChunkStructure(
+                player->getDimensionBlockSource(),
+                ChunkPos(player->getPosition())
+            );
+            for (auto& aabb : hsa) {
+                TextPacket::createRawMessage(std::format(
+                                                 "[{}, {}, {}] - [{}, {}, {}]",
+                                                 aabb.min.x,
+                                                 aabb.min.y,
+                                                 aabb.min.z,
+                                                 aabb.max.x,
+                                                 aabb.max.y,
+                                                 aabb.max.z
+                                             ))
+                    .sendTo(*player);
+            }
         });
 }
 } // namespace coral_fans::commands

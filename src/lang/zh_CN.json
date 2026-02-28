@@ -122,6 +122,11 @@
             "description": "显示HSA",
             "show": {
                 "output": "设置 显示HSA 为 \"{}\""
+            },
+            "structure": {
+                "show": {
+                    "output": "设置 显示结构边界 为 \"{}\""
+                }
             }
         },
         "counter": {

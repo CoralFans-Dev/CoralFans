@@ -5,7 +5,7 @@ namespace coral_fans {
 
 void CoralFansMod::tick(const Tick& currentTick) {
     this->getHopperCounterManager().tick();      // light 1
-    this->getHsaManager().tick();                // heavy 80
+    this->getHsaManager().tick();                // heavy 1200
     this->getSlimeManager().tick();              // heavy 80
     this->getVillageManager().tick(currentTick); // light 10
     this->mHudHelper.tick();                     // light 20

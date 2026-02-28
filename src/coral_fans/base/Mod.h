@@ -50,7 +50,6 @@ public:
 
 public:
     void tick(const Tick&);
-    void onChunkLoaded(DimensionType, ChunkPos);
 };
 
 CoralFansMod& mod();

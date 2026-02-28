@@ -1,6 +1,5 @@
 #include "coral_fans/functions/hsa/Hsa.h"
 #include "coral_fans/base/Mod.h"
-#include "coral_fans/base/Utils.h"
 #include "ll/api/service/Bedrock.h"
 #include "mc/_HeaderOutputPredefine.h"
 #include "mc/deps/core/math/Color.h"
@@ -19,13 +18,27 @@
 #include <memory>
 #include <vector>
 
-namespace {
-
-static const int radius = 5;
-
-} // namespace
-
 namespace coral_fans::functions {
+void HsaManager::setHsaShow(bool show) {
+    if (this->hsaShow == show) return;
+    this->hsaShow = show;
+    if (show) {
+        this->tickCounter              = 0;
+        this->runTimeRemoveTickCounter = 1;
+    } else this->remove();
+}
+void HsaManager::setStructureShow(bool show) {
+    if (this->structureShow == show) return;
+    this->structureShow = show;
+    if (show) {
+        this->tickCounter              = 0;
+        this->runTimeRemoveTickCounter = 1;
+    } else this->remove();
+}
+bool HsaManager::getHsaShow() { return this->hsaShow; }
+
+bool HsaManager::getStructureShow() { return this->structureShow; }
+
 void HsaManager::drawChunkHsa(std::vector<::BlockPos>& hsa, DimensionType dim, ChunkData& chunkData) {
     std::unordered_map<BlockPos, int> hsaCount;
     for (auto& pos : hsa) {
@@ -81,173 +94,144 @@ void HsaManager::drawChunkStructure(
     entt::basic_storage<::br::ChunkBoundingBox, ::br::ChunkEntity, ::std::allocator<::br::ChunkBoundingBox>, void>&
                   chunkBoundingBoxes,
     DimensionType dim,
-    ChunkData&    chunkData
+    ChunkData&    chunkData,
+    ChunkPos      chunkPos
 ) {
     std::vector<bsci::GeometryGroup::GeoId> geoIdList;
     geoIdList.reserve(chunkBoundingBoxes.size());
     auto& geometryGroup = coral_fans::mod().getGeometryGroup();
     for (auto [entity, component] : chunkBoundingBoxes.each()) {
+        if (ChunkPos(component.box->min) != chunkPos || ChunkPos(component.box->max) != chunkPos
+            || component.box->min.y < -64 || component.box->max.y > 320) {
+            continue;
+        }
         geoIdList.emplace_back(geometryGroup->box(
             dim,
             AABB(component.box->min, component.box->max + BlockPos(1, 1, 1)),
-            mce::Color::GREEN()
+            mce::Color("#10E436")
         ));
     }
     chunkData.structureGeoId = geometryGroup->merge(geoIdList);
 }
 
-void HsaManager::drawChunk(DimensionType dimId, ChunkPos chunkPos) {
+void HsaManager::draw() {
     if (!this->hsaShow && !this->structureShow) return;
     if (auto level = ll::service::getLevel()) {
-        if (auto dim = level->getDimension(dimId).lock()) {
-            auto chunk = (*dim->mBlockSource)->getChunk(chunkPos);
-            if (chunk && *chunk->mLoadState == ChunkState::Loaded) {
-                std::vector<::BlockPos> hsa;
-                auto& chunkBoundingBoxes = std::get<1>(*chunk->mLevelChunkVolumeData->mDataRegistry->mData);
-                if (this->hsaShow) hsa = chunk->mLevelChunkVolumeData->structureSpawnPos();
-                if (hsa.size() || (this->structureShow && chunkBoundingBoxes.size())) {
-                    auto [iter, inserted] = this->mChunkDataMap.try_emplace(std::make_pair(chunkPos, dimId));
-                    if (hsa.size() && !iter->second.hsaGeoId.value) this->drawChunkHsa(hsa, dimId, iter->second);
-                    if ((hsa.size() || this->structureShow) && chunkBoundingBoxes.size()
-                        && !iter->second.structureGeoId.value)
-                        this->drawChunkStructure(chunkBoundingBoxes, dimId, iter->second);
+        level->forEachPlayer([&](Player& player) {
+            ChunkPos originChunkPos = ChunkPos(player.getFeetBlockPos());
+            auto&    dim            = player.getDimension();
+            int      dimId          = player.getDimensionId();
+            for (int i = -6; i <= 6; ++i) {
+                int maxJ = 6 - abs(i);
+                for (int j = -maxJ; j <= maxJ; ++j) {
+                    ChunkPos chunkPos = ChunkPos(originChunkPos.x + i, originChunkPos.z + j);
+                    auto     chunk    = (*dim.mBlockSource)->getChunk(chunkPos);
+                    if (chunk && *chunk->mLoadState == ChunkState::Loaded) {
+                        std::vector<::BlockPos> hsa;
+                        auto& chunkBoundingBoxes = std::get<1>(*chunk->mLevelChunkVolumeData->mDataRegistry->mData);
+                        if (this->hsaShow) hsa = chunk->mLevelChunkVolumeData->structureSpawnPos();
+
+                        if (hsa.size() || (this->structureShow && chunkBoundingBoxes.size())) {
+
+                            auto [iter, inserted] = this->mChunkDataMap.try_emplace(std::make_pair(chunkPos, dimId));
+                            if (hsa.size() && !iter->second.hsaGeoId.value)
+                                this->drawChunkHsa(hsa, dimId, iter->second);
+                            try {
+                                if ((hsa.size() || this->structureShow) && chunkBoundingBoxes.size()
+                                    && !iter->second.structureGeoId.value)
+                                    this->drawChunkStructure(chunkBoundingBoxes, dimId, iter->second, chunkPos);
+                                iter->second.freshed = true;
+                            } catch (const std::runtime_error&) {
+                                if (iter->second.hsaGeoId.value) {
+                                    coral_fans::mod().getGeometryGroup()->remove(iter->second.hsaGeoId);
+                                }
+                                this->mChunkDataMap.erase(iter);
+                            }
+                        }
+                    }
                 }
             }
-        }
+            return true;
+        });
     }
 }
 
-// void HsaManager::drawHsa() {
-//     auto level = ll::service::getLevel();
-//     if (level.has_value()) {
-//         level->forEachPlayer([&](Player& player) {
-//             ChunkPos originChunkPos = utils::blockPosToChunkPos(((const Actor&)player).getFeetBlockPos());
-//             int      dim            = ((const Actor&)player).getDimensionId();
-//             auto&    region         = *((const Actor&)player).getDimension().mBlockSource;
-//             // chunks
-//             for (int _i = -radius; _i <= radius; ++_i) {
-//                 for (int j = -radius; j <= radius; ++j) {
-//                     ChunkPos chunkPos = ChunkPos(originChunkPos.x + _i, originChunkPos.z + j);
-//                     auto     chunk    = region->getChunk(chunkPos);
-//                     if (chunk && chunk->mLoadState.get() == ChunkState::Loaded) {
-//                         ::std::vector<::BlockPos> hsa = chunk->mLevelChunkVolumeData->structureSpawnPos();
-//                         if (!hsa.size()) continue; // hsa数量为0则跳过
-//                         auto [iter, inserted] = this->mParticleMap.try_emplace(std::make_pair(chunkPos, dim));
-//                         iter->second.second   = true;
-//                         if (inserted) {
-//                             std::unordered_map<BlockPos, int> hsaCount;
-//                             for (auto& pos : hsa) {
-//                                 auto [it, inserted2] = hsaCount.try_emplace(pos);
-//                                 if (inserted2) it->second = 1;
-//                                 else it->second++;
-//                                 coral_fans::mod().getLogger().info(
-//                                     "Found HSA at position {}, count: {}",
-//                                     pos,
-//                                     it->second
-//                                 );
-//                             }
-//                             std::vector<bsci::GeometryGroup::GeoId> geoIdList;
-//                             for (auto& [pos, count] : hsaCount) {
-//                                 auto& geometryGroup = coral_fans::mod().getGeometryGroup();
-//                                 auto  ids           = std::vector{
-//                                     geometryGroup->line(
-//                                         dim,
-//                                         {pos.x, pos.y, pos.z},
-//                                         {pos.x, pos.y + 1, pos.z},
-//                                         mce::Color::WHITE()
-//                                     ),
-//                                     geometryGroup->line(
-//                                         dim,
-//                                         {pos.x + 1, pos.y, pos.z},
-//                                         {pos.x + 1, pos.y + 1, pos.z},
-//                                         mce::Color::BLUE()
-//                                     ),
-//                                     geometryGroup->line(
-//                                         dim,
-//                                         {pos.x, pos.y, pos.z + 1},
-//                                         {pos.x, pos.y + 1, pos.z + 1},
-//                                         mce::Color::BLUE()
-//                                     ),
-//                                     geometryGroup->line(
-//                                         dim,
-//                                         {pos.x + 1, pos.y, pos.z + 1},
-//                                         {pos.x + 1, pos.y + 1, pos.z + 1},
-//                                         mce::Color::BLUE()
-//                                     ),
-//                                     geometryGroup->line(
-//                                         dim,
-//                                         {pos.x, pos.y + 1, pos.z},
-//                                         {pos.x + 1, pos.y + 1, pos.z},
-//                                         mce::Color::BLUE()
-//                                     ),
-//                                     geometryGroup->line(
-//                                         dim,
-//                                         {pos.x, pos.y + 1, pos.z},
-//                                         {pos.x, pos.y + 1, pos.z + 1},
-//                                         mce::Color::BLUE()
-//                                     ),
-//                                     geometryGroup->line(
-//                                         dim,
-//                                         {pos.x + 1, pos.y + 1, pos.z},
-//                                         {pos.x + 1, pos.y + 1, pos.z + 1},
-//                                         mce::Color::BLUE()
-//                                     ),
-//                                     geometryGroup->line(
-//                                         dim,
-//                                         {pos.x, pos.y + 1, pos.z + 1},
-//                                         {pos.x + 1, pos.y + 1, pos.z + 1},
-//                                         mce::Color::BLUE()
-//                                     ),
-//                                 };
-//                                 if (count > 1) {
-//                                     ids.push_back(geometryGroup->text(
-//                                         dim,
-//                                         {pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f},
-//                                         "x" + std::to_string(count),
-//                                         mce::Color::WHITE(),
-//                                         1.0f
-//                                     ));
-//                                 }
-//                                 geoIdList.push_back(geometryGroup->merge(ids));
-//                             }
-//                             iter->second.first = std::move(geoIdList);
-//                         }
-//                     }
-//                 }
-//             }
-//             return true;
-//         });
-//     }
-// }
-
 void HsaManager::tick() {
-    // static int gt = 0, gt2 = 1;
-    // if (!mShow) return;
-    // if (!gt) {
-    //     drawHsa();
-    //     if (!gt2) runtimeRemove();
-    //     gt2 = (gt2 + 1) % 15;
-    // }
-    // gt = (gt + 1) % 80;
+    if (!this->tickCounter) {
+        this->draw();
+        if (!this->runTimeRemoveTickCounter) {
+            this->runtimeRemove();
+        }
+        this->runTimeRemoveTickCounter = (this->runTimeRemoveTickCounter + 1) % 20;
+    }
+    this->tickCounter = (this->tickCounter + 1) % 60;
 }
 
 void HsaManager::remove() {
-    // for (auto i : mParticleMap) {
-    //     for (auto j : i.second.first) coral_fans::mod().getGeometryGroup()->remove(j);
-    // }
-    // mParticleMap.clear();
+    auto& geometryGroup = coral_fans::mod().getGeometryGroup();
+    if (!this->hsaShow) {
+        if (!this->structureShow) {
+            for (auto& [_, chunkData] : this->mChunkDataMap) {
+                if (chunkData.hsaGeoId.value) geometryGroup->remove(chunkData.hsaGeoId);
+                if (chunkData.structureGeoId.value) geometryGroup->remove(chunkData.structureGeoId);
+            }
+            this->mChunkDataMap.clear();
+        } else {
+            std::erase_if(this->mChunkDataMap, [&geometryGroup](auto& data) {
+                if (data.second.hsaGeoId.value) {
+                    geometryGroup->remove(data.second.hsaGeoId);
+                    data.second.hsaGeoId.value = 0;
+                }
+                return !data.second.structureGeoId.value;
+            });
+        }
+    } else {
+        std::erase_if(this->mChunkDataMap, [&geometryGroup](auto& data) {
+            if (!data.second.hsaGeoId.value) {
+                geometryGroup->remove(data.second.structureGeoId);
+                return true;
+            }
+            return false;
+        });
+    }
 }
 
 void HsaManager::runtimeRemove() {
-    // std::erase_if(mParticleMap, [](auto& data) {
-    //     if (!data.second.second) {
-    //         for (auto j : data.second.first) coral_fans::mod().getGeometryGroup()->remove(j);
-    //         return true;
-    //     } else {
-    //         data.second.second = false;
-    //         return false;
-    //     }
-    // });
+    auto& geometryGroup = coral_fans::mod().getGeometryGroup();
+    std::erase_if(this->mChunkDataMap, [&geometryGroup](auto& data) {
+        if (data.second.freshed) {
+            data.second.freshed = false;
+            return false;
+        }
+        if (data.second.hsaGeoId.value) geometryGroup->remove(data.second.hsaGeoId);
+        if (data.second.structureGeoId.value) geometryGroup->remove(data.second.structureGeoId);
+        return true;
+    });
 }
 
+std::vector<BlockPos> HsaManager::listChunkHsa(BlockSource& region, ChunkPos chunkPos) {
+    auto chunk = region.getChunk(chunkPos);
+    if (chunk && *chunk->mLoadState == ChunkState::Loaded) {
+        return chunk->mLevelChunkVolumeData->structureSpawnPos();
+    }
+    return {};
+}
+
+std::vector<AABB> HsaManager::listChunkStructure(BlockSource& region, ChunkPos chunkPos) {
+    auto chunk = region.getChunk(chunkPos);
+    if (chunk && *chunk->mLoadState == ChunkState::Loaded) {
+        std::vector<AABB> result;
+        auto&             chunkBoundingBoxes = std::get<1>(*chunk->mLevelChunkVolumeData->mDataRegistry->mData);
+        result.reserve(chunkBoundingBoxes.size());
+        for (auto [entity, component] : chunkBoundingBoxes.each()) {
+            if (ChunkPos(component.box->min) != chunkPos || ChunkPos(component.box->max) != chunkPos
+                || component.box->min.y < -64 || component.box->max.y > 320) {
+                continue;
+            }
+            result.emplace_back(AABB(component.box->min, component.box->max + BlockPos(1, 1, 1)));
+        }
+        return result;
+    }
+    return {};
+}
 } // namespace coral_fans::functions

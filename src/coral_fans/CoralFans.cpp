@@ -10,6 +10,7 @@
 #include "ll/api/mod/RegisterHelper.h"
 #include <memory>
 
+
 namespace coral_fans {
 
 CoralFans& CoralFans::getInstance() {
@@ -86,6 +87,7 @@ bool CoralFans::enable() {
     functions::registerContainerReader();
     // register shortcuts when first player join (确保其他所有插件的指令已被注册)
     functions::ShortcutsManager::getInstance().waitToRegisterShortcuts();
+
     return true;
 }
 
