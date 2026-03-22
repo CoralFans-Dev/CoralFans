@@ -1,6 +1,5 @@
 #pragma once
 
-// #include "coral_fans/functions/shortcuts/Shortcuts.h"
 #include "mc/server/commands/CommandPermissionLevel.h"
 #include <string>
 #include <vector>
@@ -30,6 +29,7 @@ struct CommandStruct {
     CommandConfigStruct minerule   = {true, CommandPermissionLevel::GameDirectors};
     CommandConfigStruct freecamera = {true, CommandPermissionLevel::Any};
     CommandConfigStruct noclip     = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct locate     = {true, CommandPermissionLevel::Any};
 };
 
 struct Shortcut {

@@ -24,5 +24,6 @@ void                   registerCalculateCommand(CommandPermissionLevel);
 void                   registerMineruleCommand(CommandPermissionLevel);
 void                   registerFreeCameraCommand(CommandPermissionLevel);
 void                   registerNoclipCommand(CommandPermissionLevel);
+void                   registerLocateCommand(CommandPermissionLevel permission);
 std::optional<Player*> tryGetPlayer(CommandOrigin const& origin);
 } // namespace coral_fans::commands

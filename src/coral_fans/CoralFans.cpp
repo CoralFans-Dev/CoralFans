@@ -83,6 +83,8 @@ bool CoralFans::enable() {
         commands::registerFreeCameraCommand(mod.getConfig().command.freecamera.permission);
     if (mod.getConfig().command.noclip.enabled)
         commands::registerNoclipCommand(mod.getConfig().command.noclip.permission);
+    if (mod.getConfig().command.locate.enabled)
+        commands::registerLocateCommand(mod.getConfig().command.locate.permission);
     // register containerreader
     functions::registerContainerReader();
     // register shortcuts when first player join (确保其他所有插件的指令已被注册)
