@@ -12,6 +12,7 @@
 #include "mc/world/level/levelgen/feature/NoSurfaceOreFeature.h"
 #include "mc/world/level/levelgen/v1/NetherGenerator.h"
 #include "mc/world/level/storage/DBChunkStorage.h"
+#include <string>
 #include <vector>
 
 
@@ -24,33 +25,29 @@ LL_TYPE_INSTANCE_HOOK(
     bool,
     ChunkViewSource& neighborhood
 ) {
-    auto            dim            = neighborhood.mDimension;
+    auto dim = neighborhood.mDimension;
+    mod().getLogger().info(std::to_string(dim->getDimensionId()));
     DBChunkStorage* dbChunkStorage = static_cast<DBChunkStorage*>(&(*dim->mChunkSource->mOwnedParent));
     auto&           pos            = neighborhood.mArea->mBounds.mMin;
     ChunkPos        originChunkPos = ChunkPos(pos->x + 1, pos->z + 1);
-    auto&           region         = dim->getBlockSourceFromMainChunkSource();
     for (int i = -1; i <= 1; i++) {
         for (int j = -1; j <= 1; j++) {
-            if (!i && !j) {
-                ChunkPos chunkPos = originChunkPos + ChunkPos(i, j);
-                auto     chunk    = region.getChunk(chunkPos);
-                if (chunk->isNonActorDataDirty() && !dbChunkStorage->isChunkSaved(chunkPos)) {
-                    auto& DuplicatableManager = DuplicatableManager::getInstance();
-                    auto  threadId            = std::this_thread::get_id();
-                    {
-                        std::lock_guard lock(DuplicatableManager.netherDecorationThreadIdsLock);
-                        DuplicatableManager.netherDecorationThreadIds.push_back(threadId);
-                    }
-                    auto ori = origin(neighborhood);
-                    {
-                        std::lock_guard lock(DuplicatableManager.netherDecorationThreadIdsLock);
-                        std::erase_if(
-                            DuplicatableManager.netherDecorationThreadIds,
-                            [threadId](const std::thread::id& id) { return id == threadId; }
-                        );
-                    }
-                    return ori;
+            ChunkPos chunkPos = originChunkPos + ChunkPos(i, j);
+            if (!dbChunkStorage->isChunkSaved(chunkPos)) {
+                auto& DuplicatableManager = DuplicatableManager::getInstance();
+                auto  threadId            = std::this_thread::get_id();
+                {
+                    std::lock_guard lock(DuplicatableManager.netherDecorationThreadIdsLock);
+                    DuplicatableManager.netherDecorationThreadIds.push_back(threadId);
                 }
+                auto ori = origin(neighborhood);
+                {
+                    std::lock_guard lock(DuplicatableManager.netherDecorationThreadIdsLock);
+                    std::erase_if(DuplicatableManager.netherDecorationThreadIds, [threadId](const std::thread::id& id) {
+                        return id == threadId;
+                    });
+                }
+                return ori;
             }
         }
     }
@@ -66,7 +63,7 @@ LL_TYPE_INSTANCE_HOOK(
     IFeature::PlacementContext const& context
 ) {
     auto ori = origin(context);
-    if (!ori.has_value()) {
+    if (ori.has_value()) {
         auto  threadId            = std::this_thread::get_id();
         auto& DuplicatableManager = DuplicatableManager::getInstance();
         {
@@ -116,6 +113,7 @@ void DuplicatableManager::draw() {
     level->forEachPlayer([this, &geometryGroup, &locateConfig](Player& player) {
         int dimId = player.getDimensionId();
         if (dimId == 1) {
+            mod().getLogger().info("a");
             ChunkPos originChunkPos = ChunkPos(player.getFeetBlockPos());
             for (int i = -6; i <= 6; ++i) {
                 int maxJ = 6 - abs(i);
@@ -175,20 +173,26 @@ void DuplicatableManager::tick() {
         }
         this->runtimeRemoveTickCounter =
             (this->runtimeRemoveTickCounter + 1) % locateConfig.duplicatable.runtimeRemoveScale;
+
+        if (!this->cacheDataRemoveTickCounter) {
+            this->removeData();
+        }
+        this->cacheDataRemoveTickCounter =
+            (this->cacheDataRemoveTickCounter + 1) % locateConfig.duplicatable.cacheDataRemoveScale;
     }
     this->tickCounter = (this->tickCounter + 1) % locateConfig.duplicatable.drawInterval;
 }
 
-void DuplicatableManager::removeBsciData(ShowType showType) {
+void DuplicatableManager::removeBsciData(ShowType _showType) {
     auto& geometryGroup  = coral_fans::mod().getGeometryGroup();
-    this->showType      &= ~static_cast<uint>(showType);
+    this->showType      &= ~static_cast<uint>(_showType);
     if (!this->showType) {
         for (auto& [_, chunkData] : this->netherBsciChunkData) {
             if (chunkData.ancientDebrisGeoId.value) geometryGroup->remove(chunkData.ancientDebrisGeoId);
         }
         this->netherBsciChunkData.clear();
     }
-    switch (showType) {
+    switch (_showType) {
     case ShowType::AncientDebris:
         std::erase_if(this->netherBsciChunkData, [&geometryGroup](auto& data) {
             if (data.second.ancientDebrisGeoId.value) {
@@ -213,16 +217,16 @@ void DuplicatableManager::bsciDataRuntimeRemove() {
 }
 
 
-void DuplicatableManager::setShowType(ShowType showType, bool show) {
-    if (this->showType & static_cast<uint>(showType)) return;
-    this->showType |= static_cast<uint>(showType);
+void DuplicatableManager::setShowType(ShowType _showType, bool show) {
+    if (this->showType & static_cast<uint>(_showType)) return;
+    this->showType |= static_cast<uint>(_showType);
     if (show) {
         this->tickCounter              = 0;
         this->runtimeRemoveTickCounter = 1;
-    } else this->removeBsciData(showType);
+    } else this->removeBsciData(_showType);
 }
 
-bool DuplicatableManager::getShowType(ShowType showType) { return this->showType & static_cast<uint>(showType); }
+bool DuplicatableManager::getShowType(ShowType _showType) { return this->showType & static_cast<uint>(_showType); }
 
 void DuplicatableManager::hook(bool enable) {
     if (enable) {

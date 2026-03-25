@@ -32,9 +32,10 @@ public:
     };
 
 private:
-    uint showType                 = 0;
-    int  tickCounter              = 1;
-    int  runtimeRemoveTickCounter = 1;
+    uint showType                   = 0;
+    int  tickCounter                = 1;
+    int  runtimeRemoveTickCounter   = 1;
+    int  cacheDataRemoveTickCounter = 1;
 
     std::unordered_map<ChunkPos, NetherBsciChunkData> netherBsciChunkData;
 

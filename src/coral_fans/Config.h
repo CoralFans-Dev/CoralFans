@@ -84,8 +84,9 @@ struct Config {
 
     struct {
         struct {
-            size_t drawInterval       = 60;
-            size_t runtimeRemoveScale = 20;
+            size_t drawInterval         = 60;
+            size_t runtimeRemoveScale   = 20;
+            size_t cacheDataRemoveScale = 100;
             struct {
                 std::string originPosColor = "#10E436";
                 std::string endPosColor    = "#FFFFFF";
