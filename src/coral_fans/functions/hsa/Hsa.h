@@ -8,6 +8,7 @@
 #include "mc/world/level/chunk/ChunkBoundingBox.h"
 #include "mc/world/level/chunk/ChunkEntity.h"
 
+
 #include <unordered_map>
 #include <vector>
 
@@ -24,18 +25,18 @@ struct PairHash {
 
 class HsaManager {
 private:
-    struct ChunkData {
+    struct HsaChunkData {
         bsci::GeometryGroup::GeoId hsaGeoId       = {0};
         bsci::GeometryGroup::GeoId structureGeoId = {0};
         bool                       freshed        = true;
     };
 
 private:
-    std::unordered_map<std::pair<ChunkPos, DimensionType>, ChunkData, PairHash> mChunkDataMap;
+    std::unordered_map<std::pair<ChunkPos, DimensionType>, HsaChunkData, PairHash> mChunkDataMap;
 
 private:
     int  tickCounter              = 1;
-    int  runTimeRemoveTickCounter = 1;
+    int  runtimeRemoveTickCounter = 1;
     bool hsaShow                  = false;
     bool structureShow            = false;
 
@@ -46,19 +47,21 @@ public:
     bool getStructureShow();
 
 public:
-    void drawChunkHsa(std::vector<::BlockPos>&, DimensionType, ChunkData&);
+    void                  tick();
+    std::vector<BlockPos> listChunkHsa(BlockSource&, ChunkPos);
+    std::vector<AABB>     listChunkStructure(BlockSource&, ChunkPos);
+
+private:
+    void drawChunkHsa(std::vector<::BlockPos>&, DimensionType, HsaChunkData&);
     void drawChunkStructure(
         entt::basic_storage<::br::ChunkBoundingBox, ::br::ChunkEntity, ::std::allocator<::br::ChunkBoundingBox>, void>&,
         DimensionType,
-        ChunkData&,
+        HsaChunkData&,
         ChunkPos
     );
-    void                  draw();
-    void                  tick();
-    void                  remove();
-    void                  runtimeRemove();
-    std::vector<BlockPos> listChunkHsa(BlockSource&, ChunkPos);
-    std::vector<AABB>     listChunkStructure(BlockSource&, ChunkPos);
+    void draw();
+    void remove();
+    void runtimeRemove();
 };
 
 } // namespace coral_fans::functions

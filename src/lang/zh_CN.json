@@ -248,6 +248,15 @@
             "description": "创造模式穿墙",
             "enabled": "创造模式穿墙已启用。",
             "disabled": "创造模式穿墙已禁用。"
+        },
+        "locate": {
+            "description": "定位特定位置",
+            "duplicatable": {
+                "show": {
+                    "output": "设置 show {} 为 \"{}\"",
+                    "error": "未定义的可回溯方块类型"
+                }
+            }
         }
     },
     "translate": {
@@ -309,6 +318,14 @@
         },
         "cfhud": {
             "base": "Tick: {}\n位置: {}\n视角: {}\n区块: {}\n方块: {} 亮度: {}\n速度: {:.4f} ({:.2f} {:.2f} {:.2f})\n群系: {}\n"
+        },
+        "locate": {
+            "duplicatable": {
+                "ancientDebris": {
+                    "oriPos": "可回溯残骸起始点",
+                    "endPos": "可回溯残骸终点"
+                }
+            }
         }
     }
 }

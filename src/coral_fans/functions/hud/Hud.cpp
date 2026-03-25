@@ -160,7 +160,7 @@ void HudHelper::tick() {
             });
         }
     }
-    gt = (gt + 1) % std::max(2, mod.getConfig().cfhudRefreshTime);
+    gt = (gt + 1) % std::max(2, mod.getConfig().hud.refreshInterval);
 }
 
 } // namespace coral_fans::functions

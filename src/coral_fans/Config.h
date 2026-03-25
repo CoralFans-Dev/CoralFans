@@ -68,10 +68,30 @@ struct Config {
     int         version    = 5;
     std::string locateName = "zh_CN";
 
-    int cfhudRefreshTime = 20;
-
     CommandStruct command;
 
+    struct {
+        int refreshInterval = 20;
+    } hud{};
+
+    struct {
+        size_t      drawInterval       = 60;
+        size_t      runtimeRemoveScale = 20;
+        std::string hsaNorthWestColor  = "#FFFFFF";
+        std::string hsaColor           = "#29ADFF";
+        std::string structureColor     = "#10E436";
+    } hsa{};
+
+    struct {
+        struct {
+            size_t drawInterval       = 60;
+            size_t runtimeRemoveScale = 20;
+            struct {
+                std::string originPosColor = "#10E436";
+                std::string endPosColor    = "#FFFFFF";
+            } ancientDebris{};
+        } duplicatable{};
+    } locate{};
 
     std::vector<Shortcut::UseOn> useons = {
         /* hoppercounter */
