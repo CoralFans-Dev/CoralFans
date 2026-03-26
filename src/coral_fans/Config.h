@@ -92,8 +92,8 @@ struct Config {
                 std::string endPosColor    = "#FFFFFF";
             } ancientDebris{};
             struct {
-                std::string savedChunk   = "#FFEC27";
-                std::string unsavedChunk = "#FFFFFF";
+                std::string savedChunk   = "#3003D9";
+                std::string unsavedChunk = "#FFC825";
             } chunkSavedDebugInfo{};
         } duplicatable{};
     } locate{};

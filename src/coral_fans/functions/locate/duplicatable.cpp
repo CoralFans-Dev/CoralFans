@@ -7,6 +7,7 @@
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/Level.h"
+#include "mc/world/level/chunk/ChunkState.h"
 #include "mc/world/level/chunk/ChunkViewSource.h"
 #include "mc/world/level/chunk/LevelChunk.h"
 #include "mc/world/level/dimension/Dimension.h"
@@ -141,8 +142,10 @@ bool DuplicatableManager::isChunkValid(BlockSource& region, ChunkPos originChunk
     for (int i = -1; i <= 1; i++) {
         for (int j = -1; j <= 1; j++) {
             ChunkPos chunkPos = originChunkPos + ChunkPos(i, j);
-            // auto     chunk    = region.getChunk(chunkPos);
-            // if ((!chunk || chunk->isNonActorDataDirty()) && !dbChunkStorage->isChunkSaved(chunkPos)) return true;
+            auto     chunk    = region.getChunk(chunkPos);
+            // if ((!chunk || *chunk->mLoadState != ChunkState::Loaded || chunk->isNonActorDataDirty())
+            // && !dbChunkStorage->isChunkSaved(chunkPos))
+            // return true;
             if (!dbChunkStorage->isChunkSaved(chunkPos)) return true;
         }
     }
@@ -190,9 +193,16 @@ void DuplicatableManager::drawChunkSavedInfo(
             auto [neighborIter, inserted] = this->netherBsciChunkData.try_emplace(chunkPos);
             if (inserted) {
                 // auto chunk = region.getChunk(chunkPos);
-                // if ((!chunk || chunk->isNonActorDataDirty()) && !dbChunkStorage->isChunkSaved(chunkPos)) {
+                // if ((!chunk || *chunk->mLoadState != ChunkState::Loaded || chunk->isNonActorDataDirty())
+                // && !dbChunkStorage->isChunkSaved(chunkPos)) {
                 if (!dbChunkStorage->isChunkSaved(chunkPos)) {
-                    neighborIter->second.chunkSaved          = false;
+                    neighborIter->second.chunkSaved = false;
+                    if (neighborIter->second.chunkSavedDrawGeoId.value) {
+                        mod().getLogger().warn(
+                            "Chunk {} load state changed but still has debug geometry, something may be wrong, pos1",
+                            chunkPos.toString()
+                        );
+                    }
                     neighborIter->second.chunkSavedDrawGeoId = geometryGroup->box(
                         region.getDimensionId(),
                         {Vec3(chunkPos.x * 16 + 0.1, 0, chunkPos.z * 16 + 0.1),
@@ -200,7 +210,13 @@ void DuplicatableManager::drawChunkSavedInfo(
                         mce::Color(duplicatableConfig.chunkSavedDebugInfo.unsavedChunk)
                     );
                 } else {
-                    neighborIter->second.chunkSaved          = true;
+                    neighborIter->second.chunkSaved = true;
+                    if (neighborIter->second.chunkSavedDrawGeoId.value) {
+                        mod().getLogger().warn(
+                            "Chunk {} load state changed but still has debug geometry, something may be wrong, pos2",
+                            chunkPos.toString()
+                        );
+                    }
                     neighborIter->second.chunkSavedDrawGeoId = geometryGroup->box(
                         region.getDimensionId(),
                         {Vec3(chunkPos.x * 16 + 0.1, 0, chunkPos.z * 16 + 0.1),
@@ -214,9 +230,16 @@ void DuplicatableManager::drawChunkSavedInfo(
     }
     if (!originChunkData.chunkSavedDrawGeoId.value) {
         // auto chunk = region.getChunk(originChunkPos);
-        // if ((!chunk || chunk->isNonActorDataDirty()) && !dbChunkStorage->isChunkSaved(originChunkPos)) {
+        // if ((!chunk || *chunk->mLoadState != ChunkState::Loaded || chunk->isNonActorDataDirty())
+        // && !dbChunkStorage->isChunkSaved(originChunkPos)) {
         if (!dbChunkStorage->isChunkSaved(originChunkPos)) {
-            originChunkData.chunkSaved          = false;
+            originChunkData.chunkSaved = false;
+            if (originChunkData.chunkSavedDrawGeoId.value) {
+                mod().getLogger().warn(
+                    "Chunk {} load state changed but still has debug geometry, something may be wrong, pos3",
+                    originChunkPos.toString()
+                );
+            }
             originChunkData.chunkSavedDrawGeoId = geometryGroup->box(
                 region.getDimensionId(),
                 {Vec3(originChunkPos.x * 16 + 0.1, 0, originChunkPos.z * 16 + 0.1),
@@ -224,7 +247,13 @@ void DuplicatableManager::drawChunkSavedInfo(
                 mce::Color(duplicatableConfig.chunkSavedDebugInfo.unsavedChunk)
             );
         } else {
-            originChunkData.chunkSaved          = true;
+            originChunkData.chunkSaved = true;
+            if (originChunkData.chunkSavedDrawGeoId.value) {
+                mod().getLogger().warn(
+                    "Chunk {} load state changed but still has debug geometry, something may be wrong, pos4",
+                    originChunkPos.toString()
+                );
+            }
             originChunkData.chunkSavedDrawGeoId = geometryGroup->box(
                 region.getDimensionId(),
                 {Vec3(originChunkPos.x * 16 + 0.1, 0, originChunkPos.z * 16 + 0.1),
@@ -302,7 +331,7 @@ void DuplicatableManager::removeBsciData(ShowType _showType) {
     if (!this->showType) {
         for (auto& [_, chunkData] : this->netherBsciChunkData) {
             if (chunkData.ancientDebrisGeoId.value) geometryGroup->remove(chunkData.ancientDebrisGeoId);
-            if (chunkData.chunkSavedDrawGeoId.value) geometryGroup->remove(chunkData.ancientDebrisGeoId);
+            if (chunkData.chunkSavedDrawGeoId.value) geometryGroup->remove(chunkData.chunkSavedDrawGeoId);
         }
         this->netherBsciChunkData.clear();
     }
@@ -355,10 +384,18 @@ void DuplicatableManager::bsciDataRuntimeRemove() {
         }
         if (data.chunkSaved || (!data.neighborValidCount && !data.dataDrawed)) continue;
         // auto chunk = netherDim->getBlockSourceFromMainChunkSource().getChunk(originChunkPos);
-        // if (dbChunkStorage->isChunkSaved(originChunkPos) || (chunk && !chunk->isNonActorDataDirty())) {
+        // if (dbChunkStorage->isChunkSaved(originChunkPos)
+        // || (chunk && *chunk->mLoadState == ChunkState::Loaded && !chunk->isNonActorDataDirty())) {
         if (dbChunkStorage->isChunkSaved(originChunkPos)) {
             data.chunkSaved = true;
             geometryGroup->remove(data.chunkSavedDrawGeoId);
+
+            if (data.chunkSavedDrawGeoId.value) {
+                mod().getLogger().warn(
+                    "Chunk {} load state changed but still has debug geometry, something may be wrong, pos5",
+                    originChunkPos.toString()
+                );
+            }
             data.chunkSavedDrawGeoId = geometryGroup->box(
                 netherDim->getDimensionId(),
                 {Vec3(originChunkPos.x * 16 + 0.1, 0, originChunkPos.z * 16 + 0.1),
