@@ -22,8 +22,12 @@ private:
     };
 
     struct NetherBsciChunkData {
-        bsci::GeometryGroup::GeoId ancientDebrisGeoId = {0};
-        bool                       freshed            = true;
+        bsci::GeometryGroup::GeoId ancientDebrisGeoId       = {0};
+        int                        neighborValidCount       = 0;
+        bool                       chunkSaved               = true;
+        bsci::GeometryGroup::GeoId chunkSavedDrawGeoId      = {0};
+        bool                       dataDrawed               = false;
+        int                        runtimeRemoveTickCounter = 0;
     };
 
 public:
@@ -34,7 +38,6 @@ public:
 private:
     uint showType                   = 0;
     int  tickCounter                = 1;
-    int  runtimeRemoveTickCounter   = 1;
     int  cacheDataRemoveTickCounter = 1;
 
     std::unordered_map<ChunkPos, NetherBsciChunkData> netherBsciChunkData;
@@ -49,17 +52,22 @@ private:
     struct DuplicatableHook2;
 
 private:
-    void removeData();
-    void draw();
-    void removeBsciData(ShowType);
-    void bsciDataRuntimeRemove();
+    void                       removeData();
+    void                       draw();
+    void                       removeBsciData(ShowType);
+    void                       bsciDataRuntimeRemove();
+    bsci::GeometryGroup::GeoId drawAncientDebris(std::unordered_set<std::pair<BlockPos, BlockPos>, BlockPosPairHash>&);
+    bool                       isChunkValid(BlockSource&, ChunkPos);
+    void                       removeNetherChunkData(ChunkPos);
+    void                       drawChunkSavedInfo(BlockSource&, ChunkPos, NetherBsciChunkData&);
 
 public:
     void tick();
 
 public:
-    void setShowType(ShowType, bool);
-    bool getShowType(ShowType);
+    void        setShowType(ShowType, bool);
+    bool        getShowType(ShowType);
+    std::string test(ChunkPos);
 
 public:
     static DuplicatableManager& getInstance() {

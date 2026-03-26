@@ -1,4 +1,6 @@
+#include "coral_fans/base/Macros.h"
 #include "coral_fans/functions/locate/DuplicatableManager.h"
+
 
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/runtime/ParamKind.h"
@@ -25,7 +27,6 @@ void registerLocateCommand(CommandPermissionLevel permission) {
 
     locateCommand.runtimeOverload()
         .text("duplicatable")
-        .text("show")
         .required("type", ll::command::ParamKind::Enum, "duplicatableShowType")
         .optional("enable", ll::command::ParamKind::Bool)
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
@@ -39,13 +40,20 @@ void registerLocateCommand(CommandPermissionLevel permission) {
             if (!static_cast<uint>(showType)) return output.success("command.locate.duplicatable.show.error"_tr());
             if (self["enable"].has_value())
                 duplicatableManager.setShowType(showType, self["enable"].get<ll::command::ParamKind::Bool>());
-            else duplicatableManager.setShowType(showType, duplicatableManager.getShowType(showType));
+            else duplicatableManager.setShowType(showType, !duplicatableManager.getShowType(showType));
             bool isopen = duplicatableManager.getShowType(showType);
             output.success("command.locate.duplicatable.show.output"_tr(
                 self["type"].get<ll::command::ParamKind::Enum>().name,
                 isopen ? "true" : "false"
             ));
         });
+
+    locateCommand.runtimeOverload().text("test").execute(
+        [](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            COMMAND_CHECK_PLAYER
+            output.success(functions::locate::DuplicatableManager::getInstance().test(ChunkPos(player->getPosition())));
+        }
+    );
 
     functions::locate::DuplicatableManager::hook(true);
 }

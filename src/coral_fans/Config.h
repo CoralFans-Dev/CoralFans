@@ -84,13 +84,17 @@ struct Config {
 
     struct {
         struct {
-            size_t drawInterval         = 60;
-            size_t runtimeRemoveScale   = 20;
-            size_t cacheDataRemoveScale = 100;
+            int drawInterval         = 60;
+            int runtimeRemoveScale   = 20;
+            int cacheDataRemoveScale = 100;
             struct {
                 std::string originPosColor = "#10E436";
                 std::string endPosColor    = "#FFFFFF";
             } ancientDebris{};
+            struct {
+                std::string savedChunk   = "#FFEC27";
+                std::string unsavedChunk = "#FFFFFF";
+            } chunkSavedDebugInfo{};
         } duplicatable{};
     } locate{};
 
