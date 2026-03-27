@@ -142,7 +142,7 @@ bool DuplicatableManager::isChunkValid(BlockSource& region, ChunkPos originChunk
     for (int i = -1; i <= 1; i++) {
         for (int j = -1; j <= 1; j++) {
             ChunkPos chunkPos = originChunkPos + ChunkPos(i, j);
-            auto     chunk    = region.getChunk(chunkPos);
+            // auto     chunk    = region.getChunk(chunkPos);
             // if ((!chunk || *chunk->mLoadState != ChunkState::Loaded || chunk->isNonActorDataDirty())
             // && !dbChunkStorage->isChunkSaved(chunkPos))
             // return true;
