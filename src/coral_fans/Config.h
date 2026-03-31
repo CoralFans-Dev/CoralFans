@@ -88,9 +88,10 @@ struct Config {
             int runtimeRemoveScale   = 20;
             int cacheDataRemoveScale = 100;
             struct {
+                bool        enable         = true;
                 std::string originPosColor = "#10E436";
                 std::string endPosColor    = "#FFFFFF";
-            } ancientDebris{};
+            } netherite{};
             struct {
                 std::string savedChunk   = "#3003D9";
                 std::string unsavedChunk = "#FFC825";

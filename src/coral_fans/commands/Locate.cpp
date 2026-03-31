@@ -21,7 +21,7 @@ void registerLocateCommand(CommandPermissionLevel permission) {
     ll::command::CommandRegistrar::getInstance(false).tryRegisterRuntimeEnum(
         "duplicatableShowType",
         {
-            {"ancient_debris", 0}
+            {"netherite", 0}
     }
     );
 
@@ -34,7 +34,7 @@ void registerLocateCommand(CommandPermissionLevel permission) {
             auto  showType            = functions::locate::DuplicatableManager::ShowType(0);
             switch (self["type"].get<ll::command::ParamKind::Enum>().index) {
             case 0:
-                showType = functions::locate::DuplicatableManager::ShowType::AncientDebris;
+                showType = functions::locate::DuplicatableManager::ShowType::Netherite;
                 break;
             }
             if (!static_cast<uint>(showType)) return output.success("command.locate.duplicatable.show.error"_tr());

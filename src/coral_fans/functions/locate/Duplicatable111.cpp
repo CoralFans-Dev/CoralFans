@@ -7,11 +7,11 @@
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/Level.h"
-#include "mc/world/level/chunk/ChunkState.h"
 #include "mc/world/level/chunk/ChunkViewSource.h"
-#include "mc/world/level/chunk/LevelChunk.h"
+#include "mc/world/level/chunk/SubChunk.h"
 #include "mc/world/level/dimension/Dimension.h"
 #include "mc/world/level/levelgen/feature/NoSurfaceOreFeature.h"
+#include "mc/world/level/levelgen/feature/OreFeature.h"
 #include "mc/world/level/levelgen/v1/NetherGenerator.h"
 #include "mc/world/level/storage/DBChunkStorage.h"
 #include <mutex>
@@ -37,18 +37,16 @@ LL_TYPE_INSTANCE_HOOK(
         for (int j = -1; j <= 1; j++) {
             ChunkPos chunkPos = originChunkPos + ChunkPos(i, j);
             if (!dbChunkStorage->isChunkSaved(chunkPos)) {
-                auto& DuplicatableManager = DuplicatableManager::getInstance();
+                auto& duplicatableManager = DuplicatableManager::getInstance();
                 auto  threadId            = std::this_thread::get_id();
                 {
-                    std::lock_guard lock(DuplicatableManager.netherDecorationThreadIdsLock);
-                    DuplicatableManager.netherDecorationThreadIds.push_back(threadId);
+                    std::lock_guard lock(duplicatableManager.netherDecorationThreadIdsLock);
+                    duplicatableManager.netherDecorationThreadIds.try_emplace(threadId, nullptr);
                 }
                 auto ori = origin(neighborhood);
                 {
-                    std::lock_guard lock(DuplicatableManager.netherDecorationThreadIdsLock);
-                    std::erase_if(DuplicatableManager.netherDecorationThreadIds, [threadId](const std::thread::id& id) {
-                        return id == threadId;
-                    });
+                    std::lock_guard lock(duplicatableManager.netherDecorationThreadIdsLock);
+                    duplicatableManager.netherDecorationThreadIds.erase(threadId);
                 }
                 return ori;
             }
@@ -68,27 +66,39 @@ LL_TYPE_INSTANCE_HOOK(
     auto ori = origin(context);
     if (ori.has_value()) {
         auto  threadId            = std::this_thread::get_id();
-        auto& DuplicatableManager = DuplicatableManager::getInstance();
+        auto& duplicatableManager = DuplicatableManager::getInstance();
         {
-            std::lock_guard lock(DuplicatableManager.netherDecorationThreadIdsLock);
-            if (std::find(
-                    DuplicatableManager.netherDecorationThreadIds.begin(),
-                    DuplicatableManager.netherDecorationThreadIds.end(),
-                    threadId
-                )
-                == DuplicatableManager.netherDecorationThreadIds.end()) {
+            std::lock_guard lock(duplicatableManager.netherDecorationThreadIdsLock);
+            if (duplicatableManager.netherDecorationThreadIds.contains(threadId)) {
                 return ori;
             }
         }
         ChunkPos chunkPos = ChunkPos(*context.mPos);
         if (ChunkPos(ori.value()) != chunkPos) {
-            std::lock_guard lock(DuplicatableManager.netherDataMapLock);
-            auto [iter, _] = DuplicatableManager.netherDataMap.try_emplace(chunkPos);
-            iter->second.ancientDebrisPosSet.emplace(std::make_pair(*context.mPos, ori.value()));
+            std::lock_guard lock(duplicatableManager.netherDataMapLock);
+            auto [iter, _] = duplicatableManager.netherDataMap.try_emplace(chunkPos);
+            iter->second.netheritePosSet.emplace(std::make_pair(*context.mPos, ori.value()));
         }
     }
     return ori;
 }
+
+LL_TYPE_INSTANCE_HOOK(
+    DuplicatableManager::DuplicatableHook3,
+    ll::memory::HookPriority::Normal,
+    OreFeature,
+    &OreFeature ::$place,
+    ::std::optional<::BlockPos>,
+    ::IFeature::PlacementContext const& context
+) {
+    if (current_thread == std::this_thread::get_id())
+        MyTest::getInstance().getSelf().getLogger().info("OreFeature ::$place  count: {}", this->mCount);
+    chunk    = context.mTarget.getChunk(ChunkPos(context.mPos));
+    auto ori = origin(context);
+    chunk    = nullptr;
+    return ori;
+}
+
 
 void DuplicatableManager::removeData() {
     auto level = ll::service::getLevel();
@@ -106,7 +116,7 @@ void DuplicatableManager::removeData() {
 }
 
 bsci::GeometryGroup::GeoId
-DuplicatableManager::drawAncientDebris(std::unordered_set<std::pair<BlockPos, BlockPos>, BlockPosPairHash>& data) {
+DuplicatableManager::drawNetherite(std::unordered_set<std::pair<BlockPos, BlockPos>, BlockPosPairHash>& data) {
     using ll::i18n_literals::operator""_tr;
     auto&                                   geometryGroup      = coral_fans::mod().getGeometryGroup();
     auto&                                   duplicatableConfig = coral_fans::mod().getConfig().locate.duplicatable;
@@ -116,22 +126,22 @@ DuplicatableManager::drawAncientDebris(std::unordered_set<std::pair<BlockPos, Bl
         geoIdList.emplace_back(geometryGroup->box(
             1,
             AABB(oriPos, oriPos + BlockPos(1, 1, 1)),
-            mce::Color(duplicatableConfig.ancientDebris.originPosColor)
+            mce::Color(duplicatableConfig.netherite.originPosColor)
         ));
         geoIdList.emplace_back(geometryGroup->text(
             1,
             {oriPos.x + 0.5f, oriPos.y + 0.5f, oriPos.z + 0.5f},
-            "translate.locate.duplicatable.ancientDebris.oriPos"_tr()
+            "translate.locate.duplicatable.netherite.oriPos"_tr()
         ));
         geoIdList.emplace_back(geometryGroup->box(
             1,
             AABB(endPos, endPos + BlockPos(1, 1, 1)),
-            mce::Color(duplicatableConfig.ancientDebris.endPosColor)
+            mce::Color(duplicatableConfig.netherite.endPosColor)
         ));
         geoIdList.emplace_back(geometryGroup->text(
             1,
             {endPos.x + 0.5f, endPos.y + 0.5f, endPos.z + 0.5f},
-            "translate.locate.duplicatable.ancientDebris.endPos"_tr()
+            "translate.locate.duplicatable.netherite.endPos"_tr()
         ));
     }
     return geometryGroup->merge(geoIdList);
@@ -156,7 +166,7 @@ void DuplicatableManager::removeNetherChunkData(ChunkPos originChunkPos) {
     auto& geometryGroup = coral_fans::mod().getGeometryGroup();
     auto  originIter    = this->netherBsciChunkData.find(originChunkPos);
     if (originIter != this->netherBsciChunkData.end() && originIter->second.dataDrawed) {
-        if (originIter->second.ancientDebrisGeoId.value) geometryGroup->remove(originIter->second.ancientDebrisGeoId);
+        if (originIter->second.netheriteGeoId.value) geometryGroup->remove(originIter->second.netheriteGeoId);
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
                 if (!i && !j) continue;
@@ -170,7 +180,7 @@ void DuplicatableManager::removeNetherChunkData(ChunkPos originChunkPos) {
                 }
             }
         }
-        if (originIter->second.ancientDebrisGeoId.value) geometryGroup->remove(originIter->second.ancientDebrisGeoId);
+        if (originIter->second.netheriteGeoId.value) geometryGroup->remove(originIter->second.netheriteGeoId);
         if (!originIter->second.neighborValidCount) {
             geometryGroup->remove(originIter->second.chunkSavedDrawGeoId);
             this->netherBsciChunkData.erase(originIter);
@@ -282,8 +292,8 @@ void DuplicatableManager::draw() {
                     auto            netherDataMapIter = this->netherDataMap.find(chunkPos);
                     if (netherDataMapIter == this->netherDataMap.end()
                         || !(
-                            this->showType & static_cast<uint>(ShowType::AncientDebris)
-                            && netherDataMapIter->second.ancientDebrisPosSet.size()
+                            this->showType & static_cast<uint>(ShowType::Netherite)
+                            && netherDataMapIter->second.netheritePosSet.size()
                         ))
                         continue;
                     if (!this->isChunkValid(region, chunkPos)) {
@@ -294,11 +304,11 @@ void DuplicatableManager::draw() {
                     }
                     auto [netherBsciChunkDataIter, inserted] = this->netherBsciChunkData.try_emplace(chunkPos);
                     netherBsciChunkDataIter->second.runtimeRemoveTickCounter = 0;
-                    if (this->showType & static_cast<uint>(ShowType::AncientDebris)
-                        && netherDataMapIter->second.ancientDebrisPosSet.size()
-                        && !netherBsciChunkDataIter->second.ancientDebrisGeoId.value) {
-                        netherBsciChunkDataIter->second.ancientDebrisGeoId =
-                            this->drawAncientDebris(netherDataMapIter->second.ancientDebrisPosSet);
+                    if (this->showType & static_cast<uint>(ShowType::Netherite)
+                        && netherDataMapIter->second.netheritePosSet.size()
+                        && !netherBsciChunkDataIter->second.netheriteGeoId.value) {
+                        netherBsciChunkDataIter->second.netheriteGeoId =
+                            this->drawNetherite(netherDataMapIter->second.netheritePosSet);
                     }
                     if (!netherBsciChunkDataIter->second.dataDrawed) {
                         this->drawChunkSavedInfo(region, chunkPos, netherBsciChunkDataIter->second);
@@ -330,17 +340,17 @@ void DuplicatableManager::removeBsciData(ShowType _showType) {
     this->showType      &= ~static_cast<uint>(_showType);
     if (!this->showType) {
         for (auto& [_, chunkData] : this->netherBsciChunkData) {
-            if (chunkData.ancientDebrisGeoId.value) geometryGroup->remove(chunkData.ancientDebrisGeoId);
+            if (chunkData.netheriteGeoId.value) geometryGroup->remove(chunkData.netheriteGeoId);
             if (chunkData.chunkSavedDrawGeoId.value) geometryGroup->remove(chunkData.chunkSavedDrawGeoId);
         }
         this->netherBsciChunkData.clear();
     }
     switch (_showType) {
-    case ShowType::AncientDebris:
+    case ShowType::Netherite:
         std::erase_if(this->netherBsciChunkData, [&geometryGroup](auto& data) {
-            if (data.second.ancientDebrisGeoId.value) {
-                geometryGroup->remove(data.second.ancientDebrisGeoId);
-                data.second.ancientDebrisGeoId.value = 0;
+            if (data.second.netheriteGeoId.value) {
+                geometryGroup->remove(data.second.netheriteGeoId);
+                data.second.netheriteGeoId.value = 0;
             }
             return true;
         });
@@ -374,7 +384,7 @@ void DuplicatableManager::bsciDataRuntimeRemove() {
                     }
                 }
             }
-            if (data.ancientDebrisGeoId.value) geometryGroup->remove(data.ancientDebrisGeoId);
+            if (data.netheriteGeoId.value) geometryGroup->remove(data.netheriteGeoId);
             if (!data.neighborValidCount) {
                 geometryGroup->remove(data.chunkSavedDrawGeoId);
                 toRemove.emplace_back(originChunkPos);
@@ -437,8 +447,7 @@ std::string DuplicatableManager::test(ChunkPos chunkPos) {
     std::lock_guard lock(this->netherDataMapLock);
     auto            iter = this->netherDataMap.find(chunkPos);
     if (iter != this->netherDataMap.end()) {
-        res += "netherDataMap: len(ancientDebrisPosSet) = " + std::to_string(iter->second.ancientDebrisPosSet.size())
-             + '\n';
+        res += "netherDataMap: len(netheritePosSet) = " + std::to_string(iter->second.netheritePosSet.size()) + '\n';
     } else {
         res += "netherDataMap数据不存在";
     }

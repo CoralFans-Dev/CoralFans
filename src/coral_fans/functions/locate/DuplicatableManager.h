@@ -1,6 +1,7 @@
 #include "bsci/GeometryGroup.h"
 #include "mc/world/level/ChunkPos.h"
 #include "mc/world/level/block/Block.h"
+#include "mc/world/level/chunk/LevelChunk.h"
 #include <unordered_map>
 
 
@@ -18,11 +19,11 @@ private:
     };
 
     struct NetherData {
-        std::unordered_set<std::pair<BlockPos, BlockPos>, BlockPosPairHash> ancientDebrisPosSet;
+        std::unordered_set<std::pair<BlockPos, BlockPos>, BlockPosPairHash> netheritePosSet;
     };
 
     struct NetherBsciChunkData {
-        bsci::GeometryGroup::GeoId ancientDebrisGeoId       = {0};
+        bsci::GeometryGroup::GeoId netheriteGeoId           = {0};
         int                        neighborValidCount       = 0;
         bool                       chunkSaved               = true;
         bsci::GeometryGroup::GeoId chunkSavedDrawGeoId      = {0};
@@ -32,7 +33,7 @@ private:
 
 public:
     enum class ShowType : uint {
-        AncientDebris = 1 << 0,
+        Netherite = 1 << 0,
     };
 
 private:
@@ -42,21 +43,22 @@ private:
 
     std::unordered_map<ChunkPos, NetherBsciChunkData> netherBsciChunkData;
 
-    std::mutex                   netherDecorationThreadIdsLock;
-    std::vector<std::thread::id> netherDecorationThreadIds;
+    std::mutex                                       netherDecorationThreadIdsLock;
+    std::unordered_map<std::thread::id, LevelChunk*> netherDecorationThreadIds;
 
     std::mutex                               netherDataMapLock;
     std::unordered_map<ChunkPos, NetherData> netherDataMap;
 
     struct DuplicatableHook1;
     struct DuplicatableHook2;
+    struct DuplicatableHook3;
 
 private:
     void                       removeData();
     void                       draw();
     void                       removeBsciData(ShowType);
     void                       bsciDataRuntimeRemove();
-    bsci::GeometryGroup::GeoId drawAncientDebris(std::unordered_set<std::pair<BlockPos, BlockPos>, BlockPosPairHash>&);
+    bsci::GeometryGroup::GeoId drawNetherite(std::unordered_set<std::pair<BlockPos, BlockPos>, BlockPosPairHash>&);
     bool                       isChunkValid(BlockSource&, ChunkPos);
     void                       removeNetherChunkData(ChunkPos);
     void                       drawChunkSavedInfo(BlockSource&, ChunkPos, NetherBsciChunkData&);
