@@ -41,12 +41,19 @@ LL_TYPE_INSTANCE_HOOK(
                 auto  threadId            = std::this_thread::get_id();
                 {
                     std::lock_guard lock(duplicatableManager.netherDecorationThreadIdsLock);
-                    duplicatableManager.netherDecorationThreadIds.try_emplace(threadId, nullptr);
+                    duplicatableManager.netherDecorationThreadIds.emplace(threadId);
                 }
                 auto ori = origin(neighborhood);
                 {
                     std::lock_guard lock(duplicatableManager.netherDecorationThreadIdsLock);
-                    duplicatableManager.netherDecorationThreadIds.erase(threadId);
+                    auto            it = duplicatableManager.netherDecorationThreadIds.find(threadId);
+                    if (!it->second.isEmpty) {
+                        std::lock_guard lock(duplicatableManager.netherDataMapLock);
+                        duplicatableManager.netherDataMap.insert_or_assign(
+                            originChunkPos,
+                            std::move(it->second.temperaryData)
+                        );
+                    }
                 }
                 return ori;
             }
@@ -69,7 +76,7 @@ LL_TYPE_INSTANCE_HOOK(
         auto& duplicatableManager = DuplicatableManager::getInstance();
         {
             std::lock_guard lock(duplicatableManager.netherDecorationThreadIdsLock);
-            if (duplicatableManager.netherDecorationThreadIds.contains(threadId)) {
+            if (!duplicatableManager.netherDecorationThreadIds.contains(threadId)) {
                 return ori;
             }
         }
@@ -83,21 +90,21 @@ LL_TYPE_INSTANCE_HOOK(
     return ori;
 }
 
-LL_TYPE_INSTANCE_HOOK(
-    DuplicatableManager::DuplicatableHook3,
-    ll::memory::HookPriority::Normal,
-    OreFeature,
-    &OreFeature ::$place,
-    ::std::optional<::BlockPos>,
-    ::IFeature::PlacementContext const& context
-) {
-    if (current_thread == std::this_thread::get_id())
-        MyTest::getInstance().getSelf().getLogger().info("OreFeature ::$place  count: {}", this->mCount);
-    chunk    = context.mTarget.getChunk(ChunkPos(context.mPos));
-    auto ori = origin(context);
-    chunk    = nullptr;
-    return ori;
-}
+// LL_TYPE_INSTANCE_HOOK(
+//     DuplicatableManager::DuplicatableHook3,
+//     ll::memory::HookPriority::Normal,
+//     OreFeature,
+//     &OreFeature ::$place,
+//     ::std::optional<::BlockPos>,
+//     ::IFeature::PlacementContext const& context
+// ) {
+//     if (current_thread == std::this_thread::get_id())
+//         MyTest::getInstance().getSelf().getLogger().info("OreFeature ::$place  count: {}", this->mCount);
+//     chunk    = context.mTarget.getChunk(ChunkPos(context.mPos));
+//     auto ori = origin(context);
+//     chunk    = nullptr;
+//     return ori;
+// }
 
 
 void DuplicatableManager::removeData() {

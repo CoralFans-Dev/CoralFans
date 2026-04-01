@@ -2,6 +2,7 @@
 #include "mc/world/level/ChunkPos.h"
 #include "mc/world/level/block/Block.h"
 #include "mc/world/level/chunk/LevelChunk.h"
+#include <memory>
 #include <unordered_map>
 
 
@@ -20,6 +21,13 @@ private:
 
     struct NetherData {
         std::unordered_set<std::pair<BlockPos, BlockPos>, BlockPosPairHash> netheritePosSet;
+    };
+
+    struct NetherThreadTemperaryData {
+        LevelChunk*           chunk = nullptr;
+        NetherData            temperaryData;
+        std::unique_ptr<bool> shouldOperate = std::make_unique<bool>(false);
+        bool                  isEmpty       = true;
     };
 
     struct NetherBsciChunkData {
@@ -43,8 +51,8 @@ private:
 
     std::unordered_map<ChunkPos, NetherBsciChunkData> netherBsciChunkData;
 
-    std::mutex                                       netherDecorationThreadIdsLock;
-    std::unordered_map<std::thread::id, LevelChunk*> netherDecorationThreadIds;
+    std::mutex                                                     netherDecorationThreadIdsLock;
+    std::unordered_map<std::thread::id, NetherThreadTemperaryData> netherDecorationThreadIds;
 
     std::mutex                               netherDataMapLock;
     std::unordered_map<ChunkPos, NetherData> netherDataMap;
