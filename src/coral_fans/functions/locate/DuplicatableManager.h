@@ -55,6 +55,7 @@ private:
     struct DuplicatableHook1;
     struct DuplicatableHook2;
     struct DuplicatableHook3;
+    struct DuplicatableHook4;
 
 private:
     void                       removeData();

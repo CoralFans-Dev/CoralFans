@@ -20,6 +20,7 @@
 #include <mutex>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 
@@ -91,6 +92,18 @@ LL_TYPE_INSTANCE_HOOK(
     auto ori                                  = origin(context);
     threadData->worldBlockTargetShouldOperate = false;
     if (!threadData->temeraryPoses.empty()) {
+        if (threadData->temeraryPoses[0] == BlockPos(6639, 44, -1084))
+            mod().getLogger().info(
+                "Netherite block found at position3: {} mReplaceBlock: {}  mPlaceBlock: {}",
+                threadData->temeraryPoses[0],
+                this->mReplaceBlock->getBlockOrUnknownBlock().getTypeName(),
+                this->mPlaceBlock->getBlockOrUnknownBlock().getTypeName()
+            );
+        mod().getGeometryGroup()->text(
+            1,
+            *context.mPos,
+            "replaceBlock: " + this->mReplaceBlock->getBlockOrUnknownBlock().getTypeName()
+        );
         threadData->threadData.netheritePosMap.emplace(context.mPos, std::move(threadData->temeraryPoses));
         threadData->isEmpty = false;
     }
@@ -101,26 +114,51 @@ LL_TYPE_INSTANCE_HOOK(
     DuplicatableManager::DuplicatableHook3,
     ll::memory::HookPriority::Normal,
     WorldBlockTarget,
-    &WorldBlockTarget ::$setBlock,
-    bool,
-    ::BlockPos const& pos,
-    ::Block const&    block,
-    int               flag
+    &WorldBlockTarget ::$getBlock,
+    ::Block const&,
+    ::BlockPos const& pos
 ) {
-    auto  threadId            = std::this_thread::get_id();
-    auto& duplicatableManager = DuplicatableManager::getInstance();
-    auto  ori                 = origin(pos, block, flag);
-    if (ori) [[likely]] {
-        NetherThreadTemperaryData* threadData = nullptr;
-        {
-            std::lock_guard lock(duplicatableManager.netherDecorationThreadIdsLock);
-            auto            it = duplicatableManager.netherDecorationThreadIds.find(threadId);
-            if (it == duplicatableManager.netherDecorationThreadIds.end() || !it->second->worldBlockTargetShouldOperate)
-                return ori;
-            else threadData = it->second.get();
-        }
-        if (ChunkPos(pos) != threadData->chunk->mPosition) threadData->temeraryPoses.emplace_back(pos);
+    auto&                      ori                 = origin(pos);
+    auto                       threadId            = std::this_thread::get_id();
+    auto&                      duplicatableManager = DuplicatableManager::getInstance();
+    NetherThreadTemperaryData* threadData          = nullptr;
+    {
+        std::lock_guard lock(duplicatableManager.netherDecorationThreadIdsLock);
+        auto            it = duplicatableManager.netherDecorationThreadIds.find(threadId);
+        if (it == duplicatableManager.netherDecorationThreadIds.end() || !it->second->worldBlockTargetShouldOperate)
+            return ori;
+        else threadData = it->second.get();
     }
+    if (ChunkPos(pos) != threadData->chunk->mPosition) threadData->temeraryPoses.emplace_back(pos);
+    if (pos == BlockPos(6639, 44, -1084)) mod().getLogger().info("Netherite block found at position2: {}", pos);
+    return std::forward<decltype(ori)>(ori);
+}
+
+LL_TYPE_STATIC_HOOK(
+    DuplicatableManager::DuplicatableHook4,
+    ll::memory::HookPriority::Normal,
+    IFeature,
+    &IFeature ::isExposedTo,
+    bool,
+    ::IBlockWorldGenAPI const& target,
+    ::BlockPos const&          candidatePos,
+    ::BlockDescriptor const&   exposedTo
+) {
+    auto                       threadId            = std::this_thread::get_id();
+    auto&                      duplicatableManager = DuplicatableManager::getInstance();
+    NetherThreadTemperaryData* threadData          = nullptr;
+    {
+        std::lock_guard lock(duplicatableManager.netherDecorationThreadIdsLock);
+        auto            it = duplicatableManager.netherDecorationThreadIds.find(threadId);
+        if (it != duplicatableManager.netherDecorationThreadIds.end() && it->second->worldBlockTargetShouldOperate)
+            threadData = it->second.get();
+    }
+    if (!threadData) return origin(target, candidatePos, exposedTo);
+    threadData->worldBlockTargetShouldOperate = false;
+    auto ori                                  = origin(target, candidatePos, exposedTo);
+    if (candidatePos == BlockPos(6639, 44, -1084))
+        mod().getLogger().info("Netherite block found at position: {}", candidatePos);
+    threadData->worldBlockTargetShouldOperate = true;
     return ori;
 }
 
@@ -437,10 +475,12 @@ void DuplicatableManager::hook(bool enable) {
         DuplicatableHook1::hook();
         DuplicatableHook2::hook();
         DuplicatableHook3::hook();
+        DuplicatableHook4::hook();
     } else {
         DuplicatableHook1::unhook();
         DuplicatableHook2::unhook();
         DuplicatableHook3::unhook();
+        DuplicatableHook4::unhook();
     }
 }
 
