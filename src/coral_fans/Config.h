@@ -90,7 +90,9 @@ struct Config {
             struct {
                 bool        enable         = true;
                 std::string originPosColor = "#10E436";
-                std::string endPosColor    = "#FFFFFF";
+                std::string posColor       = "#FFFFFF";
+                std::string textColor      = "#FFFFFF";
+                std::string arrowColor     = "#FFFFFF";
             } netherite{};
             struct {
                 std::string savedChunk   = "#3003D9";

@@ -1,33 +1,28 @@
 #include "bsci/GeometryGroup.h"
+#include "mc/world/level/BlockPos.h"
 #include "mc/world/level/ChunkPos.h"
 #include "mc/world/level/block/Block.h"
 #include "mc/world/level/chunk/LevelChunk.h"
 #include <memory>
 #include <unordered_map>
+#include <vector>
 
 
 namespace coral_fans::functions::locate {
 class DuplicatableManager {
 private:
-    struct BlockPosPairHash {
-        size_t operator()(const std::pair<BlockPos, BlockPos>& p) const {
-            // 使用 Boost 的 hash_combine 或自定义组合
-            size_t h1 = std::hash<BlockPos>()(p.first);
-            size_t h2 = std::hash<BlockPos>()(p.second);
-
-            return h1 ^ (h2 << 1);
-        }
-    };
-
     struct NetherData {
-        std::unordered_set<std::pair<BlockPos, BlockPos>, BlockPosPairHash> netheritePosSet;
+        std::map<BlockPos, std::vector<BlockPos>> netheritePosMap;
+        bool                                      reload = false;
     };
 
     struct NetherThreadTemperaryData {
         LevelChunk*           chunk = nullptr;
-        NetherData            temperaryData;
-        std::unique_ptr<bool> shouldOperate = std::make_unique<bool>(false);
-        bool                  isEmpty       = true;
+        NetherData            threadData;
+        bool                  subChunkShouldOperate         = false;
+        bool                  worldBlockTargetShouldOperate = false;
+        bool                  isEmpty                       = true;
+        std::vector<BlockPos> temeraryPoses;
     };
 
     struct NetherBsciChunkData {
@@ -35,7 +30,7 @@ private:
         int                        neighborValidCount       = 0;
         bool                       chunkSaved               = true;
         bsci::GeometryGroup::GeoId chunkSavedDrawGeoId      = {0};
-        bool                       dataDrawed               = false;
+        uint                       dataDrawed               = false;
         int                        runtimeRemoveTickCounter = 0;
     };
 
@@ -51,8 +46,8 @@ private:
 
     std::unordered_map<ChunkPos, NetherBsciChunkData> netherBsciChunkData;
 
-    std::mutex                                                     netherDecorationThreadIdsLock;
-    std::unordered_map<std::thread::id, NetherThreadTemperaryData> netherDecorationThreadIds;
+    std::mutex                                                                      netherDecorationThreadIdsLock;
+    std::unordered_map<std::thread::id, std::unique_ptr<NetherThreadTemperaryData>> netherDecorationThreadIds;
 
     std::mutex                               netherDataMapLock;
     std::unordered_map<ChunkPos, NetherData> netherDataMap;
@@ -64,11 +59,12 @@ private:
 private:
     void                       removeData();
     void                       draw();
+    void                       netherDraw(BlockSource&, ChunkPos, NetherData&);
     void                       removeBsciData(ShowType);
     void                       bsciDataRuntimeRemove();
-    bsci::GeometryGroup::GeoId drawNetherite(std::unordered_set<std::pair<BlockPos, BlockPos>, BlockPosPairHash>&);
+    bsci::GeometryGroup::GeoId drawNetherite(std::map<BlockPos, std::vector<BlockPos>>&);
     bool                       isChunkValid(BlockSource&, ChunkPos);
-    void                       removeNetherChunkData(ChunkPos);
+    void                       tryRemoveNetherChunkData(ChunkPos);
     void                       drawChunkSavedInfo(BlockSource&, ChunkPos, NetherBsciChunkData&);
 
 public:

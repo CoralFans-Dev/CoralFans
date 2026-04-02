@@ -323,7 +323,7 @@
             "duplicatable": {
                 "netherite": {
                     "oriPos": "可回溯残骸起始点",
-                    "endPos": "可回溯残骸终点"
+                    "pos": "可回溯残骸"
                 }
             }
         }
