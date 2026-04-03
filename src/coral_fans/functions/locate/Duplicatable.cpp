@@ -92,18 +92,6 @@ LL_TYPE_INSTANCE_HOOK(
     auto ori                                  = origin(context);
     threadData->worldBlockTargetShouldOperate = false;
     if (!threadData->temeraryPoses.empty()) {
-        if (threadData->temeraryPoses[0] == BlockPos(6639, 44, -1084))
-            mod().getLogger().info(
-                "Netherite block found at position3: {} mReplaceBlock: {}  mPlaceBlock: {}",
-                threadData->temeraryPoses[0],
-                this->mReplaceBlock->getBlockOrUnknownBlock().getTypeName(),
-                this->mPlaceBlock->getBlockOrUnknownBlock().getTypeName()
-            );
-        mod().getGeometryGroup()->text(
-            1,
-            *context.mPos,
-            "replaceBlock: " + this->mReplaceBlock->getBlockOrUnknownBlock().getTypeName()
-        );
         threadData->threadData.netheritePosMap.emplace(context.mPos, std::move(threadData->temeraryPoses));
         threadData->isEmpty = false;
     }
@@ -129,8 +117,14 @@ LL_TYPE_INSTANCE_HOOK(
             return ori;
         else threadData = it->second.get();
     }
-    if (ChunkPos(pos) != threadData->chunk->mPosition) threadData->temeraryPoses.emplace_back(pos);
-    if (pos == BlockPos(6639, 44, -1084)) mod().getLogger().info("Netherite block found at position2: {}", pos);
+    auto chunkPos = ChunkPos(pos);
+    int  offsetX  = threadData->chunk->mPosition->x - chunkPos.x;
+    int  offsetZ  = threadData->chunk->mPosition->z - chunkPos.z;
+    if (offsetX || offsetZ) {
+        BlockPos checkPos = BlockPos(pos.x + offsetX, pos.y, pos.z + offsetZ);
+        if (ChunkPos(checkPos) != threadData->chunk->mPosition || !origin(checkPos).isAir())
+            threadData->temeraryPoses.emplace_back(pos);
+    }
     return std::forward<decltype(ori)>(ori);
 }
 
@@ -156,8 +150,6 @@ LL_TYPE_STATIC_HOOK(
     if (!threadData) return origin(target, candidatePos, exposedTo);
     threadData->worldBlockTargetShouldOperate = false;
     auto ori                                  = origin(target, candidatePos, exposedTo);
-    if (candidatePos == BlockPos(6639, 44, -1084))
-        mod().getLogger().info("Netherite block found at position: {}", candidatePos);
     threadData->worldBlockTargetShouldOperate = true;
     return ori;
 }
