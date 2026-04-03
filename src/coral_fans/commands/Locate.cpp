@@ -6,6 +6,7 @@
 #include "ll/api/command/runtime/ParamKind.h"
 #include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
+#include "mc/nbt/CompoundTag.h"
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/server/commands/CommandPermissionLevel.h"
 
@@ -21,7 +22,8 @@ void registerLocateCommand(CommandPermissionLevel permission) {
     ll::command::CommandRegistrar::getInstance(false).tryRegisterRuntimeEnum(
         "duplicatableShowType",
         {
-            {"netherite", 0}
+            {"netherite",    0},
+            {"netherSpring", 1}
     }
     );
 
@@ -35,6 +37,9 @@ void registerLocateCommand(CommandPermissionLevel permission) {
             switch (self["type"].get<ll::command::ParamKind::Enum>().index) {
             case 0:
                 showType = functions::locate::DuplicatableManager::ShowType::Netherite;
+                break;
+            case 1:
+                showType = functions::locate::DuplicatableManager::ShowType::NetherSpring;
                 break;
             }
             if (!static_cast<uint>(showType)) return output.success("command.locate.duplicatable.show.error"_tr());

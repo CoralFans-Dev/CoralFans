@@ -324,6 +324,9 @@
                 "netherite": {
                     "oriPos": "可回溯残骸起始点",
                     "pos": "可回溯残骸"
+                },
+                "netherSpring": {
+                    "pos": "可回溯下界岩浆"
                 }
             }
         }

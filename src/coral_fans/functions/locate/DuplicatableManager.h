@@ -5,6 +5,7 @@
 #include "mc/world/level/chunk/LevelChunk.h"
 #include <memory>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 
@@ -13,6 +14,7 @@ class DuplicatableManager {
 private:
     struct NetherData {
         std::map<BlockPos, std::vector<BlockPos>> netheritePosMap;
+        std::unordered_set<BlockPos>              springPosSet;
         bool                                      reload = false;
     };
 
@@ -26,7 +28,9 @@ private:
     };
 
     struct NetherBsciChunkData {
-        bsci::GeometryGroup::GeoId netheriteGeoId           = {0};
+        bsci::GeometryGroup::GeoId netheriteGeoId = {0};
+        bsci::GeometryGroup::GeoId springGeoId    = {0};
+
         int                        neighborValidCount       = 0;
         bool                       chunkSaved               = true;
         bsci::GeometryGroup::GeoId chunkSavedDrawGeoId      = {0};
@@ -36,7 +40,8 @@ private:
 
 public:
     enum class ShowType : uint {
-        Netherite = 1 << 0,
+        Netherite    = 1 << 0,
+        NetherSpring = 1 << 1,
     };
 
 private:
@@ -56,6 +61,7 @@ private:
     struct DuplicatableHook2;
     struct DuplicatableHook3;
     struct DuplicatableHook4;
+    struct DuplicatableHook5;
 
 private:
     void                       removeData();
@@ -64,6 +70,7 @@ private:
     void                       removeBsciData(ShowType);
     void                       bsciDataRuntimeRemove();
     bsci::GeometryGroup::GeoId drawNetherite(std::map<BlockPos, std::vector<BlockPos>>&);
+    bsci::GeometryGroup::GeoId drawSpring(std::unordered_set<BlockPos>&);
     bool                       isChunkValid(BlockSource&, ChunkPos);
     void                       tryRemoveNetherChunkData(ChunkPos);
     void                       drawChunkSavedInfo(BlockSource&, ChunkPos, NetherBsciChunkData&);

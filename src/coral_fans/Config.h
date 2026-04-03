@@ -95,6 +95,12 @@ struct Config {
                 std::string arrowColor     = "#FFFFFF";
             } netherite{};
             struct {
+                bool        enable     = true;
+                std::string posColor   = "#10E436";
+                std::string textColor  = "#FFFFFF";
+                std::string arrowColor = "#FFFFFF";
+            } netherSpring{};
+            struct {
                 std::string savedChunk   = "#3003D9";
                 std::string unsavedChunk = "#FFC825";
             } chunkSavedDebugInfo{};
