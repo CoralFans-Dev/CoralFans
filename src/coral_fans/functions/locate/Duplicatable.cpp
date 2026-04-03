@@ -1,4 +1,5 @@
 #include "DuplicatableManager.h"
+#include "bsci/GeometryGroup.h"
 #include "coral_fans/base/Mod.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/memory/Hook.h"
@@ -12,6 +13,7 @@
 #include "mc/world/level/chunk/ChunkViewSource.h"
 #include "mc/world/level/chunk/SubChunk.h"
 #include "mc/world/level/dimension/Dimension.h"
+#include "mc/world/level/levelgen/feature/NetherFireFeature.h"
 #include "mc/world/level/levelgen/feature/NetherSpringFeature.h"
 #include "mc/world/level/levelgen/feature/NoSurfaceOreFeature.h"
 #include "mc/world/level/levelgen/feature/OreFeature.h"
@@ -92,8 +94,8 @@ LL_TYPE_INSTANCE_HOOK(
     threadData->worldBlockTargetShouldOperate = true;
     auto ori                                  = origin(context);
     threadData->worldBlockTargetShouldOperate = false;
-    if (!threadData->temeraryPoses.empty()) {
-        threadData->threadData.netheritePosMap.emplace(context.mPos, std::move(threadData->temeraryPoses));
+    if (!threadData->temperaryPoses.empty()) {
+        threadData->threadData.netheritePosMap.emplace(context.mPos, std::move(threadData->temperaryPoses));
         threadData->isEmpty = false;
     }
     return ori;
@@ -124,7 +126,7 @@ LL_TYPE_INSTANCE_HOOK(
     if (offsetX || offsetZ) {
         BlockPos checkPos = BlockPos(pos.x + offsetX, pos.y, pos.z + offsetZ);
         if (ChunkPos(checkPos) != threadData->chunk->mPosition || !origin(checkPos).isAir())
-            threadData->temeraryPoses.emplace_back(pos);
+            threadData->temperaryPoses.emplace(pos);
     }
     return std::forward<decltype(ori)>(ori);
 }
@@ -176,6 +178,63 @@ LL_TYPE_INSTANCE_HOOK(
     return origin(region, pos, random);
 }
 
+LL_TYPE_INSTANCE_HOOK(
+    DuplicatableManager::DuplicatableHook6,
+    ll::memory::HookPriority::Normal,
+    NetherFireFeature,
+    &NetherFireFeature ::$place,
+    bool,
+    ::BlockSource&    region,
+    ::BlockPos const& pos,
+    ::Random&         random
+) {
+    auto                       threadId            = std::this_thread::get_id();
+    auto&                      duplicatableManager = DuplicatableManager::getInstance();
+    NetherThreadTemperaryData* threadData          = nullptr;
+    {
+        std::lock_guard lock(duplicatableManager.netherDecorationThreadIdsLock);
+        auto            it = duplicatableManager.netherDecorationThreadIds.find(threadId);
+        if (it != duplicatableManager.netherDecorationThreadIds.end()) threadData = it->second.get();
+    }
+    if (!threadData) return origin(region, pos, random);
+    threadData->blockSourceShouldOperate = true;
+    auto ori                             = origin(region, pos, random);
+    threadData->blockSourceShouldOperate = false;
+    if (!threadData->temperaryPoses.empty()) {
+        threadData->threadData.firePosMap.emplace(pos, std::move(threadData->temperaryPoses));
+        threadData->isEmpty = false;
+    }
+    return ori;
+}
+
+LL_TYPE_INSTANCE_HOOK(
+    DuplicatableManager::DuplicatableHook7,
+    ll::memory::HookPriority::Normal,
+    BlockSource,
+    &BlockSource ::$getBlock,
+    ::Block const&,
+    ::BlockPos const& pos
+) {
+    auto                       threadId            = std::this_thread::get_id();
+    auto&                      duplicatableManager = DuplicatableManager::getInstance();
+    NetherThreadTemperaryData* threadData          = nullptr;
+    {
+        std::lock_guard lock(duplicatableManager.netherDecorationThreadIdsLock);
+        auto            it = duplicatableManager.netherDecorationThreadIds.find(threadId);
+        if (it != duplicatableManager.netherDecorationThreadIds.end()) threadData = it->second.get();
+    }
+    if (!threadData || !threadData->blockSourceShouldOperate) return origin(pos);
+    if (threadData->temperaryBool) {
+        threadData->temperaryBool = false;
+        return origin(pos);
+    }
+    if (ChunkPos(pos) != threadData->chunk->mPosition) threadData->temperaryPoses.emplace(pos);
+    auto& ori = origin(pos);
+    if (ori.isAir()) threadData->temperaryBool = true;
+    return ori;
+}
+
+
 void DuplicatableManager::removeData() {
     auto level = ll::service::getLevel();
     if (!level) [[unlikely]]
@@ -191,7 +250,7 @@ void DuplicatableManager::removeData() {
     }
 }
 
-bsci::GeometryGroup::GeoId DuplicatableManager::drawNetherite(std::map<BlockPos, std::vector<BlockPos>>& data) {
+bsci::GeometryGroup::GeoId DuplicatableManager::drawNetherite(std::map<BlockPos, std::unordered_set<BlockPos>>& data) {
     using ll::i18n_literals::operator""_tr;
     auto& geometryGroup   = coral_fans::mod().getGeometryGroup();
     auto& netheriteConfig = coral_fans::mod().getConfig().locate.duplicatable.netherite;
@@ -256,6 +315,45 @@ bsci::GeometryGroup::GeoId DuplicatableManager::drawSpring(std::unordered_set<Bl
     return geometryGroup->merge(geoIdList);
 }
 
+bsci::GeometryGroup::GeoId DuplicatableManager::drawFire(std::map<BlockPos, std::unordered_set<BlockPos>>& data) {
+    using ll::i18n_literals::operator""_tr;
+    auto& geometryGroup    = coral_fans::mod().getGeometryGroup();
+    auto& netherFireConfig = coral_fans::mod().getConfig().locate.duplicatable.netherFire;
+    std::vector<bsci::GeometryGroup::GeoId> geoIdList;
+    geoIdList.reserve(5 * data.size());
+    for (auto& [oriPos, poses] : data) {
+        geoIdList.emplace_back(
+            geometryGroup->box(1, AABB(oriPos, oriPos + BlockPos(1, 1, 1)), mce::Color(netherFireConfig.originPosColor))
+        );
+        geoIdList.emplace_back(geometryGroup->text(
+            1,
+            {oriPos.x + 0.5f, oriPos.y + 0.5f, oriPos.z + 0.5f},
+            "translate.locate.duplicatable.netherFire.oriPos"_tr(),
+            mce::Color(netherFireConfig.textColor)
+        ));
+        for (auto& pos : poses) {
+            geoIdList.emplace_back(
+                geometryGroup->box(1, AABB(pos, pos + BlockPos(1, 1, 1)), mce::Color(netherFireConfig.posColor))
+            );
+            geoIdList.emplace_back(geometryGroup->text(
+                1,
+                {pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f},
+                "translate.locate.duplicatable.netherFire.pos"_tr(),
+                mce::Color(netherFireConfig.textColor)
+            ));
+            geoIdList.emplace_back(geometryGroup->arrow(
+                1,
+                {oriPos.x + 0.5f, oriPos.y + 0.5f, oriPos.z + 0.5f},
+                {pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f},
+                mce::Color(netherFireConfig.arrowColor),
+                0.75f,
+                0.2f
+            ));
+        }
+    }
+    return geometryGroup->merge(geoIdList);
+}
+
 bool DuplicatableManager::isChunkValid(BlockSource& region, ChunkPos originChunkPos) {
     DBChunkStorage* dbChunkStorage = static_cast<DBChunkStorage*>(&(*region.getDimension().mChunkSource->mOwnedParent));
     for (int i = -1; i <= 1; i++) {
@@ -286,6 +384,7 @@ void DuplicatableManager::tryRemoveNetherChunkData(ChunkPos originChunkPos) {
         }
         if (originIter->second.netheriteGeoId.value) geometryGroup->remove(originIter->second.netheriteGeoId);
         if (originIter->second.springGeoId.value) geometryGroup->remove(originIter->second.springGeoId);
+        if (originIter->second.fireGeoId.value) geometryGroup->remove(originIter->second.fireGeoId);
         if (!originIter->second.neighborValidCount) {
             geometryGroup->remove(originIter->second.chunkSavedDrawGeoId);
             this->netherBsciChunkData.erase(originIter);
@@ -361,6 +460,10 @@ void DuplicatableManager::netherDraw(BlockSource& region, ChunkPos chunkPos, Net
             geometryGroup->remove(it->second.springGeoId);
             it->second.springGeoId.value = 0;
         }
+        if (it->second.fireGeoId.value) {
+            geometryGroup->remove(it->second.fireGeoId);
+            it->second.fireGeoId.value = 0;
+        }
         it->second.dataDrawed = 0;
     } else this->drawChunkSavedInfo(region, chunkPos, it->second);
     it->second.runtimeRemoveTickCounter = 0;
@@ -375,6 +478,11 @@ void DuplicatableManager::netherDraw(BlockSource& region, ChunkPos chunkPos, Net
         && !it->second.springGeoId.value) {
         it->second.springGeoId  = this->drawSpring(data.springPosSet);
         it->second.dataDrawed  |= static_cast<uint>(ShowType::NetherSpring);
+    }
+    if (this->showType & static_cast<uint>(ShowType::NetherFire) && !data.firePosMap.empty()
+        && !it->second.fireGeoId.value) {
+        it->second.fireGeoId   = this->drawFire(data.firePosMap);
+        it->second.dataDrawed |= static_cast<uint>(ShowType::NetherFire);
     }
 }
 
@@ -402,6 +510,8 @@ void DuplicatableManager::draw() {
                            && !it->second.netheritePosMap.empty())
                           || (this->showType & static_cast<uint>(ShowType::NetherSpring)
                               && !it->second.springPosSet.empty())
+                          || (this->showType & static_cast<uint>(ShowType::NetherFire) && !it->second.firePosMap.empty()
+                          )
                           // ||
                         ))
                         continue;
@@ -439,30 +549,56 @@ void DuplicatableManager::removeBsciData(ShowType _showType) {
         for (auto& [_, chunkData] : this->netherBsciChunkData) {
             if (chunkData.netheriteGeoId.value) geometryGroup->remove(chunkData.netheriteGeoId);
             if (chunkData.springGeoId.value) geometryGroup->remove(chunkData.springGeoId);
+            if (chunkData.fireGeoId.value) geometryGroup->remove(chunkData.fireGeoId);
             if (chunkData.chunkSavedDrawGeoId.value) geometryGroup->remove(chunkData.chunkSavedDrawGeoId);
         }
         this->netherBsciChunkData.clear();
+        return;
     }
+    std::vector<ChunkPos>                                            toRemove;
+    std::function<bsci::GeometryGroup::GeoId&(NetherBsciChunkData&)> getGeoId;
     switch (_showType) {
     case ShowType::Netherite:
-        std::erase_if(this->netherBsciChunkData, [&geometryGroup](auto& data) {
-            if (data.second.netheriteGeoId.value) {
-                geometryGroup->remove(data.second.netheriteGeoId);
-                data.second.netheriteGeoId.value  = 0;
-                data.second.dataDrawed           &= ~static_cast<uint>(ShowType::Netherite);
-            }
-            return !data.second.dataDrawed;
-        });
+        getGeoId = [](NetherBsciChunkData& data) -> bsci::GeometryGroup::GeoId& { return data.netheriteGeoId; };
         break;
     case ShowType::NetherSpring:
-        std::erase_if(this->netherBsciChunkData, [&geometryGroup](auto& data) {
-            if (data.second.springGeoId.value) {
-                geometryGroup->remove(data.second.springGeoId);
-                data.second.springGeoId.value  = 0;
-                data.second.dataDrawed        &= ~static_cast<uint>(ShowType::NetherSpring);
+        getGeoId = [](NetherBsciChunkData& data) -> bsci::GeometryGroup::GeoId& { return data.springGeoId; };
+        break;
+    case ShowType::NetherFire:
+        getGeoId = [](NetherBsciChunkData& data) -> bsci::GeometryGroup::GeoId& { return data.fireGeoId; };
+        break;
+    default:
+        return;
+    }
+    for (auto& [originChunkPos, data] : this->netherBsciChunkData) {
+        auto& geoId = getGeoId(data);
+        if (geoId.value) {
+            geometryGroup->remove(geoId);
+            geoId.value      = 0;
+            data.dataDrawed &= ~static_cast<uint>(_showType);
+            if (!data.dataDrawed) {
+                for (int i = -1; i <= 1; i++) {
+                    for (int j = -1; j <= 1; j++) {
+                        if (!i && !j) continue;
+                        ChunkPos chunkPos     = ChunkPos(originChunkPos.x + i, originChunkPos.z + j);
+                        auto     neighborIter = this->netherBsciChunkData.find(chunkPos);
+                        if (neighborIter == this->netherBsciChunkData.end()) continue;
+                        neighborIter->second.neighborValidCount--;
+                        if (!neighborIter->second.neighborValidCount && !neighborIter->second.dataDrawed) {
+                            geometryGroup->remove(neighborIter->second.chunkSavedDrawGeoId);
+                            toRemove.emplace_back(chunkPos);
+                        }
+                    }
+                }
+                if (!data.neighborValidCount) {
+                    geometryGroup->remove(data.chunkSavedDrawGeoId);
+                    toRemove.emplace_back(originChunkPos);
+                }
             }
-            return !data.second.dataDrawed;
-        });
+        }
+    }
+    for (const auto& key : toRemove) {
+        this->netherBsciChunkData.erase(key);
     }
 }
 
@@ -500,6 +636,10 @@ void DuplicatableManager::bsciDataRuntimeRemove() {
             if (data.springGeoId.value) {
                 geometryGroup->remove(data.springGeoId);
                 data.springGeoId.value = 0;
+            }
+            if (data.fireGeoId.value) {
+                geometryGroup->remove(data.fireGeoId);
+                data.fireGeoId.value = 0;
             }
             if (!data.neighborValidCount) {
                 geometryGroup->remove(data.chunkSavedDrawGeoId);
@@ -545,12 +685,16 @@ void DuplicatableManager::hook(bool enable) {
         DuplicatableHook3::hook();
         DuplicatableHook4::hook();
         DuplicatableHook5::hook();
+        DuplicatableHook6::hook();
+        DuplicatableHook7::hook();
     } else {
         DuplicatableHook1::unhook();
         DuplicatableHook2::unhook();
         DuplicatableHook3::unhook();
         DuplicatableHook4::unhook();
         DuplicatableHook5::unhook();
+        DuplicatableHook6::unhook();
+        DuplicatableHook7::unhook();
     }
 }
 

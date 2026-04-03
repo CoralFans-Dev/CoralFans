@@ -22,8 +22,9 @@ void registerLocateCommand(CommandPermissionLevel permission) {
     ll::command::CommandRegistrar::getInstance(false).tryRegisterRuntimeEnum(
         "duplicatableShowType",
         {
-            {"netherite",    0},
-            {"netherSpring", 1}
+            {"netherite",     0},
+            {"nether_spring", 1},
+            {"nether_fire",   2}
     }
     );
 
@@ -40,6 +41,9 @@ void registerLocateCommand(CommandPermissionLevel permission) {
                 break;
             case 1:
                 showType = functions::locate::DuplicatableManager::ShowType::NetherSpring;
+                break;
+            case 2:
+                showType = functions::locate::DuplicatableManager::ShowType::NetherFire;
                 break;
             }
             if (!static_cast<uint>(showType)) return output.success("command.locate.duplicatable.show.error"_tr());

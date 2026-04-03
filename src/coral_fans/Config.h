@@ -101,6 +101,13 @@ struct Config {
                 std::string arrowColor = "#FFFFFF";
             } netherSpring{};
             struct {
+                bool        enable         = true;
+                std::string originPosColor = "#10E436";
+                std::string posColor       = "#FFFFFF";
+                std::string textColor      = "#FFFFFF";
+                std::string arrowColor     = "#FFFFFF";
+            } netherFire{};
+            struct {
                 std::string savedChunk   = "#3003D9";
                 std::string unsavedChunk = "#FFC825";
             } chunkSavedDebugInfo{};

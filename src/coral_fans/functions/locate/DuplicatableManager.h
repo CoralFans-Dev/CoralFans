@@ -6,30 +6,33 @@
 #include <memory>
 #include <unordered_map>
 #include <unordered_set>
-#include <vector>
 
 
 namespace coral_fans::functions::locate {
 class DuplicatableManager {
 private:
     struct NetherData {
-        std::map<BlockPos, std::vector<BlockPos>> netheritePosMap;
-        std::unordered_set<BlockPos>              springPosSet;
-        bool                                      reload = false;
+        std::map<BlockPos, std::unordered_set<BlockPos>> netheritePosMap;
+        std::unordered_set<BlockPos>                     springPosSet;
+        std::map<BlockPos, std::unordered_set<BlockPos>> firePosMap;
+        bool                                             reload = false;
     };
 
     struct NetherThreadTemperaryData {
-        LevelChunk*           chunk = nullptr;
-        NetherData            threadData;
-        bool                  subChunkShouldOperate         = false;
-        bool                  worldBlockTargetShouldOperate = false;
-        bool                  isEmpty                       = true;
-        std::vector<BlockPos> temeraryPoses;
+        LevelChunk*                  chunk = nullptr;
+        NetherData                   threadData;
+        bool                         subChunkShouldOperate         = false;
+        bool                         worldBlockTargetShouldOperate = false;
+        bool                         blockSourceShouldOperate      = false;
+        bool                         isEmpty                       = true;
+        std::unordered_set<BlockPos> temperaryPoses;
+        bool                         temperaryBool = false;
     };
 
     struct NetherBsciChunkData {
         bsci::GeometryGroup::GeoId netheriteGeoId = {0};
         bsci::GeometryGroup::GeoId springGeoId    = {0};
+        bsci::GeometryGroup::GeoId fireGeoId      = {0};
 
         int                        neighborValidCount       = 0;
         bool                       chunkSaved               = true;
@@ -42,6 +45,7 @@ public:
     enum class ShowType : uint {
         Netherite    = 1 << 0,
         NetherSpring = 1 << 1,
+        NetherFire   = 1 << 2,
     };
 
 private:
@@ -62,6 +66,8 @@ private:
     struct DuplicatableHook3;
     struct DuplicatableHook4;
     struct DuplicatableHook5;
+    struct DuplicatableHook6;
+    struct DuplicatableHook7;
 
 private:
     void                       removeData();
@@ -69,8 +75,9 @@ private:
     void                       netherDraw(BlockSource&, ChunkPos, NetherData&);
     void                       removeBsciData(ShowType);
     void                       bsciDataRuntimeRemove();
-    bsci::GeometryGroup::GeoId drawNetherite(std::map<BlockPos, std::vector<BlockPos>>&);
+    bsci::GeometryGroup::GeoId drawNetherite(std::map<BlockPos, std::unordered_set<BlockPos>>&);
     bsci::GeometryGroup::GeoId drawSpring(std::unordered_set<BlockPos>&);
+    bsci::GeometryGroup::GeoId drawFire(std::map<BlockPos, std::unordered_set<BlockPos>>&);
     bool                       isChunkValid(BlockSource&, ChunkPos);
     void                       tryRemoveNetherChunkData(ChunkPos);
     void                       drawChunkSavedInfo(BlockSource&, ChunkPos, NetherBsciChunkData&);
