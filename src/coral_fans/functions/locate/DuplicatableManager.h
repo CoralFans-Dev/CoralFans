@@ -14,7 +14,8 @@ private:
     struct NetherData {
         std::map<BlockPos, std::unordered_set<BlockPos>> netheritePosMap;
         std::unordered_set<BlockPos>                     springPosSet;
-        std::map<BlockPos, std::unordered_set<BlockPos>> firePosMap;
+        std::unordered_set<BlockPos>                     firePosMap;
+        std::unordered_map<BlockPos, int>                glowStonePosMap;
         bool                                             reload = false;
     };
 
@@ -26,6 +27,7 @@ private:
         bool                         blockSourceShouldOperate      = false;
         bool                         isEmpty                       = true;
         std::unordered_set<BlockPos> temperaryPoses;
+        int                          temperaryInt  = 0;
         bool                         temperaryBool = false;
     };
 
@@ -33,6 +35,7 @@ private:
         bsci::GeometryGroup::GeoId netheriteGeoId = {0};
         bsci::GeometryGroup::GeoId springGeoId    = {0};
         bsci::GeometryGroup::GeoId fireGeoId      = {0};
+        bsci::GeometryGroup::GeoId glowStoneGeoId = {0};
 
         int                        neighborValidCount       = 0;
         bool                       chunkSaved               = true;
@@ -46,6 +49,7 @@ public:
         Netherite    = 1 << 0,
         NetherSpring = 1 << 1,
         NetherFire   = 1 << 2,
+        GlowStone    = 1 << 3,
     };
 
 private:
@@ -77,7 +81,8 @@ private:
     void                       bsciDataRuntimeRemove();
     bsci::GeometryGroup::GeoId drawNetherite(std::map<BlockPos, std::unordered_set<BlockPos>>&);
     bsci::GeometryGroup::GeoId drawSpring(std::unordered_set<BlockPos>&);
-    bsci::GeometryGroup::GeoId drawFire(std::map<BlockPos, std::unordered_set<BlockPos>>&);
+    bsci::GeometryGroup::GeoId drawFire(std::unordered_set<BlockPos>&);
+    bsci::GeometryGroup::GeoId drawGlowStone(std::unordered_map<BlockPos, int>&);
     bool                       isChunkValid(BlockSource&, ChunkPos);
     void                       tryRemoveNetherChunkData(ChunkPos);
     void                       drawChunkSavedInfo(BlockSource&, ChunkPos, NetherBsciChunkData&);

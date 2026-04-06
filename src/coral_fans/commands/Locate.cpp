@@ -6,7 +6,6 @@
 #include "ll/api/command/runtime/ParamKind.h"
 #include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
-#include "mc/nbt/CompoundTag.h"
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/server/commands/CommandPermissionLevel.h"
 
@@ -24,7 +23,8 @@ void registerLocateCommand(CommandPermissionLevel permission) {
         {
             {"netherite",     0},
             {"nether_spring", 1},
-            {"nether_fire",   2}
+            {"nether_fire",   2},
+            {"glow_stone",    3},
     }
     );
 
@@ -44,6 +44,9 @@ void registerLocateCommand(CommandPermissionLevel permission) {
                 break;
             case 2:
                 showType = functions::locate::DuplicatableManager::ShowType::NetherFire;
+                break;
+            case 3:
+                showType = functions::locate::DuplicatableManager::ShowType::GlowStone;
                 break;
             }
             if (!static_cast<uint>(showType)) return output.success("command.locate.duplicatable.show.error"_tr());

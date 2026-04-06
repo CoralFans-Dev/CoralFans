@@ -103,10 +103,17 @@ struct Config {
             struct {
                 bool        enable         = true;
                 std::string originPosColor = "#10E436";
-                std::string posColor       = "#FFFFFF";
+                std::string boundColor     = "#FFFFFF";
                 std::string textColor      = "#FFFFFF";
                 std::string arrowColor     = "#FFFFFF";
             } netherFire{};
+            struct {
+                bool        enable         = true;
+                std::string originPosColor = "#10E436";
+                std::string boundColor     = "#FFFFFF";
+                std::string textColor      = "#FFFFFF";
+                std::string arrowColor     = "#FFFFFF";
+            } glowStone{};
             struct {
                 std::string savedChunk   = "#3003D9";
                 std::string unsavedChunk = "#FFC825";

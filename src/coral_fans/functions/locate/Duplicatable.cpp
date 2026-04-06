@@ -8,11 +8,13 @@
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/BlockSource.h"
+#include "mc/world/level/ChunkPos.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/WorldBlockTarget.h"
 #include "mc/world/level/chunk/ChunkViewSource.h"
 #include "mc/world/level/chunk/SubChunk.h"
 #include "mc/world/level/dimension/Dimension.h"
+#include "mc/world/level/levelgen/feature/GlowStoneFeature.h"
 #include "mc/world/level/levelgen/feature/NetherFireFeature.h"
 #include "mc/world/level/levelgen/feature/NetherSpringFeature.h"
 #include "mc/world/level/levelgen/feature/NoSurfaceOreFeature.h"
@@ -167,13 +169,16 @@ LL_TYPE_INSTANCE_HOOK(
     ::BlockPos const& pos,
     ::Random&         random
 ) {
+    if (pos.x % 16 >= 8 && pos.z % 16 >= 8) return origin(region, pos, random);
     auto  threadId            = std::this_thread::get_id();
     auto& duplicatableManager = DuplicatableManager::getInstance();
     {
         std::lock_guard lock(duplicatableManager.netherDecorationThreadIdsLock);
         auto            it = duplicatableManager.netherDecorationThreadIds.find(threadId);
-        if (it != duplicatableManager.netherDecorationThreadIds.end() && ChunkPos(pos) != it->second->chunk->mPosition)
+        if (it != duplicatableManager.netherDecorationThreadIds.end()) {
             it->second->threadData.springPosSet.emplace(pos);
+            it->second->isEmpty = false;
+        }
     }
     return origin(region, pos, random);
 }
@@ -188,33 +193,31 @@ LL_TYPE_INSTANCE_HOOK(
     ::BlockPos const& pos,
     ::Random&         random
 ) {
-    auto                       threadId            = std::this_thread::get_id();
-    auto&                      duplicatableManager = DuplicatableManager::getInstance();
-    NetherThreadTemperaryData* threadData          = nullptr;
+    if (pos.x % 16 == 8 && pos.z % 16 == 8) return origin(region, pos, random);
+    auto  threadId            = std::this_thread::get_id();
+    auto& duplicatableManager = DuplicatableManager::getInstance();
     {
         std::lock_guard lock(duplicatableManager.netherDecorationThreadIdsLock);
         auto            it = duplicatableManager.netherDecorationThreadIds.find(threadId);
-        if (it != duplicatableManager.netherDecorationThreadIds.end()) threadData = it->second.get();
+        if (it != duplicatableManager.netherDecorationThreadIds.end()) {
+            it->second->threadData.firePosMap.emplace(pos);
+            it->second->isEmpty = false;
+        }
     }
-    if (!threadData) return origin(region, pos, random);
-    threadData->blockSourceShouldOperate = true;
-    auto ori                             = origin(region, pos, random);
-    threadData->blockSourceShouldOperate = false;
-    if (!threadData->temperaryPoses.empty()) {
-        threadData->threadData.firePosMap.emplace(pos, std::move(threadData->temperaryPoses));
-        threadData->isEmpty = false;
-    }
-    return ori;
+    return origin(region, pos, random);
 }
 
 LL_TYPE_INSTANCE_HOOK(
     DuplicatableManager::DuplicatableHook7,
     ll::memory::HookPriority::Normal,
-    BlockSource,
-    &BlockSource ::$getBlock,
-    ::Block const&,
-    ::BlockPos const& pos
+    GlowStoneFeature,
+    &GlowStoneFeature ::$place,
+    bool,
+    ::BlockSource&    region,
+    ::BlockPos const& pos,
+    ::Random&         random
 ) {
+    if (pos.x % 16 == 8 && pos.z % 16 == 8) return origin(region, pos, random);
     auto                       threadId            = std::this_thread::get_id();
     auto&                      duplicatableManager = DuplicatableManager::getInstance();
     NetherThreadTemperaryData* threadData          = nullptr;
@@ -223,17 +226,21 @@ LL_TYPE_INSTANCE_HOOK(
         auto            it = duplicatableManager.netherDecorationThreadIds.find(threadId);
         if (it != duplicatableManager.netherDecorationThreadIds.end()) threadData = it->second.get();
     }
-    if (!threadData || !threadData->blockSourceShouldOperate) return origin(pos);
-    if (threadData->temperaryBool) {
-        threadData->temperaryBool = false;
-        return origin(pos);
+    if (threadData) {
+        if (ChunkPos(pos) != threadData->chunk->mPosition) {
+            threadData->threadData.glowStonePosMap.emplace(pos, threadData->temperaryInt++);
+            threadData->isEmpty = false;
+        } else if (region.getBlock(pos).isAir()) {
+            auto& upBlockName = region.getBlock(BlockPos(pos.x, pos.y + 1, pos.z)).getTypeName();
+            if (upBlockName == "minecraft:netherrack" || upBlockName == "minecraft:soul_sand"
+                || upBlockName == "minecraft:blockstone") {
+                threadData->threadData.glowStonePosMap.emplace(pos, threadData->temperaryInt++);
+                threadData->isEmpty = false;
+            }
+        }
     }
-    if (ChunkPos(pos) != threadData->chunk->mPosition) threadData->temperaryPoses.emplace(pos);
-    auto& ori = origin(pos);
-    if (ori.isAir()) threadData->temperaryBool = true;
-    return ori;
+    return origin(region, pos, random);
 }
-
 
 void DuplicatableManager::removeData() {
     auto level = ll::service::getLevel();
@@ -315,41 +322,64 @@ bsci::GeometryGroup::GeoId DuplicatableManager::drawSpring(std::unordered_set<Bl
     return geometryGroup->merge(geoIdList);
 }
 
-bsci::GeometryGroup::GeoId DuplicatableManager::drawFire(std::map<BlockPos, std::unordered_set<BlockPos>>& data) {
+bsci::GeometryGroup::GeoId DuplicatableManager::drawFire(std::unordered_set<BlockPos>& data) {
     using ll::i18n_literals::operator""_tr;
     auto& geometryGroup    = coral_fans::mod().getGeometryGroup();
     auto& netherFireConfig = coral_fans::mod().getConfig().locate.duplicatable.netherFire;
     std::vector<bsci::GeometryGroup::GeoId> geoIdList;
-    geoIdList.reserve(5 * data.size());
-    for (auto& [oriPos, poses] : data) {
+    geoIdList.reserve(4 * data.size());
+    for (auto& pos : data) {
         geoIdList.emplace_back(
-            geometryGroup->box(1, AABB(oriPos, oriPos + BlockPos(1, 1, 1)), mce::Color(netherFireConfig.originPosColor))
+            geometryGroup->box(1, AABB(pos, pos + BlockPos(1, 1, 1)), mce::Color(netherFireConfig.originPosColor))
         );
         geoIdList.emplace_back(geometryGroup->text(
             1,
-            {oriPos.x + 0.5f, oriPos.y + 0.5f, oriPos.z + 0.5f},
-            "translate.locate.duplicatable.netherFire.oriPos"_tr(),
+            {pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f},
+            "translate.locate.duplicatable.netherFire.pos"_tr(),
             mce::Color(netherFireConfig.textColor)
         ));
-        for (auto& pos : poses) {
-            geoIdList.emplace_back(
-                geometryGroup->box(1, AABB(pos, pos + BlockPos(1, 1, 1)), mce::Color(netherFireConfig.posColor))
-            );
-            geoIdList.emplace_back(geometryGroup->text(
-                1,
-                {pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f},
-                "translate.locate.duplicatable.netherFire.pos"_tr(),
-                mce::Color(netherFireConfig.textColor)
-            ));
-            geoIdList.emplace_back(geometryGroup->arrow(
-                1,
-                {oriPos.x + 0.5f, oriPos.y + 0.5f, oriPos.z + 0.5f},
-                {pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f},
-                mce::Color(netherFireConfig.arrowColor),
-                0.75f,
-                0.2f
-            ));
-        }
+        geoIdList.emplace_back(geometryGroup->box(
+            1,
+            AABB(pos - BlockPos(7, 3, 7), pos + BlockPos(8, 4, 8)),
+            mce::Color(netherFireConfig.boundColor)
+        ));
+        geoIdList.emplace_back(geometryGroup->arrow(
+            1,
+            {pos.x - 7.5f, pos.y + 0.5f, pos.z - 7.5f},
+            {pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f},
+            mce::Color(netherFireConfig.arrowColor)
+        ));
+    }
+    return geometryGroup->merge(geoIdList);
+}
+
+bsci::GeometryGroup::GeoId DuplicatableManager::drawGlowStone(std::unordered_map<BlockPos, int>& data) {
+    using ll::i18n_literals::operator""_tr;
+    auto& geometryGroup   = coral_fans::mod().getGeometryGroup();
+    auto& glowStoneConfig = coral_fans::mod().getConfig().locate.duplicatable.glowStone;
+    std::vector<bsci::GeometryGroup::GeoId> geoIdList;
+    geoIdList.reserve(4 * data.size());
+    for (auto& [pos, number] : data) {
+        geoIdList.emplace_back(
+            geometryGroup->box(1, AABB(pos, pos + BlockPos(1, 1, 1)), mce::Color(glowStoneConfig.originPosColor))
+        );
+        geoIdList.emplace_back(geometryGroup->text(
+            1,
+            {pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f},
+            "translate.locate.duplicatable.glowStone.pos"_tr(number),
+            mce::Color(glowStoneConfig.textColor)
+        ));
+        geoIdList.emplace_back(geometryGroup->box(
+            1,
+            AABB(pos - BlockPos(7, 11, 7), pos + BlockPos(8, 1, 8)),
+            mce::Color(glowStoneConfig.boundColor)
+        ));
+        geoIdList.emplace_back(geometryGroup->arrow(
+            1,
+            {pos.x - 7.5f, pos.y + 0.5f, pos.z - 7.5f},
+            {pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f},
+            mce::Color(glowStoneConfig.arrowColor)
+        ));
     }
     return geometryGroup->merge(geoIdList);
 }
@@ -385,6 +415,7 @@ void DuplicatableManager::tryRemoveNetherChunkData(ChunkPos originChunkPos) {
         if (originIter->second.netheriteGeoId.value) geometryGroup->remove(originIter->second.netheriteGeoId);
         if (originIter->second.springGeoId.value) geometryGroup->remove(originIter->second.springGeoId);
         if (originIter->second.fireGeoId.value) geometryGroup->remove(originIter->second.fireGeoId);
+        if (originIter->second.glowStoneGeoId.value) geometryGroup->remove(originIter->second.glowStoneGeoId);
         if (!originIter->second.neighborValidCount) {
             geometryGroup->remove(originIter->second.chunkSavedDrawGeoId);
             this->netherBsciChunkData.erase(originIter);
@@ -450,7 +481,8 @@ void DuplicatableManager::drawChunkSavedInfo(
 
 void DuplicatableManager::netherDraw(BlockSource& region, ChunkPos chunkPos, NetherData& data) {
     auto [it, inserted] = this->netherBsciChunkData.try_emplace(chunkPos);
-    if (!inserted && data.reload && it->second.dataDrawed) {
+    if (!it->second.dataDrawed) this->drawChunkSavedInfo(region, chunkPos, it->second);
+    else if (data.reload) {
         auto& geometryGroup = coral_fans::mod().getGeometryGroup();
         if (it->second.netheriteGeoId.value) {
             geometryGroup->remove(it->second.netheriteGeoId);
@@ -464,8 +496,12 @@ void DuplicatableManager::netherDraw(BlockSource& region, ChunkPos chunkPos, Net
             geometryGroup->remove(it->second.fireGeoId);
             it->second.fireGeoId.value = 0;
         }
+        if (it->second.glowStoneGeoId.value) {
+            geometryGroup->remove(it->second.glowStoneGeoId);
+            it->second.glowStoneGeoId.value = 0;
+        }
         it->second.dataDrawed = 0;
-    } else this->drawChunkSavedInfo(region, chunkPos, it->second);
+    }
     it->second.runtimeRemoveTickCounter = 0;
     data.reload                         = false;
 
@@ -483,6 +519,11 @@ void DuplicatableManager::netherDraw(BlockSource& region, ChunkPos chunkPos, Net
         && !it->second.fireGeoId.value) {
         it->second.fireGeoId   = this->drawFire(data.firePosMap);
         it->second.dataDrawed |= static_cast<uint>(ShowType::NetherFire);
+    }
+    if (this->showType & static_cast<uint>(ShowType::GlowStone) && !data.glowStonePosMap.empty()
+        && !it->second.glowStoneGeoId.value) {
+        it->second.glowStoneGeoId  = this->drawGlowStone(data.glowStonePosMap);
+        it->second.dataDrawed     |= static_cast<uint>(ShowType::GlowStone);
     }
 }
 
@@ -512,6 +553,8 @@ void DuplicatableManager::draw() {
                               && !it->second.springPosSet.empty())
                           || (this->showType & static_cast<uint>(ShowType::NetherFire) && !it->second.firePosMap.empty()
                           )
+                          || (this->showType & static_cast<uint>(ShowType::GlowStone)
+                              && !it->second.glowStonePosMap.empty())
                           // ||
                         ))
                         continue;
@@ -550,6 +593,8 @@ void DuplicatableManager::removeBsciData(ShowType _showType) {
             if (chunkData.netheriteGeoId.value) geometryGroup->remove(chunkData.netheriteGeoId);
             if (chunkData.springGeoId.value) geometryGroup->remove(chunkData.springGeoId);
             if (chunkData.fireGeoId.value) geometryGroup->remove(chunkData.fireGeoId);
+            if (chunkData.glowStoneGeoId.value) geometryGroup->remove(chunkData.glowStoneGeoId);
+
             if (chunkData.chunkSavedDrawGeoId.value) geometryGroup->remove(chunkData.chunkSavedDrawGeoId);
         }
         this->netherBsciChunkData.clear();
@@ -566,6 +611,9 @@ void DuplicatableManager::removeBsciData(ShowType _showType) {
         break;
     case ShowType::NetherFire:
         getGeoId = [](NetherBsciChunkData& data) -> bsci::GeometryGroup::GeoId& { return data.fireGeoId; };
+        break;
+    case ShowType::GlowStone:
+        getGeoId = [](NetherBsciChunkData& data) -> bsci::GeometryGroup::GeoId& { return data.glowStoneGeoId; };
         break;
     default:
         return;
@@ -641,6 +689,11 @@ void DuplicatableManager::bsciDataRuntimeRemove() {
                 geometryGroup->remove(data.fireGeoId);
                 data.fireGeoId.value = 0;
             }
+            if (data.glowStoneGeoId.value) {
+                geometryGroup->remove(data.glowStoneGeoId);
+                data.glowStoneGeoId.value = 0;
+            }
+
             if (!data.neighborValidCount) {
                 geometryGroup->remove(data.chunkSavedDrawGeoId);
                 toRemove.emplace_back(originChunkPos);
