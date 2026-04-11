@@ -8,6 +8,7 @@
 #include "ll/api/i18n/I18n.h"
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/server/commands/CommandPermissionLevel.h"
+#include "mc/world/level/block/CachedComponentData.h"
 
 
 namespace coral_fans::commands {
@@ -21,10 +22,17 @@ void registerLocateCommand(CommandPermissionLevel permission) {
     ll::command::CommandRegistrar::getInstance(false).tryRegisterRuntimeEnum(
         "duplicatableShowType",
         {
-            {"netherite",     0},
-            {"nether_spring", 1},
-            {"nether_fire",   2},
-            {"glow_stone",    3},
+            {"netherite",     0 },
+            {"nether_spring", 1 },
+            {"nether_fire",   2 },
+            {"glow_stone",    3 },
+            {"mushroom",      4 },
+            {"nether_gold",   5 },
+            {"nether_quartz", 6 },
+            {"nether_magma",  7 },
+            {"nether_gravel", 8 },
+            {"blackstone",    9 },
+            {"soul_sand",     10}
     }
     );
 
@@ -47,6 +55,27 @@ void registerLocateCommand(CommandPermissionLevel permission) {
                 break;
             case 3:
                 showType = functions::locate::DuplicatableManager::ShowType::GlowStone;
+                break;
+            case 4:
+                showType = functions::locate::DuplicatableManager::ShowType::Mushroom;
+                break;
+            case 5:
+                showType = functions::locate::DuplicatableManager::ShowType::NetherGold;
+                break;
+            case 6:
+                showType = functions::locate::DuplicatableManager::ShowType::NetherQuartz;
+                break;
+            case 7:
+                showType = functions::locate::DuplicatableManager::ShowType::NetherMagma;
+                break;
+            case 8:
+                showType = functions::locate::DuplicatableManager::ShowType::NetherGravel;
+                break;
+            case 9:
+                showType = functions::locate::DuplicatableManager::ShowType::Blackstone;
+                break;
+            case 10:
+                showType = functions::locate::DuplicatableManager::ShowType::SoulSand;
                 break;
             }
             if (!static_cast<uint>(showType)) return output.success("command.locate.duplicatable.show.error"_tr());

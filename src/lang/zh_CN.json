@@ -332,7 +332,35 @@
                     "pos": "可回溯火焰起始点"
                 },
                 "glowStone": {
-                    "pos": "可回溯荧石[{}]"
+                    "pos": "可回溯荧石起始点[{}]"
+                },
+                "mushroom": {
+                    "redPos": "可回溯红蘑菇起始点",
+                    "brownPos": "可回溯灰蘑菇起始点"
+                },
+                "netherGold": {
+                    "oriPos": "可回溯下界金矿起始点",
+                    "endPos": "可回溯下界金矿终点"
+                },
+                "netherQuartz": {
+                    "oriPos": "可回溯下界石英矿起始点",
+                    "endPos": "可回溯下界石英矿终点"
+                },
+                "netherMagma": {
+                    "oriPos": "可回溯岩浆块起始点",
+                    "endPos": "可回溯岩浆块终点"
+                },
+                "netherGravel": {
+                    "oriPos": "可回溯下界沙砾起始点",
+                    "endPos": "可回溯下界沙砾终点"
+                },
+                "netherBlackstone": {
+                    "oriPos": "可回溯黑石起始点",
+                    "endPos": "可回溯黑石终点"
+                },
+                "netherSoulSand": {
+                    "oriPos": "可回溯灵魂沙起始点",
+                    "endPos": "可回溯灵魂沙终点"
                 }
             }
         }

@@ -15,6 +15,7 @@
 #include "mc/world/level/chunk/SubChunk.h"
 #include "mc/world/level/dimension/Dimension.h"
 #include "mc/world/level/levelgen/feature/GlowStoneFeature.h"
+#include "mc/world/level/levelgen/feature/MushroomFeature.h"
 #include "mc/world/level/levelgen/feature/NetherFireFeature.h"
 #include "mc/world/level/levelgen/feature/NetherSpringFeature.h"
 #include "mc/world/level/levelgen/feature/NoSurfaceOreFeature.h"
@@ -242,6 +243,102 @@ LL_TYPE_INSTANCE_HOOK(
     return origin(region, pos, random);
 }
 
+LL_TYPE_INSTANCE_HOOK(
+    DuplicatableManager::DuplicatableHook8,
+    ll::memory::HookPriority::Normal,
+    MushroomFeature,
+    &MushroomFeature ::$place,
+    bool,
+    ::BlockSource&    region,
+    ::BlockPos const& pos,
+    ::Random&         random
+) {
+    if (pos.x % 16 == 8 && pos.z % 16 == 8) return origin(region, pos, random);
+    auto  threadId            = std::this_thread::get_id();
+    auto& duplicatableManager = DuplicatableManager::getInstance();
+    {
+        std::lock_guard lock(duplicatableManager.netherDecorationThreadIdsLock);
+        auto            it = duplicatableManager.netherDecorationThreadIds.find(threadId);
+        if (it != duplicatableManager.netherDecorationThreadIds.end()) {
+            it->second->threadData.mushroomPosMap.emplace(
+                pos,
+                this->mMushroomBlock.getTypeName() == "minecraft:red_mushroom"
+            );
+            it->second->isEmpty = false;
+        }
+    }
+    return origin(region, pos, random);
+}
+
+LL_TYPE_INSTANCE_HOOK(
+    DuplicatableManager::DuplicatableHook9,
+    ll::memory::HookPriority::Normal,
+    OreFeature,
+    &OreFeature ::$place,
+    ::std::optional<::BlockPos>,
+    ::IFeature::PlacementContext const& context
+) {
+    if (context.mPos->x % 16 < 8 && context.mPos->z % 16 < 8) return origin(context);
+    auto                       threadId            = std::this_thread::get_id();
+    auto&                      duplicatableManager = DuplicatableManager::getInstance();
+    NetherThreadTemperaryData* threadData          = nullptr;
+    {
+        std::lock_guard lock(duplicatableManager.netherDecorationThreadIdsLock);
+        auto            it = duplicatableManager.netherDecorationThreadIds.find(threadId);
+        if (it != duplicatableManager.netherDecorationThreadIds.end()) threadData = it->second.get();
+    }
+    if (!threadData) return origin(context);
+    // mod().getLogger().info(
+    //     "duplicatable: subchunk operate disabled for ore feature, block: {}, oriPos: {} replaceBlock: {}",
+    //     (*this->mReplaceRules)[0].mBlock->getBlockOrUnknownBlock().getTypeName(),
+    //     context.mPos->toString(),
+    //     (*(*this->mReplaceRules)[0].mMayReplace)[0].getBlockOrUnknownBlock().getTypeName()
+    // );
+    auto& blockName          = (*this->mReplaceRules)[0].mBlock->getBlockOrUnknownBlock().getTypeName();
+    auto& duplicatableConfig = coral_fans::mod().getConfig().locate.duplicatable;
+    switch (blockName[10]) {
+    case 'n':
+        if (blockName == "minecraft:nether_gold_ore" && duplicatableConfig.netherGold.enable) {
+            threadData->threadData.netherGoldPosMap.emplace(context.mPos);
+            threadData->isEmpty = false;
+        }
+        break;
+    case 'q':
+        if (blockName == "minecraft:quartz_ore" && duplicatableConfig.netherQuartz.enable) {
+            threadData->threadData.netherQuartzPosMap.emplace(context.mPos);
+            threadData->isEmpty = false;
+        }
+        break;
+    case 'm':
+        if (blockName == "minecraft:magma" && duplicatableConfig.netherMagma.enable) {
+            threadData->threadData.netherMagmaPosMap.emplace(context.mPos);
+            threadData->isEmpty = false;
+        }
+        break;
+    case 'g':
+        if (blockName == "minecraft:gravel" && duplicatableConfig.netherGravel.enable) {
+            threadData->threadData.netherGravelPosMap.emplace(context.mPos);
+            threadData->isEmpty = false;
+        }
+        break;
+    case 'b':
+        if (blockName == "minecraft:blackstone" && duplicatableConfig.netherBlackstone.enable) {
+            threadData->threadData.blackstonePosMap.emplace(context.mPos);
+            threadData->isEmpty = false;
+        }
+        break;
+    case 's':
+        if (blockName == "minecraft:soul_sand" && duplicatableConfig.netherSoulSand.enable) {
+            threadData->threadData.soulSandPosMap.emplace(context.mPos);
+            threadData->isEmpty = false;
+        }
+        break;
+    default:
+        break;
+    }
+    return origin(context);
+}
+
 void DuplicatableManager::removeData() {
     auto level = ll::service::getLevel();
     if (!level) [[unlikely]]
@@ -353,7 +450,7 @@ bsci::GeometryGroup::GeoId DuplicatableManager::drawFire(std::unordered_set<Bloc
     return geometryGroup->merge(geoIdList);
 }
 
-bsci::GeometryGroup::GeoId DuplicatableManager::drawGlowStone(std::unordered_map<BlockPos, int>& data) {
+bsci::GeometryGroup::GeoId DuplicatableManager::drawGlowStone(std::map<BlockPos, int>& data) {
     using ll::i18n_literals::operator""_tr;
     auto& geometryGroup   = coral_fans::mod().getGeometryGroup();
     auto& glowStoneConfig = coral_fans::mod().getConfig().locate.duplicatable.glowStone;
@@ -379,6 +476,67 @@ bsci::GeometryGroup::GeoId DuplicatableManager::drawGlowStone(std::unordered_map
             {pos.x - 7.5f, pos.y + 0.5f, pos.z - 7.5f},
             {pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f},
             mce::Color(glowStoneConfig.arrowColor)
+        ));
+    }
+    return geometryGroup->merge(geoIdList);
+}
+
+bsci::GeometryGroup::GeoId DuplicatableManager::drawMushroom(std::map<BlockPos, bool>& data) {
+    using ll::i18n_literals::operator""_tr;
+    auto&                                   geometryGroup  = coral_fans::mod().getGeometryGroup();
+    auto&                                   mushroomConfig = coral_fans::mod().getConfig().locate.duplicatable.mushroom;
+    std::vector<bsci::GeometryGroup::GeoId> geoIdList;
+    geoIdList.reserve(4 * data.size());
+    for (auto& [pos, isRed] : data) {
+        geoIdList.emplace_back(
+            geometryGroup->box(1, AABB(pos, pos + BlockPos(1, 1, 1)), mce::Color(mushroomConfig.originPosColor))
+        );
+        geoIdList.emplace_back(geometryGroup->text(
+            1,
+            {pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f},
+            isRed ? "translate.locate.duplicatable.mushroom.redPos"_tr()
+                  : "translate.locate.duplicatable.mushroom.brownPos"_tr(),
+            mce::Color(mushroomConfig.textColor)
+        ));
+        geoIdList.emplace_back(geometryGroup->box(
+            1,
+            AABB(pos - BlockPos(7, 3, 7), pos + BlockPos(8, 4, 8)),
+            mce::Color(mushroomConfig.boundColor)
+        ));
+        geoIdList.emplace_back(geometryGroup->arrow(
+            1,
+            {pos.x - 7.5f, pos.y + 0.5f, pos.z - 7.5f},
+            {pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f},
+            mce::Color(mushroomConfig.arrowColor)
+        ));
+    }
+    return geometryGroup->merge(geoIdList);
+}
+
+bsci::GeometryGroup::GeoId DuplicatableManager::drawOre(
+    std::unordered_set<BlockPos>&          data,
+    config::Locate::DuplicatableOreStruct& config,
+    std::string                            oriPosText,
+    std::string                            endPosText
+) {
+    auto&                                   geometryGroup = coral_fans::mod().getGeometryGroup();
+    std::vector<bsci::GeometryGroup::GeoId> geoIdList;
+    geoIdList.reserve(3 * data.size());
+    for (auto& oriPos : data) {
+        geoIdList.emplace_back(
+            geometryGroup->box(1, AABB(oriPos, oriPos + BlockPos(1, 1, 1)), mce::Color(config.originPosColor))
+        );
+        geoIdList.emplace_back(geometryGroup->text(
+            1,
+            {oriPos.x + 0.5f, oriPos.y + 0.5f, oriPos.z + 0.5f},
+            oriPosText,
+            mce::Color(config.originPosTextColor)
+        ));
+        geoIdList.emplace_back(geometryGroup->arrow(
+            1,
+            {oriPos.x + 0.5f, oriPos.y + 0.5f, oriPos.z + 0.5f},
+            {oriPos.x + 8.5f, oriPos.y - 0.5f, oriPos.z + 8.5f},
+            mce::Color(config.arrowColor)
         ));
     }
     return geometryGroup->merge(geoIdList);
@@ -416,6 +574,14 @@ void DuplicatableManager::tryRemoveNetherChunkData(ChunkPos originChunkPos) {
         if (originIter->second.springGeoId.value) geometryGroup->remove(originIter->second.springGeoId);
         if (originIter->second.fireGeoId.value) geometryGroup->remove(originIter->second.fireGeoId);
         if (originIter->second.glowStoneGeoId.value) geometryGroup->remove(originIter->second.glowStoneGeoId);
+        if (originIter->second.mushroomGeoId.value) geometryGroup->remove(originIter->second.mushroomGeoId);
+        if (originIter->second.netherGoldGeoId.value) geometryGroup->remove(originIter->second.netherGoldGeoId);
+        if (originIter->second.netherQuartzGeoId.value) geometryGroup->remove(originIter->second.netherQuartzGeoId);
+        if (originIter->second.netherMagmaGeoId.value) geometryGroup->remove(originIter->second.netherMagmaGeoId);
+        if (originIter->second.netherGravelGeoId.value) geometryGroup->remove(originIter->second.netherGravelGeoId);
+        if (originIter->second.blackstoneGeoId.value) geometryGroup->remove(originIter->second.blackstoneGeoId);
+        if (originIter->second.soulSandGeoId.value) geometryGroup->remove(originIter->second.soulSandGeoId);
+
         if (!originIter->second.neighborValidCount) {
             geometryGroup->remove(originIter->second.chunkSavedDrawGeoId);
             this->netherBsciChunkData.erase(originIter);
@@ -480,7 +646,9 @@ void DuplicatableManager::drawChunkSavedInfo(
 }
 
 void DuplicatableManager::netherDraw(BlockSource& region, ChunkPos chunkPos, NetherData& data) {
-    auto [it, inserted] = this->netherBsciChunkData.try_emplace(chunkPos);
+    using ll::i18n_literals::operator""_tr;
+    auto& duplicatableConfig = coral_fans::mod().getConfig().locate.duplicatable;
+    auto [it, inserted]      = this->netherBsciChunkData.try_emplace(chunkPos);
     if (!it->second.dataDrawed) this->drawChunkSavedInfo(region, chunkPos, it->second);
     else if (data.reload) {
         auto& geometryGroup = coral_fans::mod().getGeometryGroup();
@@ -499,6 +667,34 @@ void DuplicatableManager::netherDraw(BlockSource& region, ChunkPos chunkPos, Net
         if (it->second.glowStoneGeoId.value) {
             geometryGroup->remove(it->second.glowStoneGeoId);
             it->second.glowStoneGeoId.value = 0;
+        }
+        if (it->second.mushroomGeoId.value) {
+            geometryGroup->remove(it->second.mushroomGeoId);
+            it->second.mushroomGeoId.value = 0;
+        }
+        if (it->second.netherGoldGeoId.value) {
+            geometryGroup->remove(it->second.netherGoldGeoId);
+            it->second.netherGoldGeoId.value = 0;
+        }
+        if (it->second.netherQuartzGeoId.value) {
+            geometryGroup->remove(it->second.netherQuartzGeoId);
+            it->second.netherQuartzGeoId.value = 0;
+        }
+        if (it->second.netherMagmaGeoId.value) {
+            geometryGroup->remove(it->second.netherMagmaGeoId);
+            it->second.netherMagmaGeoId.value = 0;
+        }
+        if (it->second.netherGravelGeoId.value) {
+            geometryGroup->remove(it->second.netherGravelGeoId);
+            it->second.netherGravelGeoId.value = 0;
+        }
+        if (it->second.blackstoneGeoId.value) {
+            geometryGroup->remove(it->second.blackstoneGeoId);
+            it->second.blackstoneGeoId.value = 0;
+        }
+        if (it->second.soulSandGeoId.value) {
+            geometryGroup->remove(it->second.soulSandGeoId);
+            it->second.soulSandGeoId.value = 0;
         }
         it->second.dataDrawed = 0;
     }
@@ -524,6 +720,71 @@ void DuplicatableManager::netherDraw(BlockSource& region, ChunkPos chunkPos, Net
         && !it->second.glowStoneGeoId.value) {
         it->second.glowStoneGeoId  = this->drawGlowStone(data.glowStonePosMap);
         it->second.dataDrawed     |= static_cast<uint>(ShowType::GlowStone);
+    }
+    if (this->showType & static_cast<uint>(ShowType::Mushroom) && !data.mushroomPosMap.empty()
+        && !it->second.mushroomGeoId.value) {
+        it->second.mushroomGeoId  = this->drawMushroom(data.mushroomPosMap);
+        it->second.dataDrawed    |= static_cast<uint>(ShowType::Mushroom);
+    }
+    if (this->showType & static_cast<uint>(ShowType::NetherGold) && !data.netherGoldPosMap.empty()
+        && !it->second.netherGoldGeoId.value) {
+        it->second.netherGoldGeoId = drawOre(
+            data.netherGoldPosMap,
+            duplicatableConfig.netherGold,
+            "translate.locate.duplicatable.netherGold.oriPos"_tr(),
+            "translate.locate.duplicatable.netherGold.endPos"_tr()
+        );
+        it->second.dataDrawed |= static_cast<uint>(ShowType::NetherGold);
+    }
+    if (this->showType & static_cast<uint>(ShowType::NetherQuartz) && !data.netherQuartzPosMap.empty()
+        && !it->second.netherQuartzGeoId.value) {
+        it->second.netherQuartzGeoId = drawOre(
+            data.netherQuartzPosMap,
+            duplicatableConfig.netherQuartz,
+            "translate.locate.duplicatable.netherQuartz.oriPos"_tr(),
+            "translate.locate.duplicatable.netherQuartz.endPos"_tr()
+        );
+        it->second.dataDrawed |= static_cast<uint>(ShowType::NetherQuartz);
+    }
+    if (this->showType & static_cast<uint>(ShowType::NetherMagma) && !data.netherMagmaPosMap.empty()
+        && !it->second.netherMagmaGeoId.value) {
+        it->second.netherMagmaGeoId = drawOre(
+            data.netherMagmaPosMap,
+            duplicatableConfig.netherMagma,
+            "translate.locate.duplicatable.netherMagma.oriPos"_tr(),
+            "translate.locate.duplicatable.netherMagma.endPos"_tr()
+        );
+        it->second.dataDrawed |= static_cast<uint>(ShowType::NetherMagma);
+    }
+    if (this->showType & static_cast<uint>(ShowType::NetherGravel) && !data.netherGravelPosMap.empty()
+        && !it->second.netherGravelGeoId.value) {
+        it->second.netherGravelGeoId = drawOre(
+            data.netherGravelPosMap,
+            duplicatableConfig.netherGravel,
+            "translate.locate.duplicatable.netherGravel.oriPos"_tr(),
+            "translate.locate.duplicatable.netherGravel.endPos"_tr()
+        );
+        it->second.dataDrawed |= static_cast<uint>(ShowType::NetherGravel);
+    }
+    if (this->showType & static_cast<uint>(ShowType::Blackstone) && !data.blackstonePosMap.empty()
+        && !it->second.blackstoneGeoId.value) {
+        it->second.blackstoneGeoId = drawOre(
+            data.blackstonePosMap,
+            duplicatableConfig.netherBlackstone,
+            "translate.locate.duplicatable.netherBlackstone.oriPos"_tr(),
+            "translate.locate.duplicatable.netherBlackstone.endPos"_tr()
+        );
+        it->second.dataDrawed |= static_cast<uint>(ShowType::Blackstone);
+    }
+    if (this->showType & static_cast<uint>(ShowType::SoulSand) && !data.soulSandPosMap.empty()
+        && !it->second.soulSandGeoId.value) {
+        it->second.soulSandGeoId = drawOre(
+            data.soulSandPosMap,
+            duplicatableConfig.netherSoulSand,
+            "translate.locate.duplicatable.netherSoulSand.oriPos"_tr(),
+            "translate.locate.duplicatable.netherSoulSand.endPos"_tr()
+        );
+        it->second.dataDrawed |= static_cast<uint>(ShowType::SoulSand);
     }
 }
 
@@ -555,8 +816,20 @@ void DuplicatableManager::draw() {
                           )
                           || (this->showType & static_cast<uint>(ShowType::GlowStone)
                               && !it->second.glowStonePosMap.empty())
-                          // ||
-                        ))
+                          || (this->showType & static_cast<uint>(ShowType::Mushroom)
+                              && !it->second.mushroomPosMap.empty())
+                          || (this->showType & static_cast<uint>(ShowType::NetherGold)
+                              && !it->second.netherGoldPosMap.empty())
+                          || (this->showType & static_cast<uint>(ShowType::NetherQuartz)
+                              && !it->second.netherQuartzPosMap.empty())
+                          || (this->showType & static_cast<uint>(ShowType::NetherMagma)
+                              && !it->second.netherMagmaPosMap.empty())
+                          || (this->showType & static_cast<uint>(ShowType::NetherGravel)
+                              && !it->second.netherGravelPosMap.empty())
+                          || (this->showType & static_cast<uint>(ShowType::Blackstone)
+                              && !it->second.blackstonePosMap.empty())
+                          || (this->showType & static_cast<uint>(ShowType::SoulSand)
+                              && !it->second.soulSandPosMap.empty())))
                         continue;
                     if (!this->isChunkValid(region, chunkPos)) {
                         this->netherDataMap.erase(it);
@@ -594,6 +867,13 @@ void DuplicatableManager::removeBsciData(ShowType _showType) {
             if (chunkData.springGeoId.value) geometryGroup->remove(chunkData.springGeoId);
             if (chunkData.fireGeoId.value) geometryGroup->remove(chunkData.fireGeoId);
             if (chunkData.glowStoneGeoId.value) geometryGroup->remove(chunkData.glowStoneGeoId);
+            if (chunkData.mushroomGeoId.value) geometryGroup->remove(chunkData.mushroomGeoId);
+            if (chunkData.netherGoldGeoId.value) geometryGroup->remove(chunkData.netherGoldGeoId);
+            if (chunkData.netherQuartzGeoId.value) geometryGroup->remove(chunkData.netherQuartzGeoId);
+            if (chunkData.netherMagmaGeoId.value) geometryGroup->remove(chunkData.netherMagmaGeoId);
+            if (chunkData.netherGravelGeoId.value) geometryGroup->remove(chunkData.netherGravelGeoId);
+            if (chunkData.blackstoneGeoId.value) geometryGroup->remove(chunkData.blackstoneGeoId);
+            if (chunkData.soulSandGeoId.value) geometryGroup->remove(chunkData.soulSandGeoId);
 
             if (chunkData.chunkSavedDrawGeoId.value) geometryGroup->remove(chunkData.chunkSavedDrawGeoId);
         }
@@ -614,6 +894,27 @@ void DuplicatableManager::removeBsciData(ShowType _showType) {
         break;
     case ShowType::GlowStone:
         getGeoId = [](NetherBsciChunkData& data) -> bsci::GeometryGroup::GeoId& { return data.glowStoneGeoId; };
+        break;
+    case ShowType::Mushroom:
+        getGeoId = [](NetherBsciChunkData& data) -> bsci::GeometryGroup::GeoId& { return data.mushroomGeoId; };
+        break;
+    case ShowType::NetherGold:
+        getGeoId = [](NetherBsciChunkData& data) -> bsci::GeometryGroup::GeoId& { return data.netherGoldGeoId; };
+        break;
+    case ShowType::NetherQuartz:
+        getGeoId = [](NetherBsciChunkData& data) -> bsci::GeometryGroup::GeoId& { return data.netherQuartzGeoId; };
+        break;
+    case ShowType::NetherMagma:
+        getGeoId = [](NetherBsciChunkData& data) -> bsci::GeometryGroup::GeoId& { return data.netherMagmaGeoId; };
+        break;
+    case ShowType::NetherGravel:
+        getGeoId = [](NetherBsciChunkData& data) -> bsci::GeometryGroup::GeoId& { return data.netherGravelGeoId; };
+        break;
+    case ShowType::Blackstone:
+        getGeoId = [](NetherBsciChunkData& data) -> bsci::GeometryGroup::GeoId& { return data.blackstoneGeoId; };
+        break;
+    case ShowType::SoulSand:
+        getGeoId = [](NetherBsciChunkData& data) -> bsci::GeometryGroup::GeoId& { return data.soulSandGeoId; };
         break;
     default:
         return;
@@ -693,6 +994,34 @@ void DuplicatableManager::bsciDataRuntimeRemove() {
                 geometryGroup->remove(data.glowStoneGeoId);
                 data.glowStoneGeoId.value = 0;
             }
+            if (data.mushroomGeoId.value) {
+                geometryGroup->remove(data.mushroomGeoId);
+                data.mushroomGeoId.value = 0;
+            }
+            if (data.netherGoldGeoId.value) {
+                geometryGroup->remove(data.netherGoldGeoId);
+                data.netherGoldGeoId.value = 0;
+            }
+            if (data.netherQuartzGeoId.value) {
+                geometryGroup->remove(data.netherQuartzGeoId);
+                data.netherQuartzGeoId.value = 0;
+            }
+            if (data.netherMagmaGeoId.value) {
+                geometryGroup->remove(data.netherMagmaGeoId);
+                data.netherMagmaGeoId.value = 0;
+            }
+            if (data.netherGravelGeoId.value) {
+                geometryGroup->remove(data.netherGravelGeoId);
+                data.netherGravelGeoId.value = 0;
+            }
+            if (data.blackstoneGeoId.value) {
+                geometryGroup->remove(data.blackstoneGeoId);
+                data.blackstoneGeoId.value = 0;
+            }
+            if (data.soulSandGeoId.value) {
+                geometryGroup->remove(data.soulSandGeoId);
+                data.soulSandGeoId.value = 0;
+            }
 
             if (!data.neighborValidCount) {
                 geometryGroup->remove(data.chunkSavedDrawGeoId);
@@ -740,6 +1069,8 @@ void DuplicatableManager::hook(bool enable) {
         DuplicatableHook5::hook();
         DuplicatableHook6::hook();
         DuplicatableHook7::hook();
+        DuplicatableHook8::hook();
+        DuplicatableHook9::hook();
     } else {
         DuplicatableHook1::unhook();
         DuplicatableHook2::unhook();
@@ -748,6 +1079,8 @@ void DuplicatableManager::hook(bool enable) {
         DuplicatableHook5::unhook();
         DuplicatableHook6::unhook();
         DuplicatableHook7::unhook();
+        DuplicatableHook8::unhook();
+        DuplicatableHook9::unhook();
     }
 }
 

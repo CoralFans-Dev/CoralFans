@@ -64,6 +64,17 @@ struct Shortcut {
     };
 };
 
+struct Locate {
+    struct DuplicatableOreStruct {
+        bool        enable             = true;
+        std::string originPosColor     = "#10E436";
+        std::string endPosColor        = "#FFFFFF";
+        std::string originPosTextColor = "#FFFFFF";
+        std::string endPosTextColor    = "#FFFFFF";
+        std::string arrowColor         = "#FFFFFF";
+    };
+};
+
 struct Config {
     int         version    = 5;
     std::string locateName = "zh_CN";
@@ -114,6 +125,19 @@ struct Config {
                 std::string textColor      = "#FFFFFF";
                 std::string arrowColor     = "#FFFFFF";
             } glowStone{};
+            struct {
+                bool        enable         = true;
+                std::string originPosColor = "#10E436";
+                std::string boundColor     = "#FFFFFF";
+                std::string textColor      = "#FFFFFF";
+                std::string arrowColor     = "#FFFFFF";
+            } mushroom{};
+            Locate::DuplicatableOreStruct netherGold{};
+            Locate::DuplicatableOreStruct netherQuartz{};
+            Locate::DuplicatableOreStruct netherMagma{};
+            Locate::DuplicatableOreStruct netherGravel{};
+            Locate::DuplicatableOreStruct netherBlackstone{};
+            Locate::DuplicatableOreStruct netherSoulSand{};
             struct {
                 std::string savedChunk   = "#3003D9";
                 std::string unsavedChunk = "#FFC825";
