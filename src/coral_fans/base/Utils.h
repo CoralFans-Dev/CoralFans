@@ -1,11 +1,13 @@
 #pragma once
 
+#include "bsci/GeometryGroup.h"
 #include "mc/nbt/CompoundTag.h"
 #include "mc/world/Container.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/ChunkPos.h"
 #include <string>
+
 
 namespace coral_fans::utils {
 
@@ -19,4 +21,12 @@ void shortHighligntBlock(int dimid, BlockPos const& blockPos, mce::Color const& 
 
 void swapItemInContainer(Player* player, int slot1, int slot2);
 
+bsci::GeometryGroup::GeoId drawCylinder(
+    DimensionType     dim,
+    Vec3 const&       topCenter,
+    Vec3 const&       bottomCenter,
+    float             topRadius,
+    float             bottomRadius,
+    mce::Color const& color
+);
 } // namespace coral_fans::utils

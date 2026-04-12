@@ -43,7 +43,7 @@ bool HsaManager::getStructureShow() { return this->structureShow; }
 
 void HsaManager::drawChunkHsa(std::vector<::BlockPos>& hsa, DimensionType dim, HsaChunkData& chunkData) {
     std::unordered_map<BlockPos, int> hsaCount;
-    auto&                             hsaConfig = mod().getConfig().hsa;
+    auto&                             hsaConfig = mod().getConfig().functions.hsa;
     for (auto& pos : hsa) {
         auto [it, inserted2] = hsaCount.try_emplace(pos);
         if (inserted2) it->second = 1;
@@ -112,7 +112,7 @@ void HsaManager::drawChunkStructure(
     ChunkPos      chunkPos
 ) {
     std::vector<bsci::GeometryGroup::GeoId> geoIdList;
-    auto&                                   hsaConfig = mod().getConfig().hsa;
+    auto&                                   hsaConfig = mod().getConfig().functions.hsa;
     geoIdList.reserve(chunkBoundingBoxes.size());
     auto& geometryGroup = coral_fans::mod().getGeometryGroup();
     for (auto [entity, component] : chunkBoundingBoxes.each()) {
@@ -172,7 +172,7 @@ void HsaManager::draw() {
 }
 
 void HsaManager::tick() {
-    auto& hsaConfig = mod().getConfig().hsa;
+    auto& hsaConfig = mod().getConfig().functions.hsa;
     if (!this->tickCounter) {
         this->draw();
         if (!this->runtimeRemoveTickCounter) {

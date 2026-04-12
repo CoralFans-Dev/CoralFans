@@ -1,5 +1,6 @@
 #include "bsci/GeometryGroup.h"
 #include "coral_fans/Config.h"
+#include "mc/deps/core/math/Random.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/ChunkPos.h"
 #include "mc/world/level/block/Block.h"
@@ -25,6 +26,8 @@ public:
         NetherGravel = 1 << 8,
         Blackstone   = 1 << 9,
         SoulSand     = 1 << 10,
+        EndIsland    = 1 << 11,
+        ChorusFlower = 1 << 12,
     };
 
 private:
@@ -70,6 +73,32 @@ private:
         bsci::GeometryGroup::GeoId chunkSavedDrawGeoId      = {0};
         uint                       dataDrawed               = false;
         int                        runtimeRemoveTickCounter = 0;
+        int                        temperaryInt             = 0;
+    };
+
+    struct TheEndData {
+        std::map<BlockPos, Core::Random> endIslandPosMap;
+        std::map<BlockPos, int>          chorusFlowerPosMap;
+        bool                             reload = false;
+    };
+
+    struct TheEndThreadTemperaryData {
+        LevelChunk* chunk = nullptr;
+        TheEndData  threadData;
+        bool        isEmpty         = true;
+        int         temperaryInt    = 0;
+        bool        temperatureBool = true;
+    };
+
+    struct TheEndBsciChunkData {
+        bsci::GeometryGroup::GeoId endIslandGeoId    = {0};
+        bsci::GeometryGroup::GeoId chorusFlowerGeoId = {0};
+
+        int                        neighborValidCount       = 0;
+        bool                       chunkSaved               = true;
+        bsci::GeometryGroup::GeoId chunkSavedDrawGeoId      = {0};
+        uint                       dataDrawed               = false;
+        int                        runtimeRemoveTickCounter = 0;
     };
 
 private:
@@ -78,12 +107,19 @@ private:
     int  cacheDataRemoveTickCounter = 1;
 
     std::unordered_map<ChunkPos, NetherBsciChunkData> netherBsciChunkData;
+    std::unordered_map<ChunkPos, TheEndBsciChunkData> theEndBsciChunkData;
 
     std::mutex                                                                      netherDecorationThreadIdsLock;
     std::unordered_map<std::thread::id, std::unique_ptr<NetherThreadTemperaryData>> netherDecorationThreadIds;
 
     std::mutex                               netherDataMapLock;
     std::unordered_map<ChunkPos, NetherData> netherDataMap;
+
+    std::mutex                                                                      theEndDecorationThreadIdsLock;
+    std::unordered_map<std::thread::id, std::unique_ptr<TheEndThreadTemperaryData>> theEndDecorationThreadIds;
+
+    std::mutex                               theEndDataMapLock;
+    std::unordered_map<ChunkPos, TheEndData> theEndDataMap;
 
     struct DuplicatableHook1;
     struct DuplicatableHook2;
@@ -94,11 +130,15 @@ private:
     struct DuplicatableHook7;
     struct DuplicatableHook8;
     struct DuplicatableHook9;
+    struct DuplicatableHook10;
+    struct DuplicatableHook11;
+    struct DuplicatableHook12;
 
 private:
     void                       removeData();
     void                       draw();
     void                       netherDraw(BlockSource&, ChunkPos, NetherData&);
+    void                       theEndDraw(BlockSource&, ChunkPos, TheEndData&);
     void                       removeBsciData(ShowType);
     void                       bsciDataRuntimeRemove();
     bsci::GeometryGroup::GeoId drawNetherite(std::map<BlockPos, std::unordered_set<BlockPos>>&);
@@ -107,10 +147,14 @@ private:
     bsci::GeometryGroup::GeoId drawGlowStone(std::map<BlockPos, int>&);
     bsci::GeometryGroup::GeoId drawMushroom(std::map<BlockPos, bool>&);
     bsci::GeometryGroup::GeoId
-         drawOre(std::unordered_set<BlockPos>&, config::Locate::DuplicatableOreStruct&, std::string, std::string);
-    bool isChunkValid(BlockSource&, ChunkPos);
-    void tryRemoveNetherChunkData(ChunkPos);
-    void drawChunkSavedInfo(BlockSource&, ChunkPos, NetherBsciChunkData&);
+    drawOre(std::unordered_set<BlockPos>&, config::Locate::DuplicatableOreStruct&, std::string);
+    bsci::GeometryGroup::GeoId drawEndIsland(std::map<BlockPos, Core::Random>&);
+    bsci::GeometryGroup::GeoId drawChorusFlower(std::map<BlockPos, int>&);
+    bool                       isChunkValid(BlockSource&, ChunkPos);
+    void                       tryRemoveNetherChunkData(ChunkPos);
+    void                       tryRemoveTheEndChunkData(ChunkPos);
+    void                       drawNetherChunkSavedInfo(BlockSource&, ChunkPos, NetherBsciChunkData&);
+    void                       drawTheEndChunkSavedInfo(BlockSource&, ChunkPos, TheEndBsciChunkData&);
 
 public:
     void tick();

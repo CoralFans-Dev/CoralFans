@@ -24,7 +24,7 @@ private:
         auto const& commandregistry = ll::service::getCommandRegistry();
 
         // useons
-        for (auto& useon : coral_fans::mod().getConfig().useons) {
+        for (auto& useon : coral_fans::mod().getConfig().shortcut.useons) {
             if (!useon.enable || useon.item == "") continue;
             for (auto action : useon.actions) {
                 if (!commandregistry->findCommand(action))
@@ -35,7 +35,7 @@ private:
         }
 
         // uses
-        for (auto& use : coral_fans::mod().getConfig().uses) {
+        for (auto& use : coral_fans::mod().getConfig().shortcut.uses) {
             if (!use.enable || use.item == "") continue;
             for (auto action : use.actions) {
                 if (!commandregistry->findCommand(action))
@@ -46,7 +46,7 @@ private:
         }
 
         // destroys
-        for (auto& destroy : coral_fans::mod().getConfig().destroys) {
+        for (auto& destroy : coral_fans::mod().getConfig().shortcut.destroys) {
             if (!destroy.enable || destroy.item == "") continue;
             for (auto action : destroy.actions) {
                 if (!commandregistry->findCommand(action))
@@ -57,7 +57,7 @@ private:
         }
 
         // commands
-        for (auto& command : coral_fans::mod().getConfig().commands) {
+        for (auto& command : coral_fans::mod().getConfig().shortcut.commands) {
             if (!command.enable || command.command == "") continue;
             for (auto action : command.actions) {
                 if (!commandregistry->findCommand(action))

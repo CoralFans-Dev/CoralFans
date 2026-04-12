@@ -1,4 +1,5 @@
 #include "coral_fans/base/Macros.h"
+#include "coral_fans/base/Mod.h"
 #include "coral_fans/functions/locate/DuplicatableManager.h"
 
 
@@ -8,7 +9,6 @@
 #include "ll/api/i18n/I18n.h"
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/server/commands/CommandPermissionLevel.h"
-#include "mc/world/level/block/CachedComponentData.h"
 
 
 namespace coral_fans::commands {
@@ -19,22 +19,48 @@ void registerLocateCommand(CommandPermissionLevel permission) {
                               .getOrCreateCommand("cflocate", "command.locate.description"_tr(), permission);
 
     // locate duplicatable show <bounds|raid|spawn|center|poi|bind> <bool>
-    ll::command::CommandRegistrar::getInstance(false).tryRegisterRuntimeEnum(
-        "duplicatableShowType",
-        {
-            {"netherite",     0 },
-            {"nether_spring", 1 },
-            {"nether_fire",   2 },
-            {"glow_stone",    3 },
-            {"mushroom",      4 },
-            {"nether_gold",   5 },
-            {"nether_quartz", 6 },
-            {"nether_magma",  7 },
-            {"nether_gravel", 8 },
-            {"blackstone",    9 },
-            {"soul_sand",     10}
+    std::vector<std::pair<std::string, uint64>> enums;
+    auto&                                       duplicatableConfig = mod().getConfig().functions.locate.duplicatable;
+    if (duplicatableConfig.netherite.enable) {
+        enums.emplace_back("netherite", 0);
     }
-    );
+    if (duplicatableConfig.netherSpring.enable) {
+        enums.emplace_back("nether_spring", 1);
+    }
+    if (duplicatableConfig.netherFire.enable) {
+        enums.emplace_back("nether_fire", 2);
+    }
+    if (duplicatableConfig.glowStone.enable) {
+        enums.emplace_back("glow_stone", 3);
+    }
+    if (duplicatableConfig.mushroom.enable) {
+        enums.emplace_back("mushroom", 4);
+    }
+    if (duplicatableConfig.netherGold.enable) {
+        enums.emplace_back("nether_gold", 5);
+    }
+    if (duplicatableConfig.netherQuartz.enable) {
+        enums.emplace_back("nether_quartz", 6);
+    }
+    if (duplicatableConfig.netherMagma.enable) {
+        enums.emplace_back("nether_magma", 7);
+    }
+    if (duplicatableConfig.netherGravel.enable) {
+        enums.emplace_back("nether_gravel", 8);
+    }
+    if (duplicatableConfig.netherBlackstone.enable) {
+        enums.emplace_back("blackstone", 9);
+    }
+    if (duplicatableConfig.netherSoulSand.enable) {
+        enums.emplace_back("soul_sand", 10);
+    }
+    if (duplicatableConfig.endIsland.enable) {
+        enums.emplace_back("end_island", 11);
+    }
+    if (duplicatableConfig.chorusFlower.enable) {
+        enums.emplace_back("chorus_flower", 12);
+    }
+    ll::command::CommandRegistrar::getInstance(false).tryRegisterRuntimeEnum("duplicatableShowType", std::move(enums));
 
     locateCommand.runtimeOverload()
         .text("duplicatable")
@@ -76,6 +102,12 @@ void registerLocateCommand(CommandPermissionLevel permission) {
                 break;
             case 10:
                 showType = functions::locate::DuplicatableManager::ShowType::SoulSand;
+                break;
+            case 11:
+                showType = functions::locate::DuplicatableManager::ShowType::EndIsland;
+                break;
+            case 12:
+                showType = functions::locate::DuplicatableManager::ShowType::ChorusFlower;
                 break;
             }
             if (!static_cast<uint>(showType)) return output.success("command.locate.duplicatable.show.error"_tr());

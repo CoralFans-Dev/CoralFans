@@ -68,9 +68,7 @@ struct Locate {
     struct DuplicatableOreStruct {
         bool        enable             = true;
         std::string originPosColor     = "#10E436";
-        std::string endPosColor        = "#FFFFFF";
         std::string originPosTextColor = "#FFFFFF";
-        std::string endPosTextColor    = "#FFFFFF";
         std::string arrowColor         = "#FFFFFF";
     };
 };
@@ -82,119 +80,136 @@ struct Config {
     CommandStruct command;
 
     struct {
-        int refreshInterval = 20;
-    } hud{};
-
-    struct {
-        size_t      drawInterval       = 60;
-        size_t      runtimeRemoveScale = 20;
-        std::string hsaNorthWestColor  = "#FFFFFF";
-        std::string hsaColor           = "#29ADFF";
-        std::string structureColor     = "#10E436";
-    } hsa{};
-
-    struct {
         struct {
-            int drawInterval         = 60;
-            int runtimeRemoveScale   = 20;
-            int cacheDataRemoveScale = 100;
-            struct {
-                bool        enable         = true;
-                std::string originPosColor = "#10E436";
-                std::string posColor       = "#FFFFFF";
-                std::string textColor      = "#FFFFFF";
-                std::string arrowColor     = "#FFFFFF";
-            } netherite{};
-            struct {
-                bool        enable     = true;
-                std::string posColor   = "#10E436";
-                std::string textColor  = "#FFFFFF";
-                std::string arrowColor = "#FFFFFF";
-            } netherSpring{};
-            struct {
-                bool        enable         = true;
-                std::string originPosColor = "#10E436";
-                std::string boundColor     = "#FFFFFF";
-                std::string textColor      = "#FFFFFF";
-                std::string arrowColor     = "#FFFFFF";
-            } netherFire{};
-            struct {
-                bool        enable         = true;
-                std::string originPosColor = "#10E436";
-                std::string boundColor     = "#FFFFFF";
-                std::string textColor      = "#FFFFFF";
-                std::string arrowColor     = "#FFFFFF";
-            } glowStone{};
-            struct {
-                bool        enable         = true;
-                std::string originPosColor = "#10E436";
-                std::string boundColor     = "#FFFFFF";
-                std::string textColor      = "#FFFFFF";
-                std::string arrowColor     = "#FFFFFF";
-            } mushroom{};
-            Locate::DuplicatableOreStruct netherGold{};
-            Locate::DuplicatableOreStruct netherQuartz{};
-            Locate::DuplicatableOreStruct netherMagma{};
-            Locate::DuplicatableOreStruct netherGravel{};
-            Locate::DuplicatableOreStruct netherBlackstone{};
-            Locate::DuplicatableOreStruct netherSoulSand{};
-            struct {
-                std::string savedChunk   = "#3003D9";
-                std::string unsavedChunk = "#FFC825";
-            } chunkSavedDebugInfo{};
-        } duplicatable{};
-    } locate{};
+            int refreshInterval = 20;
+        } hud{};
 
-    std::vector<Shortcut::UseOn> useons = {
-        /* hoppercounter */
-        {.enable = true, .item = "cactus", .block = "white_concrete",      .actions = {"counter print"}},
-        {.enable = true, .item = "cactus", .block = "orange_concrete",     .actions = {"counter print"}},
-        {.enable = true, .item = "cactus", .block = "magenta_concrete",    .actions = {"counter print"}},
-        {.enable = true, .item = "cactus", .block = "light_blue_concrete", .actions = {"counter print"}},
-        {.enable = true, .item = "cactus", .block = "yellow_concrete",     .actions = {"counter print"}},
-        {.enable = true, .item = "cactus", .block = "lime_concrete",       .actions = {"counter print"}},
-        {.enable = true, .item = "cactus", .block = "pink_concrete",       .actions = {"counter print"}},
-        {.enable = true, .item = "cactus", .block = "gray_concrete",       .actions = {"counter print"}},
-        {.enable = true, .item = "cactus", .block = "light_gray_concrete", .actions = {"counter print"}},
-        {.enable = true, .item = "cactus", .block = "cyan_concrete",       .actions = {"counter print"}},
-        {.enable = true, .item = "cactus", .block = "purple_concrete",     .actions = {"counter print"}},
-        {.enable = true, .item = "cactus", .block = "blue_concrete",       .actions = {"counter print"}},
-        {.enable = true, .item = "cactus", .block = "brown_concrete",      .actions = {"counter print"}},
-        {.enable = true, .item = "cactus", .block = "green_concrete",      .actions = {"counter print"}},
-        {.enable = true, .item = "cactus", .block = "red_concrete",        .actions = {"counter print"}},
-        {.enable = true, .item = "cactus", .block = "black_concrete",      .actions = {"counter print"}}
-    };
+        struct {
+            size_t      drawInterval       = 60;
+            size_t      runtimeRemoveScale = 20;
+            std::string hsaNorthWestColor  = "#FFFFFF";
+            std::string hsaColor           = "#29ADFF";
+            std::string structureColor     = "#10E436";
+        } hsa{};
 
-    std::vector<Shortcut::Use> uses = {
-        /* blockrotate */
-        {.enable = true, .item = "cactus", .intercept = true, .actions = {"rotate"}}
-    };
+        struct {
+            struct {
+                int drawInterval         = 60;
+                int runtimeRemoveScale   = 20;
+                int cacheDataRemoveScale = 100;
+                struct {
+                    bool        enable         = true;
+                    std::string originPosColor = "#10E436";
+                    std::string posColor       = "#FFFFFF";
+                    std::string textColor      = "#FFFFFF";
+                    std::string arrowColor     = "#FFFFFF";
+                } netherite{};
+                struct {
+                    bool        enable     = true;
+                    std::string posColor   = "#10E436";
+                    std::string textColor  = "#FFFFFF";
+                    std::string arrowColor = "#FFFFFF";
+                } netherSpring{};
+                struct {
+                    bool        enable         = true;
+                    std::string originPosColor = "#10E436";
+                    std::string boundColor     = "#FFFFFF";
+                    std::string textColor      = "#FFFFFF";
+                    std::string arrowColor     = "#FFFFFF";
+                } netherFire{};
+                struct {
+                    bool        enable         = true;
+                    std::string originPosColor = "#10E436";
+                    std::string boundColor     = "#FFFFFF";
+                    std::string textColor      = "#FFFFFF";
+                    std::string arrowColor     = "#FFFFFF";
+                } glowStone{};
+                struct {
+                    bool        enable         = true;
+                    std::string originPosColor = "#10E436";
+                    std::string boundColor     = "#FFFFFF";
+                    std::string textColor      = "#FFFFFF";
+                    std::string arrowColor     = "#FFFFFF";
+                } mushroom{};
+                Locate::DuplicatableOreStruct netherGold{};
+                Locate::DuplicatableOreStruct netherQuartz{};
+                Locate::DuplicatableOreStruct netherMagma{};
+                Locate::DuplicatableOreStruct netherGravel{};
+                Locate::DuplicatableOreStruct netherBlackstone{};
+                Locate::DuplicatableOreStruct netherSoulSand{};
+                struct {
+                    bool        enable         = true;
+                    std::string originPosColor = "#10E436";
+                    std::string boundColor     = "#FFFFFF";
+                    std::string textColor      = "#FFFFFF";
+                    std::string arrowColor     = "#FFFFFF";
+                } endIsland{};
+                struct {
+                    bool        enable         = true;
+                    std::string originPosColor = "#10E436";
+                    std::string textColor      = "#FFFFFF";
+                    std::string arrowColor     = "#FFFFFF";
+                } chorusFlower{};
+                struct {
+                    std::string savedChunk   = "#3003D9";
+                    std::string unsavedChunk = "#FFC825";
+                } chunkSavedDebugInfo{};
+            } duplicatable{};
+        } locate{};
+    } functions{};
 
-    std::vector<Shortcut::Destroy> destroys = {};
+    struct {
+        std::vector<Shortcut::UseOn> useons = {
+            /* hoppercounter */
+            {.enable = true, .item = "cactus", .block = "white_concrete",      .actions = {"counter print"}},
+            {.enable = true, .item = "cactus", .block = "orange_concrete",     .actions = {"counter print"}},
+            {.enable = true, .item = "cactus", .block = "magenta_concrete",    .actions = {"counter print"}},
+            {.enable = true, .item = "cactus", .block = "light_blue_concrete", .actions = {"counter print"}},
+            {.enable = true, .item = "cactus", .block = "yellow_concrete",     .actions = {"counter print"}},
+            {.enable = true, .item = "cactus", .block = "lime_concrete",       .actions = {"counter print"}},
+            {.enable = true, .item = "cactus", .block = "pink_concrete",       .actions = {"counter print"}},
+            {.enable = true, .item = "cactus", .block = "gray_concrete",       .actions = {"counter print"}},
+            {.enable = true, .item = "cactus", .block = "light_gray_concrete", .actions = {"counter print"}},
+            {.enable = true, .item = "cactus", .block = "cyan_concrete",       .actions = {"counter print"}},
+            {.enable = true, .item = "cactus", .block = "purple_concrete",     .actions = {"counter print"}},
+            {.enable = true, .item = "cactus", .block = "blue_concrete",       .actions = {"counter print"}},
+            {.enable = true, .item = "cactus", .block = "brown_concrete",      .actions = {"counter print"}},
+            {.enable = true, .item = "cactus", .block = "green_concrete",      .actions = {"counter print"}},
+            {.enable = true, .item = "cactus", .block = "red_concrete",        .actions = {"counter print"}},
+            {.enable = true, .item = "cactus", .block = "black_concrete",      .actions = {"counter print"}}
+        };
 
-    std::vector<Shortcut::Command> commands = {
-        {.enable      = true,
-         .command     = "r",
-         .description = "rotate",
-         .permission  = CommandPermissionLevel::Any,
-         .actions     = {"rotate"}                                         },
-        /* fastcommand */
-        {.enable      = false,
-         .command     = "c",
-         .description = "creative",
-         .permission  = CommandPermissionLevel::GameDirectors,
-         .actions     = {"gamemode creative"}                              },
-        {.enable      = false,
-         .command     = "s",
-         .description = "spectator",
-         .permission  = CommandPermissionLevel::GameDirectors,
-         .actions     = {"gamemode spectator"}                             },
-        {.enable      = false,
-         .command     = "q",
-         .description = "suicide",
-         .permission  = CommandPermissionLevel::GameDirectors,
-         .actions     = {"gamemode adventure", "kill", "gamemode creative"}}
-    };
+        std::vector<Shortcut::Use> uses = {
+            /* blockrotate */
+            {.enable = true, .item = "cactus", .intercept = true, .actions = {"rotate"}}
+        };
+
+        std::vector<Shortcut::Destroy> destroys = {};
+
+        std::vector<Shortcut::Command> commands = {
+            {.enable      = true,
+             .command     = "r",
+             .description = "rotate",
+             .permission  = CommandPermissionLevel::Any,
+             .actions     = {"rotate"}                                         },
+            /* fastcommand */
+            {.enable      = false,
+             .command     = "c",
+             .description = "creative",
+             .permission  = CommandPermissionLevel::GameDirectors,
+             .actions     = {"gamemode creative"}                              },
+            {.enable      = false,
+             .command     = "s",
+             .description = "spectator",
+             .permission  = CommandPermissionLevel::GameDirectors,
+             .actions     = {"gamemode spectator"}                             },
+            {.enable      = false,
+             .command     = "q",
+             .description = "suicide",
+             .permission  = CommandPermissionLevel::GameDirectors,
+             .actions     = {"gamemode adventure", "kill", "gamemode creative"}}
+        };
+    } shortcut{};
 };
 
 } // namespace coral_fans::config
