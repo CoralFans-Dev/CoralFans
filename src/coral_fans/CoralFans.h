@@ -25,9 +25,11 @@ public:
 
     [[nodiscard]] std::unique_ptr<bsci::GeometryGroup>& getGeometryGroup();
 
-    [[nodiscard]] ll::mod::NativeMod& getSelf() const { return mSelf; }
-
     [[nodiscard]] std::set<ll::event::ListenerPtr>& getEventListeners();
+
+    void setupCommands();
+
+    [[nodiscard]] ll::mod::NativeMod& getSelf() const { return mSelf; }
 
     /// @return True if the mod is loaded successfully.
     bool load();

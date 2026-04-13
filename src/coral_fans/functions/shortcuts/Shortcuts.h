@@ -76,7 +76,6 @@ public:
     }
 
 public:
-    void waitToRegisterShortcuts();
     void registerShortcutsListener();
     void registerShortcutsCommand();
 };

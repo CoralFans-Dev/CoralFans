@@ -4,6 +4,8 @@
 #include "coral_fans/functions/func/FuncManager.h"
 #include "coral_fans/functions/shortcuts/Shortcuts.h"
 #include "ll/api/Config.h"
+#include "ll/api/event/EventBus.h"
+#include "ll/api/event/command/ExecuteCommandEvent.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/mod/RegisterHelper.h"
 #include <memory>
@@ -31,6 +33,30 @@ std::set<ll::event::ListenerPtr>& CoralFans::getEventListeners() { return impl->
 CoralFans& CoralFans::getInstance() {
     static CoralFans instance;
     return instance;
+}
+
+void CoralFans::setupCommands() {
+    commands::registerCoralfansCommand();
+    auto& commandsConfig = this->getConfig().command;
+    if (commandsConfig.tick.enabled) commands::registerTickCommand(commandsConfig.tick.permission);
+    if (commandsConfig.func.enabled) commands::registerFuncCommand(commandsConfig.func.permission);
+    if (commandsConfig.self.enabled) commands::registerSelfCommand(commandsConfig.self.permission);
+    if (commandsConfig.hsa.enabled) commands::registerHsaCommand(commandsConfig.hsa.permission);
+    if (commandsConfig.counter.enabled) commands::registerCounterCommand(commandsConfig.counter.permission);
+    if (commandsConfig.prof.enabled) commands::registerProfCommand(commandsConfig.prof.permission);
+    if (commandsConfig.slime.enabled) commands::registerSlimeCommand(commandsConfig.slime.permission);
+    if (commandsConfig.village.enabled) commands::registerVillageCommand(commandsConfig.village.permission);
+    if (commandsConfig.rotate.enabled) commands::registerRotateCommand(commandsConfig.rotate.permission);
+    if (commandsConfig.data.enabled) commands::registerDataCommand(commandsConfig.data.permission);
+    if (commandsConfig.cfhud.enabled) commands::registerCfhudCommand(commandsConfig.cfhud.permission);
+    if (commandsConfig.log.enabled) commands::registerLogCommand(commandsConfig.log.permission);
+    if (commandsConfig.calculate.enabled) commands::registerCalculateCommand(commandsConfig.calculate.permission);
+    if (commandsConfig.minerule.enabled) commands::registerMineruleCommand(commandsConfig.minerule.permission);
+    if (commandsConfig.freecamera.enabled) commands::registerFreeCameraCommand(commandsConfig.freecamera.permission);
+    if (commandsConfig.noclip.enabled) commands::registerNoclipCommand(commandsConfig.noclip.permission);
+    if (commandsConfig.locate.enabled) commands::registerLocateCommand(commandsConfig.locate.permission);
+
+    functions::ShortcutsManager::getInstance().registerShortcutsCommand();
 }
 
 bool CoralFans::load() {
@@ -64,6 +90,7 @@ bool CoralFans::load() {
     // load GeometryGroup
     getGeometryGroup() = bsci::GeometryGroup::createDefault();
 
+
     return true;
 }
 
@@ -71,33 +98,10 @@ bool CoralFans::enable() {
     const auto& logger = getSelf().getLogger();
     logger.debug("Enabling...");
 
-    // register commands
-    commands::registerCoralfansCommand();
-    if (getConfig().command.tick.enabled) commands::registerTickCommand(getConfig().command.tick.permission);
-    if (getConfig().command.func.enabled) commands::registerFuncCommand(getConfig().command.func.permission);
-    if (getConfig().command.self.enabled) commands::registerSelfCommand(getConfig().command.self.permission);
-    if (getConfig().command.hsa.enabled) commands::registerHsaCommand(getConfig().command.hsa.permission);
-    if (getConfig().command.counter.enabled) commands::registerCounterCommand(getConfig().command.counter.permission);
-    if (getConfig().command.prof.enabled) commands::registerProfCommand(getConfig().command.prof.permission);
-    if (getConfig().command.slime.enabled) commands::registerSlimeCommand(getConfig().command.slime.permission);
-    if (getConfig().command.village.enabled) commands::registerVillageCommand(getConfig().command.village.permission);
-    if (getConfig().command.rotate.enabled) commands::registerRotateCommand(getConfig().command.rotate.permission);
-    if (getConfig().command.data.enabled) commands::registerDataCommand(getConfig().command.data.permission);
-    if (getConfig().command.cfhud.enabled) commands::registerCfhudCommand(getConfig().command.cfhud.permission);
-    if (getConfig().command.log.enabled) commands::registerLogCommand(getConfig().command.log.permission);
-    if (getConfig().command.calculate.enabled)
-        commands::registerCalculateCommand(getConfig().command.calculate.permission);
-    if (getConfig().command.minerule.enabled)
-        commands::registerMineruleCommand(getConfig().command.minerule.permission);
-    if (getConfig().command.freecamera.enabled)
-        commands::registerFreeCameraCommand(getConfig().command.freecamera.permission);
-    if (getConfig().command.noclip.enabled) commands::registerNoclipCommand(getConfig().command.noclip.permission);
-    if (getConfig().command.locate.enabled) commands::registerLocateCommand(getConfig().command.locate.permission);
+    setupCommands();
     // register containerreader
     functions::registerContainerReader();
-    // register shortcuts when first player join (确保其他所有插件的指令已被注册)
-    functions::ShortcutsManager::getInstance().waitToRegisterShortcuts();
-
+    functions::ShortcutsManager::getInstance().registerShortcutsListener();
     return true;
 }
 

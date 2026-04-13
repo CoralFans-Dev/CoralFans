@@ -272,16 +272,4 @@ void ShortcutsManager::registerShortcutsCommand() {
         });
     }
 }
-
-void ShortcutsManager::waitToRegisterShortcuts() {
-    auto& eventBus = ll::event::EventBus::getInstance();
-
-    playerJoinEventListener =
-        eventBus.emplaceListener<ll::event::player::PlayerJoinEvent>([this](ll::event::player::PlayerJoinEvent&) {
-            ll::event::EventBus::getInstance().removeListener(playerJoinEventListener);
-
-            registerShortcutsCommand();
-            registerShortcutsListener();
-        });
-}
 } // namespace coral_fans::functions
