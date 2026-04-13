@@ -1,6 +1,8 @@
 #include "Noclip.h"
-#include "coral_fans/base/Mod.h"
+#include "coral_fans/CoralFans.h"
 #include "coral_fans/base/MySchedule.h"
+
+
 #include "ll/api/memory/Hook.h"
 #include "ll/api/service/Bedrock.h"
 #include "mc/server/ServerPlayer.h"
@@ -18,7 +20,8 @@ LL_TYPE_INSTANCE_HOOK(
 ) {
     origin(gameType);
     if (gameType == ::GameType::Creative
-        && coral_fans::mod().getConfigDb()->get(std::format("noclip.players.{}", this->getUuid().asString())) == "T") {
+        && CoralFans::getInstance().getConfigDb()->get(std::format("noclip.players.{}", this->getUuid().asString()))
+               == "T") {
         this->setAbility(::AbilitiesIndex::Flying, true);
         my_schedule::MySchedule::getSchedule().add(
             [playername = this->mName.get()](int&, int&) {

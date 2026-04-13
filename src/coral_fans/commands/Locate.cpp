@@ -1,5 +1,5 @@
+#include "coral_fans/CoralFans.h"
 #include "coral_fans/base/Macros.h"
-#include "coral_fans/base/Mod.h"
 #include "coral_fans/functions/locate/DuplicatableManager.h"
 
 
@@ -22,7 +22,7 @@ void registerLocateCommand(CommandPermissionLevel permission) {
     // <netherite|nether_spring|nether_fire|glow_stone|mushroom|nether_gold|nether_quartz|nether_magma|nether_gravel|blackstone|soul_sand|end_island|chorus_flower|end_gateway>
     // <bool>
     std::vector<std::pair<std::string, uint64>> enums;
-    auto&                                       duplicatableConfig = mod().getConfig().functions.locate.duplicatable;
+    auto& duplicatableConfig = CoralFans::getInstance().getConfig().functions.locate.duplicatable;
     if (duplicatableConfig.netherite.enable) {
         enums.emplace_back("netherite", 0);
     }

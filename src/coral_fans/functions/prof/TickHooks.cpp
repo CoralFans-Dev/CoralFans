@@ -1,8 +1,14 @@
+#include "coral_fans/CoralFans.h"
 #include "coral_fans/base/Macros.h"
-#include "coral_fans/base/Mod.h"
+#include "coral_fans/base/MySchedule.h"
 #include "coral_fans/base/Utils.h"
 #include "coral_fans/functions/func/FuncManager.h"
+#include "coral_fans/functions/hsa/Hsa.h"
+#include "coral_fans/functions/hud/Hud.h"
+#include "coral_fans/functions/locate/DuplicatableManager.h"
 #include "coral_fans/functions/prof/Prof.h"
+#include "coral_fans/functions/slime/Slime.h"
+#include "coral_fans/functions/village/Village.h"
 
 
 #include "ll/api/memory/Hook.h"
@@ -22,11 +28,18 @@ namespace coral_fans::functions {
 
 // main game tick
 LL_TYPE_INSTANCE_HOOK(CoralFansTickLevelTickHook, ll::memory::HookPriority::Normal, Level, &Level::$tick, void) {
-    auto& mod  = coral_fans::mod();
     auto& prof = functions::Profiler::getInstance();
     origin();
     auto time_level = ProfilerLite::gProfilerLiteInstance().mDebugServerTickTime->count() / 1000;
-    PROF_TIMER(coralfans, { mod.tick(this->getCurrentTick()); })
+    PROF_TIMER(coralfans, {
+        functions::HopperCounterManager::getInstance().tick();
+        functions::HsaManager::getInstance().tick();                             // heavy 60
+        functions::SlimeManager::getInstance().tick();                           // heavy 60
+        functions::CFVillageManager::getInstance().tick(this->getCurrentTick()); // light 10
+        functions::HudHelper::getInstance().tick();                              // light 20
+        my_schedule::MySchedule::getSchedule().update();
+        functions::locate::DuplicatableManager::getInstance().tick();
+    })
     if (prof.profiling) {
         prof.gameSessionTickTime += time_level;
         prof.gameSessionTicksBuffer.push_back(time_level);
@@ -254,7 +267,7 @@ void hookTick(bool hook) {
         CoralFansTickLevelChunkTickBlocksHook::hook();
         CoralFansTickLevelChunkTickBlockEntitiesHook::hook();
         coral_fans::functions::MaxPtManager::getInstance().maxpt =
-            std::stoi(coral_fans::mod().getConfigDb()->get("functions.global.maxpt").value_or("100"));
+            std::stoi(CoralFans::getInstance().getConfigDb()->get("functions.global.maxpt").value_or("100"));
         CoralFansTickBlockTickingQueueTickPendingTicksHook::hook();
         CoralFansTickDimensionTickHook::hook();
         CoralFansTickEntitySystemsTickHook::hook();

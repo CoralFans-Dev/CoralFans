@@ -1,6 +1,7 @@
 #include "coral_fans/functions/slime/Slime.h"
-#include "coral_fans/base/Mod.h"
+#include "coral_fans/CoralFans.h"
 #include "coral_fans/base/Utils.h"
+
 
 #include "ll/api/service/Bedrock.h"
 #include "mc/deps/core/math/Color.h"
@@ -30,7 +31,7 @@ void SlimeManager::draw() {
     auto level = ll::service::getLevel();
     if (!level.has_value()) [[unlikely]]
         return;
-    auto& geometryGroup = mod().getGeometryGroup();
+    auto& geometryGroup = CoralFans::getInstance().getGeometryGroup();
     level->forEachPlayer([&](Player& player) {
         auto originChunkPos = utils::blockPosToChunkPos(player.getFeetBlockPos());
         for (int i = -radius; i <= radius; ++i) {
@@ -66,15 +67,16 @@ void SlimeManager::tick() {
         if (!this->runtimeRemoveTickCounter) {
             this->runtimeRemove();
         }
-        static int removeInterval      = std::max(1, mod().getConfig().functions.slime.runtimeRemoveScale);
+        static int removeInterval =
+            std::max(1, CoralFans::getInstance().getConfig().functions.slime.runtimeRemoveScale);
         this->runtimeRemoveTickCounter = (this->runtimeRemoveTickCounter + 1) % removeInterval;
     }
-    static int interval = std::max(1, mod().getConfig().functions.slime.drawInterval);
+    static int interval = std::max(1, CoralFans::getInstance().getConfig().functions.slime.drawInterval);
     this->tickCounter   = (this->tickCounter + 1) % interval;
 }
 
 void SlimeManager::remove() {
-    auto& geometryGroup = mod().getGeometryGroup();
+    auto& geometryGroup = CoralFans::getInstance().getGeometryGroup();
     for (auto& [_, data] : this->mParticleMap) {
         geometryGroup->remove(data.first);
     }
@@ -82,8 +84,8 @@ void SlimeManager::remove() {
 }
 
 void SlimeManager::runtimeRemove() {
-    auto& geometryGroup = coral_fans::mod().getGeometryGroup();
-    auto& slimeConfig   = mod().getConfig().functions.slime;
+    auto& geometryGroup = CoralFans::getInstance().getGeometryGroup();
+    auto& slimeConfig   = CoralFans::getInstance().getConfig().functions.slime;
     std::erase_if(this->mParticleMap, [&geometryGroup, &slimeConfig](auto& data) {
         if (data.second.second == slimeConfig.runtimeRemoveScale) {
             geometryGroup->remove(data.second.first);

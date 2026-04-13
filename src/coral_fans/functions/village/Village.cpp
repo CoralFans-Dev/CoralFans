@@ -1,7 +1,7 @@
 #include "coral_fans/functions/village/Village.h"
 #include "Village.h"
-#include "bsci/GeometryGroup.h"
-#include "coral_fans/base/Mod.h"
+#include "coral_fans/CoralFans.h"
+
 
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/memory/Hook.h"
@@ -44,14 +44,14 @@ CFTickingVillageData::CFTickingVillageData(Village* villagePtr, Tick& tick) {
 }
 
 void CFTickingVillageData::showBounds() {
-    auto& geoGroup = coral_fans::mod().getGeometryGroup();
+    auto& geoGroup = CoralFans::getInstance().getGeometryGroup();
     geoGroup->remove(this->mBoundsGeoId);
     this->mBoundsGeoId =
         geoGroup->box(this->mVillagePtr->mDimension.getDimensionId(), this->mVillagePtr->mBounds, mce::Color::WHITE());
 }
 
 void CFTickingVillageData::showRaidBounds() {
-    auto& geoGroup = coral_fans::mod().getGeometryGroup();
+    auto& geoGroup = CoralFans::getInstance().getGeometryGroup();
     geoGroup->remove(this->mRaidBoundsGeoId);
     this->mRaidBoundsGeoId = geoGroup->box(
         this->mVillagePtr->mDimension.getDimensionId(),
@@ -61,7 +61,7 @@ void CFTickingVillageData::showRaidBounds() {
 }
 
 void CFTickingVillageData::showIronSpawn() {
-    auto& geoGroup = coral_fans::mod().getGeometryGroup();
+    auto& geoGroup = CoralFans::getInstance().getGeometryGroup();
     geoGroup->remove(this->mIronSpawnGeoId);
     this->mIronSpawnGeoId = geoGroup->box(
         this->mVillagePtr->mDimension.getDimensionId(),
@@ -74,7 +74,7 @@ void CFTickingVillageData::showIronSpawn() {
 }
 
 void CFTickingVillageData::showCenter() {
-    auto& geoGroup = coral_fans::mod().getGeometryGroup();
+    auto& geoGroup = CoralFans::getInstance().getGeometryGroup();
     geoGroup->remove(this->mCenterGeoId);
     this->mCenterGeoId = geoGroup->box(
         this->mVillagePtr->mDimension.getDimensionId(),
@@ -87,7 +87,7 @@ void CFTickingVillageData::showCenter() {
 }
 
 void CFTickingVillageData::showPoiQuery() {
-    auto& geoGroup = coral_fans::mod().getGeometryGroup();
+    auto& geoGroup = CoralFans::getInstance().getGeometryGroup();
     geoGroup->remove(this->mPoiQueryGeoId);
     this->mPoiQueryGeoId = geoGroup->box(
         this->mVillagePtr->mDimension.getDimensionId(),
@@ -100,7 +100,7 @@ void CFTickingVillageData::showPoiQuery() {
 }
 
 void CFTickingVillageData::showBind() {
-    auto& geoGroup = coral_fans::mod().getGeometryGroup();
+    auto& geoGroup = CoralFans::getInstance().getGeometryGroup();
     geoGroup->remove(this->mBindGeoId);
     if (auto level = ll::service::getLevel()) {
         std::vector<bsci::GeometryGroup::GeoId> bindIds;
@@ -152,7 +152,7 @@ void CFVillageManager::handleVillageTick(Village* villagePtr, Tick& tick) {
 void CFVillageManager::removeVillage(Village* villagePtr) {
     auto it = this->mTickingList.find(villagePtr->mUniqueID);
     if (it != this->mTickingList.end()) {
-        auto& geoGroup = coral_fans::mod().getGeometryGroup();
+        auto& geoGroup = CoralFans::getInstance().getGeometryGroup();
         if (this->mShowBounds) geoGroup->remove(it->second->mBoundsGeoId);
         if (this->mShowRaidBounds) geoGroup->remove(it->second->mRaidBoundsGeoId);
         if (this->mShowIronSpawn) geoGroup->remove(it->second->mIronSpawnGeoId);
@@ -160,11 +160,6 @@ void CFVillageManager::removeVillage(Village* villagePtr) {
         if (this->mShowPoiQuery) geoGroup->remove(it->second->mPoiQueryGeoId);
         if (this->mShowBind) geoGroup->remove(it->second->mBindGeoId);
         this->mTickingList.erase(it);
-        // mod().getLogger().info(
-        //     "Village removed, id: {}, uuid: {}",
-        //     villagePtr->mUniqueID->asString(),
-        //     villagePtr->mUniqueID->asString()
-        // );
     }
     auto size = this->mVillageList.size();
     for (size_t i = 0; i < size; i++) {
@@ -176,7 +171,7 @@ void CFVillageManager::removeVillage(Village* villagePtr) {
 }
 
 void CFVillageManager::tick(const Tick& currentTick) {
-    auto&      geoGroup = coral_fans::mod().getGeometryGroup();
+    auto&      geoGroup = CoralFans::getInstance().getGeometryGroup();
     static int gt       = 8;
     std::erase_if(
         this->mTickingList,
@@ -235,7 +230,7 @@ void CFVillageManager::setShowBounds(bool show) {
         }
     } else {
         for (auto& [uuid, villageData] : this->mTickingList) {
-            coral_fans::mod().getGeometryGroup()->remove(villageData->mBoundsGeoId);
+            CoralFans::getInstance().getGeometryGroup()->remove(villageData->mBoundsGeoId);
         }
     }
 }
@@ -248,7 +243,7 @@ void CFVillageManager::setShowRaidBounds(bool show) {
         }
     } else {
         for (auto& [uuid, villageData] : this->mTickingList) {
-            coral_fans::mod().getGeometryGroup()->remove(villageData->mRaidBoundsGeoId);
+            CoralFans::getInstance().getGeometryGroup()->remove(villageData->mRaidBoundsGeoId);
         }
     }
 }
@@ -261,7 +256,7 @@ void CFVillageManager::setShowIronSpawn(bool show) {
         }
     } else {
         for (auto& [uuid, villageData] : this->mTickingList) {
-            coral_fans::mod().getGeometryGroup()->remove(villageData->mIronSpawnGeoId);
+            CoralFans::getInstance().getGeometryGroup()->remove(villageData->mIronSpawnGeoId);
         }
     }
 }
@@ -274,7 +269,7 @@ void CFVillageManager::setShowCenter(bool show) {
         }
     } else {
         for (auto& [uuid, villageData] : this->mTickingList) {
-            coral_fans::mod().getGeometryGroup()->remove(villageData->mCenterGeoId);
+            CoralFans::getInstance().getGeometryGroup()->remove(villageData->mCenterGeoId);
         }
     }
 }
@@ -287,7 +282,7 @@ void CFVillageManager::setShowPoiQuery(bool show) {
         }
     } else {
         for (auto& [uuid, villageData] : this->mTickingList) {
-            coral_fans::mod().getGeometryGroup()->remove(villageData->mPoiQueryGeoId);
+            CoralFans::getInstance().getGeometryGroup()->remove(villageData->mPoiQueryGeoId);
         }
     }
 }
@@ -300,7 +295,7 @@ void CFVillageManager::setShowBind(bool show) {
         }
     } else {
         for (auto& [uuid, villageData] : this->mTickingList) {
-            coral_fans::mod().getGeometryGroup()->remove(villageData->mBindGeoId);
+            CoralFans::getInstance().getGeometryGroup()->remove(villageData->mBindGeoId);
         }
     }
 }

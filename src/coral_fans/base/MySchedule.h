@@ -1,4 +1,5 @@
-#include "coral_fans/base/Mod.h"
+#pragma once
+
 #include <functional>
 
 namespace coral_fans::my_schedule {
@@ -36,26 +37,21 @@ public:
         now++;
         now &= 0x7f;
         while (schduleList[now] && !schduleList[now]->left_circle_time) {
-            try {
-                SchduleUnit* unit = schduleList[now];
-                if (schduleList[now]->task(schduleList[now]->interval, schduleList[now]->count)) {
-                    schduleList[now] = unit->next;
-                    int slot         = (unit->interval + now) & 0x7f;
-                    int circle_time  = unit->interval >> 7;
-                    if (!schduleList[slot]) {
-                        schduleList[slot] = unit;
-                        return;
-                    }
-                    SchduleUnit* tem = schduleList[slot];
-                    while (tem->next && tem->next->left_circle_time <= circle_time) tem = tem->next;
-                    tem->insert_after(unit);
-                } else {
-                    schduleList[now] = unit->next;
-                    delete unit;
+            SchduleUnit* unit = schduleList[now];
+            if (schduleList[now]->task(schduleList[now]->interval, schduleList[now]->count)) {
+                schduleList[now] = unit->next;
+                int slot         = (unit->interval + now) & 0x7f;
+                int circle_time  = unit->interval >> 7;
+                if (!schduleList[slot]) {
+                    schduleList[slot] = unit;
+                    return;
                 }
-                // this->add(schduleList[now]->task, schduleList[now]->interval, schduleList[now]->count);
-            } catch (const std::exception& e) {
-                mod().getLogger().error("Exception occurred while executing task: {}", e.what());
+                SchduleUnit* tem = schduleList[slot];
+                while (tem->next && tem->next->left_circle_time <= circle_time) tem = tem->next;
+                tem->insert_after(unit);
+            } else {
+                schduleList[now] = unit->next;
+                delete unit;
             }
         }
         SchduleUnit* tem = schduleList[now];

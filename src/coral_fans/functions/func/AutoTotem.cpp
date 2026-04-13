@@ -1,4 +1,6 @@
-#include "coral_fans/base/Mod.h"
+#include "coral_fans/CoralFans.h"
+
+
 #include "ll/api/memory/Hook.h"
 #include "mc/nbt/CompoundTag.h"
 #include "mc/world/actor/player/Inventory.h"
@@ -17,7 +19,7 @@ LL_TYPE_INSTANCE_HOOK(
     &Player::$consumeTotem,
     bool
 ) {
-    if (coral_fans::mod().getConfigDb()->get("functions.players." + this->getUuid().asString() + ".autototem")
+    if (CoralFans::getInstance().getConfigDb()->get("functions.players." + this->getUuid().asString() + ".autototem")
         == "true") {
         auto& inv  = *this->mInventory->mInventory;
         int   size = inv.getContainerSize();

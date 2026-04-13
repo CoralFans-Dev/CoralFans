@@ -1,7 +1,8 @@
 #pragma once
 
 #include "coral_fans/Config.h"
-#include "coral_fans/base/Mod.h"
+#include "coral_fans/CoralFans.h"
+#include "ll/api/event/ListenerBase.h"
 #include "ll/api/service/Bedrock.h"
 #include "mc/server/commands/CommandRegistry.h"
 #include <vector>
@@ -24,7 +25,7 @@ private:
         auto const& commandregistry = ll::service::getCommandRegistry();
 
         // useons
-        for (auto& useon : coral_fans::mod().getConfig().shortcut.useons) {
+        for (auto& useon : CoralFans::getInstance().getConfig().shortcut.useons) {
             if (!useon.enable || useon.item == "") continue;
             for (auto action : useon.actions) {
                 if (!commandregistry->findCommand(action))
@@ -35,7 +36,7 @@ private:
         }
 
         // uses
-        for (auto& use : coral_fans::mod().getConfig().shortcut.uses) {
+        for (auto& use : CoralFans::getInstance().getConfig().shortcut.uses) {
             if (!use.enable || use.item == "") continue;
             for (auto action : use.actions) {
                 if (!commandregistry->findCommand(action))
@@ -46,7 +47,7 @@ private:
         }
 
         // destroys
-        for (auto& destroy : coral_fans::mod().getConfig().shortcut.destroys) {
+        for (auto& destroy : CoralFans::getInstance().getConfig().shortcut.destroys) {
             if (!destroy.enable || destroy.item == "") continue;
             for (auto action : destroy.actions) {
                 if (!commandregistry->findCommand(action))
@@ -57,7 +58,7 @@ private:
         }
 
         // commands
-        for (auto& command : coral_fans::mod().getConfig().shortcut.commands) {
+        for (auto& command : CoralFans::getInstance().getConfig().shortcut.commands) {
             if (!command.enable || command.command == "") continue;
             for (auto action : command.actions) {
                 if (!commandregistry->findCommand(action))

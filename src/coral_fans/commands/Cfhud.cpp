@@ -1,6 +1,8 @@
+#include "coral_fans/CoralFans.h"
 #include "coral_fans/base/Macros.h"
-#include "coral_fans/base/Mod.h"
 #include "coral_fans/functions/hud/Hud.h"
+
+
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/command/runtime/ParamKind.h"
@@ -28,7 +30,7 @@ void registerCfhudCommand(CommandPermissionLevel permission) {
         .required("isopen", ll::command::ParamKind::Bool)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             COMMAND_CHECK_PLAYER
-            if (coral_fans::mod().getConfigDb()->set(
+            if (CoralFans::getInstance().getConfigDb()->set(
                     "functions.players." + player->getUuid().asString() + ".cfhud.show",
                     self["isopen"].get<ll::command::ParamKind::Bool>() ? "true" : "false"
                 ))
@@ -53,10 +55,10 @@ void registerCfhudCommand(CommandPermissionLevel permission) {
         .required("hud", ll::command::ParamKind::Enum, "cfhudType")
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             COMMAND_CHECK_PLAYER
-            auto&         mod = coral_fans::mod();
             unsigned long hud;
             try {
-                hud = std::stoul(mod.getConfigDb()
+                hud = std::stoul(CoralFans::getInstance()
+                                     .getConfigDb()
                                      ->get("functions.players." + player->getUuid().asString() + ".cfhud.hud")
                                      .value_or("0"));
             } catch (...) {
@@ -65,8 +67,10 @@ void registerCfhudCommand(CommandPermissionLevel permission) {
             if (self["action"].get<ll::command::ParamKind::Enum>().index == 0)
                 hud |= (1 << self["hud"].get<ll::command::ParamKind::Enum>().index);
             else hud &= ~(1 << self["hud"].get<ll::command::ParamKind::Enum>().index);
-            if (mod.getConfigDb()
-                    ->set("functions.players." + player->getUuid().asString() + ".cfhud.hud", std::to_string(hud)))
+            if (CoralFans::getInstance().getConfigDb()->set(
+                    "functions.players." + player->getUuid().asString() + ".cfhud.hud",
+                    std::to_string(hud)
+                ))
                 output.success("command.cfhud.success"_tr());
             else output.error("command.cfhud.error.seterror"_tr());
         });
@@ -76,8 +80,10 @@ void registerCfhudCommand(CommandPermissionLevel permission) {
         .text("removeall")
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const&) {
             COMMAND_CHECK_PLAYER
-            auto& mod = coral_fans::mod();
-            if (mod.getConfigDb()->set("functions.players." + player->getUuid().asString() + ".cfhud.hud", "0"))
+            if (CoralFans::getInstance().getConfigDb()->set(
+                    "functions.players." + player->getUuid().asString() + ".cfhud.hud",
+                    "0"
+                ))
                 output.success("command.cfhud.success"_tr());
             else output.error("command.cfhud.error.seterror"_tr());
         });

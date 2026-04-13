@@ -1,4 +1,6 @@
-#include "coral_fans/base/Mod.h"
+#include "coral_fans/CoralFans.h"
+
+
 #include "ll/api/memory/Hook.h"
 #include "mc/nbt/ByteTag.h"
 #include "mc/nbt/CompoundTag.h"
@@ -182,7 +184,9 @@ LL_TYPE_INSTANCE_HOOK(
     ::ItemUseMethod  itemUseMethod,
     bool             consumeItem
 ) {
-    if ((coral_fans::mod().getConfigDb()->get(std::format("functions.players.{}.autoitem", this->getUuid().asString()))
+    if ((CoralFans::getInstance().getConfigDb()->get(
+             std::format("functions.players.{}.autoitem", this->getUuid().asString())
+         )
          == "false")
         || this->isCreative())
         return origin(item, itemUseMethod, consumeItem);
@@ -219,7 +223,9 @@ LL_TYPE_INSTANCE_HOOK(
     ::BlockPos const& position,
     bool              withData
 ) {
-    if ((coral_fans::mod().getConfigDb()->get(std::format("functions.players.{}.autoitem", this->getUuid().asString()))
+    if ((CoralFans::getInstance().getConfigDb()->get(
+             std::format("functions.players.{}.autoitem", this->getUuid().asString())
+         )
          == "false")
         || this->isCreative())
         return origin(position, withData);

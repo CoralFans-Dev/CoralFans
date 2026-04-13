@@ -1,5 +1,7 @@
 #include "coral_fans/functions/hsa/Hsa.h"
-#include "coral_fans/base/Mod.h"
+#include "coral_fans/CoralFans.h"
+
+
 #include "ll/api/service/Bedrock.h"
 #include "mc/_HeaderOutputPredefine.h"
 #include "mc/deps/core/math/Color.h"
@@ -17,6 +19,7 @@
 #include "mc/world/level/levelgen/v2/StructureSpawnOverride.h"
 #include <memory>
 #include <vector>
+
 
 namespace coral_fans::functions {
 void HsaManager::setHsaShow(bool show) {
@@ -43,7 +46,7 @@ bool HsaManager::getStructureShow() { return this->structureShow; }
 
 void HsaManager::drawChunkHsa(std::vector<::BlockPos>& hsa, DimensionType dim, HsaChunkData& chunkData) {
     std::unordered_map<BlockPos, int> hsaCount;
-    auto&                             hsaConfig = mod().getConfig().functions.hsa;
+    auto&                             hsaConfig = CoralFans::getInstance().getConfig().functions.hsa;
     for (auto& pos : hsa) {
         auto [it, inserted2] = hsaCount.try_emplace(pos);
         if (inserted2) it->second = 1;
@@ -51,7 +54,7 @@ void HsaManager::drawChunkHsa(std::vector<::BlockPos>& hsa, DimensionType dim, H
     }
     std::vector<bsci::GeometryGroup::GeoId> geoIdList;
     geoIdList.reserve(8 * hsaCount.size() + 1);
-    auto& geometryGroup = coral_fans::mod().getGeometryGroup();
+    auto& geometryGroup = CoralFans::getInstance().getGeometryGroup();
     for (auto& [pos, count] : hsaCount) {
         geoIdList.emplace_back(
             geometryGroup
@@ -112,9 +115,9 @@ void HsaManager::drawChunkStructure(
     ChunkPos      chunkPos
 ) {
     std::vector<bsci::GeometryGroup::GeoId> geoIdList;
-    auto&                                   hsaConfig = mod().getConfig().functions.hsa;
+    auto&                                   hsaConfig = CoralFans::getInstance().getConfig().functions.hsa;
     geoIdList.reserve(chunkBoundingBoxes.size());
-    auto& geometryGroup = coral_fans::mod().getGeometryGroup();
+    auto& geometryGroup = CoralFans::getInstance().getGeometryGroup();
     for (auto [entity, component] : chunkBoundingBoxes.each()) {
         if (ChunkPos(component.box->min) != chunkPos || ChunkPos(component.box->max) != chunkPos
             || component.box->min.y < -64 || component.box->max.y > 320) {
@@ -133,7 +136,7 @@ void HsaManager::draw() {
     auto level = ll::service::getLevel();
     if (!level) [[unlikely]]
         return;
-    static int radius = std::max(0, mod().getConfig().functions.hsa.drawRadius);
+    static int radius = std::max(0, CoralFans::getInstance().getConfig().functions.hsa.drawRadius);
     level->forEachPlayer([this, radius = radius](Player& player) {
         ChunkPos originChunkPos = ChunkPos(player.getFeetBlockPos());
         auto&    dim            = player.getDimension();
@@ -152,17 +155,10 @@ void HsaManager::draw() {
 
                         auto [iter, inserted] = this->mChunkDataMap.try_emplace(std::make_pair(chunkPos, dimId));
                         if (hsa.size() && !iter->second.hsaGeoId.value) this->drawChunkHsa(hsa, dimId, iter->second);
-                        try {
-                            if ((hsa.size() || this->structureShow) && chunkBoundingBoxes.size()
-                                && !iter->second.structureGeoId.value)
-                                this->drawChunkStructure(chunkBoundingBoxes, dimId, iter->second, chunkPos);
-                            iter->second.freshed = true;
-                        } catch (const std::runtime_error&) {
-                            if (iter->second.hsaGeoId.value) {
-                                coral_fans::mod().getGeometryGroup()->remove(iter->second.hsaGeoId);
-                            }
-                            this->mChunkDataMap.erase(iter);
-                        }
+                        if ((hsa.size() || this->structureShow) && chunkBoundingBoxes.size()
+                            && !iter->second.structureGeoId.value)
+                            this->drawChunkStructure(chunkBoundingBoxes, dimId, iter->second, chunkPos);
+                        iter->second.freshed = true;
                     }
                 }
             }
@@ -178,15 +174,15 @@ void HsaManager::tick() {
         if (!this->runtimeRemoveTickCounter) {
             this->runtimeRemove();
         }
-        static int removeInterval      = std::max(1, mod().getConfig().functions.hsa.runtimeRemoveScale);
+        static int removeInterval = std::max(1, CoralFans::getInstance().getConfig().functions.hsa.runtimeRemoveScale);
         this->runtimeRemoveTickCounter = (this->runtimeRemoveTickCounter + 1) % removeInterval;
     }
-    static int interval = std::max(1, mod().getConfig().functions.hsa.drawInterval);
+    static int interval = std::max(1, CoralFans::getInstance().getConfig().functions.hsa.drawInterval);
     this->tickCounter   = (this->tickCounter + 1) % interval;
 }
 
 void HsaManager::remove() {
-    auto& geometryGroup = coral_fans::mod().getGeometryGroup();
+    auto& geometryGroup = CoralFans::getInstance().getGeometryGroup();
     if (!this->hsaShow) {
         if (!this->structureShow) {
             for (auto& [_, chunkData] : this->mChunkDataMap) {
@@ -215,7 +211,7 @@ void HsaManager::remove() {
 }
 
 void HsaManager::runtimeRemove() {
-    auto& geometryGroup = coral_fans::mod().getGeometryGroup();
+    auto& geometryGroup = CoralFans::getInstance().getGeometryGroup();
     std::erase_if(this->mChunkDataMap, [&geometryGroup](auto& data) {
         if (data.second.freshed) {
             data.second.freshed = false;

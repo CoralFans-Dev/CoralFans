@@ -1,4 +1,6 @@
-#include "coral_fans/base/Mod.h"
+#include "coral_fans/CoralFans.h"
+
+
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/player/Player.h"
 
@@ -11,7 +13,7 @@ LL_TYPE_INSTANCE_HOOK(
     &Player::$canChangeDimensionsUsingPortal,
     bool
 ) {
-    if (coral_fans::mod().getConfigDb()->get(
+    if (CoralFans::getInstance().getConfigDb()->get(
             std::format("functions.players.{}.portaldisabled", this->getUuid().asString())
         )
         == "true")

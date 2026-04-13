@@ -1,8 +1,10 @@
 
 #include "coral_fans/functions/noclip/Noclip.h"
+#include "coral_fans/CoralFans.h"
 #include "coral_fans/base/Macros.h"
-#include "coral_fans/base/Mod.h"
 #include "coral_fans/base/MySchedule.h"
+
+
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/i18n/I18n.h"
@@ -26,7 +28,7 @@ void registerNoclipCommand(CommandPermissionLevel permission) {
         if (player->getPlayerGameType() != GameType::Creative) return;
         auto& abilities = player->getAbilities();
         bool  enable    = !abilities.getAbility(AbilitiesIndex::NoClip).mValue->mBoolVal;
-        coral_fans::mod().getConfigDb()->set(
+        CoralFans::getInstance().getConfigDb()->set(
             std::format("noclip.players.{}", player->getUuid().asString()),
             enable ? "T" : "F"
         );

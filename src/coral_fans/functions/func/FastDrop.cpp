@@ -1,4 +1,6 @@
-#include "coral_fans/base/Mod.h"
+#include "coral_fans/CoralFans.h"
+
+
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/player/Inventory.h"
 #include "mc/world/actor/player/Player.h"
@@ -15,7 +17,9 @@ LL_TYPE_INSTANCE_HOOK(
     ItemStack const& item,
     bool             randomly
 ) {
-    if (coral_fans::mod().getConfigDb()->get(std::format("functions.players.{}.fastdrop", this->getUuid().asString()))
+    if (CoralFans::getInstance().getConfigDb()->get(
+            std::format("functions.players.{}.fastdrop", this->getUuid().asString())
+        )
         == "true") {
         auto& inv  = *this->mInventory->mInventory;
         int   size = inv.getContainerSize();

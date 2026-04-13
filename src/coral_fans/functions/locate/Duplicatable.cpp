@@ -1,6 +1,8 @@
 #include "DuplicatableManager.h"
 #include "bsci/GeometryGroup.h"
-#include "coral_fans/base/Mod.h"
+#include "coral_fans/CoralFans.h"
+
+
 #include "ll/api/base/StdInt.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/memory/Hook.h"
@@ -294,7 +296,7 @@ LL_TYPE_INSTANCE_HOOK(
     }
     if (!threadData) return origin(context);
     auto& blockName          = (*this->mReplaceRules)[0].mBlock->getBlockOrUnknownBlock().getTypeName();
-    auto& duplicatableConfig = coral_fans::mod().getConfig().functions.locate.duplicatable;
+    auto& duplicatableConfig = CoralFans::getInstance().getConfig().functions.locate.duplicatable;
     switch (blockName[10]) {
     case 'n':
         if (blockName == "minecraft:nether_gold_ore" && duplicatableConfig.netherGold.enable) {
@@ -498,8 +500,8 @@ void DuplicatableManager::removeData() {
 
 bsci::GeometryGroup::GeoId DuplicatableManager::drawNetherite(std::map<BlockPos, std::unordered_set<BlockPos>>& data) {
     using ll::i18n_literals::operator""_tr;
-    auto& geometryGroup   = coral_fans::mod().getGeometryGroup();
-    auto& netheriteConfig = coral_fans::mod().getConfig().functions.locate.duplicatable.netherite;
+    auto& geometryGroup   = CoralFans::getInstance().getGeometryGroup();
+    auto& netheriteConfig = CoralFans::getInstance().getConfig().functions.locate.duplicatable.netherite;
     std::vector<bsci::GeometryGroup::GeoId> geoIdList;
     geoIdList.reserve(5 * data.size());
     for (auto& [oriPos, poses] : data) {
@@ -537,8 +539,8 @@ bsci::GeometryGroup::GeoId DuplicatableManager::drawNetherite(std::map<BlockPos,
 
 bsci::GeometryGroup::GeoId DuplicatableManager::drawSpring(std::unordered_set<BlockPos>& data) {
     using ll::i18n_literals::operator""_tr;
-    auto& geometryGroup      = coral_fans::mod().getGeometryGroup();
-    auto& netherSpringConfig = coral_fans::mod().getConfig().functions.locate.duplicatable.netherSpring;
+    auto& geometryGroup      = CoralFans::getInstance().getGeometryGroup();
+    auto& netherSpringConfig = CoralFans::getInstance().getConfig().functions.locate.duplicatable.netherSpring;
     std::vector<bsci::GeometryGroup::GeoId> geoIdList;
     geoIdList.reserve(3 * data.size());
     for (auto& pos : data) {
@@ -563,8 +565,8 @@ bsci::GeometryGroup::GeoId DuplicatableManager::drawSpring(std::unordered_set<Bl
 
 bsci::GeometryGroup::GeoId DuplicatableManager::drawFire(std::unordered_set<BlockPos>& data) {
     using ll::i18n_literals::operator""_tr;
-    auto& geometryGroup    = coral_fans::mod().getGeometryGroup();
-    auto& netherFireConfig = coral_fans::mod().getConfig().functions.locate.duplicatable.netherFire;
+    auto& geometryGroup    = CoralFans::getInstance().getGeometryGroup();
+    auto& netherFireConfig = CoralFans::getInstance().getConfig().functions.locate.duplicatable.netherFire;
     std::vector<bsci::GeometryGroup::GeoId> geoIdList;
     geoIdList.reserve(4 * data.size());
     for (auto& pos : data) {
@@ -594,8 +596,8 @@ bsci::GeometryGroup::GeoId DuplicatableManager::drawFire(std::unordered_set<Bloc
 
 bsci::GeometryGroup::GeoId DuplicatableManager::drawGlowStone(std::map<BlockPos, int>& data) {
     using ll::i18n_literals::operator""_tr;
-    auto& geometryGroup   = coral_fans::mod().getGeometryGroup();
-    auto& glowStoneConfig = coral_fans::mod().getConfig().functions.locate.duplicatable.glowStone;
+    auto& geometryGroup   = CoralFans::getInstance().getGeometryGroup();
+    auto& glowStoneConfig = CoralFans::getInstance().getConfig().functions.locate.duplicatable.glowStone;
     std::vector<bsci::GeometryGroup::GeoId> geoIdList;
     geoIdList.reserve(4 * data.size());
     for (auto& [pos, number] : data) {
@@ -625,8 +627,8 @@ bsci::GeometryGroup::GeoId DuplicatableManager::drawGlowStone(std::map<BlockPos,
 
 bsci::GeometryGroup::GeoId DuplicatableManager::drawMushroom(std::map<BlockPos, bool>& data) {
     using ll::i18n_literals::operator""_tr;
-    auto& geometryGroup  = coral_fans::mod().getGeometryGroup();
-    auto& mushroomConfig = coral_fans::mod().getConfig().functions.locate.duplicatable.mushroom;
+    auto& geometryGroup  = CoralFans::getInstance().getGeometryGroup();
+    auto& mushroomConfig = CoralFans::getInstance().getConfig().functions.locate.duplicatable.mushroom;
     std::vector<bsci::GeometryGroup::GeoId> geoIdList;
     geoIdList.reserve(4 * data.size());
     for (auto& [pos, isRed] : data) {
@@ -660,7 +662,7 @@ bsci::GeometryGroup::GeoId DuplicatableManager::drawOre(
     config::Locate::DuplicatableOreStruct& config,
     std::string                            text
 ) {
-    auto&                                   geometryGroup = coral_fans::mod().getGeometryGroup();
+    auto&                                   geometryGroup = CoralFans::getInstance().getGeometryGroup();
     std::vector<bsci::GeometryGroup::GeoId> geoIdList;
     geoIdList.reserve(3 * data.size());
     for (auto& oriPos : data) {
@@ -685,8 +687,8 @@ bsci::GeometryGroup::GeoId DuplicatableManager::drawOre(
 
 bsci::GeometryGroup::GeoId DuplicatableManager::drawEndIsland(std::map<BlockPos, Core::Random>& data) {
     using ll::i18n_literals::operator""_tr;
-    auto& geometryGroup   = coral_fans::mod().getGeometryGroup();
-    auto& endIslandConfig = coral_fans::mod().getConfig().functions.locate.duplicatable.endIsland;
+    auto& geometryGroup   = CoralFans::getInstance().getGeometryGroup();
+    auto& endIslandConfig = CoralFans::getInstance().getConfig().functions.locate.duplicatable.endIsland;
     std::vector<bsci::GeometryGroup::GeoId> geoIdList;
     geoIdList.reserve(17 * data.size());
     for (auto& [pos, _random] : data) {
@@ -733,8 +735,8 @@ bsci::GeometryGroup::GeoId DuplicatableManager::drawEndIsland(std::map<BlockPos,
 
 bsci::GeometryGroup::GeoId DuplicatableManager::drawChorusFlower(std::map<BlockPos, int>& data) {
     using ll::i18n_literals::operator""_tr;
-    auto& geometryGroup      = coral_fans::mod().getGeometryGroup();
-    auto& chorusFlowerConfig = coral_fans::mod().getConfig().functions.locate.duplicatable.chorusFlower;
+    auto& geometryGroup      = CoralFans::getInstance().getGeometryGroup();
+    auto& chorusFlowerConfig = CoralFans::getInstance().getConfig().functions.locate.duplicatable.chorusFlower;
     std::vector<bsci::GeometryGroup::GeoId> geoIdList;
     geoIdList.reserve(3 * data.size());
     for (auto& [pos, number] : data) {
@@ -759,8 +761,8 @@ bsci::GeometryGroup::GeoId DuplicatableManager::drawChorusFlower(std::map<BlockP
 
 bsci::GeometryGroup::GeoId DuplicatableManager::drawEndGateway(std::unordered_set<BlockPos>& data) {
     using ll::i18n_literals::operator""_tr;
-    auto& geometryGroup    = coral_fans::mod().getGeometryGroup();
-    auto& endGatewayConfig = coral_fans::mod().getConfig().functions.locate.duplicatable.endGateway;
+    auto& geometryGroup    = CoralFans::getInstance().getGeometryGroup();
+    auto& endGatewayConfig = CoralFans::getInstance().getConfig().functions.locate.duplicatable.endGateway;
     std::vector<bsci::GeometryGroup::GeoId> geoIdList;
     geoIdList.reserve(3 * data.size());
     for (auto& pos : data) {
@@ -795,7 +797,7 @@ bool DuplicatableManager::isChunkValid(BlockSource& region, ChunkPos originChunk
 }
 
 void DuplicatableManager::tryRemoveNetherChunkData(ChunkPos originChunkPos) {
-    auto& geometryGroup = coral_fans::mod().getGeometryGroup();
+    auto& geometryGroup = CoralFans::getInstance().getGeometryGroup();
     auto  originIter    = this->netherBsciChunkData.find(originChunkPos);
     if (originIter != this->netherBsciChunkData.end() && originIter->second.dataDrawed) {
         for (int i = -1; i <= 1; i++) {
@@ -831,7 +833,7 @@ void DuplicatableManager::tryRemoveNetherChunkData(ChunkPos originChunkPos) {
 }
 
 void DuplicatableManager::tryRemoveTheEndChunkData(ChunkPos originChunkPos) {
-    auto& geometryGroup = coral_fans::mod().getGeometryGroup();
+    auto& geometryGroup = CoralFans::getInstance().getGeometryGroup();
     auto  originIter    = this->theEndBsciChunkData.find(originChunkPos);
     if (originIter != this->theEndBsciChunkData.end() && originIter->second.dataDrawed) {
         for (int i = -1; i <= 1; i++) {
@@ -863,9 +865,9 @@ void DuplicatableManager::drawNetherChunkSavedInfo(
     ChunkPos             originChunkPos,
     NetherBsciChunkData& originChunkData
 ) {
-    auto&           geometryGroup  = coral_fans::mod().getGeometryGroup();
+    auto&           geometryGroup  = CoralFans::getInstance().getGeometryGroup();
     DBChunkStorage* dbChunkStorage = static_cast<DBChunkStorage*>(&(*region.getDimension().mChunkSource->mOwnedParent));
-    auto&           duplicatableConfig = coral_fans::mod().getConfig().functions.locate.duplicatable;
+    auto&           duplicatableConfig = CoralFans::getInstance().getConfig().functions.locate.duplicatable;
     int             dimId              = region.getDimensionId();
     for (int i = -1; i <= 1; i++) {
         for (int j = -1; j <= 1; j++) {
@@ -920,9 +922,9 @@ void DuplicatableManager::drawTheEndChunkSavedInfo(
     ChunkPos             originChunkPos,
     TheEndBsciChunkData& originChunkData
 ) {
-    auto&           geometryGroup  = coral_fans::mod().getGeometryGroup();
+    auto&           geometryGroup  = CoralFans::getInstance().getGeometryGroup();
     DBChunkStorage* dbChunkStorage = static_cast<DBChunkStorage*>(&(*region.getDimension().mChunkSource->mOwnedParent));
-    auto&           duplicatableConfig = coral_fans::mod().getConfig().functions.locate.duplicatable;
+    auto&           duplicatableConfig = CoralFans::getInstance().getConfig().functions.locate.duplicatable;
     int             dimId              = region.getDimensionId();
     for (int i = -1; i <= 1; i++) {
         for (int j = -1; j <= 1; j++) {
@@ -974,11 +976,11 @@ void DuplicatableManager::drawTheEndChunkSavedInfo(
 
 void DuplicatableManager::netherDraw(BlockSource& region, ChunkPos chunkPos, NetherData& data) {
     using ll::i18n_literals::operator""_tr;
-    auto& duplicatableConfig = coral_fans::mod().getConfig().functions.locate.duplicatable;
+    auto& duplicatableConfig = CoralFans::getInstance().getConfig().functions.locate.duplicatable;
     auto [it, inserted]      = this->netherBsciChunkData.try_emplace(chunkPos);
     if (!it->second.dataDrawed) this->drawNetherChunkSavedInfo(region, chunkPos, it->second);
     else if (data.reload) {
-        auto& geometryGroup = coral_fans::mod().getGeometryGroup();
+        auto& geometryGroup = CoralFans::getInstance().getGeometryGroup();
         if (it->second.netheriteGeoId.value) {
             geometryGroup->remove(it->second.netheriteGeoId);
             it->second.netheriteGeoId.value = 0;
@@ -1114,7 +1116,7 @@ void DuplicatableManager::theEndDraw(BlockSource& region, ChunkPos chunkPos, The
     auto [it, inserted] = this->theEndBsciChunkData.try_emplace(chunkPos);
     if (!it->second.dataDrawed) this->drawTheEndChunkSavedInfo(region, chunkPos, it->second);
     else if (data.reload) {
-        auto& geometryGroup = coral_fans::mod().getGeometryGroup();
+        auto& geometryGroup = CoralFans::getInstance().getGeometryGroup();
         if (it->second.endIslandGeoId.value) {
             geometryGroup->remove(it->second.endIslandGeoId);
             it->second.endIslandGeoId.value = 0;
@@ -1154,7 +1156,7 @@ void DuplicatableManager::draw() {
     auto level = ll::service::getLevel();
     if (!level) [[unlikely]]
         return;
-    static int radius = std::max(0, mod().getConfig().functions.locate.duplicatable.drawRadius);
+    static int radius = std::max(0, CoralFans::getInstance().getConfig().functions.locate.duplicatable.drawRadius);
     level->forEachPlayer([this, radius = radius](Player& player) {
         int   dimId  = player.getDimensionId();
         auto& region = player.getDimensionBlockSource();
@@ -1240,10 +1242,11 @@ void DuplicatableManager::tick() {
         if (!this->cacheDataRemoveTickCounter) {
             this->removeData();
         }
-        static int cacheRemoveScale = std::max(1, mod().getConfig().functions.locate.duplicatable.cacheRemoveScale);
+        static int cacheRemoveScale =
+            std::max(1, CoralFans::getInstance().getConfig().functions.locate.duplicatable.cacheRemoveScale);
         this->cacheDataRemoveTickCounter = (this->cacheDataRemoveTickCounter + 1) % cacheRemoveScale;
     }
-    static int interval = std::max(1, mod().getConfig().functions.locate.duplicatable.drawInterval);
+    static int interval = std::max(1, CoralFans::getInstance().getConfig().functions.locate.duplicatable.drawInterval);
     this->tickCounter   = (this->tickCounter + 1) % interval;
 }
 
@@ -1257,7 +1260,7 @@ void DuplicatableManager::removeBsciData(ShowType _showType) {
     static uint theEndShowTypes = static_cast<uint>(ShowType::EndIsland) | static_cast<uint>(ShowType::ChorusFlower)
                                 | static_cast<uint>(ShowType::EndGateway);
 
-    auto& geometryGroup  = coral_fans::mod().getGeometryGroup();
+    auto& geometryGroup  = CoralFans::getInstance().getGeometryGroup();
     this->showType      &= ~static_cast<uint>(_showType);
     if (static_cast<uint>(_showType) & netherShowTypes) {
         if (!(this->showType & netherShowTypes)) {
@@ -1428,8 +1431,8 @@ void DuplicatableManager::bsciDataRuntimeRemove() {
     auto level = ll::service::getLevel();
     if (!level) [[unlikely]]
         return;
-    auto& geometryGroup      = coral_fans::mod().getGeometryGroup();
-    auto& duplicatableConfig = mod().getConfig().functions.locate.duplicatable;
+    auto& geometryGroup      = CoralFans::getInstance().getGeometryGroup();
+    auto& duplicatableConfig = CoralFans::getInstance().getConfig().functions.locate.duplicatable;
     if (auto netherDim = level->getDimension(1).lock()) {
         DBChunkStorage*       dbChunkStorage = static_cast<DBChunkStorage*>(&(*netherDim->mChunkSource->mOwnedParent));
         std::vector<ChunkPos> toRemove;
@@ -1589,7 +1592,7 @@ bool DuplicatableManager::getShowType(ShowType _showType) { return this->showTyp
 
 void DuplicatableManager::hook(bool enable) {
     if (enable) {
-        auto& duplicatableConfig = coral_fans::mod().getConfig().functions.locate.duplicatable;
+        auto& duplicatableConfig = CoralFans::getInstance().getConfig().functions.locate.duplicatable;
         bool  shouleNetherHook   = false;
         if (duplicatableConfig.netherite.enable) {
             DuplicatableHook2::hook();

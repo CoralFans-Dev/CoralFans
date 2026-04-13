@@ -1,7 +1,9 @@
 #pragma once
 
-#include "coral_fans/base/Mod.h"
+#include "coral_fans/CoralFans.h"
 #include "coral_fans/base/MySchedule.h"
+
+
 #include "ll/api/i18n/I18n.h"
 #include "mc/nbt/CompoundTag.h"
 #include "mc/nbt/CompoundTagVariant.h"
@@ -56,7 +58,8 @@ std::pair<std::string, bool> getNbtFromTag(CompoundTag& tag, std::string const& 
         if (nodes[0].useIndex) {
             if (tagVariant.is_array()) {
                 auto& list = tagVariant.get<ListTag>();
-                if (nodes[0].index >= list.size()) return {"translate.data.error.geterror"_tr(), false};
+                if (static_cast<size_t>(nodes[0].index) >= list.size())
+                    return {"translate.data.error.geterror"_tr(), false};
                 tagVariant = std::move(list[nodes[0].index]);
             }
         }
@@ -65,7 +68,8 @@ std::pair<std::string, bool> getNbtFromTag(CompoundTag& tag, std::string const& 
             if (nodes[i].useIndex) {
                 if (tagVariant.is_array()) {
                     auto& list = tagVariant.get<ListTag>();
-                    if (nodes[i].index >= list.size()) return {"translate.data.error.geterror"_tr(), false};
+                    if (static_cast<size_t>(nodes[i].index) >= list.size())
+                        return {"translate.data.error.geterror"_tr(), false};
                     tagVariant = std::move(list[nodes[i].index]);
                 }
             }
@@ -86,7 +90,7 @@ ChunkPos blockPosToChunkPos(BlockPos const& blockPos) {
 std::string removeMinecraftPrefix(std::string const& s) { return s.find("minecraft:") == 0 ? s.substr(10) : s; }
 
 void shortHighligntBlock(int dimid, BlockPos const& blockPos, mce::Color const& color, int time) {
-    auto& mod = coral_fans::mod();
+    auto& mod = CoralFans::getInstance();
     auto  s   = mod.getGeometryGroup()->box(dimid, {blockPos, blockPos + BlockPos::ONE()}, color);
     my_schedule::MySchedule::getSchedule().add(
         [&, s](int&, int&) {

@@ -1,8 +1,9 @@
 #include "coral_fans/functions/hud/Hud.h"
-#include "coral_fans/base/Mod.h"
+#include "coral_fans/CoralFans.h"
 #include "coral_fans/base/Utils.h"
 #include "coral_fans/functions/data/Data.h"
 #include "coral_fans/functions/func/FuncManager.h"
+
 
 #include "coral_fans/functions/village/Village.h"
 #include "ll/api/base/StdInt.h"
@@ -42,17 +43,17 @@ std::vector<std::pair<std::string, uint64>> HudHelper::HudTypeVec = {
 void HudHelper::tick() {
     using ll::i18n_literals::operator""_tr;
     static int gt;
-    auto&      mod = coral_fans::mod();
     if (gt == 1) { // delay 1 tick to get village info
-        auto level = ll::service::getLevel();
-        if (level) {
-            level->forEachPlayer([&](Player& player) {
-                if (mod.getConfigDb()->get("functions.players." + player.getUuid().asString() + ".cfhud.show")
-                    == "false")
+        auto  level    = ll::service::getLevel();
+        auto& configDb = CoralFans::getInstance().getConfigDb();
+        if (level) [[likely]] {
+            level->forEachPlayer([&configDb, &level](Player& player) {
+                if (configDb->get("functions.players." + player.getUuid().asString() + ".cfhud.show") == "false")
                     return true;
                 unsigned long hud;
                 try {
-                    hud = std::stoul(mod.getConfigDb()
+                    hud = std::stoul(CoralFans::getInstance()
+                                         .getConfigDb()
                                          ->get("functions.players." + player.getUuid().asString() + ".cfhud.hud")
                                          .value_or("0"));
                 } catch (...) {
@@ -161,7 +162,7 @@ void HudHelper::tick() {
             });
         }
     }
-    static int interval = std::max(1, mod.getConfig().functions.hud.refreshInterval);
+    static int interval = std::max(1, CoralFans::getInstance().getConfig().functions.hud.refreshInterval);
     gt                  = (gt + 1) % interval;
 }
 
