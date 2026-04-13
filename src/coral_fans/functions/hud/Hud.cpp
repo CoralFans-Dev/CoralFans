@@ -160,7 +160,7 @@ void HudHelper::tick() {
             });
         }
     }
-    static int interval = std::max(2, mod.getConfig().functions.hud.refreshInterval);
+    static int interval = std::max(1, mod.getConfig().functions.hud.refreshInterval);
     gt                  = (gt + 1) % interval;
 }
 

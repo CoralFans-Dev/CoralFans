@@ -18,7 +18,9 @@ void registerLocateCommand(CommandPermissionLevel permission) {
     auto& locateCommand = ll::command::CommandRegistrar::getInstance(false)
                               .getOrCreateCommand("cflocate", "command.locate.description"_tr(), permission);
 
-    // locate duplicatable show <bounds|raid|spawn|center|poi|bind> <bool>
+    // locate duplicatable
+    // <netherite|nether_spring|nether_fire|glow_stone|mushroom|nether_gold|nether_quartz|nether_magma|nether_gravel|blackstone|soul_sand|end_island|chorus_flower|end_gateway>
+    // <bool>
     std::vector<std::pair<std::string, uint64>> enums;
     auto&                                       duplicatableConfig = mod().getConfig().functions.locate.duplicatable;
     if (duplicatableConfig.netherite.enable) {
@@ -59,6 +61,9 @@ void registerLocateCommand(CommandPermissionLevel permission) {
     }
     if (duplicatableConfig.chorusFlower.enable) {
         enums.emplace_back("chorus_flower", 12);
+    }
+    if (duplicatableConfig.endGateway.enable) {
+        enums.emplace_back("end_gateway", 13);
     }
     ll::command::CommandRegistrar::getInstance(false).tryRegisterRuntimeEnum("duplicatableShowType", std::move(enums));
 
@@ -109,6 +114,9 @@ void registerLocateCommand(CommandPermissionLevel permission) {
             case 12:
                 showType = functions::locate::DuplicatableManager::ShowType::ChorusFlower;
                 break;
+            case 13:
+                showType = functions::locate::DuplicatableManager::ShowType::EndGateway;
+                break;
             }
             if (!static_cast<uint>(showType)) return output.success("command.locate.duplicatable.show.error"_tr());
             if (self["enable"].has_value())
@@ -121,12 +129,12 @@ void registerLocateCommand(CommandPermissionLevel permission) {
             ));
         });
 
-    locateCommand.runtimeOverload().text("test").execute(
-        [](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
-            COMMAND_CHECK_PLAYER
-            output.success(functions::locate::DuplicatableManager::getInstance().test(ChunkPos(player->getPosition())));
-        }
-    );
+    // locateCommand.runtimeOverload().text("test").execute(
+    //     [](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+    //         COMMAND_CHECK_PLAYER
+    //         output.success(functions::locate::DuplicatableManager::getInstance().test(ChunkPos(player->getPosition())));
+    //     }
+    // );
 
     functions::locate::DuplicatableManager::hook(true);
 }

@@ -1,6 +1,7 @@
 #include "DuplicatableManager.h"
 #include "bsci/GeometryGroup.h"
 #include "coral_fans/base/Mod.h"
+#include "ll/api/base/StdInt.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/memory/Hook.h"
 #include "ll/api/service/Bedrock.h"
@@ -15,6 +16,7 @@
 #include "mc/world/level/chunk/ChunkViewSource.h"
 #include "mc/world/level/chunk/SubChunk.h"
 #include "mc/world/level/dimension/Dimension.h"
+#include "mc/world/level/levelgen/feature/EndGatewayFeature.h"
 #include "mc/world/level/levelgen/feature/EndIslandFeature.h"
 #include "mc/world/level/levelgen/feature/GlowStoneFeature.h"
 #include "mc/world/level/levelgen/feature/MushroomFeature.h"
@@ -445,6 +447,31 @@ LL_TYPE_STATIC_HOOK(
     } else origin(region, current, startPos, random, maxHorizontalSpread, depth);
 }
 
+LL_TYPE_INSTANCE_HOOK(
+    DuplicatableManager::DuplicatableHook13,
+    ll::memory::HookPriority::Normal,
+    EndGatewayFeature,
+    &EndGatewayFeature ::$place,
+    bool,
+    ::BlockSource&    region,
+    ::BlockPos const& pos,
+    ::Random&         random
+) {
+    // if (pos.x % 16 + 3 >= 8 && pos.z % 16 >= 8) return origin(region, pos, random);
+    auto  threadId            = std::this_thread::get_id();
+    auto& duplicatableManager = DuplicatableManager::getInstance();
+    {
+        std::lock_guard lock(duplicatableManager.theEndDecorationThreadIdsLock);
+        auto            it = duplicatableManager.theEndDecorationThreadIds.find(threadId);
+        if (it != duplicatableManager.theEndDecorationThreadIds.end()) {
+            it->second->threadData.endGatewayPosSet.emplace(pos);
+            it->second->isEmpty = false;
+        }
+    }
+    return origin(region, pos, random);
+}
+
+
 void DuplicatableManager::removeData() {
     auto level = ll::service::getLevel();
     if (!level) [[unlikely]]
@@ -730,6 +757,32 @@ bsci::GeometryGroup::GeoId DuplicatableManager::drawChorusFlower(std::map<BlockP
     return geometryGroup->merge(geoIdList);
 }
 
+bsci::GeometryGroup::GeoId DuplicatableManager::drawEndGateway(std::unordered_set<BlockPos>& data) {
+    using ll::i18n_literals::operator""_tr;
+    auto& geometryGroup    = coral_fans::mod().getGeometryGroup();
+    auto& endGatewayConfig = coral_fans::mod().getConfig().functions.locate.duplicatable.endGateway;
+    std::vector<bsci::GeometryGroup::GeoId> geoIdList;
+    geoIdList.reserve(3 * data.size());
+    for (auto& pos : data) {
+        geoIdList.emplace_back(
+            geometryGroup->box(2, AABB(pos, pos + BlockPos(1, 1, 1)), mce::Color(endGatewayConfig.originPosColor))
+        );
+        geoIdList.emplace_back(geometryGroup->text(
+            2,
+            {pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f},
+            "translate.locate.duplicatable.endGateway.oriPos"_tr(),
+            mce::Color(endGatewayConfig.textColor)
+        ));
+        geoIdList.emplace_back(geometryGroup->arrow(
+            2,
+            {pos.x - 7.5f, pos.y + 0.5f, pos.z - 7.5f},
+            {pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f},
+            mce::Color(endGatewayConfig.arrowColor)
+        ));
+    }
+    return geometryGroup->merge(geoIdList);
+}
+
 bool DuplicatableManager::isChunkValid(BlockSource& region, ChunkPos originChunkPos) {
     DBChunkStorage* dbChunkStorage = static_cast<DBChunkStorage*>(&(*region.getDimension().mChunkSource->mOwnedParent));
     for (int i = -1; i <= 1; i++) {
@@ -796,6 +849,7 @@ void DuplicatableManager::tryRemoveTheEndChunkData(ChunkPos originChunkPos) {
         }
         if (originIter->second.endIslandGeoId.value) geometryGroup->remove(originIter->second.endIslandGeoId);
         if (originIter->second.chorusFlowerGeoId.value) geometryGroup->remove(originIter->second.chorusFlowerGeoId);
+        if (originIter->second.endGatewayGeoId.value) geometryGroup->remove(originIter->second.endGatewayGeoId);
 
         if (!originIter->second.neighborValidCount) {
             geometryGroup->remove(originIter->second.chunkSavedDrawGeoId);
@@ -1069,6 +1123,10 @@ void DuplicatableManager::theEndDraw(BlockSource& region, ChunkPos chunkPos, The
             geometryGroup->remove(it->second.chorusFlowerGeoId);
             it->second.chorusFlowerGeoId.value = 0;
         }
+        if (it->second.endGatewayGeoId.value) {
+            geometryGroup->remove(it->second.endGatewayGeoId);
+            it->second.endGatewayGeoId.value = 0;
+        }
         it->second.dataDrawed = 0;
     }
     it->second.runtimeRemoveTickCounter = 0;
@@ -1084,6 +1142,11 @@ void DuplicatableManager::theEndDraw(BlockSource& region, ChunkPos chunkPos, The
         it->second.chorusFlowerGeoId  = this->drawChorusFlower(data.chorusFlowerPosMap);
         it->second.dataDrawed        |= static_cast<uint>(ShowType::ChorusFlower);
     }
+    if (this->showType & static_cast<uint>(ShowType::EndGateway) && !data.endGatewayPosSet.empty()
+        && !it->second.endGatewayGeoId.value) {
+        it->second.endGatewayGeoId  = drawEndGateway(data.endGatewayPosSet);
+        it->second.dataDrawed      |= static_cast<uint>(ShowType::EndGateway);
+    }
 }
 
 void DuplicatableManager::draw() {
@@ -1091,13 +1154,14 @@ void DuplicatableManager::draw() {
     auto level = ll::service::getLevel();
     if (!level) [[unlikely]]
         return;
-    level->forEachPlayer([this](Player& player) {
+    static int radius = std::max(0, mod().getConfig().functions.locate.duplicatable.drawRadius);
+    level->forEachPlayer([this, radius = radius](Player& player) {
         int   dimId  = player.getDimensionId();
         auto& region = player.getDimensionBlockSource();
         if (dimId == 1) {
             ChunkPos originChunkPos = ChunkPos(player.getFeetBlockPos());
-            for (int i = -6; i <= 6; ++i) {
-                int maxJ = 6 - abs(i);
+            for (int i = -radius; i <= radius; ++i) {
+                int maxJ = radius - abs(i);
                 for (int j = -maxJ; j <= maxJ; ++j) {
                     ChunkPos        chunkPos = ChunkPos(originChunkPos.x + i, originChunkPos.z + j);
                     std::lock_guard lock(this->netherDataMapLock);
@@ -1153,8 +1217,8 @@ void DuplicatableManager::draw() {
                            && !it->second.endIslandPosMap.empty())
                           || (this->showType & static_cast<uint>(ShowType::ChorusFlower)
                               && !it->second.chorusFlowerPosMap.empty())
-                          //   ||
-                        ))
+                          || (this->showType & static_cast<uint>(ShowType::EndGateway)
+                              && !it->second.endGatewayPosSet.empty())))
                         continue;
                     if (!this->isChunkValid(region, chunkPos)) {
                         this->theEndDataMap.erase(it);
@@ -1170,17 +1234,17 @@ void DuplicatableManager::draw() {
 }
 
 void DuplicatableManager::tick() {
-    auto& duplicatableConfig = mod().getConfig().functions.locate.duplicatable;
     if (!this->tickCounter) {
         this->draw();
         this->bsciDataRuntimeRemove();
         if (!this->cacheDataRemoveTickCounter) {
             this->removeData();
         }
-        this->cacheDataRemoveTickCounter =
-            (this->cacheDataRemoveTickCounter + 1) % duplicatableConfig.cacheDataRemoveScale;
+        static int cacheRemoveScale = std::max(1, mod().getConfig().functions.locate.duplicatable.cacheRemoveScale);
+        this->cacheDataRemoveTickCounter = (this->cacheDataRemoveTickCounter + 1) % cacheRemoveScale;
     }
-    this->tickCounter = (this->tickCounter + 1) % duplicatableConfig.drawInterval;
+    static int interval = std::max(1, mod().getConfig().functions.locate.duplicatable.drawInterval);
+    this->tickCounter   = (this->tickCounter + 1) % interval;
 }
 
 void DuplicatableManager::removeBsciData(ShowType _showType) {
@@ -1190,7 +1254,8 @@ void DuplicatableManager::removeBsciData(ShowType _showType) {
                                 | static_cast<uint>(ShowType::NetherQuartz) | static_cast<uint>(ShowType::NetherMagma)
                                 | static_cast<uint>(ShowType::NetherGravel) | static_cast<uint>(ShowType::Blackstone)
                                 | static_cast<uint>(ShowType::SoulSand);
-    static uint theEndShowTypes = static_cast<uint>(ShowType::EndIsland) | static_cast<uint>(ShowType::ChorusFlower);
+    static uint theEndShowTypes = static_cast<uint>(ShowType::EndIsland) | static_cast<uint>(ShowType::ChorusFlower)
+                                | static_cast<uint>(ShowType::EndGateway);
 
     auto& geometryGroup  = coral_fans::mod().getGeometryGroup();
     this->showType      &= ~static_cast<uint>(_showType);
@@ -1298,6 +1363,8 @@ void DuplicatableManager::removeBsciData(ShowType _showType) {
         if (!(this->showType & theEndShowTypes)) {
             for (auto& [_, chunkData] : this->theEndBsciChunkData) {
                 if (chunkData.endIslandGeoId.value) geometryGroup->remove(chunkData.endIslandGeoId);
+                if (chunkData.chorusFlowerGeoId.value) geometryGroup->remove(chunkData.chorusFlowerGeoId);
+                if (chunkData.endGatewayGeoId.value) geometryGroup->remove(chunkData.endGatewayGeoId);
                 if (chunkData.chunkSavedDrawGeoId.value) geometryGroup->remove(chunkData.chunkSavedDrawGeoId);
             }
             this->theEndBsciChunkData.clear();
@@ -1312,6 +1379,11 @@ void DuplicatableManager::removeBsciData(ShowType _showType) {
             case ShowType::ChorusFlower:
                 getGeoId = [](TheEndBsciChunkData& data) -> bsci::GeometryGroup::GeoId& {
                     return data.chorusFlowerGeoId;
+                };
+                break;
+            case ShowType::EndGateway:
+                getGeoId = [](TheEndBsciChunkData& data) -> bsci::GeometryGroup::GeoId& {
+                    return data.endGatewayGeoId;
                 };
                 break;
             default:
@@ -1434,7 +1506,7 @@ void DuplicatableManager::bsciDataRuntimeRemove() {
                 data.chunkSaved = true;
                 geometryGroup->remove(data.chunkSavedDrawGeoId);
                 data.chunkSavedDrawGeoId = geometryGroup->box(
-                    netherDim->getDimensionId(),
+                    1,
                     {Vec3(originChunkPos.x * 16 + 0.1, 0, originChunkPos.z * 16 + 0.1),
                      Vec3(originChunkPos.x * 16 + 15.9, 128, originChunkPos.z * 16 + 15.9)},
                     mce::Color(duplicatableConfig.chunkSavedDebugInfo.savedChunk)
@@ -1471,6 +1543,10 @@ void DuplicatableManager::bsciDataRuntimeRemove() {
                     geometryGroup->remove(data.chorusFlowerGeoId);
                     data.chorusFlowerGeoId.value = 0;
                 }
+                if (data.endGatewayGeoId.value) {
+                    geometryGroup->remove(data.endGatewayGeoId);
+                    data.endGatewayGeoId.value = 0;
+                }
 
                 if (!data.neighborValidCount) {
                     geometryGroup->remove(data.chunkSavedDrawGeoId);
@@ -1485,7 +1561,7 @@ void DuplicatableManager::bsciDataRuntimeRemove() {
                 data.chunkSaved = true;
                 geometryGroup->remove(data.chunkSavedDrawGeoId);
                 data.chunkSavedDrawGeoId = geometryGroup->box(
-                    theEndDim->getDimensionId(),
+                    2,
                     {Vec3(originChunkPos.x * 16 + 0.1, 0, originChunkPos.z * 16 + 0.1),
                      Vec3(originChunkPos.x * 16 + 15.9, 128, originChunkPos.z * 16 + 15.9)},
                     mce::Color(duplicatableConfig.chunkSavedDebugInfo.savedChunk)
@@ -1554,6 +1630,10 @@ void DuplicatableManager::hook(bool enable) {
             DuplicatableHook12::hook();
             shouldTheEndHook = true;
         }
+        if (duplicatableConfig.endGateway.enable) {
+            DuplicatableHook13::hook();
+            shouldTheEndHook = true;
+        }
         if (shouldTheEndHook) DuplicatableHook10::hook();
     } else {
         DuplicatableHook1::unhook();
@@ -1568,45 +1648,48 @@ void DuplicatableManager::hook(bool enable) {
         DuplicatableHook10::unhook();
         DuplicatableHook11::unhook();
         DuplicatableHook12::unhook();
+        DuplicatableHook13::unhook();
     }
 }
 
-std::string DuplicatableManager::test(ChunkPos chunkPos) {
-    std::string res = chunkPos.toString() + "\n";
-    {
-        std::lock_guard lock(this->netherDataMapLock);
-        auto            iter = this->netherDataMap.find(chunkPos);
-        if (iter != this->netherDataMap.end()) {
-            res +=
-                "netherDataMap: len(netheritePosSet) = " + std::to_string(iter->second.netheritePosMap.size()) + '\n';
-        } else {
-            res += "netherDataMap数据不存在\n";
-        }
-        auto it = this->netherBsciChunkData.find(chunkPos);
-        if (it != this->netherBsciChunkData.end()) {
-            res += "netherBsciChunkData: dataDrawed = " + std::to_string(it->second.dataDrawed)
-                 + " neighborValidCount = " + std::to_string(it->second.neighborValidCount);
-        } else {
-            res += "netherBsciChunkData数据不存在\n";
-        }
-    }
-    {
-        std::lock_guard lock(this->theEndDataMapLock);
-        auto            iter = this->theEndDataMap.find(chunkPos);
-        if (iter != this->theEndDataMap.end()) {
-            res +=
-                "theEndDataMap: len(endIslandPosSet) = " + std::to_string(iter->second.endIslandPosMap.size()) + '\n';
-        } else {
-            res += "theEndDataMap数据不存在\n";
-        }
-        auto it = this->theEndBsciChunkData.find(chunkPos);
-        if (it != this->theEndBsciChunkData.end()) {
-            res += "theEndBsciChunkData: dataDrawed = " + std::to_string(it->second.dataDrawed)
-                 + " neighborValidCount = " + std::to_string(it->second.neighborValidCount);
-        } else {
-            res += "theEndBsciChunkData数据不存在";
-        }
-    }
-    return res;
-}
+// std::string DuplicatableManager::test(ChunkPos chunkPos) {
+//     std::string res = chunkPos.toString() + "\n";
+//     {
+//         std::lock_guard lock(this->netherDataMapLock);
+//         auto            iter = this->netherDataMap.find(chunkPos);
+//         if (iter != this->netherDataMap.end()) {
+//             res +=
+//                 "netherDataMap: len(netheritePosSet) = " + std::to_string(iter->second.netheritePosMap.size()) +
+//                 '\n';
+//         } else {
+//             res += "netherDataMap数据不存在\n";
+//         }
+//         auto it = this->netherBsciChunkData.find(chunkPos);
+//         if (it != this->netherBsciChunkData.end()) {
+//             res += "netherBsciChunkData: dataDrawed = " + std::to_string(it->second.dataDrawed)
+//                  + " neighborValidCount = " + std::to_string(it->second.neighborValidCount);
+//         } else {
+//             res += "netherBsciChunkData数据不存在\n";
+//         }
+//     }
+//     {
+//         std::lock_guard lock(this->theEndDataMapLock);
+//         auto            iter = this->theEndDataMap.find(chunkPos);
+//         if (iter != this->theEndDataMap.end()) {
+//             res +=
+//                 "theEndDataMap: len(endIslandPosSet) = " + std::to_string(iter->second.endIslandPosMap.size()) +
+//                 '\n';
+//         } else {
+//             res += "theEndDataMap数据不存在\n";
+//         }
+//         auto it = this->theEndBsciChunkData.find(chunkPos);
+//         if (it != this->theEndBsciChunkData.end()) {
+//             res += "theEndBsciChunkData: dataDrawed = " + std::to_string(it->second.dataDrawed)
+//                  + " neighborValidCount = " + std::to_string(it->second.neighborValidCount);
+//         } else {
+//             res += "theEndBsciChunkData数据不存在";
+//         }
+//     }
+//     return res;
+// }
 } // namespace coral_fans::functions::locate

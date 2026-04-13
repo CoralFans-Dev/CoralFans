@@ -361,6 +361,9 @@
                 },
                 "chorusFlower": {
                     "oriPos": "可回溯紫颂果树起始点[{}]"
+                },
+                "endGateway": {
+                    "oriPos": "可回溯末地折跃门起始点"
                 }
             }
         }

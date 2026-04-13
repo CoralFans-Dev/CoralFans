@@ -134,12 +134,13 @@ void HsaManager::draw() {
     auto level = ll::service::getLevel();
     if (!level) [[unlikely]]
         return;
-    level->forEachPlayer([&](Player& player) {
+    static int radius = std::max(0, mod().getConfig().functions.hsa.drawRadius);
+    level->forEachPlayer([this, radius = radius](Player& player) {
         ChunkPos originChunkPos = ChunkPos(player.getFeetBlockPos());
         auto&    dim            = player.getDimension();
         int      dimId          = player.getDimensionId();
-        for (int i = -6; i <= 6; ++i) {
-            int maxJ = 6 - abs(i);
+        for (int i = -radius; i <= radius; ++i) {
+            int maxJ = radius - abs(i);
             for (int j = -maxJ; j <= maxJ; ++j) {
                 ChunkPos chunkPos = ChunkPos(originChunkPos.x + i, originChunkPos.z + j);
                 auto     chunk    = (*dim.mBlockSource)->getChunk(chunkPos);
@@ -172,15 +173,16 @@ void HsaManager::draw() {
 }
 
 void HsaManager::tick() {
-    auto& hsaConfig = mod().getConfig().functions.hsa;
     if (!this->tickCounter) {
         this->draw();
         if (!this->runtimeRemoveTickCounter) {
             this->runtimeRemove();
         }
-        this->runtimeRemoveTickCounter = (this->runtimeRemoveTickCounter + 1) % hsaConfig.runtimeRemoveScale;
+        static int removeInterval      = std::max(1, mod().getConfig().functions.hsa.runtimeRemoveScale);
+        this->runtimeRemoveTickCounter = (this->runtimeRemoveTickCounter + 1) % removeInterval;
     }
-    this->tickCounter = (this->tickCounter + 1) % hsaConfig.drawInterval;
+    static int interval = std::max(1, mod().getConfig().functions.hsa.drawInterval);
+    this->tickCounter   = (this->tickCounter + 1) % interval;
 }
 
 void HsaManager::remove() {
