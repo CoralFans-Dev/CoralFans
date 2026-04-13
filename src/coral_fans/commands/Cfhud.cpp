@@ -1,5 +1,6 @@
 #include "coral_fans/base/Macros.h"
 #include "coral_fans/base/Mod.h"
+#include "coral_fans/functions/hud/Hud.h"
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/command/runtime/ParamKind.h"
@@ -11,6 +12,7 @@
 #include "mc/server/commands/CommandPermissionLevel.h"
 #include "mc/world/actor/player/Player.h"
 #include <string>
+
 
 namespace coral_fans::commands {
 
@@ -80,5 +82,4 @@ void registerCfhudCommand(CommandPermissionLevel permission) {
             else output.error("command.cfhud.error.seterror"_tr());
         });
 }
-
 } // namespace coral_fans::commands

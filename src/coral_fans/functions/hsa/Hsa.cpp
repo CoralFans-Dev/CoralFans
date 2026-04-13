@@ -130,7 +130,6 @@ void HsaManager::drawChunkStructure(
 }
 
 void HsaManager::draw() {
-    if (!this->hsaShow && !this->structureShow) return;
     auto level = ll::service::getLevel();
     if (!level) [[unlikely]]
         return;
@@ -173,6 +172,7 @@ void HsaManager::draw() {
 }
 
 void HsaManager::tick() {
+    if (!this->hsaShow && !this->structureShow) return;
     if (!this->tickCounter) {
         this->draw();
         if (!this->runtimeRemoveTickCounter) {

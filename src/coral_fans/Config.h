@@ -164,6 +164,13 @@ struct Config {
                 } chunkSavedDebugInfo{};
             } duplicatable{};
         } locate{};
+
+        struct {
+            int         drawInterval       = 60;
+            int         runtimeRemoveScale = 20;
+            int         drawRadius         = 6;
+            std::string slimeChunkColor    = "#10E436";
+        } slime{};
     } functions{};
 
     struct {

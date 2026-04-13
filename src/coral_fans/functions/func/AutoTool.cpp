@@ -10,6 +10,7 @@
 #include "mc/world/events/BlockEventCoordinator.h"
 #include "mc/world/item/Item.h"
 #include "mc/world/item/ItemStack.h"
+#include "mc/world/level/BlockSource.h"
 
 
 #include <format>

@@ -4,6 +4,7 @@
 #include "coral_fans/functions/data/Data.h"
 #include "coral_fans/functions/func/FuncManager.h"
 
+#include "coral_fans/functions/village/Village.h"
 #include "ll/api/base/StdInt.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/service/Bedrock.h"
@@ -106,14 +107,14 @@ void HudHelper::tick() {
                     if (hitrst.mType == HitResultType::Entity) {
                         auto* entity = hitrst.getEntity();
                         if (entity) {
-                            auto rst  = mod.getVillageManager().getVillagerInfo(entity->getOrCreateUniqueID());
+                            auto rst  = CFVillageManager::getInstance().getVillagerInfo(entity->getOrCreateUniqueID());
                             msg      += rst.first + "\n";
                         }
                     }
                 }
                 if (hud & (1 << HudHelper::HudType::hopper)) {
                     int ch = HopperCounterManager::getViewChannel(blockSource, hitrst);
-                    if (ch != -1) msg += mod.getHopperCounterManager().getChannel(ch).info() + "\n";
+                    if (ch != -1) msg += HopperCounterManager::getInstance().getChannel(ch).info() + "\n";
                 }
                 if (hud & (1 << HudHelper::HudType::block)) {
                     if (hitrst.mType == HitResultType::Tile) {

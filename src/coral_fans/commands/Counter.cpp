@@ -31,8 +31,7 @@ void registerCounterCommand(CommandPermissionLevel permission) {
         .optional("channel", ll::command::ParamKind::Int)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             if (self["channel"].has_value()) {
-                output.success(coral_fans::mod()
-                                   .getHopperCounterManager()
+                output.success(functions::HopperCounterManager::getInstance()
                                    .getChannel(self["channel"].get<ll::command::ParamKind::Int>())
                                    .info());
             } else {
@@ -45,7 +44,7 @@ void registerCounterCommand(CommandPermissionLevel permission) {
                 auto& blockSource = player->getDimensionBlockSource();
                 int   ch          = functions::HopperCounterManager::getViewChannel(blockSource, hitrst);
                 if (ch == -1) return output.error("command.counter.print.error"_tr());
-                output.success(coral_fans::mod().getHopperCounterManager().getChannel(ch).info());
+                output.success(functions::HopperCounterManager::getInstance().getChannel(ch).info());
             }
         });
 
@@ -55,8 +54,7 @@ void registerCounterCommand(CommandPermissionLevel permission) {
         .optional("channel", ll::command::ParamKind::Int)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             if (self["channel"].has_value()) {
-                coral_fans::mod()
-                    .getHopperCounterManager()
+                functions::HopperCounterManager::getInstance()
                     .getChannel(self["channel"].get<ll::command::ParamKind::Int>())
                     .reset();
                 output.success("command.counter.reset.success"_tr(self["channel"].get<ll::command::ParamKind::Int>()));
@@ -70,7 +68,7 @@ void registerCounterCommand(CommandPermissionLevel permission) {
                 auto& blockSource = player->getDimensionBlockSource();
                 int   ch          = functions::HopperCounterManager::getViewChannel(blockSource, hitrst);
                 if (ch == -1) return output.error("command.counter.reset.error"_tr(ch));
-                coral_fans::mod().getHopperCounterManager().getChannel(ch).reset();
+                functions::HopperCounterManager::getInstance().getChannel(ch).reset();
                 output.success("command.counter.reset.success"_tr(ch));
             }
         });

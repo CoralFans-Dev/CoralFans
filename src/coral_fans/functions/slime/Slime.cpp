@@ -15,50 +15,81 @@ static const int radius = 5;
 }
 
 namespace coral_fans::functions {
+void SlimeManager::setShow(bool show) {
+    if (this->mShow == show) return;
+    this->mShow = show;
+    if (show) {
+        this->tickCounter              = 0;
+        this->runtimeRemoveTickCounter = 1;
+    } else this->remove();
+}
+
+bool SlimeManager::getShow() { return this->mShow; }
+
+void SlimeManager::draw() {
+    auto level = ll::service::getLevel();
+    if (!level.has_value()) [[unlikely]]
+        return;
+    auto& geometryGroup = mod().getGeometryGroup();
+    level->forEachPlayer([&](Player& player) {
+        auto originChunkPos = utils::blockPosToChunkPos(player.getFeetBlockPos());
+        for (int i = -radius; i <= radius; ++i) {
+            int maxJ = radius - abs(i);
+            for (int j = -maxJ; j <= maxJ; ++j) {
+                auto         seed = ((originChunkPos.x + i) * 0x1f1f1f1fu) ^ (uint32_t)(originChunkPos.z + j);
+                std::mt19937 mt(seed);
+                if (mt() % 10 == 0) {
+                    auto [it, inserted] =
+                        this->mParticleMap.try_emplace(ChunkPos(originChunkPos.x + i, originChunkPos.z + j));
+                    if (inserted) {
+                        it->second.first = geometryGroup->box(
+                            0,
+                            AABB{
+                                {(originChunkPos.x + i) * 16 + 0.1,  -64, (originChunkPos.z + j) * 16 + 0.1 },
+                                {(originChunkPos.x + i) * 16 + 15.9, 320, (originChunkPos.z + j) * 16 + 15.9}
+                        },
+                            mce::Color::GREEN()
+                        );
+                    }
+                    it->second.second = 0;
+                }
+            }
+        }
+        return true;
+    });
+}
 
 void SlimeManager::tick() {
-    static int gt = 0;
-    if (gt == 0 && this->mShow) {
-        auto level = ll::service::getLevel();
-        if (level.has_value()) {
-            // get players
-            level->forEachPlayer([&](Player& player) {
-                auto originChunkPos = utils::blockPosToChunkPos(player.getFeetBlockPos());
-                // chunks
-                for (int i = -radius; i <= radius; ++i) {
-                    for (int j = -radius; j <= radius; ++j) {
-                        auto         seed = ((originChunkPos.x + i) * 0x1f1f1f1fu) ^ (uint32_t)(originChunkPos.z + j);
-                        std::mt19937 mt(seed);
-                        if (mt() % 10 == 0
-                            && this->mParticleMap.find(ChunkPos{originChunkPos.x + i, originChunkPos.z + j})
-                                   == this->mParticleMap.end())
-                            this->mParticleMap[ChunkPos{
-                                originChunkPos.x + i,
-                                originChunkPos.z + j
-                            }] =
-                                coral_fans::mod().getGeometryGroup()->box(
-                                    0,
-                                    BoundingBox{
-                                        {(originChunkPos.x + i) * 16 + 0.5, -64, (originChunkPos.z + j) * 16 + 0.5},
-                                        {(originChunkPos.x + i) * 16 + 14.5, 320, (originChunkPos.z + j) * 16 + 14.5}
-                                    },
-                                    mce::Color::GREEN()
-                                );
-                    }
-                }
-                return true;
-            });
+    if (!this->mShow) return;
+    if (!this->tickCounter) {
+        this->draw();
+        if (!this->runtimeRemoveTickCounter) {
+            this->runtimeRemove();
         }
+        static int removeInterval      = std::max(1, mod().getConfig().functions.slime.runtimeRemoveScale);
+        this->runtimeRemoveTickCounter = (this->runtimeRemoveTickCounter + 1) % removeInterval;
     }
-    gt = (gt + 1) % 80;
+    static int interval = std::max(1, mod().getConfig().functions.slime.drawInterval);
+    this->tickCounter   = (this->tickCounter + 1) % interval;
 }
 
 void SlimeManager::remove() {
-    auto it = this->mParticleMap.begin();
-    while (it != this->mParticleMap.end()) {
-        coral_fans::mod().getGeometryGroup()->remove(it->second);
-        this->mParticleMap.erase(it++);
+    auto& geometryGroup = mod().getGeometryGroup();
+    for (auto& [_, data] : this->mParticleMap) {
+        geometryGroup->remove(data.first);
     }
+    this->mParticleMap.clear();
 }
 
+void SlimeManager::runtimeRemove() {
+    auto& geometryGroup = coral_fans::mod().getGeometryGroup();
+    auto& slimeConfig   = mod().getConfig().functions.slime;
+    std::erase_if(this->mParticleMap, [&geometryGroup, &slimeConfig](auto& data) {
+        if (data.second.second == slimeConfig.runtimeRemoveScale) {
+            geometryGroup->remove(data.second.first);
+            return true;
+        }
+        return false;
+    });
+}
 } // namespace coral_fans::functions

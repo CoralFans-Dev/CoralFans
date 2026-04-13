@@ -1,3 +1,5 @@
+#pragma once
+
 #include "bsci/GeometryGroup.h"
 #include "coral_fans/Config.h"
 #include "mc/deps/core/math/Random.h"

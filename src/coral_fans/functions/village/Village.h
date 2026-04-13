@@ -85,6 +85,11 @@ public:
     // void                         clearParticle();
     std::pair<std::string, bool> getVillagerInfo(ActorUniqueID);
 
+public:
+    static CFVillageManager& getInstance() {
+        static CFVillageManager instance;
+        return instance;
+    }
     static void hookVillage(bool);
 };
 } // namespace coral_fans::functions

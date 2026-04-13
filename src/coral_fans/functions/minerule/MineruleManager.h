@@ -1,3 +1,5 @@
+#pragma once
+
 namespace coral_fans::functions {
 class MineruleManager {
 public:

@@ -508,7 +508,7 @@ LL_TYPE_INSTANCE_HOOK(
     ::BlockPos const& _origin
 ) {
     auto ori = origin(dimension, id, _origin);
-    coral_fans::mod().getVillageManager().addVillage(static_cast<Village*>(ori));
+    CFVillageManager::getInstance().addVillage(static_cast<Village*>(ori));
     return ori;
 }
 
@@ -521,7 +521,7 @@ LL_TYPE_INSTANCE_HOOK(
     Tick         tick,
     BlockSource& region
 ) {
-    coral_fans::mod().getVillageManager().handleVillageTick(this, tick);
+    CFVillageManager::getInstance().handleVillageTick(this, tick);
     origin(tick, region);
 }
 
@@ -533,7 +533,7 @@ LL_TYPE_INSTANCE_HOOK(
     void,
     ::Village& village
 ) {
-    coral_fans::mod().getVillageManager().removeVillage(&village);
+    CFVillageManager::getInstance().removeVillage(&village);
     origin(village);
 }
 

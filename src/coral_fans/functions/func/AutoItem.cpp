@@ -13,6 +13,7 @@
 #include "mc/world/item/ItemStack.h"
 #include "mc/world/item/SaveContextFactory.h"
 #include "mc/world/item/ShulkerBoxBlockItem.h"
+#include "mc/world/level/BlockSource.h"
 #include "mc/world/level/block/Block.h"
 #include <optional>
 #include <string>

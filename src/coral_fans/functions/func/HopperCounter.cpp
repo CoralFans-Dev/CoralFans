@@ -152,7 +152,7 @@ LL_TYPE_INSTANCE_HOOK(
         HOOK_HOPPER_RETURN
     }
     // save item info
-    coral_fans::mod().getHopperCounterManager().getChannel(channel).add(
+    HopperCounterManager::getInstance().getChannel(channel).add(
         item.getCustomName().empty() ? item.getName() : item.getCustomName() + " (" + item.getTypeName() + ")",
         item.mCount
     );

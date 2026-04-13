@@ -1,5 +1,7 @@
 #include "coral_fans/functions/prof/Prof.h"
-#include "coral_fans/base/Mod.h"
+
+
+
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/command/runtime/ParamKind.h"
@@ -32,8 +34,9 @@ void registerProfCommand(CommandPermissionLevel permission) {
             if (self["numberOfTick"].has_value())
                 numberOfTick = self["numberOfTick"].get<ll::command::ParamKind::Int>();
             if (numberOfTick <= 0 || numberOfTick > 1200) return output.error("command.prof.error.outofrange"_tr());
-            if (coral_fans::mod().getProfiler().profiling) return output.error("command.prof.error.running"_tr());
-            coral_fans::mod().getProfiler().start(numberOfTick, type);
+            auto& profiler = functions::Profiler::getInstance();
+            if (profiler.profiling) return output.error("command.prof.error.running"_tr());
+            profiler.start(numberOfTick, type);
             output.success("command.prof.success"_tr());
         });
 

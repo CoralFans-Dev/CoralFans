@@ -1,5 +1,5 @@
+#include "coral_fans/functions/slime/Slime.h"
 #include "coral_fans/base/Macros.h"
-#include "coral_fans/base/Mod.h"
 #include "coral_fans/base/Utils.h"
 
 #include "ll/api/command/CommandHandle.h"
@@ -24,11 +24,10 @@ void registerSlimeCommand(CommandPermissionLevel permission) {
         .text("show")
         .optional("isopen", ll::command::ParamKind::Bool)
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
-            auto& slimeManager = coral_fans::mod().getSlimeManager();
-            if (self["isopen"].has_value()) slimeManager.mShow = self["isopen"].get<ll::command::ParamKind::Bool>();
-            else slimeManager.mShow = !slimeManager.mShow;
-            if (!slimeManager.mShow) slimeManager.remove();
-            output.success("command.slime.show.output"_tr(slimeManager.mShow ? "true" : "false"));
+            auto& slimeManager = functions::SlimeManager::getInstance();
+            if (self["isopen"].has_value()) slimeManager.setShow(self["isopen"].get<ll::command::ParamKind::Bool>());
+            else slimeManager.setShow(slimeManager.getShow());
+            output.success("command.slime.show.output"_tr(slimeManager.getShow() ? "true" : "false"));
         });
 
     // slime check
