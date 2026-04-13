@@ -242,8 +242,40 @@
             "restore_ancillary_broken": {
                 "success": "设置 restore_ancillary_broken \"{}\"",
                 "error": "设置 restore_ancillary_broken 失败"
+            },
+            "fuck_population_cap": {
+                "success": "设置 fuck_population_cap \"{}\"",
+                "error": "设置 fuck_population_cap 失败"
             }
         },
+        "popcap": {
+            "description": "控制刷怪上限限制",
+            "global": {
+                "success": "已将全局刷怪上限设置为 {}",
+                "reset": {
+                    "success": "已将全局刷怪上限重置为默认值 (200)"
+                }
+            },
+            "dim": {
+                "success": "已将 {} {}{} 上限设置为 {}",
+                "error": "设置 {} {}{} 上限失败，可能该维度从未加载过",
+                "reset": {
+                    "success": "已将 {} 的刷怪上限重置为维度默认值",
+                    "error": "重置 {} 刷怪上限失败，可能该维度从未加载过"
+                }
+            },
+            "category": {
+                "animal": "动物",
+                "monster": "怪物",
+                "water_animal": "水生动物",
+                "villager": "村民",
+                "ambient": "环境生物",
+                "cat": "猫",
+                "pillager": "掠夺者"
+            }
+        },
+        "surface": "地表",
+        "underground": "洞穴",
         "noclip": {
             "description": "创造模式穿墙",
             "enabled": "创造模式穿墙已启用。",
@@ -269,7 +301,7 @@
         "dimension": {
             "overworld": "主世界",
             "nether": "下界",
-            "theend": "末地",
+            "the_end": "末地",
             "unknown": "未定义维度"
         },
         "profiler": {

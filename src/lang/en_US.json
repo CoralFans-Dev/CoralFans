@@ -206,7 +206,7 @@
             }
         },
         "minerule": {
-            "description": "Mine rule is the rule",
+            "description": "Because I Said So",
             "bedrockDrop": {
                 "success": {
                     "true": "Bedrock edition without bedrock, just like jang without moms.\n\nCongratulations on enabling the bedrock drop feature",
@@ -232,8 +232,40 @@
             "restore_ancillary_broken": {
                 "success": "set restore_ancillary_broken \"{}\"",
                 "error": "failed to set restore_ancillary_broken"
+            },
+            "fuck_population_cap": {
+                "success": "set fuck_population_cap \"{}\"",
+                "error": "failed to set fuck_population_cap"
             }
         },
+        "popcap": {
+            "description": "control mob population cap",
+            "global": {
+                "success": "Set global population cap to {}",
+                "reset": {
+                    "success": "Reset global population cap to default (200)"
+                }
+            },
+            "dim": {
+                "success": "Set dimension {} category {} cap for {} to {}",
+                "error": "Failed to set dimension {} category {} cap for {}, possibly because the dimension was never loaded",
+                "reset": {
+                    "success": "Reset dimension {} population caps to their original values",
+                    "error": "Failed to reset dimension {} population caps, possibly because the dimension was never loaded"
+                }
+            },
+            "category": {
+                "animal": "Animal",
+                "monster": "Monster",
+                "water_animal": "Water Animal",
+                "villager": "Villager",
+                "ambient": "Ambient",
+                "cat": "Cat",
+                "pillager": "Pillager"
+            }
+        },
+        "surface": "Surface",
+        "underground": "Underground",
         "noclip": {
             "description": "noclip in creative gamemode",
             "enabled": "noclip enabled.",
@@ -250,7 +282,7 @@
         "dimension": {
             "overworld": "Overworld",
             "nether": "Nether",
-            "theend": "TheEnd",
+            "the_end": "The End",
             "unknown": "Undefined Dimension"
         },
         "profiler": {

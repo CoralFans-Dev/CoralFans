@@ -79,6 +79,8 @@ bool CoralFans::enable() {
         commands::registerCalculateCommand(mod.getConfig().command.calculate.permission);
     if (mod.getConfig().command.minerule.enabled)
         commands::registerMineruleCommand(mod.getConfig().command.minerule.permission);
+    if (mod.getConfig().command.popcap.enabled)
+        commands::registerPopcapCommand(mod.getConfig().command.popcap.permission);
     if (mod.getConfig().command.freecamera.enabled)
         commands::registerFreeCameraCommand(mod.getConfig().command.freecamera.permission);
     if (mod.getConfig().command.noclip.enabled)

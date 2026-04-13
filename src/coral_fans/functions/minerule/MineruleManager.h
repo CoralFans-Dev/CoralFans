@@ -12,5 +12,6 @@ public:
     void portalSandFarmHook(bool);
     void portalSpawnHook(bool);
     void restoreAncillaryBrokenHook(bool);
+    void populationCapHook(bool);
 };
 } // namespace coral_fans::functions

@@ -110,5 +110,20 @@ void registerMineruleCommand(CommandPermissionLevel permission) {
         });
 
     mineruleManager.restoreAncillaryBrokenHook(mod().getConfigDb()->get("minerule.restore_ancillary_broken") == "true");
+
+    mineruleCommand.runtimeOverload()
+        .text("fuck_population_cap")
+        .required("isopen", ll::command::ParamKind::Bool)
+        .execute(
+            [&mineruleManager](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
+                if (coral_fans::mod().getConfigDb()->set("minerule.fuck_population_cap", isopen ? "true" : "false")) {
+                    output.success("command.minerule.fuck_population_cap.success"_tr(isopen ? "true" : "false"));
+                    mineruleManager.populationCapHook(isopen);
+                } else output.error("command.minerule.fuck_population_cap.error"_tr());
+            }
+        );
+
+    mineruleManager.populationCapHook(mod().getConfigDb()->get("minerule.fuck_population_cap") == "true");
 }
 } // namespace coral_fans::commands

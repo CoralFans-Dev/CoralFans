@@ -138,7 +138,7 @@ void Profiler::print() const {
 std::string Profiler::printChunks() const {
     using ll::i18n_literals::operator""_tr;
     const static std::string dims[] =
-        {"translate.dimension.overworld"_tr(), "translate.dimension.nether"_tr(), "translate.dimension.theend"_tr()};
+        {"translate.dimension.overworld"_tr(), "translate.dimension.nether"_tr(), "translate.dimension.the_end"_tr()};
     std::string retstr;
     for (int i = 0; i < 3; ++i) {
         auto& dim_data = this->chunkInfo.chunk_counter[i];
@@ -170,7 +170,7 @@ std::string Profiler::printChunks() const {
 std::string Profiler::printPendingTicks() const {
     using ll::i18n_literals::operator""_tr;
     const static std::string dims[] =
-        {"translate.dimension.overworld"_tr(), "translate.dimension.nether"_tr(), "translate.dimension.theend"_tr()};
+        {"translate.dimension.overworld"_tr(), "translate.dimension.nether"_tr(), "translate.dimension.the_end"_tr()};
     std::string retstr;
     for (int i = 0; i < 3; ++i) {
         auto& pt_data = this->ptCounter[i];
@@ -228,7 +228,7 @@ std::string Profiler::printBasics() const {
 std::string Profiler::printActor() const {
     using ll::i18n_literals::operator""_tr;
     const static std::string dims[] =
-        {"translate.dimension.overworld"_tr(), "translate.dimension.nether"_tr(), "translate.dimension.theend"_tr()};
+        {"translate.dimension.overworld"_tr(), "translate.dimension.nether"_tr(), "translate.dimension.the_end"_tr()};
     std::string retstr;
     double      totalTime = 0.0;
     for (int i = 0; i < 3; i++) {

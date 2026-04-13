@@ -22,6 +22,7 @@ void                   registerCfhudCommand(CommandPermissionLevel);
 void                   registerLogCommand(CommandPermissionLevel);
 void                   registerCalculateCommand(CommandPermissionLevel);
 void                   registerMineruleCommand(CommandPermissionLevel);
+void                   registerPopcapCommand(CommandPermissionLevel);
 void                   registerFreeCameraCommand(CommandPermissionLevel);
 void                   registerNoclipCommand(CommandPermissionLevel);
 void                   registerLocateCommand(CommandPermissionLevel permission);

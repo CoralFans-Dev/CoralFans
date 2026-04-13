@@ -335,7 +335,7 @@ std::vector<std::string> CFVillageManager::listVillages() {
                 dimensionText = "translate.dimension.nether"_tr();
                 break;
             case 2:
-                dimensionText = "translate.dimension.theend"_tr();
+                dimensionText = "translate.dimension.the_end"_tr();
                 break;
             default:
                 dimensionText = "translate.dimension.unknown"_tr();
@@ -372,7 +372,7 @@ std::string CFVillageManager::listTickingVillages() {
             dimensionText = "translate.dimension.nether"_tr();
             break;
         case 2:
-            dimensionText = "translate.dimension.theend"_tr();
+            dimensionText = "translate.dimension.the_end"_tr();
             break;
         default:
             dimensionText = "translate.dimension.unknown"_tr();
@@ -446,7 +446,7 @@ std::pair<std::string, bool> CFVillageManager::getVillageInfo(int id) {
         dimensionText = "translate.dimension.nether"_tr();
         break;
     case 2:
-        dimensionText = "translate.dimension.theend"_tr();
+        dimensionText = "translate.dimension.the_end"_tr();
         break;
     default:
         dimensionText = "translate.dimension.unknown"_tr();

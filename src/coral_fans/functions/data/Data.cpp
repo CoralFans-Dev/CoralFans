@@ -192,9 +192,9 @@ std::pair<std::string, bool> getItemNbt(ItemStack const& item, std::string path)
 
 void highlightBlockEntity(Player* player, int radius, int time) {
     if (player) {
-        int               dimid  = player->getDimensionId();
-        auto              origin = player->getPosition();
-        Vec3              offset{radius, radius, radius};
+        int               dimid      = player->getDimensionId();
+        auto              origin     = player->getPosition();
+        int               range      = std::max(radius, 0);
         static int        colorindex = 0;
         static std::array colors{
             mce::Color::BLACK(),
@@ -211,9 +211,18 @@ void highlightBlockEntity(Player* player, int radius, int time) {
             mce::Color::WHITE(),
             mce::Color::YELLOW()
         };
-        for (auto blockActor : player->getDimensionBlockSource().fetchBlockEntities({origin - offset, origin + offset}))
-            if (blockActor) utils::shortHighligntBlock(dimid, blockActor->mPosition, colors[colorindex], time);
-        colorindex = (colorindex + 1) % 9;
+        auto& blockSource = player->getDimensionBlockSource();
+        for (int dx = -range; dx <= range; ++dx) {
+            for (int dy = -range; dy <= range; ++dy) {
+                for (int dz = -range; dz <= range; ++dz) {
+                    BlockPos pos{origin.x + dx, origin.y + dy, origin.z + dz};
+                    if (auto* blockActor = blockSource.getBlockEntity(pos)) {
+                        utils::shortHighligntBlock(dimid, blockActor->mPosition, colors[colorindex], time);
+                    }
+                }
+            }
+        }
+        colorindex = (colorindex + 1) % colors.size();
     }
 }
 
