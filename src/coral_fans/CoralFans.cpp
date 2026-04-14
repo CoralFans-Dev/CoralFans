@@ -1,34 +1,75 @@
 #include "coral_fans/CoralFans.h"
 #include "bsci/GeometryGroup.h"
-#include "coral_fans/base/Mod.h"
-#include "coral_fans/base/MySchedule.h"
 #include "coral_fans/commands/Commands.h"
 #include "coral_fans/functions/func/FuncManager.h"
 #include "coral_fans/functions/shortcuts/Shortcuts.h"
 #include "ll/api/Config.h"
+#include "ll/api/event/EventBus.h"
+#include "ll/api/event/command/ExecuteCommandEvent.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/mod/RegisterHelper.h"
 #include <memory>
 
 
 namespace coral_fans {
+struct CoralFans::Impl {
+    config::Config                        mConfig;
+    std::unique_ptr<ll::data::KeyValueDB> mConfigDb;
+    std::unique_ptr<bsci::GeometryGroup>  mGeometryGroup;
+    std::set<ll::event::ListenerPtr>      mEventListeners;
+};
+
+CoralFans::CoralFans() : impl(std::make_unique<Impl>()), mSelf(*ll::mod::NativeMod::current()) {}
+CoralFans::~CoralFans() = default;
+
+config::Config& CoralFans::getConfig() { return impl->mConfig; }
+
+std::unique_ptr<ll::data::KeyValueDB>& CoralFans::getConfigDb() { return impl->mConfigDb; }
+
+std::unique_ptr<bsci::GeometryGroup>& CoralFans::getGeometryGroup() { return impl->mGeometryGroup; }
+
+std::set<ll::event::ListenerPtr>& CoralFans::getEventListeners() { return impl->mEventListeners; }
 
 CoralFans& CoralFans::getInstance() {
     static CoralFans instance;
     return instance;
 }
 
+void CoralFans::setupCommands() {
+    commands::registerCoralfansCommand();
+    auto& commandsConfig = this->getConfig().command;
+    if (commandsConfig.tick.enabled) commands::registerTickCommand(commandsConfig.tick.permission);
+    if (commandsConfig.func.enabled) commands::registerFuncCommand(commandsConfig.func.permission);
+    if (commandsConfig.self.enabled) commands::registerSelfCommand(commandsConfig.self.permission);
+    if (commandsConfig.hsa.enabled) commands::registerHsaCommand(commandsConfig.hsa.permission);
+    if (commandsConfig.counter.enabled) commands::registerCounterCommand(commandsConfig.counter.permission);
+    if (commandsConfig.prof.enabled) commands::registerProfCommand(commandsConfig.prof.permission);
+    if (commandsConfig.slime.enabled) commands::registerSlimeCommand(commandsConfig.slime.permission);
+    if (commandsConfig.village.enabled) commands::registerVillageCommand(commandsConfig.village.permission);
+    if (commandsConfig.rotate.enabled) commands::registerRotateCommand(commandsConfig.rotate.permission);
+    if (commandsConfig.data.enabled) commands::registerDataCommand(commandsConfig.data.permission);
+    if (commandsConfig.cfhud.enabled) commands::registerCfhudCommand(commandsConfig.cfhud.permission);
+    if (commandsConfig.log.enabled) commands::registerLogCommand(commandsConfig.log.permission);
+    if (commandsConfig.calculate.enabled) commands::registerCalculateCommand(commandsConfig.calculate.permission);
+    if (commandsConfig.minerule.enabled) commands::registerMineruleCommand(commandsConfig.minerule.permission);
+    if (commandsConfig.popcap.enabled) commands::registerPopcapCommand(commandsConfig.popcap.permission);
+    if (commandsConfig.freecamera.enabled) commands::registerFreeCameraCommand(commandsConfig.freecamera.permission);
+    if (commandsConfig.noclip.enabled) commands::registerNoclipCommand(commandsConfig.noclip.permission);
+    if (commandsConfig.locate.enabled) commands::registerLocateCommand(commandsConfig.locate.permission);
+
+    functions::ShortcutsManager::getInstance().registerShortcutsCommand();
+}
+
 bool CoralFans::load() {
     const auto& logger = getSelf().getLogger();
-    auto&       mod    = coral_fans::mod();
 
     // load config
     try {
         const auto& configFilePath = getSelf().getConfigDir() / "config.json";
-        if (!ll::config::loadConfig(mod.getConfig(), configFilePath)) {
+        if (!ll::config::loadConfig(getConfig(), configFilePath)) {
             logger.warn("Cannot load configurations from {}", configFilePath);
             logger.info("Saving default configurations");
-            if (!ll::config::saveConfig(mod.getConfig(), configFilePath)) {
+            if (!ll::config::saveConfig(getConfig(), configFilePath)) {
                 logger.error("Cannot save default configurations to {}", configFilePath);
                 return false;
             }
@@ -45,10 +86,11 @@ bool CoralFans::load() {
     // load Config Database
     logger.debug("Loading Config Database");
     const auto& configDbPath = getSelf().getDataDir() / "config";
-    mod.getConfigDb()        = std::make_unique<ll::data::KeyValueDB>(configDbPath);
+    getConfigDb()            = std::make_unique<ll::data::KeyValueDB>(configDbPath);
 
     // load GeometryGroup
-    mod.getGeometryGroup() = bsci::GeometryGroup::createDefault();
+    getGeometryGroup() = bsci::GeometryGroup::createDefault();
+
 
     return true;
 }
@@ -56,42 +98,11 @@ bool CoralFans::load() {
 bool CoralFans::enable() {
     const auto& logger = getSelf().getLogger();
     logger.debug("Enabling...");
-    auto& mod = coral_fans::mod();
 
-    // register commands
-    commands::registerCoralfansCommand();
-    if (mod.getConfig().command.tick.enabled) commands::registerTickCommand(mod.getConfig().command.tick.permission);
-    if (mod.getConfig().command.func.enabled) commands::registerFuncCommand(mod.getConfig().command.func.permission);
-    if (mod.getConfig().command.self.enabled) commands::registerSelfCommand(mod.getConfig().command.self.permission);
-    if (mod.getConfig().command.hsa.enabled) commands::registerHsaCommand(mod.getConfig().command.hsa.permission);
-    if (mod.getConfig().command.counter.enabled)
-        commands::registerCounterCommand(mod.getConfig().command.counter.permission);
-    if (mod.getConfig().command.prof.enabled) commands::registerProfCommand(mod.getConfig().command.prof.permission);
-    if (mod.getConfig().command.slime.enabled) commands::registerSlimeCommand(mod.getConfig().command.slime.permission);
-    if (mod.getConfig().command.village.enabled)
-        commands::registerVillageCommand(mod.getConfig().command.village.permission);
-    if (mod.getConfig().command.rotate.enabled)
-        commands::registerRotateCommand(mod.getConfig().command.rotate.permission);
-    if (mod.getConfig().command.data.enabled) commands::registerDataCommand(mod.getConfig().command.data.permission);
-    if (mod.getConfig().command.cfhud.enabled) commands::registerCfhudCommand(mod.getConfig().command.cfhud.permission);
-    if (mod.getConfig().command.log.enabled) commands::registerLogCommand(mod.getConfig().command.log.permission);
-    if (mod.getConfig().command.calculate.enabled)
-        commands::registerCalculateCommand(mod.getConfig().command.calculate.permission);
-    if (mod.getConfig().command.minerule.enabled)
-        commands::registerMineruleCommand(mod.getConfig().command.minerule.permission);
-    if (mod.getConfig().command.popcap.enabled)
-        commands::registerPopcapCommand(mod.getConfig().command.popcap.permission);
-    if (mod.getConfig().command.freecamera.enabled)
-        commands::registerFreeCameraCommand(mod.getConfig().command.freecamera.permission);
-    if (mod.getConfig().command.noclip.enabled)
-        commands::registerNoclipCommand(mod.getConfig().command.noclip.permission);
-    if (mod.getConfig().command.locate.enabled)
-        commands::registerLocateCommand(mod.getConfig().command.locate.permission);
+    setupCommands();
     // register containerreader
     functions::registerContainerReader();
-    // register shortcuts when first player join (确保其他所有插件的指令已被注册)
-    functions::ShortcutsManager::getInstance().waitToRegisterShortcuts();
-
+    functions::ShortcutsManager::getInstance().registerShortcutsListener();
     return true;
 }
 

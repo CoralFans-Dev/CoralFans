@@ -1,7 +1,8 @@
 #include "FuncManager.h"
 #include "coral_fans/base/Macros.h"
-#include "coral_fans/base/Mod.h"
 #include "coral_fans/base/Utils.h"
+
+
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/item/ItemStack.h"
@@ -81,7 +82,7 @@ const std::unordered_map<std::string, int> HopperCounterManager::HOPPER_COUNTER_
 };
 
 void HopperCounterManager::tick() {
-    if (coral_fans::mod().getConfigDb()->get("functions.global.hoppercounter") == "true")
+    if (enabled)
         for (auto& channel : this->channels) channel.tick();
 }
 
@@ -103,7 +104,7 @@ int HopperCounterManager::getViewChannel(BlockSource& blockSource, HitResult hit
 }
 
 LL_TYPE_INSTANCE_HOOK(
-    CoralFansFunctionsHopperCounterHook1,
+    HopperCounterHook1,
     ll::memory::HookPriority::Normal,
     HopperBlockActor,
     &HopperBlockActor::_tryMoveItems,
@@ -123,7 +124,7 @@ LL_TYPE_INSTANCE_HOOK(
 }
 
 LL_TYPE_INSTANCE_HOOK(
-    CoralFansFunctionsHopperCounterHook2,
+    HopperCounterHook2,
     ll::memory::HookPriority::Normal,
     HopperBlockActor,
     &HopperBlockActor::$setItem,
@@ -152,7 +153,7 @@ LL_TYPE_INSTANCE_HOOK(
         HOOK_HOPPER_RETURN
     }
     // save item info
-    coral_fans::mod().getHopperCounterManager().getChannel(channel).add(
+    HopperCounterManager::getInstance().getChannel(channel).add(
         item.getCustomName().empty() ? item.getName() : item.getCustomName() + " (" + item.getTypeName() + ")",
         item.mCount
     );
@@ -160,14 +161,23 @@ LL_TYPE_INSTANCE_HOOK(
     origin(slot, ItemStack::EMPTY_ITEM());
 }
 
-void hookFunctionsHopperCounter(bool hook) {
+void HopperCounterManager::hook(bool hook) {
     if (hook) {
-        CoralFansFunctionsHopperCounterHook1::hook();
-        CoralFansFunctionsHopperCounterHook2::hook();
+        HopperCounterHook1::hook();
+        HopperCounterHook2::hook();
     } else {
-        CoralFansFunctionsHopperCounterHook1::unhook();
-        CoralFansFunctionsHopperCounterHook2::unhook();
+        HopperCounterHook1::unhook();
+        HopperCounterHook2::unhook();
     }
 }
 
+void HopperCounterManager::setEnabled(bool _enabled) {
+    if (_enabled == enabled) return;
+    enabled = _enabled;
+    if (enabled) hook(true);
+    else {
+        hook(false);
+        this->clearAllData();
+    }
+}
 } // namespace coral_fans::functions

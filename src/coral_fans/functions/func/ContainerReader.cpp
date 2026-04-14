@@ -1,9 +1,9 @@
-#include "coral_fans/base/Mod.h"
+#include "coral_fans/CoralFans.h"
+
 
 #include "ll/api/event/EventBus.h"
 #include "ll/api/event/ListenerBase.h"
 #include "ll/api/event/player/PlayerInteractBlockEvent.h"
-
 #include "ll/api/i18n/I18n.h"
 #include "mc/server/ServerPlayer.h"
 #include "mc/world/Container.h"
@@ -49,10 +49,9 @@ namespace coral_fans::functions {
 
 void registerContainerReader() {
     ll::event::ListenerPtr evListener;
-    auto&                  mod = coral_fans::mod();
-    evListener                 = mod.getEventBus().emplaceListener<ll::event::PlayerInteractBlockEvent>(
+    evListener = ll::event::EventBus::getInstance().emplaceListener<ll::event::PlayerInteractBlockEvent>(
         [&](ll::event::PlayerInteractBlockEvent& ev) {
-            if (mod.getConfigDb()->get(
+            if (CoralFans::getInstance().getConfigDb()->get(
                     std::format("functions.players.{}.containerreader", ev.self().getUuid().asString())
                 )
                 != "true")
@@ -73,7 +72,7 @@ void registerContainerReader() {
             }
         }
     );
-    mod.getEventListeners().emplace(evListener);
+    CoralFans::getInstance().getEventListeners().emplace(evListener);
 }
 
 } // namespace coral_fans::functions

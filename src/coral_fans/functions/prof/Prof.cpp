@@ -1,5 +1,5 @@
 #include "coral_fans/functions/prof/Prof.h"
-#include "coral_fans/base/Mod.h"
+#include "coral_fans/CoralFans.h"
 #include "ll/api/i18n/I18n.h"
 #include "mc/network/packet/TextPacket.h"
 #include "mc/world/level/ChunkPos.h"
@@ -132,7 +132,7 @@ void Profiler::print() const {
         break;
     }
     TextPacket::createRawMessage(rst).sendToClients();
-    coral_fans::mod().getLogger().info(rst);
+    CoralFans::getInstance().getSelf().getLogger().info(rst);
 }
 
 std::string Profiler::printChunks() const {

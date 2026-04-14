@@ -1,6 +1,15 @@
+#include "coral_fans/CoralFans.h"
 #include "coral_fans/base/Macros.h"
-#include "coral_fans/base/Mod.h"
+#include "coral_fans/base/MySchedule.h"
 #include "coral_fans/base/Utils.h"
+#include "coral_fans/functions/func/FuncManager.h"
+#include "coral_fans/functions/hsa/Hsa.h"
+#include "coral_fans/functions/hud/Hud.h"
+#include "coral_fans/functions/locate/DuplicatableManager.h"
+#include "coral_fans/functions/prof/Prof.h"
+#include "coral_fans/functions/slime/Slime.h"
+#include "coral_fans/functions/village/Village.h"
+
 
 #include "ll/api/memory/Hook.h"
 #include "mc/util/ProfilerLite.h"
@@ -13,18 +22,24 @@
 #include "mc/world/level/chunk/LevelChunk.h"
 #include "mc/world/level/dimension/Dimension.h"
 #include "mc/world/redstone/circuit/CircuitSceneGraph.h"
-#include <string>
 
 
 namespace coral_fans::functions {
 
 // main game tick
 LL_TYPE_INSTANCE_HOOK(CoralFansTickLevelTickHook, ll::memory::HookPriority::Normal, Level, &Level::$tick, void) {
-    auto& mod  = coral_fans::mod();
-    auto& prof = mod.getProfiler();
+    auto& prof = functions::Profiler::getInstance();
     origin();
     auto time_level = ProfilerLite::gProfilerLiteInstance().mDebugServerTickTime->count() / 1000;
-    PROF_TIMER(coralfans, { mod.tick(this->getCurrentTick()); })
+    PROF_TIMER(coralfans, {
+        functions::HopperCounterManager::getInstance().tick();
+        functions::HsaManager::getInstance().tick();                             // heavy 60
+        functions::SlimeManager::getInstance().tick();                           // heavy 60
+        functions::CFVillageManager::getInstance().tick(this->getCurrentTick()); // light 10
+        functions::HudHelper::getInstance().tick();                              // light 20
+        my_schedule::MySchedule::getSchedule().update();
+        functions::locate::DuplicatableManager::getInstance().tick();
+    })
     if (prof.profiling) {
         prof.gameSessionTickTime += time_level;
         prof.gameSessionTicksBuffer.push_back(time_level);
@@ -47,7 +62,7 @@ LL_TYPE_INSTANCE_HOOK(
     Tick const&             tick,
     ::std::function<void()> spawnerCallback
 ) {
-    auto&      prof     = coral_fans::mod().getProfiler();
+    auto&      prof     = functions::Profiler::getInstance();
     const auto dimid    = tickRegion.getDimensionId();
     auto&      chunkPos = this->mPosition;
     if (prof.profiling) {
@@ -66,7 +81,7 @@ LL_TYPE_INSTANCE_HOOK(
     void,
     BlockSource& region
 ) {
-    auto& prof = coral_fans::mod().getProfiler();
+    auto& prof = functions::Profiler::getInstance();
     if (prof.profiling) {
         PROF_TIMER(chunk_block, { origin(region); })
         prof.chunkInfo.randomTickTime += time_chunk_block;
@@ -82,7 +97,7 @@ LL_TYPE_INSTANCE_HOOK(
     void,
     BlockSource& tickRegion
 ) {
-    auto& prof = coral_fans::mod().getProfiler();
+    auto& prof = functions::Profiler::getInstance();
     if (prof.profiling) {
         PROF_TIMER(chunk_block_entity, { origin(tickRegion); })
         prof.chunkInfo.blockEntitiesTickTime += time_chunk_block_entity;
@@ -102,7 +117,7 @@ LL_TYPE_INSTANCE_HOOK(
     bool         instaTick_
 ) {
     max        = coral_fans::functions::MaxPtManager::getInstance().maxpt;
-    auto& prof = coral_fans::mod().getProfiler();
+    auto& prof = functions::Profiler::getInstance();
     if (prof.profiling) {
         bool res;
         // from
@@ -131,7 +146,7 @@ LL_TYPE_INSTANCE_HOOK(
     &Dimension::$tick,
     void
 ) {
-    auto& prof = coral_fans::mod().getProfiler();
+    auto& prof = functions::Profiler::getInstance();
     if (prof.profiling) {
         PROF_TIMER(dimension, { origin(); })
         prof.dimensionTickTime += time_dimension;
@@ -146,7 +161,7 @@ LL_TYPE_INSTANCE_HOOK(
     &EntitySystemsManager::tickEntitySystems,
     void
 ) {
-    auto& prof = coral_fans::mod().getProfiler();
+    auto& prof = functions::Profiler::getInstance();
     if (prof.profiling) {
         PROF_TIMER(entity, { origin(); })
         prof.entitySystemTickTime += time_entity;
@@ -164,7 +179,7 @@ LL_TYPE_INSTANCE_HOOK(
     &Dimension::$tickRedstone,
     void
 ) {
-    auto& prof = coral_fans::mod().getProfiler();
+    auto& prof = functions::Profiler::getInstance();
     if (prof.profiling) {
         PROF_TIMER(dimension_redstone, { origin(); })
         prof.redstoneInfo.signalUpdate += time_dimension_redstone;
@@ -180,7 +195,7 @@ LL_TYPE_INSTANCE_HOOK(
     &CircuitSceneGraph::processPendingAdds,
     void
 ) {
-    auto& prof = coral_fans::mod().getProfiler();
+    auto& prof = functions::Profiler::getInstance();
     if (prof.profiling) {
         PROF_TIMER(pt_add, { origin(); })
         prof.redstoneInfo.pendingAdd += time_pt_add;
@@ -197,7 +212,7 @@ LL_TYPE_INSTANCE_HOOK(
     void,
     BlockSource* region
 ) {
-    auto& prof = coral_fans::mod().getProfiler();
+    auto& prof = functions::Profiler::getInstance();
     if (prof.profiling) {
         PROF_TIMER(pt_update, { origin(region); })
         prof.redstoneInfo.pendingUpdate += time_pt_update;
@@ -214,7 +229,7 @@ LL_TYPE_INSTANCE_HOOK(
     void,
     BlockPos const& pos
 ) {
-    auto& prof = coral_fans::mod().getProfiler();
+    auto& prof = functions::Profiler::getInstance();
     if (prof.profiling) {
         PROF_TIMER(pt_remove, { origin(pos); })
         prof.redstoneInfo.pendingRemove += time_pt_remove;
@@ -232,7 +247,7 @@ LL_TYPE_INSTANCE_HOOK(
     bool,
     BlockSource& region
 ) {
-    auto& prof = coral_fans::mod().getProfiler();
+    auto& prof = functions::Profiler::getInstance();
     if (prof.profiling) {
         bool res;
         PROF_TIMER(actor, { res = origin(region); })
@@ -252,7 +267,7 @@ void hookTick(bool hook) {
         CoralFansTickLevelChunkTickBlocksHook::hook();
         CoralFansTickLevelChunkTickBlockEntitiesHook::hook();
         coral_fans::functions::MaxPtManager::getInstance().maxpt =
-            std::stoi(coral_fans::mod().getConfigDb()->get("functions.global.maxpt").value_or("100"));
+            std::stoi(CoralFans::getInstance().getConfigDb()->get("functions.global.maxpt").value_or("100"));
         CoralFansTickBlockTickingQueueTickPendingTicksHook::hook();
         CoralFansTickDimensionTickHook::hook();
         CoralFansTickEntitySystemsTickHook::hook();
@@ -276,5 +291,4 @@ void hookTick(bool hook) {
         CoralFansTickActorTickHook::unhook();
     }
 }
-
 } // namespace coral_fans::functions

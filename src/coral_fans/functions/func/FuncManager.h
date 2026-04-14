@@ -16,7 +16,6 @@ void registerContainerReader();
 void forceOpenHook(bool);
 void forcePlaceHook(uint64);
 void safeExplodeHook(bool);
-void hookFunctionsHopperCounter(bool);
 void fastDropHook(bool);
 void noPickUpHook(bool);
 void portalDisabledHook(bool);
@@ -51,6 +50,7 @@ public:
 class HopperCounterManager {
 private:
     std::vector<HopperCounterChannel> channels;
+    bool                              enabled = false;
 
 public:
     const static std::unordered_map<std::string, int> HOPPER_COUNTER_MAP;
@@ -58,9 +58,18 @@ public:
     BlockPos                                          pos;
     bool                                              mutex = false;
 
+public:
     HopperCounterManager() {
         for (int i = 0; i < 16; ++i) this->channels.emplace_back(i);
     }
+
+private:
+    void hook(bool);
+
+public:
+    void setEnabled(bool);
+
+public:
     inline HopperCounterChannel& getChannel(int ch) { return this->channels[ch]; }
     inline void                  clearAllData() {
         for (auto& ch : this->channels) {
@@ -70,6 +79,7 @@ public:
     void       tick();
     static int getViewChannel(BlockSource&, HitResult);
 
+public:
     static HopperCounterManager& getInstance() {
         static HopperCounterManager instance;
         return instance;

@@ -1,5 +1,7 @@
-#include "coral_fans/base/Mod.h"
+#include "coral_fans/CoralFans.h"
 #include "coral_fans/base/Utils.h"
+
+
 #include "ll/api/memory/Hook.h"
 #include "mc/network/ServerPlayerBlockUseHandler.h"
 #include "mc/server/ServerPlayer.h"
@@ -10,6 +12,7 @@
 #include "mc/world/events/BlockEventCoordinator.h"
 #include "mc/world/item/Item.h"
 #include "mc/world/item/ItemStack.h"
+#include "mc/world/level/BlockSource.h"
 
 
 #include <format>
@@ -68,11 +71,13 @@ LL_STATIC_HOOK(
     const BlockPos& pos,
     int             face
 ) {
-    if (coral_fans::mod().getConfigDb()->get(std::format("functions.players.{}.autotool", player.getUuid().asString()))
+    if (CoralFans::getInstance().getConfigDb()->get(
+            std::format("functions.players.{}.autotool", player.getUuid().asString())
+        )
         == "true") {
         int currentSlot = player.getSelectedItemSlot();
         int minDamage =
-            std::stoi(coral_fans::mod()
+            std::stoi(CoralFans::getInstance()
                           .getConfigDb()
                           ->get(std::format("functions.players.{}.autotool.mindamage", player.getUuid().asString()))
                           .value_or("1"));
@@ -97,11 +102,13 @@ LL_TYPE_INSTANCE_HOOK(
     ::Actor&                                       actor,
     ::SharedTypes::Legacy::ActorDamageCause const& cause
 ) {
-    if (coral_fans::mod().getConfigDb()->get(std::format("functions.players.{}.autotool", this->getUuid().asString()))
+    if (CoralFans::getInstance().getConfigDb()->get(
+            std::format("functions.players.{}.autotool", this->getUuid().asString())
+        )
         == "true") {
         int currentSlot = this->getSelectedItemSlot();
         int minDamage =
-            std::stoi(coral_fans::mod()
+            std::stoi(CoralFans::getInstance()
                           .getConfigDb()
                           ->get(std::format("functions.players.{}.autotool.mindamage", this->getUuid().asString()))
                           .value_or("1"));

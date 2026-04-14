@@ -1,4 +1,5 @@
 #include "Commands.h"
+#include "coral_fans/CoralFans.h"
 #include "coral_fans/base/MySchedule.h"
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
@@ -85,7 +86,7 @@ void registerTickCommand(CommandPermissionLevel permission) {
                         )
                             .sendTo(*ll::service::getLevel()->getPlayer(mce::UUID(uuid)));
                     } else
-                        coral_fans::mod().getLogger().info("command.tick.query.output"_tr(
+                        CoralFans::getInstance().getSelf().getLogger().info("command.tick.query.output"_tr(
                             ProfilerLite::gProfilerLiteInstance().mDebugServerTickTime->count() / 1000000.0
                         ));
                     count++;

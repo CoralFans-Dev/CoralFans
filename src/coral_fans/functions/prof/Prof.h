@@ -83,7 +83,8 @@ struct EntityInfo {
     int       count;
 };
 
-struct Profiler {
+class Profiler {
+public:
     enum Type : uint64 { normal, entity, chunk, pt };
     static std::vector<std::pair<std::string, uint64>>    TypeVec;
     uint64                                                type         = Type::normal;
@@ -100,6 +101,7 @@ struct Profiler {
     long long                                             entitySystemTickTime     = 0;
     std::array<std::map<ChunkPos, unsigned long long>, 3> ptCounter{};
 
+public:
     void        print() const;
     std::string printChunks() const;
     std::string printPendingTicks() const;
@@ -108,6 +110,12 @@ struct Profiler {
     void        reset(uint64);
     void        start(long long, uint64 = Type::normal);
     void        stop();
+
+public:
+    static Profiler& getInstance() {
+        static Profiler instance;
+        return instance;
+    }
 };
 
 void hookTick(bool);

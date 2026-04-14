@@ -1,3 +1,5 @@
+#pragma once
+
 #include "bsci/GeometryGroup.h"
 #include "coral_fans/Config.h"
 #include "mc/deps/core/math/Random.h"
@@ -28,6 +30,7 @@ public:
         SoulSand     = 1 << 10,
         EndIsland    = 1 << 11,
         ChorusFlower = 1 << 12,
+        EndGateway   = 1 << 13,
     };
 
 private:
@@ -79,6 +82,7 @@ private:
     struct TheEndData {
         std::map<BlockPos, Core::Random> endIslandPosMap;
         std::map<BlockPos, int>          chorusFlowerPosMap;
+        std::unordered_set<BlockPos>     endGatewayPosSet;
         bool                             reload = false;
     };
 
@@ -93,6 +97,7 @@ private:
     struct TheEndBsciChunkData {
         bsci::GeometryGroup::GeoId endIslandGeoId    = {0};
         bsci::GeometryGroup::GeoId chorusFlowerGeoId = {0};
+        bsci::GeometryGroup::GeoId endGatewayGeoId   = {0};
 
         int                        neighborValidCount       = 0;
         bool                       chunkSaved               = true;
@@ -133,14 +138,16 @@ private:
     struct DuplicatableHook10;
     struct DuplicatableHook11;
     struct DuplicatableHook12;
+    struct DuplicatableHook13;
 
 private:
-    void                       removeData();
-    void                       draw();
-    void                       netherDraw(BlockSource&, ChunkPos, NetherData&);
-    void                       theEndDraw(BlockSource&, ChunkPos, TheEndData&);
-    void                       removeBsciData(ShowType);
-    void                       bsciDataRuntimeRemove();
+    void removeData();
+    void draw();
+    void netherDraw(BlockSource&, ChunkPos, NetherData&);
+    void theEndDraw(BlockSource&, ChunkPos, TheEndData&);
+    void removeBsciData(ShowType);
+    void bsciDataRuntimeRemove();
+
     bsci::GeometryGroup::GeoId drawNetherite(std::map<BlockPos, std::unordered_set<BlockPos>>&);
     bsci::GeometryGroup::GeoId drawSpring(std::unordered_set<BlockPos>&);
     bsci::GeometryGroup::GeoId drawFire(std::unordered_set<BlockPos>&);
@@ -150,6 +157,7 @@ private:
     drawOre(std::unordered_set<BlockPos>&, config::Locate::DuplicatableOreStruct&, std::string);
     bsci::GeometryGroup::GeoId drawEndIsland(std::map<BlockPos, Core::Random>&);
     bsci::GeometryGroup::GeoId drawChorusFlower(std::map<BlockPos, int>&);
+    bsci::GeometryGroup::GeoId drawEndGateway(std::unordered_set<BlockPos>&);
     bool                       isChunkValid(BlockSource&, ChunkPos);
     void                       tryRemoveNetherChunkData(ChunkPos);
     void                       tryRemoveTheEndChunkData(ChunkPos);
@@ -160,9 +168,9 @@ public:
     void tick();
 
 public:
-    void        setShowType(ShowType, bool);
-    bool        getShowType(ShowType);
-    std::string test(ChunkPos);
+    void setShowType(ShowType, bool);
+    bool getShowType(ShowType);
+    // std::string test(ChunkPos);
 
 public:
     static DuplicatableManager& getInstance() {

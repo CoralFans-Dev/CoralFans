@@ -62,6 +62,11 @@ private:
     void draw();
     void remove();
     void runtimeRemove();
-};
 
+public:
+    static HsaManager& getInstance() {
+        static HsaManager instance;
+        return instance;
+    }
+};
 } // namespace coral_fans::functions

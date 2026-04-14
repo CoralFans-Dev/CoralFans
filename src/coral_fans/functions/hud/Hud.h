@@ -14,6 +14,12 @@ public:
 
 public:
     void tick();
+
+public:
+    static HudHelper& getInstance() {
+        static HudHelper instance;
+        return instance;
+    }
 };
 
 } // namespace coral_fans::functions

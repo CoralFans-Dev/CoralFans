@@ -1,6 +1,5 @@
 #include "coral_fans/functions/village/Village.h"
 #include "coral_fans/base/Macros.h"
-#include "coral_fans/base/Mod.h"
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/command/runtime/ParamKind.h"
@@ -12,6 +11,8 @@
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/world/actor/Actor.h"
 #include "mc/world/actor/player/Player.h"
+#include "mc/world/phys/HitResult.h"
+
 
 namespace coral_fans::commands {
 
@@ -39,7 +40,7 @@ void registerVillageCommand(CommandPermissionLevel permission) {
         .required("type", ll::command::ParamKind::Enum, "villageShowType")
         .optional("enable", ll::command::ParamKind::Bool)
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
-            auto& villageManager = coral_fans::mod().getVillageManager();
+            auto& villageManager = functions::CFVillageManager::getInstance();
             bool  isopen         = false;
             switch (self["type"].get<ll::command::ParamKind::Enum>().index) {
             case 0:
@@ -87,21 +88,22 @@ void registerVillageCommand(CommandPermissionLevel permission) {
 
     // village list
     villageCommand.overload().text("list").execute([](CommandOrigin const& origin, CommandOutput& output) {
-        auto entity = origin.getEntity();
+        auto  entity         = origin.getEntity();
+        auto& villageManager = functions::CFVillageManager::getInstance();
         if (entity == nullptr || !entity->isType(ActorType::Player)) {
-            for (auto& str : coral_fans::mod().getVillageManager().listVillages()) {
+            for (auto& str : villageManager.listVillages()) {
                 output.success(str);
             }
         }
         auto* player = static_cast<Player*>(entity);
-        for (auto& str : coral_fans::mod().getVillageManager().listVillages()) {
+        for (auto& str : villageManager.listVillages()) {
             TextPacket::createRawMessage(str).sendTo(*player);
         }
     });
 
     // village tickinglist
     villageCommand.overload().text("tickinglist").execute([](CommandOrigin const& origin, CommandOutput& output) {
-        auto res    = coral_fans::mod().getVillageManager().listTickingVillages();
+        auto res    = functions::CFVillageManager::getInstance().listTickingVillages();
         auto entity = origin.getEntity();
         if (entity == nullptr || !entity->isType(ActorType::Player)) {
             output.success(res);
@@ -116,7 +118,8 @@ void registerVillageCommand(CommandPermissionLevel permission) {
         .required("id", ll::command::ParamKind::Int)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             auto rst =
-                coral_fans::mod().getVillageManager().getVillageInfo(self["id"].get<ll::command::ParamKind::Int>());
+                functions::CFVillageManager::getInstance().getVillageInfo(self["id"].get<ll::command::ParamKind::Int>()
+                );
             if (rst.second) {
                 auto entity = origin.getEntity();
                 if (entity == nullptr || !entity->isType(ActorType::Player)) {
@@ -134,7 +137,7 @@ void registerVillageCommand(CommandPermissionLevel permission) {
         auto* actor = hitrst.getEntity();
         if (!actor) return output.error("command.village.dweller.noactor"_tr());
         else {
-            auto rst = coral_fans::mod().getVillageManager().getVillagerInfo(actor->getOrCreateUniqueID());
+            auto rst = functions::CFVillageManager::getInstance().getVillagerInfo(actor->getOrCreateUniqueID());
             if (rst.second) {
                 // return output.success(rst.first);
                 TextPacket::createRawMessage(rst.first).sendTo(*player);

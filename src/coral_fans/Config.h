@@ -86,8 +86,9 @@ struct Config {
         } hud{};
 
         struct {
-            size_t      drawInterval       = 60;
-            size_t      runtimeRemoveScale = 20;
+            int         drawInterval       = 60;
+            int         runtimeRemoveScale = 20;
+            int         drawRadius         = 6;
             std::string hsaNorthWestColor  = "#FFFFFF";
             std::string hsaColor           = "#29ADFF";
             std::string structureColor     = "#10E436";
@@ -95,9 +96,10 @@ struct Config {
 
         struct {
             struct {
-                int drawInterval         = 60;
-                int runtimeRemoveScale   = 20;
-                int cacheDataRemoveScale = 100;
+                int drawInterval       = 60;
+                int runtimeRemoveScale = 20;
+                int cacheRemoveScale   = 100;
+                int drawRadius         = 6;
                 struct {
                     bool        enable         = true;
                     std::string originPosColor = "#10E436";
@@ -152,11 +154,24 @@ struct Config {
                     std::string arrowColor     = "#FFFFFF";
                 } chorusFlower{};
                 struct {
+                    bool        enable         = true;
+                    std::string originPosColor = "#10E436";
+                    std::string textColor      = "#FFFFFF";
+                    std::string arrowColor     = "#FFFFFF";
+                } endGateway{};
+                struct {
                     std::string savedChunk   = "#3003D9";
                     std::string unsavedChunk = "#FFC825";
                 } chunkSavedDebugInfo{};
             } duplicatable{};
         } locate{};
+
+        struct {
+            int         drawInterval       = 60;
+            int         runtimeRemoveScale = 20;
+            int         drawRadius         = 6;
+            std::string slimeChunkColor    = "#10E436";
+        } slime{};
     } functions{};
 
     struct {

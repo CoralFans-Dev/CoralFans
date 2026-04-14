@@ -1,5 +1,5 @@
+#include "coral_fans/functions/hsa/Hsa.h"
 #include "coral_fans/base/Macros.h"
-#include "coral_fans/base/Mod.h"
 
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
@@ -27,7 +27,7 @@ void registerHsaCommand(CommandPermissionLevel permission) {
         .text("show")
         .optional("isopen", ll::command::ParamKind::Bool)
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
-            auto& hsaManager = coral_fans::mod().getHsaManager();
+            auto& hsaManager = functions::HsaManager::getInstance();
             if (self["isopen"].has_value()) hsaManager.setHsaShow(self["isopen"].get<ll::command::ParamKind::Bool>());
             else hsaManager.setHsaShow(!hsaManager.getHsaShow());
             output.success("command.hsa.show.output"_tr(hsaManager.getHsaShow() ? "true" : "false"));
@@ -39,7 +39,7 @@ void registerHsaCommand(CommandPermissionLevel permission) {
         .text("show")
         .optional("isopen", ll::command::ParamKind::Bool)
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
-            auto& hsaManager = coral_fans::mod().getHsaManager();
+            auto& hsaManager = functions::HsaManager::getInstance();
             if (self["isopen"].has_value())
                 hsaManager.setStructureShow(self["isopen"].get<ll::command::ParamKind::Bool>());
             else hsaManager.setStructureShow(!hsaManager.getStructureShow());
@@ -50,7 +50,7 @@ void registerHsaCommand(CommandPermissionLevel permission) {
     hsaCommand.runtimeOverload().text("list").execute(
         [](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             COMMAND_CHECK_PLAYER
-            auto hsa = coral_fans::mod().getHsaManager().listChunkHsa(
+            auto hsa = functions::HsaManager::getInstance().listChunkHsa(
                 player->getDimensionBlockSource(),
                 ChunkPos(player->getPosition())
             );
@@ -66,7 +66,7 @@ void registerHsaCommand(CommandPermissionLevel permission) {
         .text("list")
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             COMMAND_CHECK_PLAYER
-            auto hsa = coral_fans::mod().getHsaManager().listChunkStructure(
+            auto hsa = functions::HsaManager::getInstance().listChunkStructure(
                 player->getDimensionBlockSource(),
                 ChunkPos(player->getPosition())
             );
