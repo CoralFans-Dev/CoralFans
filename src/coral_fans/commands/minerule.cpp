@@ -21,7 +21,7 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
 
     auto& configDb = CoralFans::getInstance().getConfigDb();
 
-    std::string dims[3] = {"overworld", "nether", "the_end"};
+    static constexpr std::string_view dims[3] = {"overworld", "nether", "the_end"};
 
     mineruleCommand.runtimeOverload()
         .text("fuck_bedrock_no_drop")
@@ -175,8 +175,13 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
         .required("mobtype", ll::command::ParamKind::Enum, "mobTypes")
         .required("type", ll::command::ParamKind::Enum, "popcapType")
         .required("count", ll::command::ParamKind::Float)
-        .execute([&dims](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             int   dimId       = self["dimension"].get<ll::command::ParamKind::Dimension>().id;
+            if (dimId < 0 || dimId > 2) {
+                output.error("Invalid dimension");
+                return;
+            }
+            
             int   category    = static_cast<int>(self["mobtype"].get<ll::command::ParamKind::Enum>().index);
             bool  isOnSurface = self["type"].get<ll::command::ParamKind::Enum>().index == 0;
             float count       = self["count"].get<ll::command::ParamKind::Float>();
@@ -185,7 +190,7 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
             // 由于浮点误差，最大可取值是2147483583.0f，超过这个值不刷怪
             if (count < 0 || count > 2147483583.0f) count = 2147483583.0f;
 
-            auto dimKey  = "translate.dimension." + dims[dimId];
+            auto dimKey  = "translate.dimension." + std::string(dims[dimId]);
             auto dimStr  = ll::i18n::getInstance().get(dimKey, {});
             auto typeStr = "command.minerule.popcap." + self["type"].get<ll::command::ParamKind::Enum>().name;
             auto categoryKey =
@@ -204,9 +209,14 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
         .text("popcap")
         .required("dimension", ll::command::ParamKind::Dimension)
         .text("reset")
-        .execute([&dims](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             int  dimId  = self["dimension"].get<ll::command::ParamKind::Dimension>().id;
-            auto dimKey = "translate.dimension." + dims[dimId];
+            if (dimId < 0 || dimId > 2) {
+                output.error("Invalid dimension");
+                return;
+            }
+            
+            auto dimKey = "translate.dimension." + std::string(dims[dimId]);
             auto dimStr = ll::i18n::getInstance().get(dimKey, {});
 
             if (functions::PopulationCapManager::getInstance().resetDimCap(dimId)) {
