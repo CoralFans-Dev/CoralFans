@@ -1,5 +1,5 @@
 #include "PopCapManager.h"
-#include "coral_fans/base/Mod.h"
+#include "coral_fans/CoralFans.h"
 #include "ll/api/service/Bedrock.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/dimension/Dimension.h"
@@ -11,7 +11,7 @@
 namespace coral_fans::functions {
 
 void PopulationCapManager::init() {
-    auto& db      = coral_fans::mod().getConfigDb();
+    auto& db      = CoralFans::getInstance().getConfigDb();
     auto& manager = PopulationCapManager::getInstance();
     if (auto val = db->get("populationCap.enabled")) {
         manager.enabled = val.value() == "true";
@@ -19,7 +19,7 @@ void PopulationCapManager::init() {
     if (auto val = db->get("populationCap.globalMax")) {
         manager.globalMax = std::stoi(val.value());
     }
-    
+
     for (int dimId = 0; dimId <= 2; dimId++) {
         std::string key = "populationCap.dim" + std::to_string(dimId);
         if (auto val = db->get(key)) {
@@ -30,7 +30,7 @@ void PopulationCapManager::init() {
 
 void PopulationCapManager::setEnabled(bool bl) {
     enabled = bl;
-    coral_fans::mod().getConfigDb()->set("populationCap.enabled", bl ? "true" : "false");
+    CoralFans::getInstance().getConfigDb()->set("populationCap.enabled", bl ? "true" : "false");
 
     if (!bl) {
         // restore dimension caps
@@ -57,7 +57,7 @@ void PopulationCapManager::setEnabled(bool bl) {
 
 void PopulationCapManager::setGlobalMax(int count) {
     globalMax = count;
-    coral_fans::mod().getConfigDb()->set("populationCap.globalMax", std::to_string(count));
+    CoralFans::getInstance().getConfigDb()->set("populationCap.globalMax", std::to_string(count));
 }
 
 bool PopulationCapManager::setDimCap(int dimId, int category, bool isOnSurface, float count) {
@@ -89,7 +89,10 @@ bool PopulationCapManager::setDimCap(int dimId, int category, bool isOnSurface, 
         }
     }
 
-    coral_fans::mod().getConfigDb()->set("populationCap.dim" + std::to_string(dimId), currentCaps[dimId].toBytes());
+    CoralFans::getInstance().getConfigDb()->set(
+        "populationCap.dim" + std::to_string(dimId),
+        currentCaps[dimId].toBytes()
+    );
 
     return true;
 }
@@ -107,7 +110,7 @@ bool PopulationCapManager::resetDimCap(int dimId) {
 
     currentCaps[dimId] = original;
 
-    coral_fans::mod().getConfigDb()->set("populationCap.dim" + std::to_string(dimId), original.toBytes());
+    CoralFans::getInstance().getConfigDb()->set("populationCap.dim" + std::to_string(dimId), original.toBytes());
     return true;
 }
 } // namespace coral_fans::functions

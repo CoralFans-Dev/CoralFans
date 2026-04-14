@@ -4,8 +4,6 @@
 #include "coral_fans/functions/func/FuncManager.h"
 #include "coral_fans/functions/shortcuts/Shortcuts.h"
 #include "ll/api/Config.h"
-#include "ll/api/event/EventBus.h"
-#include "ll/api/event/command/ExecuteCommandEvent.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/mod/RegisterHelper.h"
 #include <memory>
