@@ -84,6 +84,7 @@ bool PopulationCapManager::setDimCap(int dimId, int category, bool isOnSurface, 
         if (!currentCaps[dimId]) currentCaps[dimId] = std::make_unique<DimensionData>(*backupCaps[dimId]);
     }
 
+    if (!currentCaps[dimId]) currentCaps[dimId] = std::make_unique<DimensionData>();
     if (isOnSurface) currentCaps[dimId]->surfaceCaps[category] = count;
     else currentCaps[dimId]->undergroundCaps[category] = count;
 
