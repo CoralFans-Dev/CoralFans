@@ -52,7 +52,7 @@ LL_TYPE_STATIC_HOOK(
     }
 }
 
-void MineruleManager::portalSpawnHook(bool bl) {
+void portalSpawnHook(bool bl) {
     bl ? CoralFansportalPortalZombieHook::hook() : CoralFansportalPortalZombieHook ::unhook();
 }
 } // namespace coral_fans::functions

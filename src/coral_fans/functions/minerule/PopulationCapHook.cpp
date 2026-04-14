@@ -1,15 +1,124 @@
-#include "../popcap/PopCapManager.h"
 #include "MineruleManager.h"
+#include "coral_fans/CoralFans.h"
 #include "ll/api/memory/Hook.h"
+#include "ll/api/service/Bedrock.h"
 #include "mc/world/level/BedrockSpawner.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/biome/MobSpawnRules.h"
 #include "mc/world/level/biome/MobSpawnerData.h"
 #include "mc/world/level/biome/SpawnConditions.h"
 #include "mc/world/level/dimension/Dimension.h"
+#include <algorithm>
+#include <array>
+#include <memory>
+#include <string>
 
 
 namespace coral_fans::functions {
+void PopulationCapManager::init() {
+    auto& db      = CoralFans::getInstance().getConfigDb();
+    auto& manager = PopulationCapManager::getInstance();
+    if (auto val = db->get("populationCap.enabled")) {
+        manager.enabled = val.value() == "true";
+    }
+    if (auto val = db->get("populationCap.globalMax")) {
+        manager.globalMax = std::stoi(val.value());
+    }
+
+    for (int dimId = 0; dimId <= 2; dimId++) {
+        std::string key = "populationCap.dim" + std::to_string(dimId);
+        if (auto val = db->get(key)) {
+            manager.currentCaps[dimId] = std::make_unique<DimensionData>(val.value());
+        }
+    }
+}
+
+void PopulationCapManager::setEnabled(bool bl) {
+    enabled = bl;
+    CoralFans::getInstance().getConfigDb()->set("populationCap.enabled", bl ? "true" : "false");
+    auto level = ll::service::getLevel();
+    if (!level) [[unlikely]]
+        return;
+    if (!bl) {
+        // restore dimension caps
+        for (int dimId = 0; dimId < 3; dimId++) {
+            if (!backupCaps[dimId]) {
+                if (auto dim = level->getDimension(dimId).lock()) {
+                    backupCaps[dimId] = std::make_unique<DimensionData>();
+                    std::copy_n(backupCaps[dimId]->surfaceCaps.begin(), 7, dim->mMobsPerChunkSurface);
+                    std::copy_n(backupCaps[dimId]->undergroundCaps.begin(), 7, dim->mMobsPerChunkUnderground);
+                }
+            }
+        }
+
+    } else {
+        // apply current dimension caps
+        for (int dimId = 0; dimId < 3; dimId++) {
+            if (currentCaps[dimId]) {
+                if (auto dim = level->getDimension(dimId).lock()) {
+                    std::copy_n(currentCaps[dimId]->surfaceCaps.begin(), 7, dim->mMobsPerChunkSurface);
+                    std::copy_n(currentCaps[dimId]->undergroundCaps.begin(), 7, dim->mMobsPerChunkUnderground);
+                }
+            }
+        }
+    }
+}
+
+void PopulationCapManager::setGlobalMax(int count) {
+    globalMax = count;
+    CoralFans::getInstance().getConfigDb()->set("populationCap.globalMax", std::to_string(count));
+}
+
+bool PopulationCapManager::setDimCap(int dimId, int category, bool isOnSurface, float count) {
+    auto level = ll::service::getLevel();
+    if (!level) [[unlikely]]
+        return false;
+    auto dim = level->getDimension(dimId).lock();
+    if (!dim) return false;
+
+    if (!backupCaps[dimId]) {
+        backupCaps[dimId] = std::make_unique<DimensionData>();
+        std::copy_n(std::begin(dim->mMobsPerChunkSurface), 7, backupCaps[dimId]->surfaceCaps.begin());
+        std::copy_n(std::begin(dim->mMobsPerChunkUnderground), 7, backupCaps[dimId]->undergroundCaps.begin());
+
+        if (!currentCaps[dimId]) currentCaps[dimId] = std::make_unique<DimensionData>(*backupCaps[dimId]);
+    }
+
+    if (isOnSurface) currentCaps[dimId]->surfaceCaps[category] = count;
+    else currentCaps[dimId]->undergroundCaps[category] = count;
+
+
+    if (enabled) {
+        if (isOnSurface) dim->mMobsPerChunkSurface[category] = count;
+        else dim->mMobsPerChunkUnderground[category] = count;
+    }
+
+    CoralFans::getInstance().getConfigDb()->set(
+        "populationCap.dim" + std::to_string(dimId),
+        currentCaps[dimId]->toBytes()
+    );
+
+    return true;
+}
+
+bool PopulationCapManager::resetDimCap(int dimId) {
+    auto dimLock = ll::service::getLevel()->getDimension(dimId).lock();
+    if (!dimLock) return false;
+
+    if (!backupCaps[dimId]) return false;
+
+    std::copy_n(backupCaps[dimId]->surfaceCaps.begin(), 7, dimLock->mMobsPerChunkSurface);
+    std::copy_n(backupCaps[dimId]->undergroundCaps.begin(), 7, dimLock->mMobsPerChunkUnderground);
+
+    currentCaps[dimId] = std::make_unique<DimensionData>(*backupCaps[dimId]);
+
+    CoralFans::getInstance().getConfigDb()->set(
+        "populationCap.dim" + std::to_string(dimId),
+        backupCaps[dimId]->toBytes()
+    );
+    return true;
+}
+
 LL_TYPE_INSTANCE_HOOK(
     handlePopCapHook,
     HookPriority::Normal,
@@ -20,12 +129,14 @@ LL_TYPE_INSTANCE_HOOK(
     SpawnConditions const& conditions,
     int                    inSpawnCount
 ) {
-    if (!PopulationCapManager::getInstance().enabled) {
+    auto& popCapManager = PopulationCapManager::getInstance();
+
+    if (!popCapManager.enabled) {
         return origin(mobType, conditions, inSpawnCount);
     }
 
     // global
-    int maxCount = PopulationCapManager::getInstance().globalMax;
+    int maxCount = popCapManager.globalMax;
     if (maxCount >= 0 && this->mTotalEntityCount + inSpawnCount > maxCount) {
         inSpawnCount = std::max(0, maxCount - this->mTotalEntityCount);
     }
@@ -59,26 +170,28 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 ) {
     origin(structureSetRegistry);
 
-    int   dimId   = static_cast<int>(this->getDimensionId().id);
+    int   dimId   = this->getDimensionId();
     auto& manager = PopulationCapManager::getInstance();
 
-    if (manager.backupCaps.find(dimId) == manager.backupCaps.end()) {
-        mDimension original(dimId);
-        std::copy_n(std::begin(this->mMobsPerChunkSurface), 7, original.surfaceCaps.begin());
-        std::copy_n(std::begin(this->mMobsPerChunkUnderground), 7, original.undergroundCaps.begin());
-        manager.backupCaps.emplace(dimId, original);
+    if (!manager.backupCaps[dimId]) {
+        manager.backupCaps[dimId] = std::make_unique<PopulationCapManager::DimensionData>();
+        std::copy_n(std::begin(this->mMobsPerChunkSurface), 7, manager.backupCaps[dimId]->surfaceCaps.begin());
+        std::copy_n(std::begin(this->mMobsPerChunkUnderground), 7, manager.backupCaps[dimId]->undergroundCaps.begin());
     }
 
     if (manager.enabled) {
-        auto it = manager.currentCaps.find(dimId);
-        if (it != manager.currentCaps.end()) {
-            std::copy_n(it->second.surfaceCaps.begin(), 7, std::begin(this->mMobsPerChunkSurface));
-            std::copy_n(it->second.undergroundCaps.begin(), 7, std::begin(this->mMobsPerChunkUnderground));
+        if (manager.currentCaps[dimId]) {
+            std::copy_n(manager.currentCaps[dimId]->surfaceCaps.begin(), 7, std::begin(this->mMobsPerChunkSurface));
+            std::copy_n(
+                manager.currentCaps[dimId]->undergroundCaps.begin(),
+                7,
+                std::begin(this->mMobsPerChunkUnderground)
+            );
         }
     }
 }
 
-void MineruleManager::populationCapHook(bool bl) {
+void populationCapHook(bool bl) {
     bl ? handlePopCapHook::hook() : handlePopCapHook::unhook();
     PopulationCapManager::getInstance().setEnabled(bl);
 }

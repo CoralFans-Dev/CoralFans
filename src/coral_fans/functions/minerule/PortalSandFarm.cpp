@@ -20,8 +20,6 @@ LL_TYPE_INSTANCE_HOOK(
     return origin(pos, shouldStopRiding, cause, sourceEntityType, keepVelocity);
 }
 
-void MineruleManager::portalSandFarmHook(bool bl) {
-    bl ? CoralFansportalSandFarmHook::hook() : CoralFansportalSandFarmHook::unhook();
-}
+void portalSandFarmHook(bool bl) { bl ? CoralFansportalSandFarmHook::hook() : CoralFansportalSandFarmHook::unhook(); }
 
 } // namespace coral_fans::functions

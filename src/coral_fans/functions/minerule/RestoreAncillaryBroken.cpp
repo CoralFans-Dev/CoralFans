@@ -4,37 +4,31 @@
 #include "mc/world/level/Level.h"
 #include "mc/world/level/block/Block.h"
 #include "mc/world/level/block/BlockType.h"
-#include "mc/world/level/block/actor/PistonBlockActor.h"
 #include <cstddef>
 #include <vector>
 
 
 namespace coral_fans::functions {
-bool                        mutex  = false;
-bool                        mutex2 = false;
-const ResourceDropsContext* dropsContext;
-Randomize*                  _randomize;
-PistonBlockActor*           pistonBlockActor;
-
 LL_TYPE_INSTANCE_HOOK(
-    CoralFansRestoreAncillaryBrokenHook1,
+    RestoreAncillaryBrokenHook1,
     ll::memory::HookPriority::Normal,
     PistonBlockActor,
     &PistonBlockActor::_spawnMovingBlocks,
     void,
     ::BlockSource& region
 ) {
-    mutex            = true;
-    mutex2           = true;
-    pistonBlockActor = this;
+    auto& helper            = RestoreAncillaryBrokenHelper::getInstance();
+    helper.mutex            = true;
+    helper.mutex2           = true;
+    helper.pistonBlockActor = this;
     origin(region);
-    mutex  = false;
-    mutex2 = false;
+    helper.mutex  = false;
+    helper.mutex2 = false;
 }
 
 
 LL_TYPE_INSTANCE_HOOK(
-    CoralFansRestoreAncillaryBrokenHook2,
+    RestoreAncillaryBrokenHook2,
     HookPriority::Normal,
     BlockType,
     &BlockType ::spawnResources,
@@ -45,10 +39,11 @@ LL_TYPE_INSTANCE_HOOK(
     ::Randomize&                  randomize,
     ::ResourceDropsContext const& resourceDropsContext
 ) {
-    if (mutex2) {
-        mutex2       = false;
-        _randomize   = &randomize;
-        dropsContext = &resourceDropsContext;
+    auto& helper = RestoreAncillaryBrokenHelper::getInstance();
+    if (helper.mutex2) {
+        helper.mutex2       = false;
+        helper._randomize   = &randomize;
+        helper.dropsContext = &resourceDropsContext;
         origin(region, pos, block, randomize, resourceDropsContext);
         return;
     }
@@ -56,7 +51,7 @@ LL_TYPE_INSTANCE_HOOK(
 }
 
 LL_TYPE_INSTANCE_HOOK(
-    CoralFansRestoreAncillaryBrokenHook3,
+    RestoreAncillaryBrokenHook3,
     ll::memory::HookPriority::Normal,
     Level,
     &Level::$destroyBlock,
@@ -66,8 +61,9 @@ LL_TYPE_INSTANCE_HOOK(
     bool                        dropResources,
     const ::BlockChangeContext& blockChangeContext
 ) {
-    if (mutex) {
-        mutex2         = true;
+    auto& helper = RestoreAncillaryBrokenHelper::getInstance();
+    if (helper.mutex) {
+        helper.mutex2  = true;
         auto&    block = region.getBlock(pos);
         BlockPos secondPartPos;
         bool     hasSecondPart = block.mBlockType->getSecondPart(region, pos, secondPartPos);
@@ -76,15 +72,22 @@ LL_TYPE_INSTANCE_HOOK(
             auto& secondPartBlock = region.getBlock(secondPartPos);
             if (block.mBlockType != secondPartBlock.mBlockType) {
                 secondPartBlock.mBlockType
-                    ->spawnResources(region, secondPartPos, secondPartBlock, *_randomize, *dropsContext);
+                    ->spawnResources(region, secondPartPos, secondPartBlock, *helper._randomize, *helper.dropsContext);
                 auto& secondPartLiquidBlock = region.getLiquidBlock(secondPartPos);
-                secondPartLiquidBlock.mBlockType
-                    ->spawnResources(region, secondPartPos, secondPartLiquidBlock, *_randomize, *dropsContext);
+                secondPartLiquidBlock.mBlockType->spawnResources(
+                    region,
+                    secondPartPos,
+                    secondPartLiquidBlock,
+                    *helper._randomize,
+                    *helper.dropsContext
+                );
                 region.removeBlock(secondPartPos, blockChangeContext);
-                size_t length = pistonBlockActor->mBreakBlocks->size();
+                size_t length = helper.pistonBlockActor->mBreakBlocks->size();
                 for (size_t i = 0; i < length; i++) {
-                    if ((*pistonBlockActor->mBreakBlocks)[i] == secondPartPos) {
-                        pistonBlockActor->mBreakBlocks->erase(pistonBlockActor->mBreakBlocks->begin() + i);
+                    if ((*helper.pistonBlockActor->mBreakBlocks)[i] == secondPartPos) {
+                        helper.pistonBlockActor->mBreakBlocks->erase(
+                            helper.pistonBlockActor->mBreakBlocks->begin() + i
+                        );
                     }
                 }
             }
@@ -94,15 +97,15 @@ LL_TYPE_INSTANCE_HOOK(
     return origin(region, pos, dropResources, blockChangeContext);
 }
 
-void MineruleManager::restoreAncillaryBrokenHook(bool bl) {
+void restoreAncillaryBrokenHook(bool bl) {
     if (bl) {
-        CoralFansRestoreAncillaryBrokenHook1::hook();
-        CoralFansRestoreAncillaryBrokenHook2::hook();
-        CoralFansRestoreAncillaryBrokenHook3::hook();
+        RestoreAncillaryBrokenHook1::hook();
+        RestoreAncillaryBrokenHook2::hook();
+        RestoreAncillaryBrokenHook3::hook();
     } else {
-        CoralFansRestoreAncillaryBrokenHook1::unhook();
-        CoralFansRestoreAncillaryBrokenHook2::unhook();
-        CoralFansRestoreAncillaryBrokenHook3::unhook();
+        RestoreAncillaryBrokenHook1::unhook();
+        RestoreAncillaryBrokenHook2::unhook();
+        RestoreAncillaryBrokenHook3::unhook();
     }
 }
 } // namespace coral_fans::functions

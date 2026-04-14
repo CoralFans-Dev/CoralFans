@@ -90,8 +90,8 @@ LL_TYPE_INSTANCE_HOOK(
     return origin(region, pos, block, randomize, resourceDropsContext);
 }
 
-void MineruleManager::bedrockDropHook(bool bl) { bl ? CoralFansDropHook1::hook() : CoralFansDropHook1::unhook(); }
-void MineruleManager::mbDropHook(bool bl) {
+void bedrockDropHook(bool bl) { bl ? CoralFansDropHook1::hook() : CoralFansDropHook1::unhook(); }
+void mbDropHook(bool bl) {
     if (bl) {
         CoralFansDropHook2::hook();
         CoralFansDropHook3::hook();
