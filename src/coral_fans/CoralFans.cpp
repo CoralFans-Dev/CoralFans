@@ -50,7 +50,6 @@ void CoralFans::setupCommands() {
     if (commandsConfig.log.enabled) commands::registerLogCommand(commandsConfig.log.permission);
     if (commandsConfig.calculate.enabled) commands::registerCalculateCommand(commandsConfig.calculate.permission);
     if (commandsConfig.minerule.enabled) commands::registerMineruleCommand(commandsConfig.minerule.permission);
-    if (commandsConfig.popcap.enabled) commands::registerPopcapCommand(commandsConfig.popcap.permission);
     if (commandsConfig.freecamera.enabled) commands::registerFreeCameraCommand(commandsConfig.freecamera.permission);
     if (commandsConfig.noclip.enabled) commands::registerNoclipCommand(commandsConfig.noclip.permission);
     if (commandsConfig.locate.enabled) commands::registerLocateCommand(commandsConfig.locate.permission);

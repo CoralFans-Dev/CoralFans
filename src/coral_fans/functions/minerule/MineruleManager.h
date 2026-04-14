@@ -28,20 +28,18 @@ public:
 class PopulationCapManager {
 public:
     struct DimensionData {
-        // int32_t              mId;
         std::array<float, 7> surfaceCaps;
         std::array<float, 7> undergroundCaps;
 
         std::string toBytes() const {
             std::string bytes;
-            bytes.reserve(sizeof(int32_t) + 14 * sizeof(float));
+            bytes.reserve(14 * sizeof(float));
 
             auto push_val = [&](const auto& val) {
                 const char* ptr = reinterpret_cast<const char*>(&val);
                 bytes.append(ptr, sizeof(val));
             };
 
-            // push_val(mId);
             for (float f : surfaceCaps) push_val(f);
             for (float f : undergroundCaps) push_val(f);
 
@@ -49,18 +47,17 @@ public:
         }
 
         explicit DimensionData(const std::string& bytes) {
-            size_t expected = sizeof(int32_t) + 14 * sizeof(float);
+            size_t expected = 14 * sizeof(float);
             if (bytes.size() != expected) {
-                throw std::invalid_argument("Invalid bytes size");
+                throw std::invalid_argument("Invalid bytes size: expected " + std::to_string(expected) + ", got " + std::to_string(bytes.size()));
             }
 
             const char* ptr      = bytes.data();
             auto        read_val = [&](auto& val) {
-                std::copy_n(ptr, sizeof(val), reinterpret_cast<char*>(&val));
+                memcpy(&val, ptr, sizeof(val));
                 ptr += sizeof(val);
             };
 
-            // read_val(mId);
             for (float& f : surfaceCaps) read_val(f);
             for (float& f : undergroundCaps) read_val(f);
         }

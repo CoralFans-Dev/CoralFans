@@ -8,6 +8,7 @@
 #include "ll/api/i18n/I18n.h"
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/server/commands/CommandPermissionLevel.h"
+#include <string>
 
 
 namespace coral_fans::commands {
@@ -18,6 +19,8 @@ void registerMineruleCommand(CommandPermissionLevel permission) {
                                 .getOrCreateCommand("minerule", "command.minerule.description"_tr(), permission);
 
     auto& configDb = CoralFans::getInstance().getConfigDb();
+
+    std::string dims[3] = {"overworld", "nether", "the_end"};
 
     mineruleCommand.runtimeOverload()
         .text("fuck_bedrock_no_drop")
@@ -153,14 +156,14 @@ void registerMineruleCommand(CommandPermissionLevel permission) {
             int count = self["count"].get<ll::command::ParamKind::Int>();
             // 这里不需要处理负数，游戏默认负数不限制
             functions::PopulationCapManager::getInstance().setGlobalMax(count);
-            output.success("command.popcap.global.success"_tr(count));
+            output.success("command.minerule.popcap.global.success"_tr(count));
         });
 
     // minerule popcap global reset
     mineruleCommand.runtimeOverload().text("popcap").text("global").text("reset").execute(
         [](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const&) {
             functions::PopulationCapManager::getInstance().setGlobalMax(200);
-            output.success("command.popcap.global.reset.success"_tr());
+            output.success("command.minerule.popcap.global.reset.success"_tr());
         }
     );
 
@@ -171,8 +174,8 @@ void registerMineruleCommand(CommandPermissionLevel permission) {
         .required("mobtype", ll::command::ParamKind::Enum, "mobTypes")
         .required("type", ll::command::ParamKind::Enum, "popcapType")
         .required("count", ll::command::ParamKind::Float)
-        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
-            auto  dimId       = self["dimension"].get<ll::command::ParamKind::Dimension>();
+        .execute([&dims](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            int   dimId       = self["dimension"].get<ll::command::ParamKind::Dimension>().id;
             int   category    = static_cast<int>(self["mobtype"].get<ll::command::ParamKind::Enum>().index);
             bool  isOnSurface = self["type"].get<ll::command::ParamKind::Enum>().index == 0;
             float count       = self["count"].get<ll::command::ParamKind::Float>();
@@ -181,17 +184,17 @@ void registerMineruleCommand(CommandPermissionLevel permission) {
             // 由于浮点误差，最大可取值是2147483583.0f，超过这个值不刷怪
             if (count < 0 || count > 2147483583.0f) count = 2147483583.0f;
 
-            auto dimKey =
-                "translate.dimension." + std::to_string(self["dimension"].get<ll::command::ParamKind::Dimension>());
-            auto dimStr      = ll::i18n::getInstance().get(dimKey, {});
-            auto typeStr     = isOnSurface ? "command.surface"_tr() : "command.underground"_tr();
-            auto categoryKey = "command.popcap.category." + self["mobtype"].get<ll::command::ParamKind::Enum>().name;
+            auto dimKey  = "translate.dimension." + dims[dimId];
+            auto dimStr  = ll::i18n::getInstance().get(dimKey, {});
+            auto typeStr = "command.minerule.popcap." + self["type"].get<ll::command::ParamKind::Enum>().name;
+            auto categoryKey =
+                "command.minerule.popcap.category." + self["mobtype"].get<ll::command::ParamKind::Enum>().name;
             auto categoryStr = ll::i18n::getInstance().get(categoryKey, {});
 
             if (functions::PopulationCapManager::getInstance().setDimCap(dimId, category, isOnSurface, count)) {
-                output.success("command.popcap.dim.success"_tr(dimStr, categoryStr, typeStr, count));
+                output.success("command.minerule.popcap.dim.success"_tr(dimStr, categoryStr, typeStr, count));
             } else {
-                output.error("command.popcap.dim.error"_tr(dimStr, categoryStr, typeStr));
+                output.error("command.minerule.popcap.dim.error"_tr(dimStr, categoryStr, typeStr));
             }
         });
 
@@ -200,16 +203,15 @@ void registerMineruleCommand(CommandPermissionLevel permission) {
         .text("popcap")
         .required("dimension", ll::command::ParamKind::Dimension)
         .text("reset")
-        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
-            auto dimId = self["dimension"].get<ll::command::ParamKind::Dimension>();
-            auto dimKey =
-                "translate.dimension." + std::to_string(self["dimension"].get<ll::command::ParamKind::Dimension>());
+        .execute([&dims](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            int  dimId  = self["dimension"].get<ll::command::ParamKind::Dimension>().id;
+            auto dimKey = "translate.dimension." + dims[dimId];
             auto dimStr = ll::i18n::getInstance().get(dimKey, {});
 
             if (functions::PopulationCapManager::getInstance().resetDimCap(dimId)) {
-                output.success("command.popcap.dim.reset.success"_tr(dimStr));
+                output.success("command.minerule.popcap.dim.reset.success"_tr(dimStr));
             } else {
-                output.error("command.popcap.dim.reset.error"_tr(dimStr));
+                output.error("command.minerule.popcap.dim.reset.error"_tr(dimStr));
             }
         });
 

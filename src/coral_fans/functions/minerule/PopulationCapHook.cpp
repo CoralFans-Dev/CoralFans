@@ -42,11 +42,14 @@ void PopulationCapManager::setEnabled(bool bl) {
     if (!bl) {
         // restore dimension caps
         for (int dimId = 0; dimId < 3; dimId++) {
-            if (!backupCaps[dimId]) {
+            if (backupCaps[dimId]) {
                 if (auto dim = level->getDimension(dimId).lock()) {
-                    backupCaps[dimId] = std::make_unique<DimensionData>();
-                    std::copy_n(backupCaps[dimId]->surfaceCaps.begin(), 7, dim->mMobsPerChunkSurface);
-                    std::copy_n(backupCaps[dimId]->undergroundCaps.begin(), 7, dim->mMobsPerChunkUnderground);
+                    std::copy_n(backupCaps[dimId]->surfaceCaps.begin(), 7, std::begin(dim->mMobsPerChunkSurface));
+                    std::copy_n(
+                        backupCaps[dimId]->undergroundCaps.begin(),
+                        7,
+                        std::begin(dim->mMobsPerChunkUnderground)
+                    );
                 }
             }
         }
@@ -80,11 +83,14 @@ bool PopulationCapManager::setDimCap(int dimId, int category, bool isOnSurface, 
         backupCaps[dimId] = std::make_unique<DimensionData>();
         std::copy_n(std::begin(dim->mMobsPerChunkSurface), 7, backupCaps[dimId]->surfaceCaps.begin());
         std::copy_n(std::begin(dim->mMobsPerChunkUnderground), 7, backupCaps[dimId]->undergroundCaps.begin());
-
-        if (!currentCaps[dimId]) currentCaps[dimId] = std::make_unique<DimensionData>(*backupCaps[dimId]);
     }
 
-    if (!currentCaps[dimId]) currentCaps[dimId] = std::make_unique<DimensionData>();
+    if (!currentCaps[dimId]) {
+        currentCaps[dimId] = std::make_unique<DimensionData>();
+        std::copy_n(std::begin(dim->mMobsPerChunkSurface), 7, currentCaps[dimId]->surfaceCaps.begin());
+        std::copy_n(std::begin(dim->mMobsPerChunkUnderground), 7, currentCaps[dimId]->undergroundCaps.begin());
+    }
+
     if (isOnSurface) currentCaps[dimId]->surfaceCaps[category] = count;
     else currentCaps[dimId]->undergroundCaps[category] = count;
 

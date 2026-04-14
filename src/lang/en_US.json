@@ -236,36 +236,35 @@
             "fuck_population_cap": {
                 "success": "set fuck_population_cap \"{}\"",
                 "error": "failed to set fuck_population_cap"
+            },
+            "popcap": {
+                "global": {
+                    "success": "Set global population cap to {}",
+                    "reset": {
+                        "success": "Reset global population cap to default (200)"
+                    }
+                },
+                "dim": {
+                    "success": "Set dimension {} category {} cap for {} to {}",
+                    "error": "Failed to set dimension {} category {} cap for {}, possibly because the dimension was never loaded",
+                    "reset": {
+                        "success": "Reset dimension {} population caps to their original values",
+                        "error": "Failed to reset dimension {} population caps, possibly because the dimension was never loaded"
+                    }
+                },
+                "surface": "Surface",
+                "underground": "Underground",
+                "category": {
+                    "animal": "Animal",
+                    "monster": "Monster",
+                    "water_animal": "Water Animal",
+                    "villager": "Villager",
+                    "ambient": "Ambient",
+                    "cat": "Cat",
+                    "pillager": "Pillager"
+                }
             }
         },
-        "popcap": {
-            "description": "control mob population cap",
-            "global": {
-                "success": "Set global population cap to {}",
-                "reset": {
-                    "success": "Reset global population cap to default (200)"
-                }
-            },
-            "dim": {
-                "success": "Set dimension {} category {} cap for {} to {}",
-                "error": "Failed to set dimension {} category {} cap for {}, possibly because the dimension was never loaded",
-                "reset": {
-                    "success": "Reset dimension {} population caps to their original values",
-                    "error": "Failed to reset dimension {} population caps, possibly because the dimension was never loaded"
-                }
-            },
-            "category": {
-                "animal": "Animal",
-                "monster": "Monster",
-                "water_animal": "Water Animal",
-                "villager": "Villager",
-                "ambient": "Ambient",
-                "cat": "Cat",
-                "pillager": "Pillager"
-            }
-        },
-        "surface": "Surface",
-        "underground": "Underground",
         "noclip": {
             "description": "noclip in creative gamemode",
             "enabled": "noclip enabled.",
