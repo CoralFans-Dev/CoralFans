@@ -1,5 +1,8 @@
+#include "coral_fans/Config.h"
 #include "coral_fans/base/Macros.h"
 #include "coral_fans/base/Utils.h"
+
+
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/command/runtime/RuntimeCommand.h"
@@ -9,7 +12,6 @@
 #include "mc/network/packet/TextPacket.h"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
-#include "mc/server/commands/CommandPermissionLevel.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/BlockTickingQueue.h"
 #include "mc/world/level/ChunkPos.h"
@@ -20,17 +22,16 @@
 #include "mc/world/level/chunk/ChunkSource.h"
 #include "mc/world/level/chunk/LevelChunk.h"
 #include "mc/world/level/dimension/Dimension.h"
-#include <string>
 
 
 namespace coral_fans::commands {
 
-void registerLogCommand(CommandPermissionLevel permission) {
+void registerLogCommand(config::CommandConfigStruct& config) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
     auto& logCommand = ll::command::CommandRegistrar::getInstance(false)
-                           .getOrCreateCommand("log", "command.log.description"_tr(), permission);
+                           .getOrCreateCommand(config.command, "command.log.description"_tr(), config.permission);
 
     logCommand.runtimeOverload()
         .text("levelseed")

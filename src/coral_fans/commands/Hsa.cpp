@@ -1,5 +1,7 @@
 #include "coral_fans/functions/hsa/Hsa.h"
+#include "coral_fans/Config.h"
 #include "coral_fans/base/Macros.h"
+
 
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
@@ -10,17 +12,16 @@
 #include "mc/network/packet/TextPacket.h"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
-#include "mc/server/commands/CommandPermissionLevel.h"
 #include "mc/world/level/ChunkPos.h"
 
 
 namespace coral_fans::commands {
-void registerHsaCommand(CommandPermissionLevel permission) {
+void registerHsaCommand(config::CommandConfigStruct& config) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
     auto& hsaCommand = ll::command::CommandRegistrar::getInstance(false)
-                           .getOrCreateCommand("hsa", "command.hsa.description"_tr(), permission);
+                           .getOrCreateCommand(config.command, "command.hsa.description"_tr(), config.permission);
 
     // hsa show [bool]
     hsaCommand.runtimeOverload()

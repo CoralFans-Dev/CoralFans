@@ -1,6 +1,9 @@
 
 #include "coral_fans/functions/freeCamera/FreeCamera.h"
+#include "coral_fans/Config.h"
 #include "coral_fans/base/Macros.h"
+
+
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/i18n/I18n.h"
@@ -10,11 +13,11 @@
 
 
 namespace coral_fans::commands {
-void registerFreeCameraCommand(CommandPermissionLevel permission) {
+void registerFreeCameraCommand(config::CommandConfigStruct& config) {
     using ll::i18n_literals::operator""_tr;
 
     auto& cmd = ll::command::CommandRegistrar::getInstance(false)
-                    .getOrCreateCommand("freecamera", "command.freecamera.description"_tr(), permission);
+                    .getOrCreateCommand(config.command, "command.freecamera.description"_tr(), config.permission);
     ll::service::getCommandRegistry()->registerAlias("freecamera", "fc");
     cmd.overload().execute([&](CommandOrigin const& origin, CommandOutput& output) {
         COMMAND_CHECK_PLAYER

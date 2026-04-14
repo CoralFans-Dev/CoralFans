@@ -1,5 +1,8 @@
 #include "coral_fans/functions/village/Village.h"
+#include "coral_fans/Config.h"
 #include "coral_fans/base/Macros.h"
+
+
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/command/runtime/ParamKind.h"
@@ -16,12 +19,15 @@
 
 namespace coral_fans::commands {
 
-void registerVillageCommand(CommandPermissionLevel permission) {
+void registerVillageCommand(config::CommandConfigStruct& config) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
-    auto& villageCommand = ll::command::CommandRegistrar::getInstance(false)
-                               .getOrCreateCommand("village", "command.village.description"_tr(), permission);
+    auto& villageCommand = ll::command::CommandRegistrar::getInstance(false).getOrCreateCommand(
+        config.command,
+        "command.village.description"_tr(),
+        config.permission
+    );
 
     // village show <bounds|raid|spawn|center|poi|bind> <bool>
     ll::command::CommandRegistrar::getInstance(false).tryRegisterRuntimeEnum(

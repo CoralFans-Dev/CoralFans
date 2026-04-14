@@ -18,11 +18,11 @@
 
 
 namespace coral_fans::commands {
-void registerNoclipCommand(CommandPermissionLevel permission) {
+void registerNoclipCommand(config::CommandConfigStruct& config) {
     using ll::i18n_literals::operator""_tr;
 
     auto& cmd = ll::command::CommandRegistrar::getInstance(false)
-                    .getOrCreateCommand("noclip", "command.noclip.description"_tr(), permission);
+                    .getOrCreateCommand(config.command, "command.noclip.description"_tr(), config.permission);
     cmd.overload().execute([&](CommandOrigin const& origin, CommandOutput& output) {
         COMMAND_CHECK_PLAYER
         if (player->getPlayerGameType() != GameType::Creative) return;

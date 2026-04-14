@@ -44,74 +44,81 @@ CFTickingVillageData::CFTickingVillageData(Village* villagePtr, Tick& tick) {
 }
 
 void CFTickingVillageData::showBounds() {
-    auto& geoGroup = CoralFans::getInstance().getGeometryGroup();
-    geoGroup->remove(this->mBoundsGeoId);
-    this->mBoundsGeoId =
-        geoGroup->box(this->mVillagePtr->mDimension.getDimensionId(), this->mVillagePtr->mBounds, mce::Color::WHITE());
+    auto& mod = CoralFans::getInstance();
+    mod.getGeometryGroup()->remove(this->mBoundsGeoId);
+    this->mBoundsGeoId = mod.getGeometryGroup()->box(
+        this->mVillagePtr->mDimension.getDimensionId(),
+        this->mVillagePtr->mBounds,
+        mce::Color(mod.getConfig().functions.village.boundsColor)
+    );
 }
 
 void CFTickingVillageData::showRaidBounds() {
-    auto& geoGroup = CoralFans::getInstance().getGeometryGroup();
-    geoGroup->remove(this->mRaidBoundsGeoId);
-    this->mRaidBoundsGeoId = geoGroup->box(
+    auto& mod = CoralFans::getInstance();
+    mod.getGeometryGroup()->remove(this->mRaidBoundsGeoId);
+    this->mRaidBoundsGeoId = mod.getGeometryGroup()->box(
         this->mVillagePtr->mDimension.getDimensionId(),
         this->mVillagePtr->mStaticRaidBounds,
-        mce::Color::GREEN()
+        mce::Color(mod.getConfig().functions.village.raidBoundsColor)
     );
 }
 
 void CFTickingVillageData::showIronSpawn() {
-    auto& geoGroup = CoralFans::getInstance().getGeometryGroup();
-    geoGroup->remove(this->mIronSpawnGeoId);
-    this->mIronSpawnGeoId = geoGroup->box(
+    auto& mod = CoralFans::getInstance();
+    mod.getGeometryGroup()->remove(this->mIronSpawnGeoId);
+    this->mIronSpawnGeoId = mod.getGeometryGroup()->box(
         this->mVillagePtr->mDimension.getDimensionId(),
         {
             this->mVillagePtr->mBounds->center() - Vec3{8, 6, 8},
             this->mVillagePtr->mBounds->center() + Vec3{9, 7, 9}
     },
-        mce::Color::BLUE()
+        mce::Color(mod.getConfig().functions.village.ironSpawnBoundsColor)
     );
 }
 
 void CFTickingVillageData::showCenter() {
-    auto& geoGroup = CoralFans::getInstance().getGeometryGroup();
-    geoGroup->remove(this->mCenterGeoId);
-    this->mCenterGeoId = geoGroup->box(
+    auto& mod = CoralFans::getInstance();
+    mod.getGeometryGroup()->remove(this->mCenterGeoId);
+    this->mCenterGeoId = mod.getGeometryGroup()->box(
         this->mVillagePtr->mDimension.getDimensionId(),
         {
             this->mVillagePtr->mBounds->center(),
             this->mVillagePtr->mBounds->center() + Vec3{1, 1, 1}
     },
-        mce::Color::RED()
+        mce::Color(mod.getConfig().functions.village.centerColor)
     );
 }
 
 void CFTickingVillageData::showPoiQuery() {
-    auto& geoGroup = CoralFans::getInstance().getGeometryGroup();
-    geoGroup->remove(this->mPoiQueryGeoId);
-    this->mPoiQueryGeoId = geoGroup->box(
+    auto& mod = CoralFans::getInstance();
+    mod.getGeometryGroup()->remove(this->mPoiQueryGeoId);
+    this->mPoiQueryGeoId = mod.getGeometryGroup()->box(
         this->mVillagePtr->mDimension.getDimensionId(),
         {
             this->mVillagePtr->mBounds->min - Vec3{64, 64, 64},
             this->mVillagePtr->mBounds->max + Vec3{64, 64, 64}
     },
-        mce::Color::YELLOW()
+        mce::Color(mod.getConfig().functions.village.poiBoundsColor)
     );
 }
 
 void CFTickingVillageData::showBind() {
-    auto& geoGroup = CoralFans::getInstance().getGeometryGroup();
-    geoGroup->remove(this->mBindGeoId);
+    auto& mod = CoralFans::getInstance();
+    mod.getGeometryGroup()->remove(this->mBindGeoId);
     if (auto level = ll::service::getLevel()) {
         std::vector<bsci::GeometryGroup::GeoId> bindIds;
-        const static mce::Color colors[3] = {mce::Color::PURPLE(), mce::Color::WHITE(), mce::Color::GREEN()};
+        const static mce::Color                 colors[3] = {
+            mce::Color(mod.getConfig().functions.village.bedBindColor),
+            mce::Color(mod.getConfig().functions.village.ringBindColor),
+            mce::Color(mod.getConfig().functions.village.workBindColor)
+        };
         bindIds.reserve(3 * this->mVillagePtr->mClaimedPOIs->size());
         for (auto& [actorUniqueId, poiArray] : *this->mVillagePtr->mClaimedPOIs) {
             auto villager = level->fetchEntity(actorUniqueId, false);
             if (!villager) continue;
             for (int i = 0; i < 3; i++) {
                 if (auto poi = poiArray[i].lock()) {
-                    bindIds.emplace_back(geoGroup->line(
+                    bindIds.emplace_back(mod.getGeometryGroup()->line(
                         villager->getDimensionId(),
                         villager->getHeadPos(),
                         poi->mPosition->center(),
@@ -120,7 +127,7 @@ void CFTickingVillageData::showBind() {
                 }
             }
         }
-        this->mBindGeoId = geoGroup->merge(bindIds);
+        this->mBindGeoId = mod.getGeometryGroup()->merge(bindIds);
     }
 }
 
@@ -171,7 +178,8 @@ void CFVillageManager::removeVillage(Village* villagePtr) {
 }
 
 void CFVillageManager::tick(const Tick& currentTick) {
-    auto&      geoGroup = CoralFans::getInstance().getGeometryGroup();
+    auto&      mod      = CoralFans::getInstance();
+    auto&      geoGroup = mod.getGeometryGroup();
     static int gt       = 8;
     std::erase_if(
         this->mTickingList,
@@ -219,7 +227,8 @@ void CFVillageManager::tick(const Tick& currentTick) {
             return false;
         }
     );
-    gt = (gt + 1) % 10;
+    const static int interval = std::max(1, mod.getConfig().functions.village.drawInterval);
+    gt                        = (gt + 1) % interval;
 }
 
 void CFVillageManager::setShowBounds(bool show) {

@@ -36,23 +36,23 @@ CoralFans& CoralFans::getInstance() {
 void CoralFans::setupCommands() {
     commands::registerCoralfansCommand();
     auto& commandsConfig = this->getConfig().command;
-    if (commandsConfig.tick.enabled) commands::registerTickCommand(commandsConfig.tick.permission);
-    if (commandsConfig.func.enabled) commands::registerFuncCommand(commandsConfig.func.permission);
-    if (commandsConfig.self.enabled) commands::registerSelfCommand(commandsConfig.self.permission);
-    if (commandsConfig.hsa.enabled) commands::registerHsaCommand(commandsConfig.hsa.permission);
-    if (commandsConfig.counter.enabled) commands::registerCounterCommand(commandsConfig.counter.permission);
-    if (commandsConfig.prof.enabled) commands::registerProfCommand(commandsConfig.prof.permission);
-    if (commandsConfig.slime.enabled) commands::registerSlimeCommand(commandsConfig.slime.permission);
-    if (commandsConfig.village.enabled) commands::registerVillageCommand(commandsConfig.village.permission);
-    if (commandsConfig.rotate.enabled) commands::registerRotateCommand(commandsConfig.rotate.permission);
-    if (commandsConfig.data.enabled) commands::registerDataCommand(commandsConfig.data.permission);
-    if (commandsConfig.cfhud.enabled) commands::registerCfhudCommand(commandsConfig.cfhud.permission);
-    if (commandsConfig.log.enabled) commands::registerLogCommand(commandsConfig.log.permission);
-    if (commandsConfig.calculate.enabled) commands::registerCalculateCommand(commandsConfig.calculate.permission);
-    if (commandsConfig.minerule.enabled) commands::registerMineruleCommand(commandsConfig.minerule.permission);
-    if (commandsConfig.freecamera.enabled) commands::registerFreeCameraCommand(commandsConfig.freecamera.permission);
-    if (commandsConfig.noclip.enabled) commands::registerNoclipCommand(commandsConfig.noclip.permission);
-    if (commandsConfig.locate.enabled) commands::registerLocateCommand(commandsConfig.locate.permission);
+    if (commandsConfig.tick.enabled) commands::registerTickCommand(commandsConfig.tick);
+    if (commandsConfig.func.enabled) commands::registerFuncCommand(commandsConfig.func);
+    if (commandsConfig.self.enabled) commands::registerSelfCommand(commandsConfig.self);
+    if (commandsConfig.hsa.enabled) commands::registerHsaCommand(commandsConfig.hsa);
+    if (commandsConfig.counter.enabled) commands::registerCounterCommand(commandsConfig.counter);
+    if (commandsConfig.prof.enabled) commands::registerProfCommand(commandsConfig.prof);
+    if (commandsConfig.slime.enabled) commands::registerSlimeCommand(commandsConfig.slime);
+    if (commandsConfig.village.enabled) commands::registerVillageCommand(commandsConfig.village);
+    if (commandsConfig.rotate.enabled) commands::registerRotateCommand(commandsConfig.rotate);
+    if (commandsConfig.data.enabled) commands::registerDataCommand(commandsConfig.data);
+    if (commandsConfig.cfhud.enabled) commands::registerCfhudCommand(commandsConfig.cfhud);
+    if (commandsConfig.log.enabled) commands::registerLogCommand(commandsConfig.log);
+    if (commandsConfig.calculate.enabled) commands::registerCalculateCommand(commandsConfig.calculate);
+    if (commandsConfig.minerule.enabled) commands::registerMineruleCommand(commandsConfig.minerule);
+    if (commandsConfig.freecamera.enabled) commands::registerFreeCameraCommand(commandsConfig.freecamera);
+    if (commandsConfig.noclip.enabled) commands::registerNoclipCommand(commandsConfig.noclip);
+    if (commandsConfig.locate.enabled) commands::registerLocateCommand(commandsConfig.locate);
 
     functions::ShortcutsManager::getInstance().registerShortcutsCommand();
 }

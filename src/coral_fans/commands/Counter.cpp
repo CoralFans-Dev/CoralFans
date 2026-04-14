@@ -1,6 +1,8 @@
+#include "coral_fans/Config.h"
 #include "coral_fans/base/Macros.h"
-
 #include "coral_fans/functions/func/FuncManager.h"
+
+
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/command/runtime/ParamKind.h"
@@ -9,20 +11,23 @@
 #include "ll/api/i18n/I18n.h"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
-#include "mc/server/commands/CommandPermissionLevel.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/block/Block.h"
 #include "mc/world/level/material/Material.h"
 
+
 namespace coral_fans::commands {
 
-void registerCounterCommand(CommandPermissionLevel permission) {
+void registerCounterCommand(config::CommandConfigStruct& config) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
-    auto& counterCommand = ll::command::CommandRegistrar::getInstance(false)
-                               .getOrCreateCommand("counter", "command.counter.description"_tr(), permission);
+    auto& counterCommand = ll::command::CommandRegistrar::getInstance(false).getOrCreateCommand(
+        config.command,
+        "command.counter.description"_tr(),
+        config.permission
+    );
 
     // count print <int>
     counterCommand.runtimeOverload()

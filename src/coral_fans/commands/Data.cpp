@@ -1,5 +1,8 @@
 #include "coral_fans/functions/data/Data.h"
+#include "coral_fans/Config.h"
 #include "coral_fans/base/Macros.h"
+
+
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/command/runtime/ParamKind.h"
@@ -7,7 +10,6 @@
 #include "ll/api/i18n/I18n.h"
 #include "mc/network/packet/TextPacket.h"
 #include "mc/server/commands/CommandOutput.h"
-#include "mc/server/commands/CommandPermissionLevel.h"
 #include "mc/server/commands/CommandVersion.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/level/BlockPos.h"
@@ -19,12 +21,12 @@
 
 namespace coral_fans::commands {
 
-void registerDataCommand(CommandPermissionLevel permission) {
+void registerDataCommand(config::CommandConfigStruct& config) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
     auto& dataCommand = ll::command::CommandRegistrar::getInstance(false)
-                            .getOrCreateCommand("data", "command.data.description"_tr(), permission);
+                            .getOrCreateCommand(config.command, "command.data.description"_tr(), config.permission);
 
     // block [blockPos: x y z]
     dataCommand.runtimeOverload()

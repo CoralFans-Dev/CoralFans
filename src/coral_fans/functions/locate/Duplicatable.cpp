@@ -498,7 +498,8 @@ void DuplicatableManager::removeData() {
     }
 }
 
-bsci::GeometryGroup::GeoId DuplicatableManager::drawNetherite(std::map<BlockPos, std::unordered_set<BlockPos>>& data) {
+bsci::GeometryGroup::GeoId
+DuplicatableManager::drawNetherite(std::multimap<BlockPos, std::unordered_set<BlockPos>>& data) {
     using ll::i18n_literals::operator""_tr;
     auto& geometryGroup   = CoralFans::getInstance().getGeometryGroup();
     auto& netheriteConfig = CoralFans::getInstance().getConfig().functions.locate.duplicatable.netherite;
@@ -594,7 +595,7 @@ bsci::GeometryGroup::GeoId DuplicatableManager::drawFire(std::unordered_set<Bloc
     return geometryGroup->merge(geoIdList);
 }
 
-bsci::GeometryGroup::GeoId DuplicatableManager::drawGlowStone(std::map<BlockPos, int>& data) {
+bsci::GeometryGroup::GeoId DuplicatableManager::drawGlowStone(std::multimap<BlockPos, int>& data) {
     using ll::i18n_literals::operator""_tr;
     auto& geometryGroup   = CoralFans::getInstance().getGeometryGroup();
     auto& glowStoneConfig = CoralFans::getInstance().getConfig().functions.locate.duplicatable.glowStone;
@@ -625,7 +626,7 @@ bsci::GeometryGroup::GeoId DuplicatableManager::drawGlowStone(std::map<BlockPos,
     return geometryGroup->merge(geoIdList);
 }
 
-bsci::GeometryGroup::GeoId DuplicatableManager::drawMushroom(std::map<BlockPos, bool>& data) {
+bsci::GeometryGroup::GeoId DuplicatableManager::drawMushroom(std::multimap<BlockPos, bool>& data) {
     using ll::i18n_literals::operator""_tr;
     auto& geometryGroup  = CoralFans::getInstance().getGeometryGroup();
     auto& mushroomConfig = CoralFans::getInstance().getConfig().functions.locate.duplicatable.mushroom;
@@ -685,7 +686,7 @@ bsci::GeometryGroup::GeoId DuplicatableManager::drawOre(
     return geometryGroup->merge(geoIdList);
 }
 
-bsci::GeometryGroup::GeoId DuplicatableManager::drawEndIsland(std::map<BlockPos, Core::Random>& data) {
+bsci::GeometryGroup::GeoId DuplicatableManager::drawEndIsland(std::multimap<BlockPos, Core::Random>& data) {
     using ll::i18n_literals::operator""_tr;
     auto& geometryGroup   = CoralFans::getInstance().getGeometryGroup();
     auto& endIslandConfig = CoralFans::getInstance().getConfig().functions.locate.duplicatable.endIsland;
@@ -733,7 +734,7 @@ bsci::GeometryGroup::GeoId DuplicatableManager::drawEndIsland(std::map<BlockPos,
     return geometryGroup->merge(geoIdList);
 }
 
-bsci::GeometryGroup::GeoId DuplicatableManager::drawChorusFlower(std::map<BlockPos, int>& data) {
+bsci::GeometryGroup::GeoId DuplicatableManager::drawChorusFlower(std::multimap<BlockPos, int>& data) {
     using ll::i18n_literals::operator""_tr;
     auto& geometryGroup      = CoralFans::getInstance().getGeometryGroup();
     auto& chorusFlowerConfig = CoralFans::getInstance().getConfig().functions.locate.duplicatable.chorusFlower;

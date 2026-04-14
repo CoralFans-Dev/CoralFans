@@ -285,7 +285,7 @@
             "duplicatable": {
                 "show": {
                     "output": "设置 show {} 为 \"{}\"",
-                    "error": "未定义的可回溯方块类型"
+                    "error": "未定义的可回溯地物类型"
                 }
             }
         }

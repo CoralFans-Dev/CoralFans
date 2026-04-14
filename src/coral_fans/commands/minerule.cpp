@@ -7,16 +7,17 @@
 #include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
 #include "mc/server/commands/CommandOutput.h"
-#include "mc/server/commands/CommandPermissionLevel.h"
-#include <string>
 
 
 namespace coral_fans::commands {
-void registerMineruleCommand(CommandPermissionLevel permission) {
+void registerMineruleCommand(config::CommandConfigStruct& config) {
     using ll::i18n_literals::operator""_tr;
 
-    auto& mineruleCommand = ll::command::CommandRegistrar::getInstance(false)
-                                .getOrCreateCommand("minerule", "command.minerule.description"_tr(), permission);
+    auto& mineruleCommand = ll::command::CommandRegistrar::getInstance(false).getOrCreateCommand(
+        config.command,
+        "command.minerule.description"_tr(),
+        config.permission
+    );
 
     auto& configDb = CoralFans::getInstance().getConfigDb();
 

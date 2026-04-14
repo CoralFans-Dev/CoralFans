@@ -1,5 +1,5 @@
 #include "coral_fans/functions/prof/Prof.h"
-
+#include "coral_fans/Config.h"
 
 
 #include "ll/api/command/CommandHandle.h"
@@ -10,18 +10,17 @@
 #include "ll/api/i18n/I18n.h"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
-#include "mc/server/commands/CommandPermissionLevel.h"
 #include <string>
 
 
 namespace coral_fans::commands {
 
-void registerProfCommand(CommandPermissionLevel permission) {
+void registerProfCommand(config::CommandConfigStruct& config) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
     auto& profCommand = ll::command::CommandRegistrar::getInstance(false)
-                            .getOrCreateCommand("prof", "command.prof.description"_tr(), permission);
+                            .getOrCreateCommand(config.command, "command.prof.description"_tr(), config.permission);
 
     ll::command::CommandRegistrar::getInstance(false).tryRegisterRuntimeEnum("profType", functions::Profiler::TypeVec);
     profCommand.runtimeOverload()

@@ -10,26 +10,27 @@ namespace coral_fans::config {
 struct CommandConfigStruct {
     bool                   enabled;
     CommandPermissionLevel permission;
+    std::string            command;
 };
 
 struct CommandStruct {
-    CommandConfigStruct tick       = {true, CommandPermissionLevel::GameDirectors};
-    CommandConfigStruct func       = {true, CommandPermissionLevel::GameDirectors};
-    CommandConfigStruct self       = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct hsa        = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct counter    = {true, CommandPermissionLevel::GameDirectors};
-    CommandConfigStruct prof       = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct slime      = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct village    = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct rotate     = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct data       = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct cfhud      = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct log        = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct calculate  = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct minerule   = {true, CommandPermissionLevel::GameDirectors};
-    CommandConfigStruct freecamera = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct noclip     = {true, CommandPermissionLevel::Any};
-    CommandConfigStruct locate     = {true, CommandPermissionLevel::Any};
+    CommandConfigStruct tick       = {true, CommandPermissionLevel::GameDirectors, "tick"};
+    CommandConfigStruct func       = {true, CommandPermissionLevel::GameDirectors, "func"};
+    CommandConfigStruct self       = {true, CommandPermissionLevel::Any, "self"};
+    CommandConfigStruct hsa        = {true, CommandPermissionLevel::Any, "hsa"};
+    CommandConfigStruct counter    = {true, CommandPermissionLevel::GameDirectors, "counter"};
+    CommandConfigStruct prof       = {true, CommandPermissionLevel::Any, "prof"};
+    CommandConfigStruct slime      = {true, CommandPermissionLevel::Any, "slime"};
+    CommandConfigStruct village    = {true, CommandPermissionLevel::Any, "village"};
+    CommandConfigStruct rotate     = {true, CommandPermissionLevel::Any, "rotate"};
+    CommandConfigStruct data       = {true, CommandPermissionLevel::Any, "data"};
+    CommandConfigStruct cfhud      = {true, CommandPermissionLevel::Any, "cfhud"};
+    CommandConfigStruct log        = {true, CommandPermissionLevel::Any, "log"};
+    CommandConfigStruct calculate  = {true, CommandPermissionLevel::Any, "calculate"};
+    CommandConfigStruct minerule   = {true, CommandPermissionLevel::GameDirectors, "minerule"};
+    CommandConfigStruct freecamera = {true, CommandPermissionLevel::Any, "freecamera"};
+    CommandConfigStruct noclip     = {true, CommandPermissionLevel::Any, "noclip"};
+    CommandConfigStruct locate     = {true, CommandPermissionLevel::Any, "cflocate"};
 };
 
 struct Shortcut {
@@ -74,7 +75,7 @@ struct Locate {
 };
 
 struct Config {
-    int         version    = 5;
+    int         version    = 6;
     std::string locateName = "zh_CN";
 
     CommandStruct command;
@@ -171,6 +172,18 @@ struct Config {
             int         drawRadius         = 6;
             std::string slimeChunkColor    = "#10E436";
         } slime{};
+
+        struct {
+            int         drawInterval         = 10;
+            std::string boundsColor          = "#FFFFFF";
+            std::string raidBoundsColor      = "#10E436";
+            std::string ironSpawnBoundsColor = "#3003D9";
+            std::string centerColor          = "#FF0040";
+            std::string poiBoundsColor       = "#FFA214";
+            std::string bedBindColor         = "#DB3FFD";
+            std::string ringBindColor        = "#FFEC27";
+            std::string workBindColor        = "#5AC54F";
+        } village{};
     } functions{};
 
     struct {

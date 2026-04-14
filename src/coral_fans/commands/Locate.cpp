@@ -8,15 +8,14 @@
 #include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
 #include "mc/server/commands/CommandOutput.h"
-#include "mc/server/commands/CommandPermissionLevel.h"
 
 
 namespace coral_fans::commands {
-void registerLocateCommand(CommandPermissionLevel permission) {
+void registerLocateCommand(config::CommandConfigStruct& config) {
     using ll::i18n_literals::operator""_tr;
 
     auto& locateCommand = ll::command::CommandRegistrar::getInstance(false)
-                              .getOrCreateCommand("cflocate", "command.locate.description"_tr(), permission);
+                              .getOrCreateCommand(config.command, "command.locate.description"_tr(), config.permission);
 
     // locate duplicatable
     // <netherite|nether_spring|nether_fire|glow_stone|mushroom|nether_gold|nether_quartz|nether_magma|nether_gravel|blackstone|soul_sand|end_island|chorus_flower|end_gateway>

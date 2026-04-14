@@ -1,6 +1,8 @@
 #include "Commands.h"
 #include "coral_fans/CoralFans.h"
 #include "coral_fans/base/MySchedule.h"
+
+
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/command/runtime/ParamKind.h"
@@ -11,7 +13,6 @@
 #include "mc/network/packet/TextPacket.h"
 #include "mc/platform/UUID.h"
 #include "mc/server/commands/CommandOutput.h"
-#include "mc/server/commands/CommandPermissionLevel.h"
 #include "mc/server/commands/CommandRegistry.h"
 #include "mc/util/ProfilerLite.h"
 #include "mc/util/Timer.h"
@@ -20,12 +21,14 @@
 
 
 namespace coral_fans::commands {
-void registerTickCommand(CommandPermissionLevel permission) {
+void registerTickCommand(config::CommandConfigStruct& config) {
     using ll::i18n_literals::operator""_tr;
+
+    auto command = config.command;
 
     // reg cmd
     auto& tickCommand = ll::command::CommandRegistrar::getInstance(false)
-                            .getOrCreateCommand("tick", "command.tick.description"_tr(), permission);
+                            .getOrCreateCommand(command, "command.tick.description"_tr(), config.permission);
 
     // tick freeze|reset
     ll::command::CommandRegistrar::getInstance(false).tryRegisterRuntimeEnum(

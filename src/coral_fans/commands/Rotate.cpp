@@ -1,22 +1,25 @@
 #include "coral_fans/functions/rotate/Rotate.h"
+#include "coral_fans/Config.h"
 #include "coral_fans/base/Macros.h"
+
+
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/i18n/I18n.h"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
-#include "mc/server/commands/CommandPermissionLevel.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/phys/HitResult.h"
 
+
 namespace coral_fans::commands {
 
-void registerRotateCommand(CommandPermissionLevel permission) {
+void registerRotateCommand(config::CommandConfigStruct& config) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
     auto& rotateCommand = ll::command::CommandRegistrar::getInstance(false)
-                              .getOrCreateCommand("rotate", "command.rotate.description"_tr(), permission);
+                              .getOrCreateCommand(config.command, "command.rotate.description"_tr(), config.permission);
 
     rotateCommand.overload().execute([](CommandOrigin const& origin, CommandOutput& output) {
         COMMAND_CHECK_PLAYER

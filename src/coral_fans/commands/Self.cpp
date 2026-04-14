@@ -10,16 +10,15 @@
 #include "ll/api/i18n/I18n.h"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
-#include "mc/server/commands/CommandPermissionLevel.h"
 #include "mc/world/actor/player/Player.h"
 
 namespace coral_fans::commands {
-void registerSelfCommand(CommandPermissionLevel permission) {
+void registerSelfCommand(config::CommandConfigStruct& config) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
     auto& selfCommand = ll::command::CommandRegistrar::getInstance(false)
-                            .getOrCreateCommand("self", "command.self.description"_tr(), permission);
+                            .getOrCreateCommand(config.command, "command.self.description"_tr(), config.permission);
 
     // self autotool <bool>
     selfCommand.runtimeOverload()

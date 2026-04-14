@@ -11,18 +11,17 @@
 #include "ll/api/i18n/I18n.h"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
-#include "mc/server/commands/CommandPermissionLevel.h"
 #include "mc/world/actor/player/Player.h"
 #include <string>
 
 
 namespace coral_fans::commands {
 
-void registerCfhudCommand(CommandPermissionLevel permission) {
+void registerCfhudCommand(config::CommandConfigStruct& config) {
     using ll::i18n_literals::operator""_tr;
     // reg cmd
     auto& cfhudCommand = ll::command::CommandRegistrar::getInstance(false)
-                             .getOrCreateCommand("cfhud", "command.cfhud.description"_tr(), permission);
+                             .getOrCreateCommand(config.command, "command.cfhud.description"_tr(), config.permission);
 
     // cfhud show <bool>
     cfhudCommand.runtimeOverload()

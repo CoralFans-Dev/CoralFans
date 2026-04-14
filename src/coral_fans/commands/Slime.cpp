@@ -1,6 +1,8 @@
 #include "coral_fans/functions/slime/Slime.h"
+#include "coral_fans/Config.h"
 #include "coral_fans/base/Macros.h"
 #include "coral_fans/base/Utils.h"
+
 
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
@@ -12,12 +14,12 @@
 
 namespace coral_fans::commands {
 
-void registerSlimeCommand(CommandPermissionLevel permission) {
+void registerSlimeCommand(config::CommandConfigStruct& config) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
     auto& slimeCommand = ll::command::CommandRegistrar::getInstance(false)
-                             .getOrCreateCommand("slime", "command.slime.description"_tr(), permission);
+                             .getOrCreateCommand(config.command, "command.slime.description"_tr(), config.permission);
 
     // slime show <bool>
     slimeCommand.runtimeOverload()

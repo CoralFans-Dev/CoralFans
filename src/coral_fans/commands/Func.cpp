@@ -1,3 +1,4 @@
+#include "coral_fans/Config.h"
 #include "coral_fans/CoralFans.h"
 #include "coral_fans/functions/func/FuncManager.h"
 
@@ -10,17 +11,16 @@
 #include "ll/api/i18n/I18n.h"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
-#include "mc/server/commands/CommandPermissionLevel.h"
 #include <string>
 
 
 namespace coral_fans::commands {
-void registerFuncCommand(CommandPermissionLevel permission) {
+void registerFuncCommand(config::CommandConfigStruct& config) {
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd
     auto& funcCommand = ll::command::CommandRegistrar::getInstance(false)
-                            .getOrCreateCommand("func", "command.func.description"_tr(), permission);
+                            .getOrCreateCommand(config.command, "command.func.description"_tr(), config.permission);
 
     // func forceopen <bool>
     funcCommand.runtimeOverload()

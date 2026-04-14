@@ -269,6 +269,15 @@
             "description": "noclip in creative gamemode",
             "enabled": "noclip enabled.",
             "disabled": "noclip disabled."
+        },
+        "locate": {
+            "description": "locate specific feature",
+            "duplicatable": {
+                "show": {
+                    "output": "set show {}  \"{}\"",
+                    "error": "undefined duplicatable feature"
+                }
+            }
         }
     },
     "translate": {
@@ -329,6 +338,54 @@
         },
         "cfhud": {
             "base": "Tick: {}\nPos: {}\nView: {}\nChunk: {}\nBlock: {} Light: {}\nSpeed: {:.4f} ({:.2f} {:.2f} {:.2f})\nBiome: {}\n"
+        },
+        "locate": {
+            "duplicatable": {
+                "netherite": {
+                    "oriPos": "duplicatable netherite origin position",
+                    "pos": "duplicatable netherite position"
+                },
+                "netherSpring": {
+                    "pos": "duplicatable nether spring"
+                },
+                "netherFire": {
+                    "pos": "duplicatable nether fire origin position"
+                },
+                "glowStone": {
+                    "pos": "duplicatable glowStone origin position[{}]"
+                },
+                "mushroom": {
+                    "redPos": "duplicatable red mushroom origin position",
+                    "brownPos": "duplicatable brown mushroom origin position"
+                },
+                "netherGold": {
+                    "oriPos": "duplicatable nether gold origin position"
+                },
+                "netherQuartz": {
+                    "oriPos": "duplicatable nether quartz origin position"
+                },
+                "netherMagma": {
+                    "oriPos": "duplicatable magma origin position"
+                },
+                "netherGravel": {
+                    "oriPos": "duplicatable gravel origin position"
+                },
+                "netherBlackstone": {
+                    "oriPos": "duplicatable blackstone origin position"
+                },
+                "netherSoulSand": {
+                    "oriPos": "duplicatable soul sand origin position"
+                },
+                "endIsland": {
+                    "oriPos": "duplicatable end island origin position"
+                },
+                "chorusFlower": {
+                    "oriPos": "duplicatable chorus flower origin position[{}]"
+                },
+                "endGateway": {
+                    "oriPos": "duplicatable end gateway origin position"
+                }
+            }
         }
     }
 }

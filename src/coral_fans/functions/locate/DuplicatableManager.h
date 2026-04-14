@@ -35,18 +35,18 @@ public:
 
 private:
     struct NetherData {
-        std::map<BlockPos, std::unordered_set<BlockPos>> netheritePosMap;
-        std::unordered_set<BlockPos>                     springPosSet;
-        std::unordered_set<BlockPos>                     firePosMap;
-        std::map<BlockPos, int>                          glowStonePosMap;
-        std::map<BlockPos, bool>                         mushroomPosMap;
-        std::unordered_set<BlockPos>                     netherGoldPosMap;
-        std::unordered_set<BlockPos>                     netherQuartzPosMap;
-        std::unordered_set<BlockPos>                     netherMagmaPosMap;
-        std::unordered_set<BlockPos>                     netherGravelPosMap;
-        std::unordered_set<BlockPos>                     blackstonePosMap;
-        std::unordered_set<BlockPos>                     soulSandPosMap;
-        bool                                             reload = false;
+        std::multimap<BlockPos, std::unordered_set<BlockPos>> netheritePosMap;
+        std::unordered_set<BlockPos>                          springPosSet;
+        std::unordered_set<BlockPos>                          firePosMap;
+        std::multimap<BlockPos, int>                          glowStonePosMap;
+        std::multimap<BlockPos, bool>                         mushroomPosMap;
+        std::unordered_set<BlockPos>                          netherGoldPosMap;
+        std::unordered_set<BlockPos>                          netherQuartzPosMap;
+        std::unordered_set<BlockPos>                          netherMagmaPosMap;
+        std::unordered_set<BlockPos>                          netherGravelPosMap;
+        std::unordered_set<BlockPos>                          blackstonePosMap;
+        std::unordered_set<BlockPos>                          soulSandPosMap;
+        bool                                                  reload = false;
     };
 
     struct NetherThreadTemperaryData {
@@ -80,10 +80,10 @@ private:
     };
 
     struct TheEndData {
-        std::map<BlockPos, Core::Random> endIslandPosMap;
-        std::map<BlockPos, int>          chorusFlowerPosMap;
-        std::unordered_set<BlockPos>     endGatewayPosSet;
-        bool                             reload = false;
+        std::multimap<BlockPos, Core::Random> endIslandPosMap;
+        std::multimap<BlockPos, int>          chorusFlowerPosMap;
+        std::unordered_set<BlockPos>          endGatewayPosSet;
+        bool                                  reload = false;
     };
 
     struct TheEndThreadTemperaryData {
@@ -148,15 +148,15 @@ private:
     void removeBsciData(ShowType);
     void bsciDataRuntimeRemove();
 
-    bsci::GeometryGroup::GeoId drawNetherite(std::map<BlockPos, std::unordered_set<BlockPos>>&);
+    bsci::GeometryGroup::GeoId drawNetherite(std::multimap<BlockPos, std::unordered_set<BlockPos>>&);
     bsci::GeometryGroup::GeoId drawSpring(std::unordered_set<BlockPos>&);
     bsci::GeometryGroup::GeoId drawFire(std::unordered_set<BlockPos>&);
-    bsci::GeometryGroup::GeoId drawGlowStone(std::map<BlockPos, int>&);
-    bsci::GeometryGroup::GeoId drawMushroom(std::map<BlockPos, bool>&);
+    bsci::GeometryGroup::GeoId drawGlowStone(std::multimap<BlockPos, int>&);
+    bsci::GeometryGroup::GeoId drawMushroom(std::multimap<BlockPos, bool>&);
     bsci::GeometryGroup::GeoId
     drawOre(std::unordered_set<BlockPos>&, config::Locate::DuplicatableOreStruct&, std::string);
-    bsci::GeometryGroup::GeoId drawEndIsland(std::map<BlockPos, Core::Random>&);
-    bsci::GeometryGroup::GeoId drawChorusFlower(std::map<BlockPos, int>&);
+    bsci::GeometryGroup::GeoId drawEndIsland(std::multimap<BlockPos, Core::Random>&);
+    bsci::GeometryGroup::GeoId drawChorusFlower(std::multimap<BlockPos, int>&);
     bsci::GeometryGroup::GeoId drawEndGateway(std::unordered_set<BlockPos>&);
     bool                       isChunkValid(BlockSource&, ChunkPos);
     void                       tryRemoveNetherChunkData(ChunkPos);
