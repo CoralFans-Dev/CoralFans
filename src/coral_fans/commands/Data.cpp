@@ -10,7 +10,6 @@
 #include "ll/api/i18n/I18n.h"
 #include "mc/network/packet/TextPacket.h"
 #include "mc/server/commands/CommandOutput.h"
-#include "mc/server/commands/CommandVersion.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/BlockSource.h"
@@ -37,7 +36,7 @@ void registerDataCommand(config::CommandConfigStruct& config) {
             BlockPos blockPos;
             if (self["blockPos"].has_value())
                 blockPos = self["blockPos"].get<ll::command::ParamKind::BlockPos>().getBlockPos(
-                    CommandVersion::CurrentVersion(),
+                    static_cast<int>(CurrentCmdVersion::Latest),
                     origin,
                     {0, 0, 0}
                 );
@@ -94,7 +93,7 @@ void registerDataCommand(config::CommandConfigStruct& config) {
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             COMMAND_CHECK_PLAYER
             BlockPos blockPos = self["blockPos"].get<ll::command::ParamKind::BlockPos>().getBlockPos(
-                CommandVersion::CurrentVersion(),
+                static_cast<int>(CurrentCmdVersion::Latest),
                 origin,
                 {0, 0, 0}
             );
@@ -114,7 +113,7 @@ void registerDataCommand(config::CommandConfigStruct& config) {
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             COMMAND_CHECK_PLAYER
             BlockPos blockPos = self["blockPos"].get<ll::command::ParamKind::BlockPos>().getBlockPos(
-                CommandVersion::CurrentVersion(),
+                static_cast<int>(CurrentCmdVersion::Latest),
                 origin,
                 {0, 0, 0}
             );
@@ -187,7 +186,7 @@ void registerDataCommand(config::CommandConfigStruct& config) {
             BlockPos blockPos;
             if (self["blockPos"].has_value())
                 blockPos = self["blockPos"].get<ll::command::ParamKind::BlockPos>().getBlockPos(
-                    CommandVersion::CurrentVersion(),
+                    static_cast<int>(CurrentCmdVersion::Latest),
                     origin,
                     {0, 0, 0}
                 );

@@ -13,7 +13,7 @@
 #include "mc/network/packet/TextPacket.h"
 #include "mc/network/packet/TextPacketPayload.h"
 #include "mc/network/packet/TextPacketType.h"
-#include "mc/util/ProfilerLite.h"
+#include "mc/profile/ProfilerLite.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/item/ItemStack.h"
 #include "mc/world/level/BlockSource.h"

@@ -12,7 +12,7 @@
 
 
 #include "ll/api/memory/Hook.h"
-#include "mc/util/ProfilerLite.h"
+#include "mc/profile/ProfilerLite.h"
 #include "mc/world/actor/Actor.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/BlockTickingQueue.h"

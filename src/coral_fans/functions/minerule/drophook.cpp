@@ -1,7 +1,6 @@
 #include "MineruleManager.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/scripting/modules/minecraft/events/ScriptBlockGlobalEventListener.h"
-#include "mc/util/Randomize.h"
 #include "mc/world/item/ItemStack.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/Explosion.h"
@@ -16,6 +15,7 @@
 #include "mc/world/level/block/components/BlockComponentDirectData.h"
 #include "mc/world/level/dimension/Dimension.h"
 #include <mc/world/level/BlockSource.h>
+#include <utility>
 
 
 namespace coral_fans::functions {
@@ -26,15 +26,17 @@ LL_TYPE_INSTANCE_HOOK(
     &BlockType::getResourceDrops,
     ResourceDrops,
     ::Block const&                block,
-    ::Randomize&                  randomize,
+    ::IRandom&                    random,
     ::ResourceDropsContext const& resourceDropsContext
 ) {
     if (block.getTypeName() == "minecraft:bedrock") {
         ItemStack itemStack;
         itemStack.reinit("bedrock", 1, 0);
-        return ResourceDrops(std::vector<ItemStack>{std::move(itemStack)});
+        ResourceDrops res{};
+        res.mItems = std::vector<ItemStack>{std::move(itemStack)};
+        return res;
     }
-    return origin(block, randomize, resourceDropsContext);
+    return origin(block, random, std::forward<ResourceDropsContext const&>(resourceDropsContext));
 }
 
 LL_TYPE_STATIC_HOOK(
@@ -46,25 +48,18 @@ LL_TYPE_STATIC_HOOK(
     ::BlockSource&                                       region,
     ::BlockPos const&                                    blockPos,
     ::Block const&                                       block,
-    ::Randomize&                                         randomize,
+    ::IRandom&                                           random,
     ::ResourceDropsContext const&                        resourceDropsContext,
     ::std::vector<::std::pair<::ItemStack, ::BlockPos>>& itemStacks
 ) {
     if (block.getTypeName() == "minecraft:moving_block") {
         MovingBlockActor* mba = (MovingBlockActor*)region.getBlockEntity(blockPos);
         if (mba->mWrappedBlock->getTypeName() != "minecraft:moving_block") { // 防止mb的mb导致的无限循环
-            region.setBlock(
-                blockPos,
-                *mba->mWrappedBlock,
-                3,
-                mba->mWrappedBlockActor,
-                nullptr,
-                BlockChangeContext(false)
-            );
-            return origin(region, blockPos, region.getBlock(blockPos), randomize, resourceDropsContext, itemStacks);
+            region.setBlock(blockPos, *mba->mWrappedBlock, 3, mba->mWrappedBlockActor, nullptr, BlockChangeContext());
+            return origin(region, blockPos, region.getBlock(blockPos), random, resourceDropsContext, itemStacks);
         }
     }
-    return origin(region, blockPos, block, randomize, resourceDropsContext, itemStacks);
+    return origin(region, blockPos, block, random, resourceDropsContext, itemStacks);
 }
 
 LL_TYPE_INSTANCE_HOOK(
@@ -76,18 +71,18 @@ LL_TYPE_INSTANCE_HOOK(
     ::BlockSource&                region,
     ::BlockPos const&             pos,
     ::Block const&                block,
-    ::Randomize&                  randomize,
+    ::IRandom&                    random,
     ::ResourceDropsContext const& resourceDropsContext
 ) {
     if (block.getTypeName() == "minecraft:moving_block") {
         MovingBlockActor* mba = (MovingBlockActor*)region.getBlockEntity(pos);
         if (mba->mWrappedBlock->getTypeName() != "minecraft:moving_block") { // 防止mb的mb导致的无限循环
-            region.setBlock(pos, *mba->mWrappedBlock, 3, mba->mWrappedBlockActor, nullptr, BlockChangeContext(false));
+            region.setBlock(pos, *mba->mWrappedBlock, 3, mba->mWrappedBlockActor, nullptr, BlockChangeContext());
             const Block& newBlock = region.getBlock(pos);
-            return newBlock.mBlockType->spawnResources(region, pos, newBlock, randomize, resourceDropsContext);
+            return newBlock.mBlockType->spawnResources(region, pos, newBlock, random, resourceDropsContext);
         }
     }
-    return origin(region, pos, block, randomize, resourceDropsContext);
+    return origin(region, pos, block, random, resourceDropsContext);
 }
 
 void bedrockDropHook(bool bl) { bl ? CoralFansDropHook1::hook() : CoralFansDropHook1::unhook(); }

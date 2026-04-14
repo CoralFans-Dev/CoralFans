@@ -14,6 +14,9 @@
 #include "mc/world/level/Level.h"
 #include "mc/world/level/Tick.h"
 
+PlayerSkinPacketPayload::PlayerSkinPacketPayload()                               = default;
+PlayerSkinPacketPayload::PlayerSkinPacketPayload(PlayerSkinPacketPayload const&) = default;
+SerializedSkinRef::SerializedSkinRef(class SerializedSkinRef const&)             = default;
 
 namespace coral_fans::functions {
 
@@ -35,11 +38,13 @@ void SendFakePlayerPacket(Player* pl) {
     pl->sendNetworkPacket(pkt1);
     // Update Skin
 
-    auto pkt2                  = PlayerSkinPacket();
-    pkt2.mUUID                 = randomUuid;
-    pkt2.mSkin                 = *pl->mSkin;
-    pkt2.mLocalizedNewSkinName = "";
-    pkt2.mLocalizedOldSkinName = "";
+    auto skinPktPayload                  = PlayerSkinPacketPayload();
+    skinPktPayload.mUUID                 = randomUuid;
+    skinPktPayload.mSkin                 = *pl->mSkin;
+    skinPktPayload.mLocalizedNewSkinName = "";
+    skinPktPayload.mLocalizedOldSkinName = "";
+    auto pkt2                            = PlayerSkinPacket(std::move(skinPktPayload));
+
     pkt2.sendTo(*pl);
 
 

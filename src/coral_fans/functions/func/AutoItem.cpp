@@ -2,10 +2,10 @@
 
 
 #include "ll/api/memory/Hook.h"
-#include "mc/nbt/ByteTag.h"
-#include "mc/nbt/CompoundTag.h"
-#include "mc/nbt/CompoundTagVariant.h"
-#include "mc/nbt/IntTag.h"
+#include "mc/deps/nbt/ByteTag.h"
+#include "mc/deps/nbt/CompoundTag.h"
+#include "mc/deps/nbt/CompoundTagVariant.h"
+#include "mc/deps/nbt/IntTag.h"
 #include "mc/server/ServerPlayer.h"
 #include "mc/world/Container.h"
 #include "mc/world/actor/Mob.h"

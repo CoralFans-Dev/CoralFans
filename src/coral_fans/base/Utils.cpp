@@ -5,9 +5,8 @@
 
 
 #include "ll/api/i18n/I18n.h"
-#include "mc/nbt/CompoundTag.h"
-#include "mc/nbt/CompoundTagVariant.h"
-#include "mc/nbt/ListTag.h"
+#include "mc/deps/nbt/CompoundTagVariant.h"
+#include "mc/deps/nbt/ListTag.h"
 #include "mc/world/Container.h"
 #include "mc/world/actor/player/Inventory.h"
 #include "mc/world/actor/player/Player.h"
@@ -91,7 +90,14 @@ std::string removeMinecraftPrefix(std::string const& s) { return s.find("minecra
 
 void shortHighligntBlock(int dimid, BlockPos const& blockPos, mce::Color const& color, int time) {
     auto& mod = CoralFans::getInstance();
-    auto  s   = mod.getGeometryGroup()->box(dimid, {blockPos, blockPos + BlockPos::ONE()}, color);
+    auto  s   = mod.getGeometryGroup()->box(
+        dimid,
+        {
+            blockPos,
+            {blockPos.x + 1, blockPos.y + 1, blockPos.z + 1}
+    },
+        color
+    );
     my_schedule::MySchedule::getSchedule().add(
         [&, s](int&, int&) {
             mod.getGeometryGroup()->remove(s);

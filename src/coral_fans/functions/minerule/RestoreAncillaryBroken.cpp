@@ -36,18 +36,18 @@ LL_TYPE_INSTANCE_HOOK(
     ::BlockSource&                region,
     ::BlockPos const&             pos,
     ::Block const&                block,
-    ::Randomize&                  randomize,
+    ::IRandom&                    random,
     ::ResourceDropsContext const& resourceDropsContext
 ) {
     auto& helper = RestoreAncillaryBrokenHelper::getInstance();
     if (helper.mutex2) {
         helper.mutex2       = false;
-        helper._randomize   = &randomize;
+        helper._randomize   = &random;
         helper.dropsContext = &resourceDropsContext;
-        origin(region, pos, block, randomize, resourceDropsContext);
+        origin(region, pos, block, random, resourceDropsContext);
         return;
     }
-    origin(region, pos, block, randomize, resourceDropsContext);
+    origin(region, pos, block, random, resourceDropsContext);
 }
 
 LL_TYPE_INSTANCE_HOOK(

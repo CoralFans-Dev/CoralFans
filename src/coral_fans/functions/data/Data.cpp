@@ -1,9 +1,9 @@
 #include "coral_fans/base/Utils.h"
 #include "ll/api/i18n/I18n.h"
 #include "mc/deps/core/math/Color.h"
+#include "mc/deps/nbt/CompoundTag.h"
+#include "mc/deps/nbt/Tag.h"
 #include "mc/legacy/ActorUniqueID.h"
-#include "mc/nbt/CompoundTag.h"
-#include "mc/nbt/Tag.h"
 #include "mc/world/actor/Actor.h"
 #include "mc/world/item/ItemStack.h"
 #include "mc/world/item/SaveContextFactory.h"
@@ -192,9 +192,10 @@ std::pair<std::string, bool> getItemNbt(ItemStack const& item, std::string path)
 
 void highlightBlockEntity(Player* player, int radius, int time) {
     if (player) {
-        int               dimid      = player->getDimensionId();
-        auto              origin     = player->getPosition();
-        int               range      = std::max(radius, 0);
+        int  dimid  = player->getDimensionId();
+        auto origin = player->getPosition();
+        // int               range  = std::max(radius, 0);
+        Vec3              offset{radius, radius, radius};
         static int        colorindex = 0;
         static std::array colors{
             mce::Color::BLACK(),
@@ -204,24 +205,26 @@ void highlightBlockEntity(Player* player, int radius, int time) {
             // mce::Color::GREY(),
             // mce::Color::MINECOIN_GOLD(),
             // mce::Color::ORANGE(),
-            mce::Color::PINK(),
+            // mce::Color::PINK(),
             mce::Color::PURPLE(),
-            mce::Color::REBECCA_PURPLE(),
+            // mce::Color::REBECCA_PURPLE(),
             mce::Color::RED(),
             mce::Color::WHITE(),
             mce::Color::YELLOW()
         };
-        auto& blockSource = player->getDimensionBlockSource();
-        for (int dx = -range; dx <= range; ++dx) {
-            for (int dy = -range; dy <= range; ++dy) {
-                for (int dz = -range; dz <= range; ++dz) {
-                    BlockPos pos{origin.x + dx, origin.y + dy, origin.z + dz};
-                    if (auto* blockActor = blockSource.getBlockEntity(pos)) {
-                        utils::shortHighligntBlock(dimid, blockActor->mPosition, colors[colorindex], time);
-                    }
-                }
-            }
-        }
+        // auto& blockSource = player->getDimensionBlockSource();
+        // for (int dx = -range; dx <= range; ++dx) {
+        //     for (int dy = -range; dy <= range; ++dy) {
+        //         for (int dz = -range; dz <= range; ++dz) {
+        //             BlockPos pos{origin.x + dx, origin.y + dy, origin.z + dz};
+        //             if (auto* blockActor = blockSource.getBlockEntity(pos)) {
+        //                 utils::shortHighligntBlock(dimid, blockActor->mPosition, colors[colorindex], time);
+        //             }
+        //         }
+        //     }
+        // }
+        for (auto blockActor : player->getDimensionBlockSource().fetchBlockEntities({origin - offset, origin + offset}))
+            if (blockActor) utils::shortHighligntBlock(dimid, blockActor->mPosition, colors[colorindex], time);
         colorindex = (colorindex + 1) % colors.size();
     }
 }

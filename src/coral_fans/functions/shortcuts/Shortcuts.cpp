@@ -15,7 +15,6 @@
 #include "mc/server/commands/CommandContext.h"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
-#include "mc/server/commands/CommandVersion.h"
 #include "mc/server/commands/MinecraftCommands.h"
 #include "mc/server/commands/PlayerCommandOrigin.h"
 #include "mc/world/Minecraft.h"
@@ -126,7 +125,7 @@ void ShortcutsManager::registerShortcutsListener() {
                                     event.self().getLevel(),
                                     event.self().getOrCreateUniqueID()
                                 ),
-                                CommandVersion::CurrentVersion()
+                                static_cast<int>(CurrentCmdVersion::Latest)
                             );
                             [[maybe_unused]] MCRESULT unused = mc->mCommands->executeCommand(context, false);
                         }
@@ -183,7 +182,7 @@ void ShortcutsManager::registerShortcutsListener() {
                                     event.self().getLevel(),
                                     event.self().getOrCreateUniqueID()
                                 ),
-                                CommandVersion::CurrentVersion()
+                                static_cast<int>(CurrentCmdVersion::Latest)
                             );
                             mc->mCommands->executeCommand(context, false);
                         }
@@ -236,7 +235,7 @@ void ShortcutsManager::registerShortcutsListener() {
                                     event.self().getLevel(),
                                     event.self().getOrCreateUniqueID()
                                 ),
-                                CommandVersion::CurrentVersion()
+                                static_cast<int>(CurrentCmdVersion::Latest)
                             );
                             mc->mCommands->executeCommand(context, false);
                         }
@@ -265,7 +264,7 @@ void ShortcutsManager::registerShortcutsCommand() {
                     CommandContext context = CommandContext(
                         command,
                         std::make_unique<PlayerCommandOrigin>(player->getLevel(), player->getOrCreateUniqueID()),
-                        CommandVersion::CurrentVersion()
+                        static_cast<int>(CurrentCmdVersion::Latest)
                     );
                     mc->mCommands->executeCommand(context, false);
                 }

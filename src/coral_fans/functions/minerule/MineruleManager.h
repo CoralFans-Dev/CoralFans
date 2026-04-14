@@ -1,6 +1,9 @@
 #pragma once
 
+#include "mc/deps/core/math/IRandom.h"
+#include "mc/world/level/block/ResourceDropsContext.h"
 #include "mc/world/level/block/actor/PistonBlockActor.h"
+
 
 namespace coral_fans::functions {
 void bedrockDropHook(bool);
@@ -15,7 +18,7 @@ public:
     bool                        mutex  = false;
     bool                        mutex2 = false;
     const ResourceDropsContext* dropsContext;
-    Randomize*                  _randomize;
+    IRandom*                    _randomize;
     PistonBlockActor*           pistonBlockActor;
 
 public:
@@ -49,7 +52,9 @@ public:
         explicit DimensionData(const std::string& bytes) {
             size_t expected = 14 * sizeof(float);
             if (bytes.size() != expected) {
-                throw std::invalid_argument("Invalid bytes size: expected " + std::to_string(expected) + ", got " + std::to_string(bytes.size()));
+                throw std::invalid_argument(
+                    "Invalid bytes size: expected " + std::to_string(expected) + ", got " + std::to_string(bytes.size())
+                );
             }
 
             const char* ptr      = bytes.data();

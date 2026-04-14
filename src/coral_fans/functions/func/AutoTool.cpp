@@ -6,6 +6,7 @@
 #include "mc/network/ServerPlayerBlockUseHandler.h"
 #include "mc/server/ServerPlayer.h"
 #include "mc/world/Container.h"
+#include "mc/world/actor/ActorHurtResult.h"
 #include "mc/world/actor/player/Inventory.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/actor/player/PlayerInventory.h"
@@ -98,7 +99,7 @@ LL_TYPE_INSTANCE_HOOK(
     ll::memory::HookPriority::Normal,
     Player,
     &Player::$attack,
-    bool,
+    ::ActorHurtResult,
     ::Actor&                                       actor,
     ::SharedTypes::Legacy::ActorDamageCause const& cause
 ) {
