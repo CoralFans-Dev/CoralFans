@@ -1,7 +1,7 @@
 {
     "format_version": 2,
     "tooth": "github.com/CoralFans-Dev/CoralFans",
-    "version": "2.9.3",
+    "version": "26.10.0",
     "info": {
         "name": "CoralFans",
         "description": "CoralFans Mod.",
@@ -13,8 +13,8 @@
     },
     "asset_url": "https://github.com/CoralFans-Dev/CoralFans/releases/download/v$(version)/CoralFans-windows-x64.zip",
     "prerequisites": {
-        "github.com/LiteLDev/LeviLamina": ">=1.9.0 <1.10.0",
-        "github.com/OEOTYAN/BedrockServerClientInterface": "0.2.0"
+        "github.com/LiteLDev/LeviLamina": ">=26.10.x <26.20.0",
+        "github.com/OEOTYAN/BedrockServerClientInterface": "0.3.1"
     },
     "files": {
         "place": [
