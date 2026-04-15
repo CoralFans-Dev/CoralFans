@@ -176,12 +176,12 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
         .required("type", ll::command::ParamKind::Enum, "popcapType")
         .required("count", ll::command::ParamKind::Float)
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
-            int   dimId       = self["dimension"].get<ll::command::ParamKind::Dimension>().id;
+            int dimId = self["dimension"].get<ll::command::ParamKind::Dimension>().id;
             if (dimId < 0 || dimId > 2) {
                 output.error("Invalid dimension");
                 return;
             }
-            
+
             int   category    = static_cast<int>(self["mobtype"].get<ll::command::ParamKind::Enum>().index);
             bool  isOnSurface = self["type"].get<ll::command::ParamKind::Enum>().index == 0;
             float count       = self["count"].get<ll::command::ParamKind::Float>();
@@ -192,7 +192,8 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
 
             auto dimKey  = "translate.dimension." + std::string(dims[dimId]);
             auto dimStr  = ll::i18n::getInstance().get(dimKey, {});
-            auto typeStr = "command.minerule.popcap." + self["type"].get<ll::command::ParamKind::Enum>().name;
+            auto typeKey = "command.minerule.popcap." + self["type"].get<ll::command::ParamKind::Enum>().name;
+            auto typeStr = ll::i18n::getInstance().get(typeKey, {});
             auto categoryKey =
                 "command.minerule.popcap.category." + self["mobtype"].get<ll::command::ParamKind::Enum>().name;
             auto categoryStr = ll::i18n::getInstance().get(categoryKey, {});
@@ -210,12 +211,12 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
         .required("dimension", ll::command::ParamKind::Dimension)
         .text("reset")
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
-            int  dimId  = self["dimension"].get<ll::command::ParamKind::Dimension>().id;
+            int dimId = self["dimension"].get<ll::command::ParamKind::Dimension>().id;
             if (dimId < 0 || dimId > 2) {
                 output.error("Invalid dimension");
                 return;
             }
-            
+
             auto dimKey = "translate.dimension." + std::string(dims[dimId]);
             auto dimStr = ll::i18n::getInstance().get(dimKey, {});
 
