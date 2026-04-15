@@ -171,6 +171,7 @@ public:
     void setShowType(ShowType, bool);
     bool getShowType(ShowType);
     // std::string test(ChunkPos);
+    void clear();
 
 public:
     static DuplicatableManager& getInstance() {

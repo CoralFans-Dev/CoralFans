@@ -203,4 +203,8 @@ void populationCapHook(bool bl) {
     PopulationCapManager::getInstance().setEnabled(bl);
 }
 
+void PopulationCapManager::clear() {
+    for (auto& item : this->backupCaps) item = nullptr;
+    for (auto& item : this->currentCaps) item = nullptr;
+}
 } // namespace coral_fans::functions

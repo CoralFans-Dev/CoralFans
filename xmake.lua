@@ -21,7 +21,7 @@ if not has_config("vs_runtime") then
 end
 
 option("target_type")
-    set_default("server")
+    set_default("client")
     set_showmenu(true)
     set_values("server", "client")
 option_end()

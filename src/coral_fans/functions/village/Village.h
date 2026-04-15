@@ -84,6 +84,7 @@ public:
     // void                         insertVillage(Village*, int);
     // void                         clearParticle();
     std::pair<std::string, bool> getVillagerInfo(ActorUniqueID);
+    void                         clear();
 
 public:
     static CFVillageManager& getInstance() {

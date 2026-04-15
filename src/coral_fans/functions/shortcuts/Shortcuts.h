@@ -2,7 +2,6 @@
 
 #include "coral_fans/Config.h"
 #include "coral_fans/CoralFans.h"
-#include "ll/api/event/ListenerBase.h"
 #include "ll/api/service/Bedrock.h"
 #include "mc/server/commands/CommandRegistry.h"
 #include <vector>
@@ -16,9 +15,6 @@ private:
     std::vector<coral_fans::config::Shortcut::Use>     uses;
     std::vector<coral_fans::config::Shortcut::Destroy> destroys;
     std::vector<coral_fans::config::Shortcut::Command> commands;
-
-private:
-    ll::event::ListenerPtr playerJoinEventListener;
 
 private:
     ShortcutsManager() {

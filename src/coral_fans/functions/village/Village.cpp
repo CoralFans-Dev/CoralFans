@@ -552,4 +552,15 @@ void CFVillageManager::hookVillage(bool hook) {
         CoralFansVillageRemoveHook::unhook();
     }
 }
+
+void CFVillageManager::clear() {
+    setShowBounds(false);
+    setShowRaidBounds(false);
+    setShowIronSpawn(false);
+    setShowCenter(false);
+    setShowPoiQuery(false);
+    setShowBind(false);
+    mVillageList.clear();
+    mTickingList.clear();
+}
 } // namespace coral_fans::functions

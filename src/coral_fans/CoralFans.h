@@ -29,6 +29,9 @@ public:
 
     void setupCommands();
 
+    void unhook();
+
+public:
     [[nodiscard]] ll::mod::NativeMod& getSelf() const { return mSelf; }
 
     /// @return True if the mod is loaded successfully.

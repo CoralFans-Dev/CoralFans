@@ -1363,7 +1363,8 @@ void DuplicatableManager::removeBsciData(ShowType _showType) {
                 this->netherBsciChunkData.erase(key);
             }
         }
-    } else {
+    }
+    if (static_cast<uint>(_showType) & theEndShowTypes) {
         if (!(this->showType & theEndShowTypes)) {
             for (auto& [_, chunkData] : this->theEndBsciChunkData) {
                 if (chunkData.endIslandGeoId.value) geometryGroup->remove(chunkData.endIslandGeoId);
@@ -1696,4 +1697,9 @@ void DuplicatableManager::hook(bool enable) {
 //     }
 //     return res;
 // }
+void DuplicatableManager::clear() {
+    removeBsciData(static_cast<ShowType>(-1));
+    this->netherDataMap.clear();
+    this->theEndDataMap.clear();
+}
 } // namespace coral_fans::functions::locate

@@ -92,6 +92,8 @@ public:
     bool setDimCap(int dimId, int category, bool isOnSurface, float count);
     bool resetDimCap(int dimId);
 
+    void clear();
+
 private:
     PopulationCapManager() = default;
 };

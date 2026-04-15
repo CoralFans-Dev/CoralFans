@@ -1,9 +1,19 @@
 #include "coral_fans/CoralFans.h"
 #include "bsci/GeometryGroup.h"
 #include "coral_fans/commands/Commands.h"
+#include "coral_fans/functions/freeCamera/FreeCamera.h"
 #include "coral_fans/functions/func/FuncManager.h"
+#include "coral_fans/functions/hsa/Hsa.h"
+#include "coral_fans/functions/locate/DuplicatableManager.h"
+#include "coral_fans/functions/minerule/MineruleManager.h"
+#include "coral_fans/functions/noclip/Noclip.h"
+#include "coral_fans/functions/prof/Prof.h"
 #include "coral_fans/functions/shortcuts/Shortcuts.h"
+#include "coral_fans/functions/slime/Slime.h"
+#include "coral_fans/functions/village/Village.h"
 #include "ll/api/Config.h"
+#include "ll/api/event/EventBus.h"
+#include "ll/api/event/command/ServerCommandRegisterEvent.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/mod/RegisterHelper.h"
 #include <memory>
@@ -57,6 +67,43 @@ void CoralFans::setupCommands() {
     functions::ShortcutsManager::getInstance().registerShortcutsCommand();
 }
 
+void CoralFans::unhook() {
+    functions::FreeCameraManager::freecameraHook(false);
+    functions::autoItemHook(false);
+    functions::autoTotemHook(false);
+    functions::hookAutoTool(false);
+    functions::registerContainerReader();
+    functions::forceOpenHook(false);
+    functions::forcePlaceHook(0);
+    functions::safeExplodeHook(false);
+    functions::fastDropHook(false);
+    functions::noPickUpHook(false);
+    functions::portalDisabledHook(false);
+    functions::FuncDropNoCostManager::droppernocostHook(false);
+    functions::HopperCounterManager::getInstance().setEnabled(false);
+    functions::locate::DuplicatableManager::hook(false);
+    functions::bedrockDropHook(false);
+    functions::mbDropHook(false);
+    functions::portalSandFarmHook(false);
+    functions::portalSpawnHook(false);
+    functions::restoreAncillaryBrokenHook(false);
+    functions::populationCapHook(false);
+    functions::noclipHook(false);
+    functions::hookTick(false);
+    functions::CFVillageManager::hookVillage(false);
+}
+
+void removeRuntimeData() {
+    functions::FreeCameraManager::getInstance().FreeCamList.clear();
+    functions::HopperCounterManager::getInstance().clearAllData();
+    functions::HsaManager::getInstance().setHsaShow(false);
+    functions::HsaManager::getInstance().setStructureShow(false);
+    functions::locate::DuplicatableManager::getInstance().clear();
+    functions::PopulationCapManager::getInstance().clear();
+    functions::SlimeManager::getInstance().setShow(false);
+    functions::CFVillageManager::getInstance().clear();
+}
+
 bool CoralFans::load() {
     const auto& logger = getSelf().getLogger();
 
@@ -88,7 +135,11 @@ bool CoralFans::load() {
     // load GeometryGroup
     getGeometryGroup() = bsci::GeometryGroup::createDefault();
 
-
+    getEventListeners().emplace(
+        ll::event::EventBus::getInstance().emplaceListener<ll::event::command::ServerCommandRegisterEvent>(
+            [this](auto&&) { setupCommands(); }
+        )
+    );
     return true;
 }
 
@@ -96,7 +147,7 @@ bool CoralFans::enable() {
     const auto& logger = getSelf().getLogger();
     logger.debug("Enabling...");
 
-    setupCommands();
+    // setupCommands();
     // register containerreader
     functions::registerContainerReader();
     functions::ShortcutsManager::getInstance().registerShortcutsListener();
@@ -105,6 +156,8 @@ bool CoralFans::enable() {
 
 bool CoralFans::disable() {
     getSelf().getLogger().debug("Disabling...");
+    unhook();
+    removeRuntimeData();
     return true;
 }
 

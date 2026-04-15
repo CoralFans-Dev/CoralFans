@@ -11,10 +11,6 @@
 #include "mc/world/level/chunk/ChunkSource.h"
 #include "mc/world/level/levelgen/structure/BoundingBox.h"
 
-namespace {
-static const int radius = 5;
-}
-
 namespace coral_fans::functions {
 void SlimeManager::setShow(bool show) {
     if (this->mShow == show) return;
@@ -31,7 +27,8 @@ void SlimeManager::draw() {
     auto level = ll::service::getLevel();
     if (!level.has_value()) [[unlikely]]
         return;
-    auto& geometryGroup = CoralFans::getInstance().getGeometryGroup();
+    auto&      geometryGroup = CoralFans::getInstance().getGeometryGroup();
+    static int radius        = std::max(0, CoralFans::getInstance().getConfig().functions.slime.drawRadius);
     level->forEachPlayer([&](Player& player) {
         auto originChunkPos = utils::blockPosToChunkPos(player.getFeetBlockPos());
         for (int i = -radius; i <= radius; ++i) {
