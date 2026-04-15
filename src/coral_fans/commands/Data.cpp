@@ -200,8 +200,9 @@ void registerDataCommand(config::CommandConfigStruct& config) {
                 blockPos,
                 self["redstoneType"].get<ll::command::ParamKind::Enum>().index
             );
-            if (rst.second) TextPacket::createRawMessage(rst.first).sendTo(*player);
-            else output.error(rst.first);
+            if (rst.second) {
+                if (!rst.first.empty()) TextPacket::createRawMessage(rst.first).sendTo(*player);
+            } else output.error(rst.first);
         });
 
     // item nbt [path]

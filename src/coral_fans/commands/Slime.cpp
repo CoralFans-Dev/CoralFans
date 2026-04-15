@@ -28,7 +28,7 @@ void registerSlimeCommand(config::CommandConfigStruct& config) {
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             auto& slimeManager = functions::SlimeManager::getInstance();
             if (self["isopen"].has_value()) slimeManager.setShow(self["isopen"].get<ll::command::ParamKind::Bool>());
-            else slimeManager.setShow(slimeManager.getShow());
+            else slimeManager.setShow(!slimeManager.getShow());
             output.success("command.slime.show.output"_tr(slimeManager.getShow() ? "true" : "false"));
         });
 

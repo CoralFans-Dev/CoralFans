@@ -2,15 +2,15 @@
 
 
 #include "ll/api/memory/Hook.h"
-#include "mc/world/actor/player/Player.h"
+#include "mc/server/ServerPlayer.h"
 
 
 namespace coral_fans::functions {
 LL_TYPE_INSTANCE_HOOK(
     CoralFansPortalDisabled,
     ll::memory::HookPriority::Normal,
-    Player,
-    &Player::$canChangeDimensionsUsingPortal,
+    ServerPlayer,
+    &ServerPlayer::$canChangeDimensionsUsingPortal,
     bool
 ) {
     if (CoralFans::getInstance().getConfigDb()->get(

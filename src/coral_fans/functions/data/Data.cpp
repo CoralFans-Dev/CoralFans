@@ -1,3 +1,4 @@
+#include "coral_fans/CoralFans.h"
 #include "coral_fans/base/Utils.h"
 #include "ll/api/i18n/I18n.h"
 #include "mc/deps/core/math/Color.h"
@@ -87,7 +88,7 @@ std::pair<std::string, bool> showRedstoneComponentsInfo(Dimension& dimension, Bl
     CircuitSceneGraph& graph      = circuitSys->mSceneGraph;
     if (type == 0) {
         // chunk
-        auto     chunkPos = utils::blockPosToChunkPos(pos);
+        auto     chunkPos = ChunkPos(pos);
         BlockPos chunkBlockPos{chunkPos.x * 16, 0, chunkPos.z * 16};
         auto     iter = graph.mActiveComponentsPerChunk.find(chunkBlockPos);
         if (iter != graph.mActiveComponentsPerChunk.end())
