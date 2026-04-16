@@ -224,8 +224,20 @@ void highlightBlockEntity(Player* player, int radius, int time) {
         //         }
         //     }
         // }
+#ifdef LL_PLAT_S
         for (auto blockActor : player->getDimensionBlockSource().fetchBlockEntities({origin - offset, origin + offset}))
             if (blockActor) utils::shortHighligntBlock(dimid, blockActor->mPosition, colors[colorindex], time);
+#endif
+#ifndef LL_PLAT_C
+        auto& blockSource = player->getDimensionBlockSource();
+        for (int x = -radius; x <= radius; ++x)
+            for (int y = -radius; y <= radius; ++y)
+                for (int z = -radius; z <= radius; ++z) {
+                    BlockPos pos{origin.x + x, origin.y + y, origin.z + z};
+                    if (auto* blockActor = blockSource.getBlockEntity(pos))
+                        utils::shortHighligntBlock(dimid, blockActor->mPosition, colors[colorindex], time);
+                }
+#endif
         colorindex = (colorindex + 1) % colors.size();
     }
 }
