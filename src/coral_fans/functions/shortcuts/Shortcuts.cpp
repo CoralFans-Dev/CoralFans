@@ -312,7 +312,6 @@ void ShortcutsManager::loadData() {
         for (auto action : command.actions) {
             if (!commandregistry->findCommand(action)) continue; // 如果action中有一条未注册，则不会加入到shortcuts中
         }
-        CoralFans::getInstance().getSelf().getLogger().info("add a command: {}", command.command);
         this->commands.push_back(command);
     }
 }

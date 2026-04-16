@@ -66,16 +66,18 @@ LL_TYPE_INSTANCE_HOOK(
                 {
                     std::lock_guard lock(duplicatableManager.netherDecorationThreadIdsLock);
                     auto            it = duplicatableManager.netherDecorationThreadIds.find(threadId);
-                    std::lock_guard lock2(duplicatableManager.netherDataMapLock);
-                    if (it->second->isEmpty) duplicatableManager.netherDataMap.erase(originChunkPos);
-                    else {
-                        auto [newIter, inserted] = duplicatableManager.netherDataMap.insert_or_assign(
-                            originChunkPos,
-                            std::move(it->second->threadData)
-                        );
-                        if (!inserted) newIter->second.reload = true;
+                    if (it != duplicatableManager.netherDecorationThreadIds.end()) {
+                        std::lock_guard lock2(duplicatableManager.netherDataMapLock);
+                        if (it->second->isEmpty) duplicatableManager.netherDataMap.erase(originChunkPos);
+                        else {
+                            auto [newIter, inserted] = duplicatableManager.netherDataMap.insert_or_assign(
+                                originChunkPos,
+                                std::move(it->second->threadData)
+                            );
+                            if (!inserted) newIter->second.reload = true;
+                        }
+                        duplicatableManager.netherDecorationThreadIds.erase(it);
                     }
-                    duplicatableManager.netherDecorationThreadIds.erase(it);
                 }
                 return ori;
             }
@@ -368,16 +370,18 @@ LL_TYPE_INSTANCE_HOOK(
                 {
                     std::lock_guard lock(duplicatableManager.theEndDecorationThreadIdsLock);
                     auto            it = duplicatableManager.theEndDecorationThreadIds.find(threadId);
-                    std::lock_guard lock2(duplicatableManager.theEndDataMapLock);
-                    if (it->second->isEmpty) duplicatableManager.theEndDataMap.erase(originChunkPos);
-                    else {
-                        auto [newIter, inserted] = duplicatableManager.theEndDataMap.insert_or_assign(
-                            originChunkPos,
-                            std::move(it->second->threadData)
-                        );
-                        if (!inserted) newIter->second.reload = true;
+                    if (it != duplicatableManager.theEndDecorationThreadIds.end()) {
+                        std::lock_guard lock2(duplicatableManager.theEndDataMapLock);
+                        if (it->second->isEmpty) duplicatableManager.theEndDataMap.erase(originChunkPos);
+                        else {
+                            auto [newIter, inserted] = duplicatableManager.theEndDataMap.insert_or_assign(
+                                originChunkPos,
+                                std::move(it->second->threadData)
+                            );
+                            if (!inserted) newIter->second.reload = true;
+                        }
+                        duplicatableManager.theEndDecorationThreadIds.erase(it);
                     }
-                    duplicatableManager.theEndDecorationThreadIds.erase(it);
                 }
                 return ori;
             }
@@ -1699,7 +1703,21 @@ void DuplicatableManager::hook(bool enable) {
 // }
 void DuplicatableManager::clear() {
     removeBsciData(static_cast<ShowType>(-1));
-    this->netherDataMap.clear();
-    this->theEndDataMap.clear();
+    {
+        std::lock_guard lock(this->netherDecorationThreadIdsLock);
+        this->netherDecorationThreadIds.clear();
+    }
+    {
+        std::lock_guard lock(this->netherDataMapLock);
+        this->netherDataMap.clear();
+    }
+    {
+        std::lock_guard lock(this->theEndDecorationThreadIdsLock);
+        this->theEndDecorationThreadIds.clear();
+    }
+    {
+        std::lock_guard lock(this->theEndDataMapLock);
+        this->theEndDataMap.clear();
+    }
 }
 } // namespace coral_fans::functions::locate

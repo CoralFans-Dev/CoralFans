@@ -1,4 +1,5 @@
 #include "coral_fans/CoralFans.h"
+#include "base/MySchedule.h"
 #include "bsci/GeometryGroup.h"
 #include "coral_fans/commands/Commands.h"
 #include "coral_fans/functions/freeCamera/FreeCamera.h"
@@ -105,6 +106,7 @@ void CoralFans::removeRuntimeData() {
     functions::ShortcutsManager::getInstance().clear();
     functions::SlimeManager::getInstance().setShow(false);
     functions::CFVillageManager::getInstance().clear();
+    my_schedule::MySchedule::getSchedule().clear();
 }
 
 bool CoralFans::load() {

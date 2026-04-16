@@ -28,7 +28,7 @@ private:
     MySchedule() { std::memset(schduleList, 0, sizeof(schduleList)); }
 
 public:
-    static MySchedule& getSchedule() {
+    [[nodiscard]] static MySchedule& getSchedule() {
         static MySchedule instance;
         return instance;
     }
@@ -73,9 +73,7 @@ public:
         tem->insert_after(new SchduleUnit(delay, times, circle_time, task));
     }
 
-    MySchedule(const MySchedule&)            = delete;
-    MySchedule& operator=(const MySchedule&) = delete;
-    ~MySchedule() {
+    void clear() {
         for (int i = 0; i < 128; ++i) {
             SchduleUnit* current = schduleList[i];
             while (current) {
@@ -84,6 +82,10 @@ public:
                 current = schduleList[i];
             }
         }
-    };
+    }
+
+    MySchedule(const MySchedule&)            = delete;
+    MySchedule& operator=(const MySchedule&) = delete;
+    ~MySchedule() { clear(); };
 };
 } // namespace coral_fans::my_schedule
