@@ -64,6 +64,9 @@ void CoralFans::setupCommands() {
     if (commandsConfig.freecamera.enabled) commands::registerFreeCameraCommand(commandsConfig.freecamera);
     if (commandsConfig.noclip.enabled) commands::registerNoclipCommand(commandsConfig.noclip);
     if (commandsConfig.locate.enabled) commands::registerLocateCommand(commandsConfig.locate);
+
+    functions::ShortcutsManager::getInstance().loadData();
+    functions::ShortcutsManager::getInstance().registerShortcutsCommand();
 }
 
 // void CoralFans::unhook() {
@@ -142,14 +145,12 @@ bool CoralFans::load() {
                                         // load GeometryGroup
                                         getGeometryGroup() = bsci::GeometryGroup::createDefault();
                                         setupCommands();
-                                        functions::ShortcutsManager::getInstance().loadData();
                                     }));
     getEventListeners().emplace(
         ll::event::EventBus::getInstance().emplaceListener<ll::event::server::ServerStoppingEvent>([this](auto&&) {
             removeRuntimeData();
         })
     );
-    functions::ShortcutsManager::getInstance().registerShortcutsCommand();
     functions::ShortcutsManager::getInstance().registerShortcutsListener();
     return true;
 }
