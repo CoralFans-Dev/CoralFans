@@ -228,7 +228,7 @@ void highlightBlockEntity(Player* player, int radius, int time) {
         for (auto blockActor : player->getDimensionBlockSource().fetchBlockEntities({origin - offset, origin + offset}))
             if (blockActor) utils::shortHighligntBlock(dimid, blockActor->mPosition, colors[colorindex], time);
 #endif
-#ifndef LL_PLAT_C
+#ifdef LL_PLAT_C
         auto& blockSource = player->getDimensionBlockSource();
         for (int x = -radius; x <= radius; ++x)
             for (int y = -radius; y <= radius; ++y)
