@@ -1,4 +1,3 @@
-#include "coral_fans/CoralFans.h"
 #include "coral_fans/base/Utils.h"
 #include "ll/api/i18n/I18n.h"
 #include "mc/deps/core/math/Color.h"
@@ -213,31 +212,15 @@ void highlightBlockEntity(Player* player, int radius, int time) {
             mce::Color::WHITE(),
             mce::Color::YELLOW()
         };
-        // auto& blockSource = player->getDimensionBlockSource();
-        // for (int dx = -range; dx <= range; ++dx) {
-        //     for (int dy = -range; dy <= range; ++dy) {
-        //         for (int dz = -range; dz <= range; ++dz) {
-        //             BlockPos pos{origin.x + dx, origin.y + dy, origin.z + dz};
-        //             if (auto* blockActor = blockSource.getBlockEntity(pos)) {
-        //                 utils::shortHighligntBlock(dimid, blockActor->mPosition, colors[colorindex], time);
-        //             }
-        //         }
-        //     }
-        // }
+        std::vector<::BlockActor*> blockActors{};
 #ifdef LL_PLAT_S
-        for (auto blockActor : player->getDimensionBlockSource().fetchBlockEntities({origin - offset, origin + offset}))
-            if (blockActor) utils::shortHighligntBlock(dimid, blockActor->mPosition, colors[colorindex], time);
+        blockActors = player->getDimensionBlockSource().fetchBlockEntities({origin - offset, origin + offset});
 #endif
 #ifdef LL_PLAT_C
-        auto& blockSource = player->getDimensionBlockSource();
-        for (int x = -radius; x <= radius; ++x)
-            for (int y = -radius; y <= radius; ++y)
-                for (int z = -radius; z <= radius; ++z) {
-                    BlockPos pos{origin.x + x, origin.y + y, origin.z + z};
-                    if (auto* blockActor = blockSource.getBlockEntity(pos))
-                        utils::shortHighligntBlock(dimid, blockActor->mPosition, colors[colorindex], time);
-                }
+        player->getDimensionBlockSource().fetchBlockEntities({origin - offset, origin + offset}, blockActors, false);
 #endif
+        for (auto blockActor : blockActors)
+            if (blockActor) utils::shortHighligntBlock(dimid, blockActor->mPosition, colors[colorindex], time);
         colorindex = (colorindex + 1) % colors.size();
     }
 }

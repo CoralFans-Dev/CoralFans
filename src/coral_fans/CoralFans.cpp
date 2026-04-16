@@ -7,13 +7,14 @@
 #include "coral_fans/functions/locate/DuplicatableManager.h"
 #include "coral_fans/functions/minerule/MineruleManager.h"
 #include "coral_fans/functions/noclip/Noclip.h"
-#include "coral_fans/functions/prof/Prof.h"
+// #include "coral_fans/functions/prof/Prof.h"
 #include "coral_fans/functions/shortcuts/Shortcuts.h"
 #include "coral_fans/functions/slime/Slime.h"
 #include "coral_fans/functions/village/Village.h"
 #include "ll/api/Config.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/event/command/ServerCommandRegisterEvent.h"
+#include "ll/api/event/server/ServerStoppingEvent.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/mod/RegisterHelper.h"
 #include <memory>
@@ -63,43 +64,42 @@ void CoralFans::setupCommands() {
     if (commandsConfig.freecamera.enabled) commands::registerFreeCameraCommand(commandsConfig.freecamera);
     if (commandsConfig.noclip.enabled) commands::registerNoclipCommand(commandsConfig.noclip);
     if (commandsConfig.locate.enabled) commands::registerLocateCommand(commandsConfig.locate);
-
-    functions::ShortcutsManager::getInstance().registerShortcutsCommand();
 }
 
-void CoralFans::unhook() {
-    functions::FreeCameraManager::freecameraHook(false);
-    functions::autoItemHook(false);
-    functions::autoTotemHook(false);
-    functions::hookAutoTool(false);
-    functions::registerContainerReader();
-    functions::forceOpenHook(false);
-    functions::forcePlaceHook(0);
-    functions::safeExplodeHook(false);
-    functions::fastDropHook(false);
-    functions::noPickUpHook(false);
-    functions::portalDisabledHook(false);
-    functions::FuncDropNoCostManager::droppernocostHook(false);
-    functions::HopperCounterManager::getInstance().setEnabled(false);
-    functions::locate::DuplicatableManager::hook(false);
-    functions::bedrockDropHook(false);
-    functions::mbDropHook(false);
-    functions::portalSandFarmHook(false);
-    functions::portalSpawnHook(false);
-    functions::restoreAncillaryBrokenHook(false);
-    functions::populationCapHook(false);
-    functions::noclipHook(false);
-    functions::hookTick(false);
-    functions::CFVillageManager::hookVillage(false);
-}
+// void CoralFans::unhook() {
+//     functions::FreeCameraManager::freecameraHook(false);
+//     functions::autoItemHook(false);
+//     functions::autoTotemHook(false);
+//     functions::hookAutoTool(false);
+//     functions::registerContainerReader();
+//     functions::forceOpenHook(false);
+//     functions::forcePlaceHook(0);
+//     functions::safeExplodeHook(false);
+//     functions::fastDropHook(false);
+//     functions::noPickUpHook(false);
+//     functions::portalDisabledHook(false);
+//     functions::FuncDropNoCostManager::droppernocostHook(false);
+//     functions::HopperCounterManager::getInstance().setEnabled(false);
+//     functions::locate::DuplicatableManager::hook(false);
+//     functions::bedrockDropHook(false);
+//     functions::mbDropHook(false);
+//     functions::portalSandFarmHook(false);
+//     functions::portalSpawnHook(false);
+//     functions::restoreAncillaryBrokenHook(false);
+//     functions::populationCapHook(false);
+//     functions::noclipHook(false);
+//     functions::hookTick(false);
+//     functions::CFVillageManager::hookVillage(false);
+// }
 
-void removeRuntimeData() {
+void CoralFans::removeRuntimeData() {
     functions::FreeCameraManager::getInstance().FreeCamList.clear();
     functions::HopperCounterManager::getInstance().clearAllData();
     functions::HsaManager::getInstance().setHsaShow(false);
     functions::HsaManager::getInstance().setStructureShow(false);
     functions::locate::DuplicatableManager::getInstance().clear();
     functions::PopulationCapManager::getInstance().clear();
+    functions::ShortcutsManager::getInstance().clear();
     functions::SlimeManager::getInstance().setShow(false);
     functions::CFVillageManager::getInstance().clear();
 }
@@ -127,19 +127,30 @@ bool CoralFans::load() {
     logger.debug("Loading I18n");
     if (!ll::i18n::getInstance().load(getSelf().getLangDir())) logger.error("Failed to load I18n");
 
-    // load Config Database
-    logger.debug("Loading Config Database");
-    const auto& configDbPath = getSelf().getDataDir() / "config";
-    getConfigDb()            = std::make_unique<ll::data::KeyValueDB>(configDbPath);
+    getEventListeners().emplace(ll::event::EventBus::getInstance()
+                                    .emplaceListener<ll::event::command::ServerCommandRegisterEvent>([this](auto&&) {
+#ifdef LL_PLAT_S
+                                        auto configDbPath = getSelf().getDataDir() / "config";
+#endif
+#ifdef LL_PLAT_C
+                                        auto dataPath     = getSelf().getWorldDataDir();
+                                        auto configDbPath = dataPath.has_value() ? dataPath.value() / "config"
+                                                                                 : getSelf().getDataDir() / "config";
+#endif
+                                        getConfigDb() = std::make_unique<ll::data::KeyValueDB>(configDbPath);
 
-    // load GeometryGroup
-    getGeometryGroup() = bsci::GeometryGroup::createDefault();
-
+                                        // load GeometryGroup
+                                        getGeometryGroup() = bsci::GeometryGroup::createDefault();
+                                        setupCommands();
+                                        functions::ShortcutsManager::getInstance().loadData();
+                                    }));
     getEventListeners().emplace(
-        ll::event::EventBus::getInstance().emplaceListener<ll::event::command::ServerCommandRegisterEvent>(
-            [this](auto&&) { setupCommands(); }
-        )
+        ll::event::EventBus::getInstance().emplaceListener<ll::event::server::ServerStoppingEvent>([this](auto&&) {
+            removeRuntimeData();
+        })
     );
+    functions::ShortcutsManager::getInstance().registerShortcutsCommand();
+    functions::ShortcutsManager::getInstance().registerShortcutsListener();
     return true;
 }
 
@@ -147,16 +158,12 @@ bool CoralFans::enable() {
     const auto& logger = getSelf().getLogger();
     logger.debug("Enabling...");
 
-    // setupCommands();
-    // register containerreader
-    functions::registerContainerReader();
-    functions::ShortcutsManager::getInstance().registerShortcutsListener();
     return true;
 }
 
 bool CoralFans::disable() {
     getSelf().getLogger().debug("Disabling...");
-    unhook();
+    // unhook();
     removeRuntimeData();
     return true;
 }

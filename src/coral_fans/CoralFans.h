@@ -29,7 +29,9 @@ public:
 
     void setupCommands();
 
-    void unhook();
+    // void unhook();
+
+    void removeRuntimeData();
 
 public:
     [[nodiscard]] ll::mod::NativeMod& getSelf() const { return mSelf; }

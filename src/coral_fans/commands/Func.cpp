@@ -30,7 +30,8 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
             bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
             if (CoralFans::getInstance().getConfigDb()->set("functions.global.forceopen", isopen ? "true" : "false")) {
                 output.success("command.func.forceopen.success"_tr(isopen ? "true" : "false"));
-                coral_fans::functions::forceOpenHook(isopen);
+                functions::ContainerOpenManager::getInstance().forceOpen = isopen;
+                functions::ContainerOpenManager::hook();
             } else output.error("command.func.forceopen.error"_tr());
         });
 
@@ -50,7 +51,7 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
             const auto val = self["level"].get<ll::command::ParamKind::Enum>();
             if (CoralFans::getInstance().getConfigDb()->set("functions.global.forceplace", std::to_string(val.index))) {
                 output.success("command.func.forceplace.success"_tr(val.name));
-                coral_fans::functions::forcePlaceHook(val.index);
+                functions::forcePlaceHook(val.index);
             } else output.error("command.func.forceplace.error"_tr());
         });
 
@@ -64,7 +65,7 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
                     "functions.global.droppernocost",
                     isopen ? "true" : "false"
                 )) {
-                coral_fans::functions::FuncDropNoCostManager::droppernocostHook(isopen);
+                functions::FuncDropNoCostManager::droppernocostHook(isopen);
                 output.success("command.func.droppernocost.success"_tr(isopen ? "true" : "false"));
             } else output.error("command.func.droppernocost.error"_tr());
         });
@@ -79,7 +80,7 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
                     "functions.global.safeexplode",
                     isopen ? "true" : "false"
                 )) {
-                coral_fans::functions::safeExplodeHook(isopen);
+                functions::safeExplodeHook(isopen);
                 output.success("command.func.safeexplode.success"_tr(isopen ? "true" : "false"));
             } else output.error("command.func.safeexplode.error"_tr());
         });
@@ -92,7 +93,7 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
             bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
             if (CoralFans::getInstance().getConfigDb()->set("functions.global.autotool", isopen ? "true" : "false")) {
                 output.success("command.func.autotool.success"_tr(isopen ? "true" : "false"));
-                coral_fans::functions::hookAutoTool(isopen);
+                functions::hookAutoTool(isopen);
             } else output.error("command.func.autotool.error"_tr());
         });
 
@@ -106,7 +107,7 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
                     "functions.global.hoppercounter",
                     isopen ? "true" : "false"
                 )) {
-                coral_fans::functions::HopperCounterManager::getInstance().setEnabled(isopen);
+                functions::HopperCounterManager::getInstance().setEnabled(isopen);
                 output.success("command.func.hoppercounter.success"_tr(isopen ? "true" : "false"));
             } else output.error("command.func.hoppercounter.error"_tr());
         });
@@ -119,7 +120,7 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
             int maxpt = self["maxpt"].get<ll::command::ParamKind::Int>();
             if (maxpt <= 0) output.error("command.func.maxpt.error.nonpositive"_tr());
             if (CoralFans::getInstance().getConfigDb()->set("functions.global.maxpt", std::to_string(maxpt))) {
-                coral_fans::functions::MaxPtManager::getInstance().maxpt = maxpt;
+                functions::MaxPtManager::getInstance().maxpt = maxpt;
                 output.success("command.func.maxpt.success"_tr(maxpt));
             } else output.error("command.func.maxpt.error.failed"_tr());
         });
@@ -133,9 +134,10 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
             if (CoralFans::getInstance().getConfigDb()->set(
                     "functions.global.containerreader",
                     isopen ? "true" : "false"
-                ))
+                )) {
                 output.success("command.func.containerreader.success"_tr(isopen ? "true" : "false"));
-            else output.error("command.func.containerreader.error"_tr());
+                functions::ContainerOpenManager::hook();
+            } else output.error("command.func.containerreader.error"_tr());
         });
 
     // autototem
@@ -146,7 +148,7 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
             bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
             if (CoralFans::getInstance().getConfigDb()->set("functions.global.autototem", isopen ? "true" : "false")) {
                 output.success("command.func.autototem.success"_tr(isopen ? "true" : "false"));
-                coral_fans::functions::autoTotemHook(isopen);
+                functions::autoTotemHook(isopen);
             } else output.error("command.func.autototem.error"_tr());
         });
 
@@ -158,7 +160,7 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
             bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
             if (CoralFans::getInstance().getConfigDb()->set("functions.global.autoitem", isopen ? "true" : "false")) {
                 output.success("command.func.autoitem.success"_tr(isopen ? "true" : "false"));
-                coral_fans::functions::autoItemHook(isopen);
+                functions::autoItemHook(isopen);
             } else output.error("command.func.autoitem.error"_tr());
         });
 
@@ -169,7 +171,7 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
             if (CoralFans::getInstance().getConfigDb()->set("functions.global.fastdrop", isopen ? "true" : "false")) {
-                coral_fans::functions::fastDropHook(isopen);
+                functions::fastDropHook(isopen);
                 output.success("command.func.fastdrop.success"_tr(isopen ? "true" : "false"));
             } else output.error("command.func.fastdrop.error"_tr());
         });
@@ -181,7 +183,7 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
             if (CoralFans::getInstance().getConfigDb()->set("functions.global.nopickup", isopen ? "true" : "false")) {
-                coral_fans::functions::noPickUpHook(isopen);
+                functions::noPickUpHook(isopen);
                 output.success("command.func.nopickup.success"_tr(isopen ? "true" : "false"));
             } else output.error("command.func.nopickup.error"_tr());
         });
@@ -196,48 +198,46 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
                     "functions.global.portaldisabled",
                     isopen ? "true" : "false"
                 )) {
-                coral_fans::functions::portalDisabledHook(isopen);
+                functions::portalDisabledHook(isopen);
                 output.success("command.func.portaldisabled.success"_tr(isopen ? "true" : "false"));
             } else output.error("command.func.portaldisabled.error"_tr());
         });
 
     auto& configDb = CoralFans::getInstance().getConfigDb();
 
-    // func forceopen <bool>
-    coral_fans::functions::forceOpenHook(configDb->get("functions.global.forceopen") == "true");
+    // func forceopen <bool> & containerReader
+    functions::ContainerOpenManager::hook();
 
     // func forceplace normal|entity|all
-    coral_fans::functions::forcePlaceHook(configDb->get("functions.global.forceplace")->c_str()[0] - '0');
+    functions::forcePlaceHook(configDb->get("functions.global.forceplace")->c_str()[0] - '0');
 
     // func droppernocost <bool>
-    coral_fans::functions::FuncDropNoCostManager::droppernocostHook(
-        configDb->get("functions.global.droppernocost") == "true"
-    );
+    functions::FuncDropNoCostManager::droppernocostHook(configDb->get("functions.global.droppernocost") == "true");
 
     // safeexplode
-    coral_fans::functions::safeExplodeHook(configDb->get("functions.global.safeexplode") == "true");
+    functions::safeExplodeHook(configDb->get("functions.global.safeexplode") == "true");
 
     // autotool
-    coral_fans::functions::hookAutoTool(configDb->get("functions.global.autotool") == "true");
+    functions::hookAutoTool(configDb->get("functions.global.autotool") == "true");
 
     // hoppercounter
-    coral_fans::functions::HopperCounterManager::getInstance().setEnabled(
+    functions::HopperCounterManager::getInstance().setEnabled(
         configDb->get("functions.global.hoppercounter") == "true"
     );
 
     // autototem
-    coral_fans::functions::autoTotemHook(configDb->get("functions.global.autototem") == "true");
+    functions::autoTotemHook(configDb->get("functions.global.autototem") == "true");
 
     // autoitem
-    coral_fans::functions::autoItemHook(configDb->get("functions.global.autoitem") == "true");
+    functions::autoItemHook(configDb->get("functions.global.autoitem") == "true");
 
     // fastdrop
-    coral_fans::functions::fastDropHook(configDb->get("functions.global.fastdrop") == "true");
+    functions::fastDropHook(configDb->get("functions.global.fastdrop") == "true");
 
     // nopickup
-    coral_fans::functions::noPickUpHook(configDb->get("functions.global.nopickup") == "true");
+    functions::noPickUpHook(configDb->get("functions.global.nopickup") == "true");
 
     // portaldisabled
-    coral_fans::functions::portalDisabledHook(configDb->get("functions.global.portaldisabled") == "true");
+    functions::portalDisabledHook(configDb->get("functions.global.portaldisabled") == "true");
 }
 } // namespace coral_fans::commands

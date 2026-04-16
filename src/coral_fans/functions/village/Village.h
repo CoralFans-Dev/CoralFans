@@ -86,8 +86,11 @@ public:
     std::pair<std::string, bool> getVillagerInfo(ActorUniqueID);
     void                         clear();
 
+private:
+    CFVillageManager() = default;
+
 public:
-    static CFVillageManager& getInstance() {
+    [[nodiscard]] static CFVillageManager& getInstance() {
         static CFVillageManager instance;
         return instance;
     }

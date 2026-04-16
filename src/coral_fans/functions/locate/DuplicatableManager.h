@@ -173,8 +173,11 @@ public:
     // std::string test(ChunkPos);
     void clear();
 
+private:
+    DuplicatableManager() = default;
+
 public:
-    static DuplicatableManager& getInstance() {
+    [[nodiscard]] static DuplicatableManager& getInstance() {
         static DuplicatableManager instance;
         return instance;
     }

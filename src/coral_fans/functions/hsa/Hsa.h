@@ -63,8 +63,11 @@ private:
     void remove();
     void runtimeRemove();
 
+private:
+    HsaManager() = default;
+
 public:
-    static HsaManager& getInstance() {
+    [[nodiscard]] static HsaManager& getInstance() {
         static HsaManager instance;
         return instance;
     }

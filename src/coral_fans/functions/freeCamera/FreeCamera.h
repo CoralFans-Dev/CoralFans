@@ -6,9 +6,12 @@
 #include <unordered_set>
 namespace coral_fans::functions {
 class FreeCameraManager {
+private:
+    FreeCameraManager() = default;
+
 public:
-    std::unordered_set<unsigned long long> FreeCamList;
-    static FreeCameraManager&              getInstance() {
+    std::unordered_set<unsigned long long>  FreeCamList;
+    [[nodiscard]] static FreeCameraManager& getInstance() {
         static FreeCameraManager instance;
         return instance;
     }

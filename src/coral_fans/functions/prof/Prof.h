@@ -111,8 +111,11 @@ public:
     void        start(long long, uint64 = Type::normal);
     void        stop();
 
+private:
+    Profiler() = default;
+
 public:
-    static Profiler& getInstance() {
+    [[nodiscard]] static Profiler& getInstance() {
         static Profiler instance;
         return instance;
     }

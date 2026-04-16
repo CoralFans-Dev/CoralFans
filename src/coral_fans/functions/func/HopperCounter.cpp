@@ -16,13 +16,13 @@
 
 namespace coral_fans::functions {
 
-void HopperCounterChannel::reset() {
+void HopperCounterManager::HopperCounterChannel::reset() {
     this->gameTick = 0;
     this->counterList.clear();
     this->gtCounter.clear();
 }
 
-std::string HopperCounterChannel::info() {
+std::string HopperCounterManager::HopperCounterChannel::info() {
     using ll::i18n_literals::operator""_tr;
     unsigned long long n = 0;
     for (const auto& i : this->counterList) n += i.second;
@@ -48,7 +48,7 @@ std::string HopperCounterChannel::info() {
     return retstr;
 }
 
-void HopperCounterChannel::add(std::string name, unsigned long long count) {
+void HopperCounterManager::HopperCounterChannel::add(std::string name, unsigned long long count) {
     this->counterList[name]         += count;
     this->gtCounter[this->gameTick] += count;
     // refresh gtCounter

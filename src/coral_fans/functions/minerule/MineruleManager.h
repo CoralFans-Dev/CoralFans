@@ -21,6 +21,9 @@ public:
     IRandom*                    _randomize;
     PistonBlockActor*           pistonBlockActor;
 
+private:
+    RestoreAncillaryBrokenHelper() = default;
+
 public:
     [[nodiscard]] static RestoreAncillaryBrokenHelper& getInstance() {
         static RestoreAncillaryBrokenHelper instance;
@@ -80,7 +83,7 @@ public:
     std::array<std::unique_ptr<DimensionData>, 3> currentCaps; // key: dimension id, value: mDimension struct
 
 public:
-    static PopulationCapManager& getInstance() {
+    [[nodiscard]] static PopulationCapManager& getInstance() {
         static PopulationCapManager instance;
         return instance;
     }

@@ -30,8 +30,11 @@ private:
     void remove();
     void runtimeRemove();
 
+private:
+    SlimeManager() = default;
+
 public:
-    static SlimeManager& getInstance() {
+    [[nodiscard]] static SlimeManager& getInstance() {
         static SlimeManager instance;
         return instance;
     }

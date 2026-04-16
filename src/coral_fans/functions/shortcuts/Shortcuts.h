@@ -1,9 +1,6 @@
 #pragma once
 
 #include "coral_fans/Config.h"
-#include "coral_fans/CoralFans.h"
-#include "ll/api/service/Bedrock.h"
-#include "mc/server/commands/CommandRegistry.h"
 #include <vector>
 
 
@@ -17,56 +14,10 @@ private:
     std::vector<coral_fans::config::Shortcut::Command> commands;
 
 private:
-    ShortcutsManager() {
-        auto const& commandregistry = ll::service::getCommandRegistry();
-
-        // useons
-        for (auto& useon : CoralFans::getInstance().getConfig().shortcut.useons) {
-            if (!useon.enable || useon.item == "") continue;
-            for (auto action : useon.actions) {
-                if (!commandregistry->findCommand(action))
-                    goto next; // 如果action中有一条未注册，则不会加入到shortcuts中
-            }
-            useons.push_back(useon);
-        next:;
-        }
-
-        // uses
-        for (auto& use : CoralFans::getInstance().getConfig().shortcut.uses) {
-            if (!use.enable || use.item == "") continue;
-            for (auto action : use.actions) {
-                if (!commandregistry->findCommand(action))
-                    goto next2; // 如果action中有一条未注册，则不会加入到shortcuts中
-            }
-            uses.push_back(use);
-        next2:;
-        }
-
-        // destroys
-        for (auto& destroy : CoralFans::getInstance().getConfig().shortcut.destroys) {
-            if (!destroy.enable || destroy.item == "") continue;
-            for (auto action : destroy.actions) {
-                if (!commandregistry->findCommand(action))
-                    goto next3; // 如果action中有一条未注册，则不会加入到shortcuts中
-            }
-            destroys.push_back(destroy);
-        next3:;
-        }
-
-        // commands
-        for (auto& command : CoralFans::getInstance().getConfig().shortcut.commands) {
-            if (!command.enable || command.command == "") continue;
-            for (auto action : command.actions) {
-                if (!commandregistry->findCommand(action))
-                    goto next4; // 如果action中有一条未注册，则不会加入到shortcuts中
-            }
-            commands.push_back(command);
-        next4:;
-        }
-    }
+    ShortcutsManager() = default;
 
 public:
-    static ShortcutsManager& getInstance() {
+    [[nodiscard]] static ShortcutsManager& getInstance() {
         static ShortcutsManager instance;
         return instance;
     }
@@ -74,5 +25,7 @@ public:
 public:
     void registerShortcutsListener();
     void registerShortcutsCommand();
+    void loadData();
+    void clear();
 };
 } // namespace coral_fans::functions

@@ -15,8 +15,11 @@ public:
 public:
     void tick();
 
+private:
+    HudHelper() = default;
+
 public:
-    static HudHelper& getInstance() {
+    [[nodiscard]] static HudHelper& getInstance() {
         static HudHelper instance;
         return instance;
     }

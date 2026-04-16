@@ -1,6 +1,9 @@
 #include "Shortcuts.h"
+#include "coral_fans/CoralFans.h"
 #include "coral_fans/base/Macros.h"
 #include "coral_fans/base/Utils.h"
+
+
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/event/ListenerBase.h"
@@ -15,6 +18,7 @@
 #include "mc/server/commands/CommandContext.h"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
+#include "mc/server/commands/CommandRegistry.h"
 #include "mc/server/commands/MinecraftCommands.h"
 #include "mc/server/commands/PlayerCommandOrigin.h"
 #include "mc/world/Minecraft.h"
@@ -270,5 +274,52 @@ void ShortcutsManager::registerShortcutsCommand() {
                 }
         });
     }
+}
+
+void ShortcutsManager::loadData() {
+    auto const& commandregistry = ll::service::getCommandRegistry();
+
+    // useons
+    for (auto& useon : CoralFans::getInstance().getConfig().shortcut.useons) {
+        if (!useon.enable || useon.item == "") continue;
+        for (auto action : useon.actions) {
+            if (!commandregistry->findCommand(action)) continue; // 如果action中有一条未注册，则不会加入到shortcuts中
+        }
+        this->useons.push_back(useon);
+    }
+
+    // uses
+    for (auto& use : CoralFans::getInstance().getConfig().shortcut.uses) {
+        if (!use.enable || use.item == "") continue;
+        for (auto action : use.actions) {
+            if (!commandregistry->findCommand(action)) continue; // 如果action中有一条未注册，则不会加入到shortcuts中
+        }
+        this->uses.push_back(use);
+    }
+
+    // destroys
+    for (auto& destroy : CoralFans::getInstance().getConfig().shortcut.destroys) {
+        if (!destroy.enable || destroy.item == "") continue;
+        for (auto action : destroy.actions) {
+            if (!commandregistry->findCommand(action)) continue; // 如果action中有一条未注册，则不会加入到shortcuts中
+        }
+        this->destroys.push_back(destroy);
+    }
+
+    // commands
+    for (auto& command : CoralFans::getInstance().getConfig().shortcut.commands) {
+        if (!command.enable || command.command == "") continue;
+        for (auto action : command.actions) {
+            if (!commandregistry->findCommand(action)) continue; // 如果action中有一条未注册，则不会加入到shortcuts中
+        }
+        this->commands.push_back(command);
+    }
+}
+
+void ShortcutsManager::clear() {
+    this->useons.clear();
+    this->uses.clear();
+    this->destroys.clear();
+    this->commands.clear();
 }
 } // namespace coral_fans::functions
