@@ -8,7 +8,6 @@
 #include "coral_fans/functions/locate/DuplicatableManager.h"
 #include "coral_fans/functions/minerule/MineruleManager.h"
 #include "coral_fans/functions/noclip/Noclip.h"
-// #include "coral_fans/functions/prof/Prof.h"
 #include "coral_fans/functions/shortcuts/Shortcuts.h"
 #include "coral_fans/functions/slime/Slime.h"
 #include "coral_fans/functions/village/Village.h"
@@ -151,6 +150,8 @@ bool CoralFans::load() {
     getEventListeners().emplace(
         ll::event::EventBus::getInstance().emplaceListener<ll::event::server::ServerStoppingEvent>([this](auto&&) {
             removeRuntimeData();
+            getConfigDb()      = nullptr;
+            getGeometryGroup() = nullptr;
         })
     );
     functions::ShortcutsManager::getInstance().registerShortcutsListener();

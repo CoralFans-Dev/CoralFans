@@ -169,7 +169,7 @@ struct Config {
         struct {
             int         drawInterval       = 60;
             int         runtimeRemoveScale = 20;
-            int         drawRadius         = 6;
+            int         drawRadius         = 8;
             std::string slimeChunkColor    = "#10E436";
         } slime{};
 
