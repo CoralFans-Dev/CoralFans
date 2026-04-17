@@ -9,10 +9,12 @@
 #include "mc/network/packet/RemoveActorPacket.h"
 #include "mc/network/packet/UpdateAbilitiesPacket.h"
 #include "mc/network/packet/UpdatePlayerGameTypePacket.h"
+#include "mc/server/ServerInstance.h"
 #include "mc/server/ServerPlayer.h"
 #include "mc/world/actor/Actor.h "
 #include "mc/world/level/Level.h"
 #include "mc/world/level/Tick.h"
+#include <thread>
 
 PlayerSkinPacketPayload::PlayerSkinPacketPayload()                               = default;
 PlayerSkinPacketPayload::PlayerSkinPacketPayload(PlayerSkinPacketPayload const&) = default;
@@ -134,6 +136,10 @@ LL_TYPE_INSTANCE_HOOK(
     NetworkIdentifier const&     id,
     PlayerAuthInputPacket const& pkt
 ) {
+#ifdef LL_PLAT_C
+    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin(id, pkt);
+#endif
     if (!FreeCameraManager::getInstance().FreeCamList.contains(id.mGuid.g)) {
         origin(id, pkt);
     }
@@ -147,6 +153,10 @@ LL_TYPE_INSTANCE_HOOK(
     void,
     ::GameType gamemode
 ) {
+#ifdef LL_PLAT_C
+    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin(gamemode);
+#endif
     origin(gamemode);
     if (FreeCameraManager::getInstance().FreeCamList.contains(getNetworkIdentifier().mGuid.g)) {
         FreeCameraManager::DisableFreeCamera(this);
@@ -162,6 +172,10 @@ LL_TYPE_INSTANCE_HOOK(
     class ActorDamageSource const& a1,
     float                          a2
 ) {
+#ifdef LL_PLAT_C
+    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin(a1, a2);
+#endif
     auto res = origin(a1, a2);
     if (this->isType(ActorType::Player) && res != 0) {
         auto pl = (Player*)this;
@@ -181,6 +195,10 @@ LL_TYPE_INSTANCE_HOOK(
     void,
     class ActorDamageSource const& a1
 ) {
+#ifdef LL_PLAT_C
+    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin(a1);
+#endif
     if (FreeCameraManager::getInstance().FreeCamList.contains(getNetworkIdentifier().mGuid.g)) {
         FreeCameraManager::DisableFreeCamera(this);
     }
@@ -194,6 +212,10 @@ LL_TYPE_INSTANCE_HOOK(
     &ServerPlayer::disconnect,
     void
 ) {
+#ifdef LL_PLAT_C
+    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin();
+#endif
     FreeCameraManager::getInstance().FreeCamList.erase(getNetworkIdentifier().mGuid.g);
     return origin();
 }

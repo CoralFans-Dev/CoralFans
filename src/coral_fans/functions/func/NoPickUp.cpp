@@ -2,7 +2,10 @@
 
 
 #include "ll/api/memory/Hook.h"
+#include "ll/api/service/Bedrock.h"
+#include "mc/server/ServerInstance.h"
 #include "mc/world/actor/player/Player.h"
+#include <thread>
 
 
 namespace coral_fans::functions {
@@ -17,6 +20,10 @@ LL_TYPE_INSTANCE_HOOK(
     int    orgCount,
     int    favoredSlot
 ) {
+#ifdef LL_PLAT_C
+    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin(itemActor, orgCount, favoredSlot);
+#endif
     if (itemActor.hasCategory(ActorCategory::Item)
         && CoralFans::getInstance().getConfigDb()->get(
                std::format("functions.players.{}.nopickup", this->getUuid().asString())

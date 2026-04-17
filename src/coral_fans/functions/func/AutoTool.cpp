@@ -3,7 +3,9 @@
 
 
 #include "ll/api/memory/Hook.h"
+#include "ll/api/service/Bedrock.h"
 #include "mc/network/ServerPlayerBlockUseHandler.h"
+#include "mc/server/ServerInstance.h"
 #include "mc/server/ServerPlayer.h"
 #include "mc/world/Container.h"
 #include "mc/world/actor/ActorHurtResult.h"
@@ -18,6 +20,7 @@
 
 #include <format>
 #include <string>
+#include <thread>
 
 namespace {
 
@@ -72,6 +75,10 @@ LL_STATIC_HOOK(
     const BlockPos& pos,
     int             face
 ) {
+#ifdef LL_PLAT_C
+    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin(player, pos, face);
+#endif
     if (CoralFans::getInstance().getConfigDb()->get(
             std::format("functions.players.{}.autotool", player.getUuid().asString())
         )
@@ -103,6 +110,10 @@ LL_TYPE_INSTANCE_HOOK(
     ::Actor&                                       actor,
     ::SharedTypes::Legacy::ActorDamageCause const& cause
 ) {
+#ifdef LL_PLAT_C
+    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin(actor, cause);
+#endif
     if (CoralFans::getInstance().getConfigDb()->get(
             std::format("functions.players.{}.autotool", this->getUuid().asString())
         )

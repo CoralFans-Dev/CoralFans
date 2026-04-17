@@ -2,7 +2,10 @@
 
 
 #include "ll/api/memory/Hook.h"
+#include "ll/api/service/Bedrock.h"
+#include "mc/server/ServerInstance.h"
 #include "mc/server/ServerPlayer.h"
+#include <thread>
 
 
 namespace coral_fans::functions {
@@ -13,6 +16,10 @@ LL_TYPE_INSTANCE_HOOK(
     &ServerPlayer::$canChangeDimensionsUsingPortal,
     bool
 ) {
+#ifdef LL_PLAT_C
+    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin();
+#endif
     if (CoralFans::getInstance().getConfigDb()->get(
             std::format("functions.players.{}.portaldisabled", this->getUuid().asString())
         )

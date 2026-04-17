@@ -2,6 +2,7 @@
 #include "ll/api/memory/Hook.h"
 #include "ll/api/service/Bedrock.h"
 #include "mc/deps/core/math/Vec3.h"
+#include "mc/server/ServerInstance.h"
 #include "mc/world/actor/ActorDefinitionIdentifier.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/BlockSource.h"
@@ -23,6 +24,10 @@ LL_TYPE_STATIC_HOOK(
     ::BlockPos const& pos,
     ::PortalAxis      axis
 ) {
+#ifdef LL_PLAT_C
+    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin(region, pos, axis);
+#endif
     Vec3 _pos = pos;
     while (_pos.y-- > 1) {
         auto& block = region.getBlock(_pos);

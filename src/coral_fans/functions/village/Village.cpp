@@ -10,6 +10,7 @@
 #include "mc/deps/core/math/Vec3.h"
 #include "mc/legacy/ActorUniqueID.h"
 #include "mc/platform/UUID.h"
+#include "mc/server/ServerInstance.h"
 #include "mc/world/actor/Actor.h"
 #include "mc/world/actor/ai/village/POIInstance.h"
 #include "mc/world/actor/ai/village/Village.h"
@@ -20,6 +21,7 @@
 #include "mc/world/level/dimension/Dimension.h"
 #include "mc/world/level/levelgen/structure/BoundingBox.h"
 #include "mc/world/phys/AABB.h"
+#include <thread>
 
 #include <cstddef>
 #include <math.h>
@@ -511,6 +513,10 @@ LL_TYPE_INSTANCE_HOOK(
     ::mce::UUID       id,
     ::BlockPos const& _origin
 ) {
+#ifdef LL_PLAT_C
+    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin(dimension, id, _origin);
+#endif
     auto ori = origin(dimension, id, _origin);
     CFVillageManager::getInstance().addVillage(static_cast<Village*>(ori));
     return ori;
@@ -525,6 +531,10 @@ LL_TYPE_INSTANCE_HOOK(
     Tick         tick,
     BlockSource& region
 ) {
+#ifdef LL_PLAT_C
+    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin(tick, region);
+#endif
     CFVillageManager::getInstance().handleVillageTick(this, tick);
     origin(tick, region);
 }
@@ -537,6 +547,10 @@ LL_TYPE_INSTANCE_HOOK(
     void,
     ::Village& village
 ) {
+#ifdef LL_PLAT_C
+    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin(village);
+#endif
     CFVillageManager::getInstance().removeVillage(&village);
     origin(village);
 }

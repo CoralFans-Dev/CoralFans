@@ -2,6 +2,7 @@
 #include "coral_fans/CoralFans.h"
 #include "ll/api/memory/Hook.h"
 #include "ll/api/service/Bedrock.h"
+#include "mc/server/ServerInstance.h"
 #include "mc/world/level/BedrockSpawner.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/biome/MobSpawnRules.h"
@@ -12,6 +13,7 @@
 #include <array>
 #include <memory>
 #include <string>
+#include <thread>
 
 
 namespace coral_fans::functions {
@@ -136,6 +138,10 @@ LL_TYPE_INSTANCE_HOOK(
     SpawnConditions const& conditions,
     int                    inSpawnCount
 ) {
+#ifdef LL_PLAT_C
+    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin(mobType, conditions, inSpawnCount);
+#endif
     auto& popCapManager = PopulationCapManager::getInstance();
 
     if (!popCapManager.enabled) {
@@ -175,6 +181,10 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     void,
     const br::worldgen::StructureSetRegistry& structureSetRegistry
 ) {
+#ifdef LL_PLAT_C
+    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin(structureSetRegistry);
+#endif
     origin(structureSetRegistry);
 
     int   dimId   = this->getDimensionId();
@@ -199,7 +209,13 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
 }
 
 void populationCapHook(bool bl) {
-    bl ? handlePopCapHook::hook() : handlePopCapHook::unhook();
+    if (bl) {
+        handlePopCapHook::hook();
+        DimInitHook::hook();
+    } else {
+        handlePopCapHook::unhook();
+        DimInitHook::unhook();
+    }
     PopulationCapManager::getInstance().setEnabled(bl);
 }
 

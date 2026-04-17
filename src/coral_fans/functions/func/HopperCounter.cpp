@@ -13,6 +13,10 @@
 
 #include <format>
 #include <string>
+#include <thread>
+
+#include "ll/api/service/Bedrock.h"
+#include "mc/server/ServerInstance.h"
 
 namespace coral_fans::functions {
 
@@ -115,6 +119,10 @@ LL_TYPE_INSTANCE_HOOK(
     int            attachedFace,
     bool           canPushItems
 ) {
+#ifdef LL_PLAT_C
+    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin(region, fromContainer, pos, attachedFace, canPushItems);
+#endif
     HopperCounterManager::getInstance().region = &region;
     HopperCounterManager::getInstance().pos    = pos;
     HopperCounterManager::getInstance().mutex  = true;
@@ -132,6 +140,10 @@ LL_TYPE_INSTANCE_HOOK(
     int                slot,
     ::ItemStack const& item
 ) {
+#ifdef LL_PLAT_C
+    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin(slot, item);
+#endif
     if (!HopperCounterManager::getInstance().mutex) {
         HOOK_HOPPER_RETURN
     }

@@ -1,10 +1,13 @@
 #include "MineruleManager.h"
 #include "ll/api/memory/Hook.h"
+#include "ll/api/service/Bedrock.h"
+#include "mc/server/ServerInstance.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/block/Block.h"
 #include "mc/world/level/block/BlockType.h"
 #include <cstddef>
+#include <thread>
 #include <vector>
 
 
@@ -17,6 +20,10 @@ LL_TYPE_INSTANCE_HOOK(
     void,
     ::BlockSource& region
 ) {
+#ifdef LL_PLAT_C
+    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin(region);
+#endif
     auto& helper            = RestoreAncillaryBrokenHelper::getInstance();
     helper.mutex            = true;
     helper.mutex2           = true;
@@ -39,6 +46,10 @@ LL_TYPE_INSTANCE_HOOK(
     ::IRandom&                    random,
     ::ResourceDropsContext const& resourceDropsContext
 ) {
+#ifdef LL_PLAT_C
+    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin(region, pos, block, random, resourceDropsContext);
+#endif
     auto& helper = RestoreAncillaryBrokenHelper::getInstance();
     if (helper.mutex2) {
         helper.mutex2       = false;
@@ -61,6 +72,10 @@ LL_TYPE_INSTANCE_HOOK(
     bool                        dropResources,
     const ::BlockChangeContext& blockChangeContext
 ) {
+#ifdef LL_PLAT_C
+    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin(region, pos, dropResources, blockChangeContext);
+#endif
     auto& helper = RestoreAncillaryBrokenHelper::getInstance();
     if (helper.mutex) {
         helper.mutex2  = true;

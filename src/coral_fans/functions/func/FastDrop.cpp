@@ -2,9 +2,12 @@
 
 
 #include "ll/api/memory/Hook.h"
+#include "ll/api/service/Bedrock.h"
+#include "mc/server/ServerInstance.h"
 #include "mc/world/actor/player/Inventory.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/actor/player/PlayerInventory.h"
+#include <thread>
 
 namespace coral_fans::functions {
 // fastdrop
@@ -17,6 +20,10 @@ LL_TYPE_INSTANCE_HOOK(
     ItemStack const& item,
     bool             randomly
 ) {
+#ifdef LL_PLAT_C
+    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin(item, randomly);
+#endif
     if (CoralFans::getInstance().getConfigDb()->get(
             std::format("functions.players.{}.fastdrop", this->getUuid().asString())
         )

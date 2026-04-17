@@ -1,6 +1,9 @@
 #include "ll/api/memory/Hook.h"
+#include "ll/api/service/Bedrock.h"
 #include "mc/deps/core/math/Vec3.h"
+#include "mc/server/ServerInstance.h"
 #include "mc/world/level/BlockSource.h"
+#include <thread>
 
 
 namespace coral_fans::functions {
@@ -18,6 +21,10 @@ LL_TYPE_INSTANCE_HOOK(
     bool,
     Vec3 clickPos
 ) {
+#ifdef LL_PLAT_C
+    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin(block, pos, face, placer, true, clickPos);
+#endif
     return origin(block, pos, face, placer, true, clickPos);
 }
 
@@ -27,13 +34,17 @@ LL_TYPE_INSTANCE_HOOK(
     BlockSource,
     &BlockSource::$mayPlace,
     bool,
-    Block const&,
-    BlockPos const&,
-    uchar,
-    Actor*,
-    bool,
-    Vec3
+    Block const&    block,
+    BlockPos const& pos,
+    uchar           face,
+    Actor*          placer,
+    bool            val,
+    Vec3            clickPos
 ) {
+#ifdef LL_PLAT_C
+    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin(block, pos, face, placer, val, clickPos);
+#endif
     return true;
 }
 

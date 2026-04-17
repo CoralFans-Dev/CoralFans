@@ -5,8 +5,10 @@
 
 #include "ll/api/memory/Hook.h"
 #include "ll/api/service/Bedrock.h"
+#include "mc/server/ServerInstance.h"
 #include "mc/server/ServerPlayer.h"
 #include "mc/world/level/Level.h"
+#include <thread>
 
 
 namespace coral_fans::functions {
@@ -18,6 +20,10 @@ LL_TYPE_INSTANCE_HOOK(
     void,
     ::GameType gameType
 ) {
+#ifdef LL_PLAT_C
+    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin(gameType);
+#endif
     origin(gameType);
     if (gameType == ::GameType::Creative
         && CoralFans::getInstance().getConfigDb()->get(std::format("noclip.players.{}", this->getUuid().asString()))

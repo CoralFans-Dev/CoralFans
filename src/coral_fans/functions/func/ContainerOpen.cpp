@@ -4,6 +4,8 @@
 
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/memory/Hook.h"
+#include "ll/api/service/Bedrock.h"
+#include "mc/server/ServerInstance.h"
 #include "mc/server/ServerPlayer.h"
 #include "mc/world/Container.h"
 #include "mc/world/actor/player/Player.h"
@@ -14,6 +16,7 @@
 #include "mc/world/level/block/Block.h"
 #include "mc/world/level/block/actor/ChestBlockActor.h"
 #include "mc/world/level/dimension/Dimension.h"
+#include <thread>
 
 
 #include <string>
@@ -56,6 +59,10 @@ LL_TYPE_INSTANCE_HOOK(
     Block const*    block,
     bool            isFirstEvent
 ) {
+#ifdef LL_PLAT_C
+    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin(item, blockPos, face, clickPos, block, isFirstEvent);
+#endif
     auto& containerOpenManager  = ContainerOpenManager::getInstance();
     containerOpenManager.player = &this->mPlayer;
     auto res                    = origin(item, blockPos, face, clickPos, block, isFirstEvent);
@@ -71,13 +78,17 @@ LL_TYPE_INSTANCE_HOOK(
     bool,
     BlockSource& region
 ) {
+#ifdef LL_PLAT_C
+    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin(region);
+#endif
     auto& containerOpenManager = ContainerOpenManager::getInstance();
     if (containerOpenManager.forceOpen) return true;
     auto res = origin(region);
     if (!res && containerOpenManager.player
         && CoralFans::getInstance().getConfigDb()->get(
                std::format("functions.players.{}.containerreader", containerOpenManager.player->getUuid().asString())
-           ) != "true")
+           ) == "true")
         containerOpenManager.sendContentToPlayer(this->getContainer());
     return res;
 }
