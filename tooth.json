@@ -1,27 +1,88 @@
 {
-    "format_version": 2,
+    "format_version": 3,
+    "format_uuid": "dc4f0bf5-29fd-addf-6582-6ff4dd79cb31",
     "tooth": "github.com/CoralFans-Dev/CoralFans",
-    "version": "26.10.0",
+    "version": "26.10.1",
     "info": {
         "name": "CoralFans",
-        "description": "CoralFans Mod.",
+        "description": "A Minecraft tech-survival assistant mod.",
         "author": "CoralFans-Dev",
         "tags": [
             "platform:levilamina",
             "type:mod"
-        ]
+        ],
+        "avatar_url": "github.com/CoralFans-Dev/CoralFans-doc/blob/main/docs/icon.png"
     },
-    "asset_url": "https://github.com/CoralFans-Dev/CoralFans/releases/download/v$(version)/CoralFans-windows-x64.zip",
-    "prerequisites": {
-        "github.com/LiteLDev/LeviLamina": ">=26.10.x <26.20.0",
-        "github.com/OEOTYAN/BedrockServerClientInterface": "0.3.1"
-    },
-    "files": {
-        "place": [
-            {
-                "src": "CoralFans/*",
-                "dest": "plugins/CoralFans/"
+    "variants": [
+        {
+            "label": "server",
+            "platform": "win-x64",
+            "dependencies": {
+                "github.com/LiteLDev/LeviLamina": ">=26.10.x <26.20.0",
+                "github.com/OEOTYAN/BedrockServerClientInterface": "0.3.1"
+            },
+            "assets": [
+                {
+                    "type": "zip",
+                    "urls": [
+                        "https://github.com/CoralFans-Dev/CoralFans/releases/download/v$(version)/CoralFans-server-windows-x64.zip"
+                    ],
+                    "placements": [
+                        {
+                            "type": "dir",
+                            "src": "CoralFans/",
+                            "dest": "plugins/CoralFans/"
+                        }
+                    ]
+                }
+            ],
+            "preserve_files": [],
+            "remove_files": [],
+            "scripts": {
+                "pre_install": [],
+                "install": [],
+                "post_install": [],
+                "pre_pack": [],
+                "post_pack": [],
+                "pre_uninstall": [],
+                "uninstall": [],
+                "post_uninstall": []
             }
-        ]
-    }
+        },
+        {
+            "label": "client",
+            "platform": "win-x64",
+            "dependencies": {
+                "github.com/LiteLDev/LeviLamina#client": ">=26.10.x <26.20.0",
+                "github.com/OEOTYAN/BedrockServerClientInterface": "0.3.1"
+            },
+            "assets": [
+                {
+                    "type": "zip",
+                    "urls": [
+                        "https://github.com/CoralFans-Dev/CoralFans/releases/download/v$(version)/CoralFans-client-windows-x64.zip"
+                    ],
+                    "placements": [
+                        {
+                            "type": "dir",
+                            "src": "CoralFans/",
+                            "dest": "mods/CoralFans/"
+                        }
+                    ]
+                }
+            ],
+            "preserve_files": [],
+            "remove_files": [],
+            "scripts": {
+                "pre_install": [],
+                "install": [],
+                "post_install": [],
+                "pre_pack": [],
+                "post_pack": [],
+                "pre_uninstall": [],
+                "uninstall": [],
+                "post_uninstall": []
+            }
+        }
+    ]
 }
