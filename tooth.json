@@ -2,7 +2,7 @@
     "format_version": 3,
     "format_uuid": "dc4f0bf5-29fd-addf-6582-6ff4dd79cb31",
     "tooth": "github.com/CoralFans-Dev/CoralFans",
-    "version": "26.10.1-rc.1",
+    "version": "26.10.1-rc.2",
     "info": {
         "name": "CoralFans",
         "description": "A tech-survival assistant mod for Bedrock Version.",
