@@ -1,22 +1,14 @@
 #pragma once
 
-#include "bsci/GeometryGroup.h"
-#include "coral_fans/Config.h"
-#include "mc/deps/core/math/Random.h"
-#include "mc/world/level/BlockPos.h"
-#include "mc/world/level/ChunkPos.h"
-#include "mc/world/level/block/Block.h"
-#include "mc/world/level/chunk/LevelChunk.h"
-#include <memory>
-#include <string>
-#include <unordered_map>
-#include <unordered_set>
-
 
 namespace coral_fans::functions::locate {
+
+class NetherDuplicatableController;
+class TheEndDuplicatableController;
+
 class DuplicatableManager {
 public:
-    enum class ShowType : uint {
+    enum class ShowType : unsigned int {
         Netherite    = 1 << 0,
         NetherSpring = 1 << 1,
         NetherFire   = 1 << 2,
@@ -34,153 +26,35 @@ public:
     };
 
 private:
-    struct NetherData {
-        std::multimap<BlockPos, std::unordered_set<BlockPos>> netheritePosMap;
-        std::unordered_set<BlockPos>                          springPosSet;
-        std::unordered_set<BlockPos>                          firePosMap;
-        std::multimap<BlockPos, int>                          glowStonePosMap;
-        std::multimap<BlockPos, bool>                         mushroomPosMap;
-        std::unordered_set<BlockPos>                          netherGoldPosMap;
-        std::unordered_set<BlockPos>                          netherQuartzPosMap;
-        std::unordered_set<BlockPos>                          netherMagmaPosMap;
-        std::unordered_set<BlockPos>                          netherGravelPosMap;
-        std::unordered_set<BlockPos>                          blackstonePosMap;
-        std::unordered_set<BlockPos>                          soulSandPosMap;
-        bool                                                  reload = false;
-    };
+    unsigned int showType                   = 0;
+    int          tickCounter                = 1;
+    int          cacheDataRemoveTickCounter = 1;
 
-    struct NetherThreadTemperaryData {
-        LevelChunk*                  chunk = nullptr;
-        NetherData                   threadData;
-        bool                         worldBlockTargetShouldOperate = false;
-        bool                         isEmpty                       = true;
-        std::unordered_set<BlockPos> temperaryPoses;
-        int                          temperaryInt = 0;
-    };
-
-    struct NetherBsciChunkData {
-        bsci::GeometryGroup::GeoId netheriteGeoId    = {0};
-        bsci::GeometryGroup::GeoId springGeoId       = {0};
-        bsci::GeometryGroup::GeoId fireGeoId         = {0};
-        bsci::GeometryGroup::GeoId glowStoneGeoId    = {0};
-        bsci::GeometryGroup::GeoId mushroomGeoId     = {0};
-        bsci::GeometryGroup::GeoId netherGoldGeoId   = {0};
-        bsci::GeometryGroup::GeoId netherQuartzGeoId = {0};
-        bsci::GeometryGroup::GeoId netherMagmaGeoId  = {0};
-        bsci::GeometryGroup::GeoId netherGravelGeoId = {0};
-        bsci::GeometryGroup::GeoId blackstoneGeoId   = {0};
-        bsci::GeometryGroup::GeoId soulSandGeoId     = {0};
-
-        int                        neighborValidCount       = 0;
-        bool                       chunkSaved               = true;
-        bsci::GeometryGroup::GeoId chunkSavedDrawGeoId      = {0};
-        uint                       dataDrawed               = false;
-        int                        runtimeRemoveTickCounter = 0;
-        int                        temperaryInt             = 0;
-    };
-
-    struct TheEndData {
-        std::multimap<BlockPos, Core::Random> endIslandPosMap;
-        std::multimap<BlockPos, int>          chorusFlowerPosMap;
-        std::unordered_set<BlockPos>          endGatewayPosSet;
-        bool                                  reload = false;
-    };
-
-    struct TheEndThreadTemperaryData {
-        LevelChunk* chunk = nullptr;
-        TheEndData  threadData;
-        bool        isEmpty         = true;
-        int         temperaryInt    = 0;
-        bool        temperatureBool = true;
-    };
-
-    struct TheEndBsciChunkData {
-        bsci::GeometryGroup::GeoId endIslandGeoId    = {0};
-        bsci::GeometryGroup::GeoId chorusFlowerGeoId = {0};
-        bsci::GeometryGroup::GeoId endGatewayGeoId   = {0};
-
-        int                        neighborValidCount       = 0;
-        bool                       chunkSaved               = true;
-        bsci::GeometryGroup::GeoId chunkSavedDrawGeoId      = {0};
-        uint                       dataDrawed               = false;
-        int                        runtimeRemoveTickCounter = 0;
-    };
-
-private:
-    uint showType                   = 0;
-    int  tickCounter                = 1;
-    int  cacheDataRemoveTickCounter = 1;
-
-    std::unordered_map<ChunkPos, NetherBsciChunkData> netherBsciChunkData;
-    std::unordered_map<ChunkPos, TheEndBsciChunkData> theEndBsciChunkData;
-
-    std::mutex                                                                      netherDecorationThreadIdsLock;
-    std::unordered_map<std::thread::id, std::unique_ptr<NetherThreadTemperaryData>> netherDecorationThreadIds;
-
-    std::mutex                               netherDataMapLock;
-    std::unordered_map<ChunkPos, NetherData> netherDataMap;
-
-    std::mutex                                                                      theEndDecorationThreadIdsLock;
-    std::unordered_map<std::thread::id, std::unique_ptr<TheEndThreadTemperaryData>> theEndDecorationThreadIds;
-
-    std::mutex                               theEndDataMapLock;
-    std::unordered_map<ChunkPos, TheEndData> theEndDataMap;
-
-    struct DuplicatableHook1;
-    struct DuplicatableHook2;
-    struct DuplicatableHook3;
-    struct DuplicatableHook4;
-    struct DuplicatableHook5;
-    struct DuplicatableHook6;
-    struct DuplicatableHook7;
-    struct DuplicatableHook8;
-    struct DuplicatableHook9;
-    struct DuplicatableHook10;
-    struct DuplicatableHook11;
-    struct DuplicatableHook12;
-    struct DuplicatableHook13;
+    NetherDuplicatableController* netherController;
+    TheEndDuplicatableController* theEndController;
 
 private:
     void removeData();
     void draw();
-    void netherDraw(BlockSource&, ChunkPos, NetherData&);
-    void theEndDraw(BlockSource&, ChunkPos, TheEndData&);
-    void removeBsciData(ShowType);
     void bsciDataRuntimeRemove();
-
-    bsci::GeometryGroup::GeoId drawNetherite(std::multimap<BlockPos, std::unordered_set<BlockPos>>&);
-    bsci::GeometryGroup::GeoId drawSpring(std::unordered_set<BlockPos>&);
-    bsci::GeometryGroup::GeoId drawFire(std::unordered_set<BlockPos>&);
-    bsci::GeometryGroup::GeoId drawGlowStone(std::multimap<BlockPos, int>&);
-    bsci::GeometryGroup::GeoId drawMushroom(std::multimap<BlockPos, bool>&);
-    bsci::GeometryGroup::GeoId
-    drawOre(std::unordered_set<BlockPos>&, config::Locate::DuplicatableOreStruct&, std::string);
-    bsci::GeometryGroup::GeoId drawEndIsland(std::multimap<BlockPos, Core::Random>&);
-    bsci::GeometryGroup::GeoId drawChorusFlower(std::multimap<BlockPos, int>&);
-    bsci::GeometryGroup::GeoId drawEndGateway(std::unordered_set<BlockPos>&);
-    bool                       isChunkValid(BlockSource&, ChunkPos);
-    void                       tryRemoveNetherChunkData(ChunkPos);
-    void                       tryRemoveTheEndChunkData(ChunkPos);
-    void                       drawNetherChunkSavedInfo(BlockSource&, ChunkPos, NetherBsciChunkData&);
-    void                       drawTheEndChunkSavedInfo(BlockSource&, ChunkPos, TheEndBsciChunkData&);
 
 public:
     void tick();
-
-public:
     void setShowType(ShowType, bool);
     bool getShowType(ShowType);
-    // std::string test(ChunkPos);
     void clear();
 
+    static void hook(bool);
+
 private:
-    DuplicatableManager() = default;
+    DuplicatableManager();
+    ~DuplicatableManager();
 
 public:
-    [[nodiscard]] static DuplicatableManager& getInstance() {
-        static DuplicatableManager instance;
-        return instance;
-    }
-    static void hook(bool);
+    [[nodiscard]] static DuplicatableManager& getInstance();
+
+    DuplicatableManager(const DuplicatableManager&)            = delete;
+    DuplicatableManager& operator=(const DuplicatableManager&) = delete;
 };
+
 } // namespace coral_fans::functions::locate
