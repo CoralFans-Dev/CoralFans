@@ -754,30 +754,36 @@ void NetherDuplicatableController::hook(bool enable) {
             NetherHook3::hook();
             NetherHook4::hook();
             shouldHook = true;
+        } else {
+            NetherHook2::unhook();
+            NetherHook3::unhook();
+            NetherHook4::unhook();
         }
         if (duplicatableConfig.netherSpring.enable) {
             NetherHook5::hook();
             shouldHook = true;
-        }
+        } else NetherHook5::unhook();
         if (duplicatableConfig.netherFire.enable) {
             NetherHook6::hook();
             shouldHook = true;
-        }
+        } else NetherHook6::unhook();
         if (duplicatableConfig.glowStone.enable) {
             NetherHook7::hook();
             shouldHook = true;
-        }
+        } else NetherHook7::unhook();
         if (duplicatableConfig.mushroom.enable) {
             NetherHook8::hook();
             shouldHook = true;
-        }
+        } else NetherHook8::unhook();
+        NetherHook8::unhook();
         if (duplicatableConfig.netherGold.enable || duplicatableConfig.netherQuartz.enable
             || duplicatableConfig.netherMagma.enable || duplicatableConfig.netherGravel.enable
             || duplicatableConfig.netherBlackstone.enable || duplicatableConfig.netherSoulSand.enable) {
             NetherHook9::hook();
             shouldHook = true;
-        }
+        } else NetherHook9::unhook();
         if (shouldHook) NetherHook1::hook();
+        else NetherHook1::unhook();
     } else {
         NetherHook1::unhook();
         NetherHook2::unhook();

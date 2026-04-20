@@ -357,16 +357,17 @@ void TheEndDuplicatableController::hook(bool enable) {
         if (duplicatableConfig.endIsland.enable) {
             TheEndHook2::hook();
             shouldHook = true;
-        }
+        } else TheEndHook2::unhook();
         if (duplicatableConfig.chorusFlower.enable) {
             TheEndHook3::hook();
             shouldHook = true;
-        }
+        } else TheEndHook3::unhook();
         if (duplicatableConfig.endGateway.enable) {
             TheEndHook4::hook();
             shouldHook = true;
-        }
+        } else TheEndHook4::unhook();
         if (shouldHook) TheEndHook1::hook();
+        else TheEndHook1::unhook();
     } else {
         TheEndHook1::unhook();
         TheEndHook2::unhook();

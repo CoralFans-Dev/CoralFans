@@ -5,9 +5,9 @@ add_repositories("oeotyan-repo https://github.com/OEOTYAN/xmake-repo.git")
 add_repositories("coralfansdev-repo https://github.com/CoralFans-Dev/xmake-repo.git")
 
 if is_config("target_type", "server") then
-    add_requires("levilamina 26.10.7", {configs = {target_type = "server"}})
+    add_requires("levilamina 26.10.8", {configs = {target_type = "server"}})
 else
-    add_requires("levilamina 26.10.7", {configs = {target_type = "client"}})
+    add_requires("levilamina 26.10.8", {configs = {target_type = "client"}})
 end
 
 

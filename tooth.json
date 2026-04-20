@@ -18,7 +18,7 @@
             "label": "",
             "platform": "win-x64",
             "dependencies": {
-                "github.com/LiteLDev/LeviLamina": ">=26.10.x <26.20.0",
+                "github.com/LiteLDev/LeviLamina": ">=26.10.8 <26.20.0",
                 "github.com/OEOTYAN/BedrockServerClientInterface": "0.3.1"
             },
             "assets": [
@@ -53,7 +53,7 @@
             "label": "client",
             "platform": "win-x64",
             "dependencies": {
-                "github.com/LiteLDev/LeviLamina#client": ">=26.10.x <26.20.0",
+                "github.com/LiteLDev/LeviLamina#client": ">=26.10.8 <26.20.0",
                 "github.com/OEOTYAN/BedrockServerClientInterface": "0.3.1"
             },
             "assets": [
