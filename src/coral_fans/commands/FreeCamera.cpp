@@ -7,7 +7,6 @@
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/i18n/I18n.h"
-#include "ll/api/service/Bedrock.h"
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/world/actor/player/Player.h"
 
@@ -18,7 +17,6 @@ void registerFreeCameraCommand(config::CommandConfigStruct& config) {
 
     auto& cmd = ll::command::CommandRegistrar::getInstance(false)
                     .getOrCreateCommand(config.command, "command.freecamera.description"_tr(), config.permission);
-    ll::service::getCommandRegistry()->registerAlias("freecamera", "fc");
     cmd.overload().execute([&](CommandOrigin const& origin, CommandOutput& output) {
         COMMAND_CHECK_PLAYER
         auto guid = player->getNetworkIdentifier().mGuid.g;

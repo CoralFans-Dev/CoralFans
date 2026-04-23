@@ -7,12 +7,16 @@
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/event/ListenerBase.h"
+#include "ll/api/event/input/KeyInputEvent.h"
 #include "ll/api/event/player/PlayerDestroyBlockEvent.h"
 #include "ll/api/event/player/PlayerInteractBlockEvent.h"
 #include "ll/api/event/player/PlayerUseItemEvent.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/service/Bedrock.h"
+#include "ll/api/service/TargetedBedrock.h"
 #include "ll/api/utils/StringUtils.h"
+#include "mc/client/game/ClientInstance.h"
+#include "mc/client/player/LocalPlayer.h"
 #include "mc/deps/core/utility/MCRESULT.h"
 #include "mc/server/ServerPlayer.h"
 #include "mc/server/commands/CommandContext.h"
@@ -27,6 +31,7 @@
 #include <ll/api/event/EventBus.h>
 #include <ll/api/event/ListenerBase.h>
 #include <ll/api/event/player/PlayerJoinEvent.h>
+#include <ll/api/thread/ServerThreadExecutor.h>
 #include <memory>
 
 
@@ -66,8 +71,8 @@ namespace coral_fans::functions {
 
 void ShortcutsManager::registerShortcutsListener() {
     // useon
-    ll::event::ListenerPtr playerInteractBlockEventListener;
-    playerInteractBlockEventListener =
+    auto& eventListeners = CoralFans::getInstance().getEventListeners();
+    eventListeners.emplace(
         ll::event::EventBus::getInstance().emplaceListener<ll::event::player::PlayerInteractBlockEvent>(
             [this](ll::event::player::PlayerInteractBlockEvent& event) {
                 if (!::antiShake(event.self(), event.blockPos())) return;
@@ -138,68 +143,62 @@ void ShortcutsManager::registerShortcutsListener() {
                 }
                 if (cancel) event.cancel();
             }
-        );
-    CoralFans::getInstance().getEventListeners().emplace(playerInteractBlockEventListener);
+        )
+    );
 
     // use
-    ll::event::ListenerPtr playerUseItemEventListener;
-    playerUseItemEventListener =
-        ll::event::EventBus::getInstance().emplaceListener<ll::event::player::PlayerUseItemEvent>(
-            [this](ll::event::player::PlayerUseItemEvent& event) {
-                bool cancel = false;
-                for (auto& use : uses) {
-                    if (utils::removeMinecraftPrefix(event.item().getTypeName()) != use.item) continue;
-                    auto mc = ll::service::getMinecraft();
-                    if (mc)
-                        for (auto& action : use.actions) {
-                            auto command =
-                                ll::string_utils::replaceAll(action, "{selfname}", event.self().getRealName());
-                            command = ll::string_utils::replaceAll(
-                                command,
-                                "{selfx}",
-                                std::to_string(event.self().getPosition().x)
-                            );
-                            command = ll::string_utils::replaceAll(
-                                command,
-                                "{selfy}",
-                                std::to_string(event.self().getPosition().y)
-                            );
-                            command = ll::string_utils::replaceAll(
-                                command,
-                                "{selfz}",
-                                std::to_string(event.self().getPosition().z)
-                            );
-                            command = ll::string_utils::replaceAll(
-                                command,
-                                "{itemname}",
-                                event.item().getCustomName().empty() ? event.item().getName()
-                                                                     : event.item().getCustomName()
-                            );
-                            command = ll::string_utils::replaceAll(
-                                command,
-                                "{itemaux}",
-                                std::to_string(event.item().getAuxValue())
-                            );
-                            CommandContext context = CommandContext(
-                                command,
-                                std::make_unique<PlayerCommandOrigin>(
-                                    event.self().getLevel(),
-                                    event.self().getOrCreateUniqueID()
-                                ),
-                                static_cast<int>(CurrentCmdVersion::Latest)
-                            );
-                            mc->mCommands->executeCommand(context, false);
-                        }
-                    cancel |= use.intercept;
-                }
-                if (cancel) event.cancel();
+    eventListeners.emplace(ll::event::EventBus::getInstance().emplaceListener<ll::event::player::PlayerUseItemEvent>(
+        [this](ll::event::player::PlayerUseItemEvent& event) {
+            bool cancel = false;
+            for (auto& use : uses) {
+                if (utils::removeMinecraftPrefix(event.item().getTypeName()) != use.item) continue;
+                auto mc = ll::service::getMinecraft();
+                if (mc)
+                    for (auto& action : use.actions) {
+                        auto command = ll::string_utils::replaceAll(action, "{selfname}", event.self().getRealName());
+                        command      = ll::string_utils::replaceAll(
+                            command,
+                            "{selfx}",
+                            std::to_string(event.self().getPosition().x)
+                        );
+                        command = ll::string_utils::replaceAll(
+                            command,
+                            "{selfy}",
+                            std::to_string(event.self().getPosition().y)
+                        );
+                        command = ll::string_utils::replaceAll(
+                            command,
+                            "{selfz}",
+                            std::to_string(event.self().getPosition().z)
+                        );
+                        command = ll::string_utils::replaceAll(
+                            command,
+                            "{itemname}",
+                            event.item().getCustomName().empty() ? event.item().getName() : event.item().getCustomName()
+                        );
+                        command = ll::string_utils::replaceAll(
+                            command,
+                            "{itemaux}",
+                            std::to_string(event.item().getAuxValue())
+                        );
+                        CommandContext context = CommandContext(
+                            command,
+                            std::make_unique<PlayerCommandOrigin>(
+                                event.self().getLevel(),
+                                event.self().getOrCreateUniqueID()
+                            ),
+                            static_cast<int>(CurrentCmdVersion::Latest)
+                        );
+                        mc->mCommands->executeCommand(context, false);
+                    }
+                cancel |= use.intercept;
             }
-        );
-    CoralFans::getInstance().getEventListeners().emplace(playerUseItemEventListener);
+            if (cancel) event.cancel();
+        }
+    ));
 
     // destroy
-    ll::event::ListenerPtr playerDestroyBlockEventListener;
-    playerInteractBlockEventListener =
+    eventListeners.emplace(
         ll::event::EventBus::getInstance().emplaceListener<ll::event::player::PlayerDestroyBlockEvent>(
             [this](ll::event::player::PlayerDestroyBlockEvent& event) {
                 bool        cancel = false;
@@ -247,8 +246,65 @@ void ShortcutsManager::registerShortcutsListener() {
                 }
                 if (cancel) event.cancel();
             }
-        );
-    CoralFans::getInstance().getEventListeners().emplace(playerDestroyBlockEventListener);
+        )
+    );
+
+#ifdef LL_PLAT_C
+    eventListeners.emplace(ll::event::EventBus::getInstance().emplaceListener<ll::event::KeyInputEvent>(
+        [this](ll::event::KeyInputEvent& event) {
+            bool cancel         = false;
+            auto clientInstance = ll::service::getClientInstance();
+            if (!clientInstance) [[unlikely]]
+                return;
+            auto localPlayer = clientInstance->getLocalPlayer();
+            if (!localPlayer) [[unlikely]]
+                return;
+            auto level = ll::service::getLevel();
+            if (!level) [[unlikely]]
+                return;
+            auto serverPlayer = ll::service::getLevel()->getPlayer(localPlayer->mName);
+            if (!serverPlayer) [[unlikely]]
+                return;
+            if (serverPlayer == localPlayer) CoralFans::getInstance().getSelf().getLogger().info("get localPlayer");
+            for (auto& keyBoard : keyBoards) {
+                if (keyBoard.keyCode != event.keyCode() || event.isDown()) continue;
+                auto mc = ll::service::getMinecraft();
+                if (mc)
+                    for (auto& action : keyBoard.actions) {
+                        auto command = ll::string_utils::replaceAll(action, "{selfname}", serverPlayer->getRealName());
+                        command      = ll::string_utils::replaceAll(
+                            command,
+                            "{selfx}",
+                            std::to_string(serverPlayer->getPosition().x)
+                        );
+                        command = ll::string_utils::replaceAll(
+                            command,
+                            "{selfy}",
+                            std::to_string(serverPlayer->getPosition().y)
+                        );
+                        command = ll::string_utils::replaceAll(
+                            command,
+                            "{selfz}",
+                            std::to_string(serverPlayer->getPosition().z)
+                        );
+                        CommandContext context = CommandContext(
+                            command,
+                            std::make_unique<PlayerCommandOrigin>(
+                                serverPlayer->getLevel(),
+                                serverPlayer->getOrCreateUniqueID()
+                            ),
+                            static_cast<int>(CurrentCmdVersion::Latest)
+                        );
+                        ll::thread::ServerThreadExecutor::getDefault().execute([&mc, &context]() {
+                            mc->mCommands->executeCommand(context, false);
+                        });
+                    }
+                cancel |= keyBoard.intercept;
+            }
+            if (cancel) event.cancel();
+        }
+    ));
+#endif
 }
 
 void ShortcutsManager::registerShortcutsCommand() {
@@ -278,9 +334,10 @@ void ShortcutsManager::registerShortcutsCommand() {
 
 void ShortcutsManager::loadData() {
     auto const& commandregistry = ll::service::getCommandRegistry();
+    auto&       shortcutConfig  = CoralFans::getInstance().getConfig().shortcut;
 
     // useons
-    for (auto& useon : CoralFans::getInstance().getConfig().shortcut.useons) {
+    for (auto& useon : shortcutConfig.useons) {
         if (!useon.enable || useon.item == "") continue;
         for (auto action : useon.actions) {
             if (!commandregistry->findCommand(action)) continue; // 如果action中有一条未注册，则不会加入到shortcuts中
@@ -289,7 +346,7 @@ void ShortcutsManager::loadData() {
     }
 
     // uses
-    for (auto& use : CoralFans::getInstance().getConfig().shortcut.uses) {
+    for (auto& use : shortcutConfig.uses) {
         if (!use.enable || use.item == "") continue;
         for (auto action : use.actions) {
             if (!commandregistry->findCommand(action)) continue; // 如果action中有一条未注册，则不会加入到shortcuts中
@@ -298,7 +355,7 @@ void ShortcutsManager::loadData() {
     }
 
     // destroys
-    for (auto& destroy : CoralFans::getInstance().getConfig().shortcut.destroys) {
+    for (auto& destroy : shortcutConfig.destroys) {
         if (!destroy.enable || destroy.item == "") continue;
         for (auto action : destroy.actions) {
             if (!commandregistry->findCommand(action)) continue; // 如果action中有一条未注册，则不会加入到shortcuts中
@@ -307,13 +364,24 @@ void ShortcutsManager::loadData() {
     }
 
     // commands
-    for (auto& command : CoralFans::getInstance().getConfig().shortcut.commands) {
+    for (auto& command : shortcutConfig.commands) {
         if (!command.enable || command.command == "") continue;
         for (auto action : command.actions) {
             if (!commandregistry->findCommand(action)) continue; // 如果action中有一条未注册，则不会加入到shortcuts中
         }
         this->commands.push_back(command);
     }
+
+#ifdef LL_PLAT_C
+    // key board
+    for (auto& command : shortcutConfig.keyBoards) {
+        if (!command.enable || command.keyCode == 0) continue;
+        for (auto action : command.actions) {
+            if (!commandregistry->findCommand(action)) continue; // 如果action中有一条未注册，则不会加入到shortcuts中
+        }
+        this->keyBoards.push_back(command);
+    }
+#endif
 }
 
 void ShortcutsManager::clear() {

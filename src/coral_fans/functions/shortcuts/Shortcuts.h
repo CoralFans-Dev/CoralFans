@@ -8,10 +8,13 @@ namespace coral_fans::functions {
 
 class ShortcutsManager {
 private:
-    std::vector<coral_fans::config::Shortcut::UseOn>   useons;
-    std::vector<coral_fans::config::Shortcut::Use>     uses;
-    std::vector<coral_fans::config::Shortcut::Destroy> destroys;
-    std::vector<coral_fans::config::Shortcut::Command> commands;
+    std::vector<config::Shortcut::UseOn>   useons;
+    std::vector<config::Shortcut::Use>     uses;
+    std::vector<config::Shortcut::Destroy> destroys;
+    std::vector<config::Shortcut::Command> commands;
+#ifdef LL_PLAT_C
+    std::vector<config::Shortcut::keyBoard> keyBoards;
+#endif
 
 private:
     ShortcutsManager() = default;

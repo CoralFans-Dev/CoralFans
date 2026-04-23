@@ -63,6 +63,17 @@ struct Shortcut {
         CommandPermissionLevel   permission  = CommandPermissionLevel::Any;
         std::vector<std::string> actions;
     };
+
+#ifdef LL_PLAT_C
+    struct keyBoard {
+        bool                     enable;
+        int                      keyCode     = 0;
+        bool                     isDown      = true;
+        std::string              description = "";
+        bool                     intercept   = false;
+        std::vector<std::string> actions;
+    };
+#endif
 };
 
 struct Locate {
@@ -75,7 +86,7 @@ struct Locate {
 };
 
 struct Config {
-    int         version    = 6;
+    int         version    = 7;
     std::string locateName = "zh_CN";
 
     CommandStruct command;
@@ -220,6 +231,11 @@ struct Config {
              .description = "rotate",
              .permission  = CommandPermissionLevel::Any,
              .actions     = {"rotate"}                                         },
+            {.enable      = true,
+             .command     = "fc",
+             .description = "freeCamera",
+             .permission  = CommandPermissionLevel::Any,
+             .actions     = {"rotate"}                                         },
             /* fastcommand */
             {.enable      = false,
              .command     = "c",
@@ -237,6 +253,29 @@ struct Config {
              .permission  = CommandPermissionLevel::GameDirectors,
              .actions     = {"gamemode adventure", "kill", "gamemode creative"}}
         };
+
+#ifdef LL_PLAT_C
+        std::vector<Shortcut::keyBoard> keyBoards = {
+            {.enable      = true,
+             .keyCode     = 'F',
+             .isDown      = true,
+             .description = "freeCamera",
+             .intercept   = false,
+             .actions     = {"freecamera"}},
+            {.enable      = true,
+             .keyCode     = 'R',
+             .isDown      = true,
+             .description = "ratate",
+             .intercept   = false,
+             .actions     = {"rotate"}    },
+            {.enable      = false,
+             .keyCode     = 'N',
+             .isDown      = true,
+             .description = "noclip",
+             .intercept   = false,
+             .actions     = {"noclip"}    }
+        };
+#endif
     } shortcut{};
 };
 

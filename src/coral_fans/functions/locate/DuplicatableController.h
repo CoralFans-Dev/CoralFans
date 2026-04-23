@@ -105,6 +105,15 @@ public:
     // 绘制入口（由子类实现具体地物绘制）
     virtual void draw(BlockSource& region, ChunkPos chunkPos, uint showType) = 0;
 
+    // 根据 ShowType 获取对应的 GeoId（由子类实现，不匹配时返回 nullptr）
+    virtual bsci::GeometryGroup::GeoId* getGeoIdByShowType(BsciChunkDataBase& data, uint showType) = 0;
+
+    // 判断某个 ShowType 是否属于该 Controller
+    virtual bool isResponsibleFor(uint showType) const = 0;
+
+    // 移除指定 BsciChunkData 的所有 GeoId（由子类实现）
+    virtual void removeAllGeoIds(BsciChunkDataBase& data) = 0;
+
     // 清理无效数据（removeData 中调用）
     void removeInvalidData(class ChunkSource& chunkSource);
 
@@ -114,17 +123,8 @@ public:
     // 按 ShowType 移除 BSCI 数据
     void removeBsciDataByType(uint showType);
 
-    // 根据 ShowType 获取对应的 GeoId（由子类实现，不匹配时返回 nullptr）
-    virtual bsci::GeometryGroup::GeoId* getGeoIdByShowType(BsciChunkDataBase& data, uint showType) = 0;
-
-    // 判断某个 ShowType 是否属于该 Controller
-    virtual bool isResponsibleFor(uint showType) const = 0;
-
     // 清除所有数据
     void clearInternal();
-
-    // 移除指定 BsciChunkData 的所有 GeoId（由子类实现）
-    virtual void removeAllGeoIds(BsciChunkDataBase& data) = 0;
 
     // 通用方法
     static bool isChunkValid(BlockSource& region, ChunkPos originChunkPos);
