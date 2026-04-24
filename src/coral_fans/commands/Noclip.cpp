@@ -35,12 +35,13 @@ void registerNoclipCommand(config::CommandConfigStruct& config) {
         if (enable) {
             player->setAbility(::AbilitiesIndex::Flying, true);
             my_schedule::MySchedule::getSchedule().add(
-                [playername = player->mName.get()](int&, int&) {
+                [playername = *player->mName](int&, int&) {
                     auto level = ll::service::getLevel();
-                    if (!level.has_value()) return false;
+                    if (!level.has_value()) [[unlikely]]
+                        return false;
                     Player* pl = nullptr;
                     level->forEachPlayer([&pl, playername](Player& player) {
-                        if (player.mName.get() == playername) pl = &player;
+                        if (*player.mName == playername) pl = &player;
                         return false;
                     });
                     if (pl) pl->setAbility(::AbilitiesIndex::NoClip, true);

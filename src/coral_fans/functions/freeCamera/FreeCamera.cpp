@@ -16,6 +16,7 @@
 #include "mc/world/level/Tick.h"
 #include <thread>
 
+
 PlayerSkinPacketPayload::PlayerSkinPacketPayload()                               = default;
 PlayerSkinPacketPayload::PlayerSkinPacketPayload(PlayerSkinPacketPayload const&) = default;
 SerializedSkinRef::SerializedSkinRef(class SerializedSkinRef const&)             = default;

@@ -259,46 +259,32 @@ void ShortcutsManager::registerShortcutsListener() {
             auto localPlayer = clientInstance->getLocalPlayer();
             if (!localPlayer) [[unlikely]]
                 return;
-            auto level = ll::service::getLevel();
-            if (!level) [[unlikely]]
-                return;
-            auto serverPlayer = ll::service::getLevel()->getPlayer(localPlayer->mName);
-            if (!serverPlayer) [[unlikely]]
-                return;
-            if (serverPlayer == localPlayer) CoralFans::getInstance().getSelf().getLogger().info("get localPlayer");
             for (auto& keyBoard : keyBoards) {
                 if (keyBoard.keyCode != event.keyCode() || event.isDown()) continue;
-                auto mc = ll::service::getMinecraft();
-                if (mc)
-                    for (auto& action : keyBoard.actions) {
-                        auto command = ll::string_utils::replaceAll(action, "{selfname}", serverPlayer->getRealName());
-                        command      = ll::string_utils::replaceAll(
-                            command,
-                            "{selfx}",
-                            std::to_string(serverPlayer->getPosition().x)
-                        );
-                        command = ll::string_utils::replaceAll(
-                            command,
-                            "{selfy}",
-                            std::to_string(serverPlayer->getPosition().y)
-                        );
-                        command = ll::string_utils::replaceAll(
-                            command,
-                            "{selfz}",
-                            std::to_string(serverPlayer->getPosition().z)
-                        );
-                        CommandContext context = CommandContext(
-                            command,
-                            std::make_unique<PlayerCommandOrigin>(
-                                serverPlayer->getLevel(),
-                                serverPlayer->getOrCreateUniqueID()
-                            ),
-                            static_cast<int>(CurrentCmdVersion::Latest)
-                        );
-                        ll::thread::ServerThreadExecutor::getDefault().execute([&mc, &context]() {
-                            mc->mCommands->executeCommand(context, false);
-                        });
-                    }
+                for (auto& action : keyBoard.actions) {
+                    ll::thread::ServerThreadExecutor::getDefault().execute([playername = *localPlayer->mName, action] {
+                        auto level = ll::service::getLevel();
+                        if (!level.has_value()) [[unlikely]]
+                            return;
+                        auto pl = ll::service::getLevel()->getPlayer(playername);
+                        if (pl) {
+                            auto command = ll::string_utils::replaceAll(action, "{selfname}", pl->getRealName());
+                            command =
+                                ll::string_utils::replaceAll(command, "{selfx}", std::to_string(pl->getPosition().x));
+                            command =
+                                ll::string_utils::replaceAll(command, "{selfy}", std::to_string(pl->getPosition().y));
+                            command =
+                                ll::string_utils::replaceAll(command, "{selfz}", std::to_string(pl->getPosition().z));
+                            CommandContext context = CommandContext(
+                                command,
+                                std::make_unique<PlayerCommandOrigin>(level, pl->getOrCreateUniqueID()),
+                                static_cast<int>(CurrentCmdVersion::Latest)
+                            );
+                            auto mc = ll::service::getMinecraft();
+                            if (mc) mc->mCommands->executeCommand(context, false);
+                        }
+                    });
+                }
                 cancel |= keyBoard.intercept;
             }
             if (cancel) event.cancel();
