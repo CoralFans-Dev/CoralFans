@@ -273,6 +273,10 @@
                     "cat": "猫",
                     "pillager": "掠夺者"
                 }
+            },
+            "fuck_piston_reset_velocity": {
+                "success": "设置 fuck_piston_reset_velocity \"{}\"",
+                "error": "设置 fuck_piston_reset_velocity 失败"
             }
         },
         "noclip": {

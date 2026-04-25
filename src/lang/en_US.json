@@ -263,6 +263,10 @@
                     "cat": "Cat",
                     "pillager": "Pillager"
                 }
+            },
+            "fuck_piston_reset_velocity": {
+                "success": "set fuck_piston_reset_velocity \"{}\"",
+                "error": "failed to set fuck_piston_reset_velocity"
             }
         },
         "noclip": {

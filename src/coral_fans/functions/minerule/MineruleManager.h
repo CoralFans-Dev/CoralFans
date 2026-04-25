@@ -12,6 +12,7 @@ void portalSandFarmHook(bool);
 void portalSpawnHook(bool);
 void restoreAncillaryBrokenHook(bool);
 void populationCapHook(bool);
+void pistonCollisionHook(bool);
 
 class RestoreAncillaryBrokenHelper {
 public:

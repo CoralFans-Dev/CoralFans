@@ -228,5 +228,23 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
         });
 
     functions::PopulationCapManager::getInstance().init();
+
+    mineruleCommand.runtimeOverload()
+        .text("fuck_piston_reset_velocity")
+        .required("isopen", ll::command::ParamKind::Bool)
+        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
+            if (CoralFans::getInstance().getConfigDb()->set(
+                    "minerule.fuck_piston_reset_velocity",
+                    isopen ? "true" : "false"
+                )) {
+                output.success("command.minerule.fuck_piston_reset_velocity.success"_tr(isopen ? "true" : "false"));
+                functions::pistonCollisionHook(isopen);
+            } else {
+                output.error("command.minerule.fuck_piston_reset_velocity.error"_tr());
+            }
+        });
+
+    functions::pistonCollisionHook(configDb->get("minerule.fuck_piston_reset_velocity") == "true");
 }
 } // namespace coral_fans::commands
