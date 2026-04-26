@@ -7,7 +7,6 @@
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/event/ListenerBase.h"
-#include "ll/api/event/input/KeyInputEvent.h"
 #include "ll/api/event/player/PlayerDestroyBlockEvent.h"
 #include "ll/api/event/player/PlayerInteractBlockEvent.h"
 #include "ll/api/event/player/PlayerUseItemEvent.h"
@@ -33,6 +32,10 @@
 #include <ll/api/event/player/PlayerJoinEvent.h>
 #include <ll/api/thread/ServerThreadExecutor.h>
 #include <memory>
+
+#ifdef LL_PLAT_C
+#include "ll/api/event/input/KeyInputEvent.h"
+#endif
 
 
 namespace {
@@ -147,55 +150,59 @@ void ShortcutsManager::registerShortcutsListener() {
     );
 
     // use
-    eventListeners.emplace(ll::event::EventBus::getInstance().emplaceListener<ll::event::player::PlayerUseItemEvent>(
-        [this](ll::event::player::PlayerUseItemEvent& event) {
-            bool cancel = false;
-            for (auto& use : uses) {
-                if (utils::removeMinecraftPrefix(event.item().getTypeName()) != use.item) continue;
-                auto mc = ll::service::getMinecraft();
-                if (mc)
-                    for (auto& action : use.actions) {
-                        auto command = ll::string_utils::replaceAll(action, "{selfname}", event.self().getRealName());
-                        command      = ll::string_utils::replaceAll(
-                            command,
-                            "{selfx}",
-                            std::to_string(event.self().getPosition().x)
-                        );
-                        command = ll::string_utils::replaceAll(
-                            command,
-                            "{selfy}",
-                            std::to_string(event.self().getPosition().y)
-                        );
-                        command = ll::string_utils::replaceAll(
-                            command,
-                            "{selfz}",
-                            std::to_string(event.self().getPosition().z)
-                        );
-                        command = ll::string_utils::replaceAll(
-                            command,
-                            "{itemname}",
-                            event.item().getCustomName().empty() ? event.item().getName() : event.item().getCustomName()
-                        );
-                        command = ll::string_utils::replaceAll(
-                            command,
-                            "{itemaux}",
-                            std::to_string(event.item().getAuxValue())
-                        );
-                        CommandContext context = CommandContext(
-                            command,
-                            std::make_unique<PlayerCommandOrigin>(
-                                event.self().getLevel(),
-                                event.self().getOrCreateUniqueID()
-                            ),
-                            static_cast<int>(CurrentCmdVersion::Latest)
-                        );
-                        mc->mCommands->executeCommand(context, false);
-                    }
-                cancel |= use.intercept;
+    eventListeners.emplace(
+        ll::event::EventBus::getInstance().emplaceListener<ll::event::player::PlayerUseItemEvent>(
+            [this](ll::event::player::PlayerUseItemEvent& event) {
+                bool cancel = false;
+                for (auto& use : uses) {
+                    if (utils::removeMinecraftPrefix(event.item().getTypeName()) != use.item) continue;
+                    auto mc = ll::service::getMinecraft();
+                    if (mc)
+                        for (auto& action : use.actions) {
+                            auto command =
+                                ll::string_utils::replaceAll(action, "{selfname}", event.self().getRealName());
+                            command = ll::string_utils::replaceAll(
+                                command,
+                                "{selfx}",
+                                std::to_string(event.self().getPosition().x)
+                            );
+                            command = ll::string_utils::replaceAll(
+                                command,
+                                "{selfy}",
+                                std::to_string(event.self().getPosition().y)
+                            );
+                            command = ll::string_utils::replaceAll(
+                                command,
+                                "{selfz}",
+                                std::to_string(event.self().getPosition().z)
+                            );
+                            command = ll::string_utils::replaceAll(
+                                command,
+                                "{itemname}",
+                                event.item().getCustomName().empty() ? event.item().getName()
+                                                                     : event.item().getCustomName()
+                            );
+                            command = ll::string_utils::replaceAll(
+                                command,
+                                "{itemaux}",
+                                std::to_string(event.item().getAuxValue())
+                            );
+                            CommandContext context = CommandContext(
+                                command,
+                                std::make_unique<PlayerCommandOrigin>(
+                                    event.self().getLevel(),
+                                    event.self().getOrCreateUniqueID()
+                                ),
+                                static_cast<int>(CurrentCmdVersion::Latest)
+                            );
+                            mc->mCommands->executeCommand(context, false);
+                        }
+                    cancel |= use.intercept;
+                }
+                if (cancel) event.cancel();
             }
-            if (cancel) event.cancel();
-        }
-    ));
+        )
+    );
 
     // destroy
     eventListeners.emplace(
@@ -250,8 +257,10 @@ void ShortcutsManager::registerShortcutsListener() {
     );
 
 #ifdef LL_PLAT_C
-    eventListeners.emplace(ll::event::EventBus::getInstance().emplaceListener<ll::event::KeyInputEvent>(
-        [this](ll::event::KeyInputEvent& event) {
+    eventListeners.emplace(
+        ll::event::EventBus::getInstance().emplaceListener<ll::event::KeyInputEvent>([this](
+                                                                                         ll::event::KeyInputEvent& event
+                                                                                     ) {
             bool cancel         = false;
             auto clientInstance = ll::service::getClientInstance();
             if (!clientInstance) [[unlikely]]
@@ -288,8 +297,8 @@ void ShortcutsManager::registerShortcutsListener() {
                 cancel |= keyBoard.intercept;
             }
             if (cancel) event.cancel();
-        }
-    ));
+        })
+    );
 #endif
 }
 

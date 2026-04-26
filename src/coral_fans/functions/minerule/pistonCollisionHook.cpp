@@ -7,19 +7,6 @@
 #include <vector>
 
 namespace coral_fans::functions {
-constexpr float epsilon = 0.00001f; // 防止浮点数误差导致的错误
-
-float myAdd(float a, float b) {
-    float absA = std::abs(a);
-    float absB = std::abs(b);
-
-    if (absA > absB + epsilon) return a;
-    if (absB > absA + epsilon) return b;
-
-    // 当绝对值在误差范围内相等时：
-    if ((a > 0 && b > 0) || (a < 0 && b < 0)) return a;
-    return 0;
-}
 
 LL_TYPE_INSTANCE_HOOK(
     collisionHook,
@@ -57,11 +44,12 @@ LL_TYPE_INSTANCE_HOOK(
         if (!entity) gsl::details::terminate();
 
         Vec3 engineVelocity = entity->getPosDelta();
+        if (engineVelocity == velocity) continue;
 
-        Vec3 finalVelocity;
-        finalVelocity.x = myAdd(velocity.x, engineVelocity.x);
-        finalVelocity.y = myAdd(velocity.y, engineVelocity.y);
-        finalVelocity.z = myAdd(velocity.z, engineVelocity.z);
+        Vec3 finalVelocity = velocity;
+        if (engineVelocity.x != 0.0f) finalVelocity.x = engineVelocity.x;
+        if (engineVelocity.y != 0.0f) finalVelocity.y = engineVelocity.y;
+        if (engineVelocity.z != 0.0f) finalVelocity.z = engineVelocity.z;
 
         entity->mBuiltInComponents->mStateVectorComponent->mPosDelta = finalVelocity;
     }
