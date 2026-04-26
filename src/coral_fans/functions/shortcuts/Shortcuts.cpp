@@ -6,6 +6,7 @@
 
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
+#include "ll/api/event/EventBus.h"
 #include "ll/api/event/ListenerBase.h"
 #include "ll/api/event/player/PlayerDestroyBlockEvent.h"
 #include "ll/api/event/player/PlayerInteractBlockEvent.h"
@@ -13,7 +14,10 @@
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/service/Bedrock.h"
 #include "ll/api/service/TargetedBedrock.h"
+#include "ll/api/thread/ServerThreadExecutor.h"
 #include "ll/api/utils/StringUtils.h"
+
+
 #include "mc/client/game/ClientInstance.h"
 #include "mc/client/player/LocalPlayer.h"
 #include "mc/deps/core/utility/MCRESULT.h"
@@ -27,10 +31,6 @@
 #include "mc/world/Minecraft.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/Level.h"
-#include <ll/api/event/EventBus.h>
-#include <ll/api/event/ListenerBase.h>
-#include <ll/api/event/player/PlayerJoinEvent.h>
-#include <ll/api/thread/ServerThreadExecutor.h>
 #include <memory>
 
 #ifdef LL_PLAT_C
@@ -265,16 +265,18 @@ void ShortcutsManager::registerShortcutsListener() {
             auto clientInstance = ll::service::getClientInstance();
             if (!clientInstance) [[unlikely]]
                 return;
+            if (clientInstance->isShowingMenu()) return;
             auto localPlayer = clientInstance->getLocalPlayer();
             if (!localPlayer) [[unlikely]]
                 return;
             for (auto& keyBoard : keyBoards) {
-                if (keyBoard.keyCode != event.keyCode() || event.isDown()) continue;
-                for (auto& action : keyBoard.actions) {
-                    ll::thread::ServerThreadExecutor::getDefault().execute([playername = *localPlayer->mName, action] {
-                        auto level = ll::service::getLevel();
-                        if (!level.has_value()) [[unlikely]]
-                            return;
+                if (keyBoard.keyCode != event.keyCode() || keyBoard.isDown != event.isDown()) continue;
+                ll::thread::ServerThreadExecutor::getDefault().execute([playername = *localPlayer->mName,
+                                                                        actions    = keyBoard.actions] {
+                    auto level = ll::service::getLevel();
+                    if (!level.has_value()) [[unlikely]]
+                        return;
+                    for (auto& action : actions) {
                         auto pl = ll::service::getLevel()->getPlayer(playername);
                         if (pl) {
                             auto command = ll::string_utils::replaceAll(action, "{selfname}", pl->getRealName());
@@ -292,8 +294,8 @@ void ShortcutsManager::registerShortcutsListener() {
                             auto mc = ll::service::getMinecraft();
                             if (mc) mc->mCommands->executeCommand(context, false);
                         }
-                    });
-                }
+                    }
+                });
                 cancel |= keyBoard.intercept;
             }
             if (cancel) event.cancel();

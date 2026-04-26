@@ -7,7 +7,7 @@
 #include "coral_fans/functions/hsa/Hsa.h"
 #include "coral_fans/functions/locate/DuplicatableManager.h"
 #include "coral_fans/functions/minerule/MineruleManager.h"
-#include "coral_fans/functions/noclip/Noclip.h"
+#include "coral_fans/functions/noclip/NoclipManager.h"
 #include "coral_fans/functions/shortcuts/Shortcuts.h"
 #include "coral_fans/functions/slime/Slime.h"
 #include "coral_fans/functions/village/Village.h"
@@ -90,7 +90,7 @@ void CoralFans::setupCommands() {
 //     functions::portalSpawnHook(false);
 //     functions::restoreAncillaryBrokenHook(false);
 //     functions::populationCapHook(false);
-//     functions::noclipHook(false);
+//     functions::NoclipManager::getInstance().hook(false);
 //     functions::hookTick(false);
 //     functions::CFVillageManager::hookVillage(false);
 // }

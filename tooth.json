@@ -25,7 +25,7 @@
                 {
                     "type": "zip",
                     "urls": [
-                        "https://github.com/CoralFans-Dev/CoralFans/releases/download/v$(version)/CoralFans-server-windows-x64.zip"
+                        "https://github.com/CoralFans-Dev/CoralFans/releases/download/v${{version}}/CoralFans-server-windows-x64.zip"
                     ],
                     "placements": [
                         {
@@ -60,7 +60,7 @@
                 {
                     "type": "zip",
                     "urls": [
-                        "https://github.com/CoralFans-Dev/CoralFans/releases/download/v$(version)/CoralFans-client-windows-x64.zip"
+                        "https://github.com/CoralFans-Dev/CoralFans/releases/download/v${{version}}/CoralFans-client-windows-x64.zip"
                     ],
                     "placements": [
                         {

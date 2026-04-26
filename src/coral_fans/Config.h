@@ -67,10 +67,9 @@ struct Shortcut {
 #ifdef LL_PLAT_C
     struct keyBoard {
         bool                     enable;
-        int                      keyCode     = 0;
-        bool                     isDown      = true;
-        std::string              description = "";
-        bool                     intercept   = false;
+        int                      keyCode   = 0;
+        bool                     isDown    = true;
+        bool                     intercept = false;
         std::vector<std::string> actions;
     };
 #endif
@@ -256,24 +255,9 @@ struct Config {
 
 #ifdef LL_PLAT_C
         std::vector<Shortcut::keyBoard> keyBoards = {
-            {.enable      = true,
-             .keyCode     = 'F',
-             .isDown      = true,
-             .description = "freeCamera",
-             .intercept   = false,
-             .actions     = {"freecamera"}},
-            {.enable      = true,
-             .keyCode     = 'R',
-             .isDown      = true,
-             .description = "ratate",
-             .intercept   = false,
-             .actions     = {"rotate"}    },
-            {.enable      = false,
-             .keyCode     = 'N',
-             .isDown      = true,
-             .description = "noclip",
-             .intercept   = false,
-             .actions     = {"noclip"}    }
+            {.enable = true,  .keyCode = 'F', .isDown = false, .intercept = false, .actions = {"freecamera"}},
+            {.enable = true,  .keyCode = 'R', .isDown = true,  .intercept = false, .actions = {"rotate"}    },
+            {.enable = false, .keyCode = 'N', .isDown = false, .intercept = false, .actions = {"noclip"}    }
         };
 #endif
     } shortcut{};
