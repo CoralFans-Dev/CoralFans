@@ -32,7 +32,9 @@ namespace coral_fans::functions {
 // main game tick
 LL_TYPE_INSTANCE_HOOK(CoralFansTickLevelTickHook, ll::memory::HookPriority::Normal, Level, &Level::$tick, void) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin();
 #endif
     auto& prof = functions::Profiler::getInstance();
@@ -70,7 +72,9 @@ LL_TYPE_INSTANCE_HOOK(
     ::std::function<void()> spawnerCallback
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(tickRegion, tick, spawnerCallback);
 #endif
     auto&      prof     = functions::Profiler::getInstance();
@@ -93,7 +97,9 @@ LL_TYPE_INSTANCE_HOOK(
     BlockSource& region
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(region);
 #endif
     auto& prof = functions::Profiler::getInstance();
@@ -113,7 +119,9 @@ LL_TYPE_INSTANCE_HOOK(
     BlockSource& tickRegion
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(tickRegion);
 #endif
     auto& prof = functions::Profiler::getInstance();
@@ -136,7 +144,9 @@ LL_TYPE_INSTANCE_HOOK(
     bool         instaTick_
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(region, until, max, instaTick_);
 #endif
     max        = coral_fans::functions::MaxPtManager::getInstance().maxpt;
@@ -170,7 +180,9 @@ LL_TYPE_INSTANCE_HOOK(
     void
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin();
 #endif
     auto& prof = functions::Profiler::getInstance();
@@ -189,7 +201,9 @@ LL_TYPE_INSTANCE_HOOK(
     void
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin();
 #endif
     auto& prof = functions::Profiler::getInstance();
@@ -211,7 +225,9 @@ LL_TYPE_INSTANCE_HOOK(
     void
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin();
 #endif
     auto& prof = functions::Profiler::getInstance();
@@ -231,7 +247,9 @@ LL_TYPE_INSTANCE_HOOK(
     void
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin();
 #endif
     auto& prof = functions::Profiler::getInstance();
@@ -252,7 +270,9 @@ LL_TYPE_INSTANCE_HOOK(
     BlockSource* region
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(region);
 #endif
     auto& prof = functions::Profiler::getInstance();
@@ -273,7 +293,9 @@ LL_TYPE_INSTANCE_HOOK(
     BlockPos const& pos
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(pos);
 #endif
     auto& prof = functions::Profiler::getInstance();
@@ -295,7 +317,9 @@ LL_TYPE_INSTANCE_HOOK(
     BlockSource& region
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(region);
 #endif
     auto& prof = functions::Profiler::getInstance();

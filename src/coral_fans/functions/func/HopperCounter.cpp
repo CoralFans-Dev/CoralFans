@@ -120,7 +120,9 @@ LL_TYPE_INSTANCE_HOOK(
     bool           canPushItems
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(region, fromContainer, pos, attachedFace, canPushItems);
 #endif
     HopperCounterManager::getInstance().region = &region;
@@ -141,7 +143,9 @@ LL_TYPE_INSTANCE_HOOK(
     ::ItemStack const& item
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(slot, item);
 #endif
     if (!HopperCounterManager::getInstance().mutex) {

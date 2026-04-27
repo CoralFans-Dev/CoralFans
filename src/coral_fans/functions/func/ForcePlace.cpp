@@ -22,7 +22,9 @@ LL_TYPE_INSTANCE_HOOK(
     Vec3 clickPos
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(block, pos, face, placer, true, clickPos);
 #endif
     return origin(block, pos, face, placer, true, clickPos);
@@ -42,7 +44,9 @@ LL_TYPE_INSTANCE_HOOK(
     Vec3            clickPos
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(block, pos, face, placer, val, clickPos);
 #endif
     return true;

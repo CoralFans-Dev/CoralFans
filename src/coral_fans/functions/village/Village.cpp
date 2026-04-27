@@ -514,7 +514,9 @@ LL_TYPE_INSTANCE_HOOK(
     ::BlockPos const& _origin
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(dimension, id, _origin);
 #endif
     auto ori = origin(dimension, id, _origin);
@@ -532,7 +534,9 @@ LL_TYPE_INSTANCE_HOOK(
     BlockSource& region
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(tick, region);
 #endif
     CFVillageManager::getInstance().handleVillageTick(this, tick);
@@ -548,7 +552,9 @@ LL_TYPE_INSTANCE_HOOK(
     ::Village& village
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(village);
 #endif
     CFVillageManager::getInstance().removeVillage(&village);

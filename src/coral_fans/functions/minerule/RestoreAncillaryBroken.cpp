@@ -21,7 +21,9 @@ LL_TYPE_INSTANCE_HOOK(
     ::BlockSource& region
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(region);
 #endif
     auto& helper            = RestoreAncillaryBrokenHelper::getInstance();
@@ -47,7 +49,9 @@ LL_TYPE_INSTANCE_HOOK(
     ::ResourceDropsContext const& resourceDropsContext
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(region, pos, block, random, resourceDropsContext);
 #endif
     auto& helper = RestoreAncillaryBrokenHelper::getInstance();
@@ -73,7 +77,9 @@ LL_TYPE_INSTANCE_HOOK(
     const ::BlockChangeContext& blockChangeContext
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(region, pos, dropResources, blockChangeContext);
 #endif
     auto& helper = RestoreAncillaryBrokenHelper::getInstance();

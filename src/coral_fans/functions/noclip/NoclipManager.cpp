@@ -15,6 +15,11 @@
 #include "mc/world/level/Level.h"
 #include <thread>
 
+
+#include "mc/server/ServerInstance.h"
+#include "mc/world/Minecraft.h"
+
+
 namespace coral_fans::functions {
 
 LL_TYPE_INSTANCE_HOOK(
@@ -26,7 +31,9 @@ LL_TYPE_INSTANCE_HOOK(
     ::GameType gameType
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(gameType);
 #endif
     origin(gameType);
@@ -37,9 +44,24 @@ LL_TYPE_INSTANCE_HOOK(
     }
 }
 
+LL_TYPE_INSTANCE_HOOK(Test, ll::memory::HookPriority::Normal, Minecraft, &Minecraft::update, bool) {
+#ifdef LL_PLAT_C
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin();
+
+#endif
+    auto ori = origin();
+    if (ori) CoralFans::getInstance().getSelf().getLogger().info("server minecraft::update end {}", ori);
+    return ori;
+}
+
+
 void NoclipManager::hook(bool enable) {
     if (enable) {
         CoralFansNoClipHook::hook();
+        Test::hook();
     } else {
         CoralFansNoClipHook::unhook();
     }

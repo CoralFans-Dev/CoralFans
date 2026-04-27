@@ -33,7 +33,9 @@ LL_TYPE_INSTANCE_HOOK(
     ::ResourceDropsContext const& resourceDropsContext
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(block, random, std::forward<ResourceDropsContext const&>(resourceDropsContext));
 #endif
     if (block.getTypeName() == "minecraft:bedrock") {
@@ -60,7 +62,9 @@ LL_TYPE_STATIC_HOOK(
     ::std::vector<::std::pair<::ItemStack, ::BlockPos>>& itemStacks
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(region, blockPos, block, random, resourceDropsContext, itemStacks);
 #endif
     if (block.getTypeName() == "minecraft:moving_block") {
@@ -86,7 +90,9 @@ LL_TYPE_INSTANCE_HOOK(
     ::ResourceDropsContext const& resourceDropsContext
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(region, pos, block, random, resourceDropsContext);
 #endif
     if (block.getTypeName() == "minecraft:moving_block") {

@@ -60,7 +60,9 @@ LL_TYPE_INSTANCE_HOOK(
     bool            isFirstEvent
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(item, blockPos, face, clickPos, block, isFirstEvent);
 #endif
     auto& containerOpenManager  = ContainerOpenManager::getInstance();
@@ -79,7 +81,9 @@ LL_TYPE_INSTANCE_HOOK(
     BlockSource& region
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(region);
 #endif
     auto& containerOpenManager = ContainerOpenManager::getInstance();

@@ -138,7 +138,9 @@ LL_TYPE_INSTANCE_HOOK(
     PlayerAuthInputPacket const& pkt
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(id, pkt);
 #endif
     if (!FreeCameraManager::getInstance().FreeCamList.contains(id.mGuid.g)) {
@@ -155,7 +157,9 @@ LL_TYPE_INSTANCE_HOOK(
     ::GameType gamemode
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(gamemode);
 #endif
     origin(gamemode);

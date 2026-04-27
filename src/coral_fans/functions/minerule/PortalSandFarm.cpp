@@ -20,7 +20,9 @@ LL_TYPE_INSTANCE_HOOK(
     bool          keepVelocity
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(pos, shouldStopRiding, cause, sourceEntityType, keepVelocity);
 #endif
     this->mState = State::Falling;

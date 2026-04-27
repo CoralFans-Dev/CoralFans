@@ -139,7 +139,9 @@ LL_TYPE_INSTANCE_HOOK(
     int                    inSpawnCount
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(mobType, conditions, inSpawnCount);
 #endif
     auto& popCapManager = PopulationCapManager::getInstance();
@@ -182,7 +184,9 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     const br::worldgen::StructureSetRegistry& structureSetRegistry
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(structureSetRegistry);
 #endif
     origin(structureSetRegistry);

@@ -22,7 +22,9 @@ LL_TYPE_INSTANCE_HOOK(
     int count
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(slot, count);
 #endif
     if (FuncDropNoCostManager::getInstance().mutex) {
@@ -42,7 +44,9 @@ LL_TYPE_INSTANCE_HOOK(
     ::ItemStack const& item
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(item);
 #endif
     FuncDropNoCostManager::getInstance().mutex = true;
@@ -63,7 +67,9 @@ LL_TYPE_INSTANCE_HOOK(
     uchar          face
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(region, container, slot, pos, face);
 #endif
     FuncDropNoCostManager::getInstance().mutex2 = false;
@@ -80,7 +86,9 @@ LL_TYPE_INSTANCE_HOOK(
     ::ItemStack const& item
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(slot, item);
 #endif
     if (FuncDropNoCostManager::getInstance().mutex2) origin(slot, item);
