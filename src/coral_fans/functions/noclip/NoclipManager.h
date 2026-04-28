@@ -23,6 +23,7 @@ public:
     }
 
     void hook(bool enable);
+    void clear();
 
     void enableNoclip(Player* player);
     void disableNoclip(Player* player);
