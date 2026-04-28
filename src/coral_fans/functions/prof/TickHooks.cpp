@@ -1,4 +1,3 @@
-#include "coral_fans/CoralFans.h"
 #include "coral_fans/base/Macros.h"
 #include "coral_fans/base/MySchedule.h"
 #include "coral_fans/base/Utils.h"
@@ -14,7 +13,6 @@
 #include "ll/api/memory/Hook.h"
 #include "ll/api/service/Bedrock.h"
 #include "mc/profile/ProfilerLite.h"
-#include "mc/server/ServerInstance.h"
 #include "mc/world/actor/Actor.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/BlockTickingQueue.h"
@@ -24,7 +22,12 @@
 #include "mc/world/level/chunk/LevelChunk.h"
 #include "mc/world/level/dimension/Dimension.h"
 #include "mc/world/redstone/circuit/CircuitSceneGraph.h"
+
+
+#ifdef LL_PLAT_C
+#include "mc/server/ServerInstance.h"
 #include <thread>
+#endif
 
 
 namespace coral_fans::functions {
@@ -149,7 +152,6 @@ LL_TYPE_INSTANCE_HOOK(
         || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(region, until, max, instaTick_);
 #endif
-    max        = coral_fans::functions::MaxPtManager::getInstance().maxpt;
     auto& prof = functions::Profiler::getInstance();
     if (prof.profiling) {
         bool res;
@@ -335,14 +337,12 @@ LL_TYPE_INSTANCE_HOOK(
     } else return origin(region);
 }
 
-void hookTick(bool hook) {
+void hookTick(bool hook, bool disable) {
+    if (!disable) CoralFansTickLevelTickHook::hook();
     if (hook) {
-        CoralFansTickLevelTickHook::hook();
         CoralFansTickLevelChunkTickHook::hook();
         CoralFansTickLevelChunkTickBlocksHook::hook();
         CoralFansTickLevelChunkTickBlockEntitiesHook::hook();
-        coral_fans::functions::MaxPtManager::getInstance().maxpt =
-            std::stoi(CoralFans::getInstance().getConfigDb()->get("functions.global.maxpt").value_or("100"));
         CoralFansTickBlockTickingQueueTickPendingTicksHook::hook();
         CoralFansTickDimensionTickHook::hook();
         CoralFansTickEntitySystemsTickHook::hook();
@@ -352,7 +352,6 @@ void hookTick(bool hook) {
         CoralFansTickCircuitSceneGraphRemoveComponentHook::hook();
         CoralFansTickActorTickHook::hook();
     } else {
-        CoralFansTickLevelTickHook::unhook();
         CoralFansTickLevelChunkTickHook::unhook();
         CoralFansTickLevelChunkTickBlocksHook::unhook();
         CoralFansTickLevelChunkTickBlockEntitiesHook::unhook();

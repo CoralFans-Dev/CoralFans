@@ -3,9 +3,7 @@
 
 
 #include "ll/api/memory/Hook.h"
-#include "ll/api/service/Bedrock.h"
 #include "mc/network/ServerPlayerBlockUseHandler.h"
-#include "mc/server/ServerInstance.h"
 #include "mc/server/ServerPlayer.h"
 #include "mc/world/Container.h"
 #include "mc/world/actor/ActorHurtResult.h"
@@ -18,9 +16,15 @@
 #include "mc/world/level/BlockSource.h"
 
 
+#ifdef LL_PLAT_C
+#include "ll/api/service/Bedrock.h"
+#include "mc/server/ServerInstance.h"
+#include <thread>
+#endif
+
+
 #include <format>
 #include <string>
-#include <thread>
 
 namespace {
 
@@ -76,7 +80,9 @@ LL_STATIC_HOOK(
     int             face
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(player, pos, face);
 #endif
     if (CoralFans::getInstance().getConfigDb()->get(
@@ -111,7 +117,9 @@ LL_TYPE_INSTANCE_HOOK(
     ::SharedTypes::Legacy::ActorDamageCause const& cause
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(actor, cause);
 #endif
     if (CoralFans::getInstance().getConfigDb()->get(

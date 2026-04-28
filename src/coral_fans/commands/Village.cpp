@@ -20,138 +20,140 @@
 namespace coral_fans::commands {
 
 void registerVillageCommand(config::CommandConfigStruct& config) {
-    using ll::i18n_literals::operator""_tr;
+    if (config.enabled) {
+        using ll::i18n_literals::operator""_tr;
 
-    // reg cmd
-    auto& villageCommand = ll::command::CommandRegistrar::getInstance(false).getOrCreateCommand(
-        config.command,
-        "command.village.description"_tr(),
-        config.permission
-    );
+        // reg cmd
+        auto& villageCommand = ll::command::CommandRegistrar::getInstance(false).getOrCreateCommand(
+            config.command,
+            "command.village.description"_tr(),
+            config.permission
+        );
 
-    // village show <bounds|raid|spawn|center|poi|bind> <bool>
-    ll::command::CommandRegistrar::getInstance(false).tryRegisterRuntimeEnum(
-        "villageShowType",
-        {
-            {"bounds", 0},
-            {"raid",   1},
-            {"spawn",  2},
-            {"center", 3},
-            {"poi",    4},
-            {"bind",   5}
-    }
-    );
-    villageCommand.runtimeOverload()
-        .text("show")
-        .required("type", ll::command::ParamKind::Enum, "villageShowType")
-        .optional("enable", ll::command::ParamKind::Bool)
-        .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
-            auto& villageManager = functions::CFVillageManager::getInstance();
-            bool  isopen         = false;
-            switch (self["type"].get<ll::command::ParamKind::Enum>().index) {
-            case 0:
-                if (self["enable"].has_value())
-                    villageManager.setShowBounds(self["enable"].get<ll::command::ParamKind::Bool>());
-                else villageManager.setShowBounds(!villageManager.getShowBounds());
-                isopen = villageManager.getShowBounds();
-                break;
-            case 1:
-                if (self["enable"].has_value())
-                    villageManager.setShowRaidBounds(self["enable"].get<ll::command::ParamKind::Bool>());
-                else villageManager.setShowRaidBounds(!villageManager.getShowRaidBounds());
-                isopen = villageManager.getShowRaidBounds();
-                break;
-            case 2:
-                if (self["enable"].has_value())
-                    villageManager.setShowIronSpawn(self["enable"].get<ll::command::ParamKind::Bool>());
-                else villageManager.setShowIronSpawn(!villageManager.getShowIronSpawn());
-                isopen = villageManager.getShowIronSpawn();
-                break;
-            case 3:
-                if (self["enable"].has_value())
-                    villageManager.setShowCenter(self["enable"].get<ll::command::ParamKind::Bool>());
-                else villageManager.setShowCenter(!villageManager.getShowCenter());
-                isopen = villageManager.getShowCenter();
-                break;
-            case 4:
-                if (self["enable"].has_value())
-                    villageManager.setShowPoiQuery(self["enable"].get<ll::command::ParamKind::Bool>());
-                else villageManager.setShowPoiQuery(!villageManager.getShowPoiQuery());
-                isopen = villageManager.getShowPoiQuery();
-                break;
-            case 5:
-                if (self["enable"].has_value())
-                    villageManager.setShowBind(self["enable"].get<ll::command::ParamKind::Bool>());
-                else villageManager.setShowBind(!villageManager.getShowBind());
-                isopen = villageManager.getShowBind();
-                break;
-            }
-            output.success("command.village.show.output"_tr(
-                self["type"].get<ll::command::ParamKind::Enum>().name,
-                isopen ? "true" : "false"
-            ));
-        });
-
-    // village list
-    villageCommand.overload().text("list").execute([](CommandOrigin const& origin, CommandOutput& output) {
-        auto  entity         = origin.getEntity();
-        auto& villageManager = functions::CFVillageManager::getInstance();
-        if (entity == nullptr || !entity->isType(ActorType::Player)) {
-            for (auto& str : villageManager.listVillages()) {
-                output.success(str);
-            }
+        // village show <bounds|raid|spawn|center|poi|bind> <bool>
+        ll::command::CommandRegistrar::getInstance(false).tryRegisterRuntimeEnum(
+            "villageShowType",
+            {
+                {"bounds", 0},
+                {"raid",   1},
+                {"spawn",  2},
+                {"center", 3},
+                {"poi",    4},
+                {"bind",   5}
         }
-        auto* player = static_cast<Player*>(entity);
-        for (auto& str : villageManager.listVillages()) {
-            TextPacket::createRawMessage(str).sendTo(*player);
-        }
-    });
-
-    // village tickinglist
-    villageCommand.overload().text("tickinglist").execute([](CommandOrigin const& origin, CommandOutput& output) {
-        auto res    = functions::CFVillageManager::getInstance().listTickingVillages();
-        auto entity = origin.getEntity();
-        if (entity == nullptr || !entity->isType(ActorType::Player)) {
-            output.success(res);
-        }
-        TextPacket::createRawMessage(res).sendTo(*static_cast<Player*>(entity));
-    });
-
-
-    // village info <id: int>
-    villageCommand.runtimeOverload()
-        .text("info")
-        .required("id", ll::command::ParamKind::Int)
-        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
-            auto rst =
-                functions::CFVillageManager::getInstance().getVillageInfo(self["id"].get<ll::command::ParamKind::Int>()
-                );
-            if (rst.second) {
-                auto entity = origin.getEntity();
-                if (entity == nullptr || !entity->isType(ActorType::Player)) {
-                    output.success(rst.first);
+        );
+        villageCommand.runtimeOverload()
+            .text("show")
+            .required("type", ll::command::ParamKind::Enum, "villageShowType")
+            .optional("enable", ll::command::ParamKind::Bool)
+            .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                auto& villageManager = functions::CFVillageManager::getInstance();
+                bool  isopen         = false;
+                switch (self["type"].get<ll::command::ParamKind::Enum>().index) {
+                case 0:
+                    if (self["enable"].has_value())
+                        villageManager.setShowBounds(self["enable"].get<ll::command::ParamKind::Bool>());
+                    else villageManager.setShowBounds(!villageManager.getShowBounds());
+                    isopen = villageManager.getShowBounds();
+                    break;
+                case 1:
+                    if (self["enable"].has_value())
+                        villageManager.setShowRaidBounds(self["enable"].get<ll::command::ParamKind::Bool>());
+                    else villageManager.setShowRaidBounds(!villageManager.getShowRaidBounds());
+                    isopen = villageManager.getShowRaidBounds();
+                    break;
+                case 2:
+                    if (self["enable"].has_value())
+                        villageManager.setShowIronSpawn(self["enable"].get<ll::command::ParamKind::Bool>());
+                    else villageManager.setShowIronSpawn(!villageManager.getShowIronSpawn());
+                    isopen = villageManager.getShowIronSpawn();
+                    break;
+                case 3:
+                    if (self["enable"].has_value())
+                        villageManager.setShowCenter(self["enable"].get<ll::command::ParamKind::Bool>());
+                    else villageManager.setShowCenter(!villageManager.getShowCenter());
+                    isopen = villageManager.getShowCenter();
+                    break;
+                case 4:
+                    if (self["enable"].has_value())
+                        villageManager.setShowPoiQuery(self["enable"].get<ll::command::ParamKind::Bool>());
+                    else villageManager.setShowPoiQuery(!villageManager.getShowPoiQuery());
+                    isopen = villageManager.getShowPoiQuery();
+                    break;
+                case 5:
+                    if (self["enable"].has_value())
+                        villageManager.setShowBind(self["enable"].get<ll::command::ParamKind::Bool>());
+                    else villageManager.setShowBind(!villageManager.getShowBind());
+                    isopen = villageManager.getShowBind();
+                    break;
                 }
-                TextPacket::createRawMessage(rst.first).sendTo(*static_cast<Player*>(entity));
-            } else return output.error(rst.first);
+                output.success("command.village.show.output"_tr(
+                    self["type"].get<ll::command::ParamKind::Enum>().name,
+                    isopen ? "true" : "false"
+                ));
+            });
+
+        // village list
+        villageCommand.overload().text("list").execute([](CommandOrigin const& origin, CommandOutput& output) {
+            auto  entity         = origin.getEntity();
+            auto& villageManager = functions::CFVillageManager::getInstance();
+            if (entity == nullptr || !entity->isType(ActorType::Player)) {
+                for (auto& str : villageManager.listVillages()) {
+                    output.success(str);
+                }
+            }
+            auto* player = static_cast<Player*>(entity);
+            for (auto& str : villageManager.listVillages()) {
+                TextPacket::createRawMessage(str).sendTo(*player);
+            }
         });
 
-    // village dweller
-    villageCommand.overload().text("dweller").execute([](CommandOrigin const& origin, CommandOutput& output) {
-        COMMAND_CHECK_PLAYER
-        auto hitrst = player->traceRay(5.25f, true, false);
-        if (!hitrst) return output.error("command.village.dweller.noactor"_tr());
-        auto* actor = hitrst.getEntity();
-        if (!actor) return output.error("command.village.dweller.noactor"_tr());
-        else {
-            auto rst = functions::CFVillageManager::getInstance().getVillagerInfo(actor->getOrCreateUniqueID());
-            if (rst.second) {
-                // return output.success(rst.first);
-                TextPacket::createRawMessage(rst.first).sendTo(*player);
-            } else return output.error(rst.first);
-        }
-    });
+        // village tickinglist
+        villageCommand.overload().text("tickinglist").execute([](CommandOrigin const& origin, CommandOutput& output) {
+            auto res    = functions::CFVillageManager::getInstance().listTickingVillages();
+            auto entity = origin.getEntity();
+            if (entity == nullptr || !entity->isType(ActorType::Player)) {
+                output.success(res);
+            }
+            TextPacket::createRawMessage(res).sendTo(*static_cast<Player*>(entity));
+        });
 
-    coral_fans::functions::CFVillageManager::hookVillage(true);
+
+        // village info <id: int>
+        villageCommand.runtimeOverload()
+            .text("info")
+            .required("id", ll::command::ParamKind::Int)
+            .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                auto rst = functions::CFVillageManager::getInstance().getVillageInfo(
+                    self["id"].get<ll::command::ParamKind::Int>()
+                );
+                if (rst.second) {
+                    auto entity = origin.getEntity();
+                    if (entity == nullptr || !entity->isType(ActorType::Player)) {
+                        output.success(rst.first);
+                    }
+                    TextPacket::createRawMessage(rst.first).sendTo(*static_cast<Player*>(entity));
+                } else return output.error(rst.first);
+            });
+
+        // village dweller
+        villageCommand.overload().text("dweller").execute([](CommandOrigin const& origin, CommandOutput& output) {
+            COMMAND_CHECK_PLAYER
+            auto hitrst = player->traceRay(5.25f, true, false);
+            if (!hitrst) return output.error("command.village.dweller.noactor"_tr());
+            auto* actor = hitrst.getEntity();
+            if (!actor) return output.error("command.village.dweller.noactor"_tr());
+            else {
+                auto rst = functions::CFVillageManager::getInstance().getVillagerInfo(actor->getOrCreateUniqueID());
+                if (rst.second) {
+                    // return output.success(rst.first);
+                    TextPacket::createRawMessage(rst.first).sendTo(*player);
+                } else return output.error(rst.first);
+            }
+        });
+    }
+
+    coral_fans::functions::CFVillageManager::hookVillage(config.enabled);
 }
 
 } // namespace coral_fans::commands

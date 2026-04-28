@@ -4,8 +4,6 @@
 
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/memory/Hook.h"
-#include "ll/api/service/Bedrock.h"
-#include "mc/server/ServerInstance.h"
 #include "mc/server/ServerPlayer.h"
 #include "mc/world/Container.h"
 #include "mc/world/actor/player/Player.h"
@@ -16,7 +14,13 @@
 #include "mc/world/level/block/Block.h"
 #include "mc/world/level/block/actor/ChestBlockActor.h"
 #include "mc/world/level/dimension/Dimension.h"
+
+
+#ifdef LL_PLAT_C
+#include "ll/api/service/Bedrock.h"
+#include "mc/server/ServerInstance.h"
 #include <thread>
+#endif
 
 
 #include <string>
@@ -97,14 +101,19 @@ LL_TYPE_INSTANCE_HOOK(
     return res;
 }
 
-void ContainerOpenManager::hook() {
-    auto& configDb = CoralFans::getInstance().getConfigDb();
-    if (configDb->get("functions.global.containerreader") == "true") {
-        PlayerInteractBlockHook::hook();
-        CoralFansForceOpenHook::hook();
-    } else if (configDb->get("functions.global.forceopen") == "true") {
-        CoralFansForceOpenHook::hook();
-        PlayerInteractBlockHook::unhook();
+void ContainerOpenManager::hook(bool enabled) {
+    if (enabled) {
+        auto& configDb = CoralFans::getInstance().getConfigDb();
+        if (configDb->get("functions.global.containerreader") == "true") {
+            PlayerInteractBlockHook::hook();
+            CoralFansForceOpenHook::hook();
+        } else if (configDb->get("functions.global.forceopen") == "true") {
+            CoralFansForceOpenHook::hook();
+            PlayerInteractBlockHook::unhook();
+        } else {
+            PlayerInteractBlockHook::unhook();
+            CoralFansForceOpenHook::unhook();
+        }
     } else {
         PlayerInteractBlockHook::unhook();
         CoralFansForceOpenHook::unhook();

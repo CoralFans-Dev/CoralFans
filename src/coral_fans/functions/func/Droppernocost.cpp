@@ -1,12 +1,16 @@
 #include "FuncManager.h"
 #include "ll/api/memory/Hook.h"
-#include "ll/api/service/Bedrock.h"
-#include "mc/server/ServerInstance.h"
 #include "mc/world/Container.h"
 #include "mc/world/item/FertilizerItem.h"
 #include "mc/world/item/ItemStack.h"
 #include "mc/world/level/block/actor/DispenserBlockActor.h"
+
+
+#ifdef LL_PLAT_C
+#include "ll/api/service/Bedrock.h"
+#include "mc/server/ServerInstance.h"
 #include <thread>
+#endif
 
 
 namespace coral_fans::functions {

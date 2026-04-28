@@ -121,5 +121,5 @@ public:
     }
 };
 
-void hookTick(bool);
+void hookTick(bool, bool = false);
 } // namespace coral_fans::functions

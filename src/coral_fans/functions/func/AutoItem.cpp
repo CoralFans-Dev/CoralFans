@@ -2,12 +2,10 @@
 
 
 #include "ll/api/memory/Hook.h"
-#include "ll/api/service/Bedrock.h"
 #include "mc/deps/nbt/ByteTag.h"
 #include "mc/deps/nbt/CompoundTag.h"
 #include "mc/deps/nbt/CompoundTagVariant.h"
 #include "mc/deps/nbt/IntTag.h"
-#include "mc/server/ServerInstance.h"
 #include "mc/server/ServerPlayer.h"
 #include "mc/world/Container.h"
 #include "mc/world/actor/Mob.h"
@@ -21,8 +19,15 @@
 #include "mc/world/level/block/Block.h"
 #include <optional>
 #include <string>
-#include <thread>
 #include <vector>
+
+
+#ifdef LL_PLAT_C
+#include "ll/api/service/Bedrock.h"
+#include "mc/server/ServerInstance.h"
+#include <thread>
+
+#endif
 
 
 namespace coral_fans::functions {
@@ -188,7 +193,9 @@ LL_TYPE_INSTANCE_HOOK(
     bool             consumeItem
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(item, itemUseMethod, consumeItem);
 #endif
     if ((CoralFans::getInstance().getConfigDb()->get(
@@ -231,7 +238,9 @@ LL_TYPE_INSTANCE_HOOK(
     bool              withData
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(position, withData);
 #endif
     if ((CoralFans::getInstance().getConfigDb()->get(

@@ -11,12 +11,15 @@
 #include "mc/world/level/block/Block.h"
 #include "mc/world/level/block/actor/HopperBlockActor.h"
 
-#include <format>
-#include <string>
-#include <thread>
 
+#ifdef LL_PLAT_C
 #include "ll/api/service/Bedrock.h"
 #include "mc/server/ServerInstance.h"
+#include <thread>
+#endif
+
+#include <format>
+#include <string>
 
 namespace coral_fans::functions {
 

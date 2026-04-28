@@ -17,6 +17,7 @@
 
 namespace coral_fans::commands {
 void registerHsaCommand(config::CommandConfigStruct& config) {
+    if (!config.enabled) return;
     using ll::i18n_literals::operator""_tr;
 
     // reg cmd

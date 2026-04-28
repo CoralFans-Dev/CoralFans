@@ -13,23 +13,24 @@
 
 namespace coral_fans::commands {
 void registerFreeCameraCommand(config::CommandConfigStruct& config) {
-    using ll::i18n_literals::operator""_tr;
+    if (config.enabled) {
+        using ll::i18n_literals::operator""_tr;
 
-    auto& cmd = ll::command::CommandRegistrar::getInstance(false)
-                    .getOrCreateCommand(config.command, "command.freecamera.description"_tr(), config.permission);
-    cmd.overload().execute([&](CommandOrigin const& origin, CommandOutput& output) {
-        COMMAND_CHECK_PLAYER
-        auto guid = player->getNetworkIdentifier().mGuid.g;
-        if (!coral_fans::functions::FreeCameraManager::getInstance().FreeCamList.count(guid)) {
-            coral_fans::functions::FreeCameraManager::EnableFreeCamera(player);
-            return output.success("command.freecamera.enabled"_tr());
-        } else {
-            coral_fans::functions::FreeCameraManager::DisableFreeCamera(player);
-            return output.success("command.freecamera.disabled"_tr());
-        }
-        return;
-    });
-
-    coral_fans::functions::FreeCameraManager::freecameraHook(true);
+        auto& cmd = ll::command::CommandRegistrar::getInstance(false)
+                        .getOrCreateCommand(config.command, "command.freecamera.description"_tr(), config.permission);
+        cmd.overload().execute([&](CommandOrigin const& origin, CommandOutput& output) {
+            COMMAND_CHECK_PLAYER
+            auto guid = player->getNetworkIdentifier().mGuid.g;
+            if (!coral_fans::functions::FreeCameraManager::getInstance().FreeCamList.count(guid)) {
+                coral_fans::functions::FreeCameraManager::EnableFreeCamera(player);
+                return output.success("command.freecamera.enabled"_tr());
+            } else {
+                coral_fans::functions::FreeCameraManager::DisableFreeCamera(player);
+                return output.success("command.freecamera.disabled"_tr());
+            }
+            return;
+        });
+    }
+    coral_fans::functions::FreeCameraManager::freecameraHook(config.enabled);
 }
 } // namespace coral_fans::commands

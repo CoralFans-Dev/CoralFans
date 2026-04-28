@@ -1,23 +1,22 @@
 #include "NoclipManager.h"
 #include "coral_fans/CoralFans.h"
-#include "coral_fans/base/MySchedule.h"
+#include "coral_fans/helper/MainThreadExecutor.h"
 
-#include "chrono"
+
 #include "ll/api/chrono/GameChrono.h"
 #include "ll/api/coro/CoroTask.h"
 #include "ll/api/memory/Hook.h"
 #include "ll/api/service/Bedrock.h"
-#include "ll/api/thread/ServerThreadExecutor.h"
-#include "mc/server/ServerInstance.h"
 #include "mc/server/ServerPlayer.h"
 #include "mc/world/actor/player/AbilitiesIndex.h"
 #include "mc/world/actor/player/LayeredAbilities.h"
 #include "mc/world/level/Level.h"
-#include <thread>
 
 
+#ifdef LL_PLAT_C
 #include "mc/server/ServerInstance.h"
-#include "mc/world/Minecraft.h"
+#include <thread>
+#endif
 
 
 namespace coral_fans::functions {
@@ -44,24 +43,9 @@ LL_TYPE_INSTANCE_HOOK(
     }
 }
 
-LL_TYPE_INSTANCE_HOOK(Test, ll::memory::HookPriority::Normal, Minecraft, &Minecraft::update, bool) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin();
-
-#endif
-    auto ori = origin();
-    if (ori) CoralFans::getInstance().getSelf().getLogger().info("server minecraft::update end {}", ori);
-    return ori;
-}
-
-
 void NoclipManager::hook(bool enable) {
     if (enable) {
         CoralFansNoClipHook::hook();
-        Test::hook();
     } else {
         CoralFansNoClipHook::unhook();
     }
@@ -74,54 +58,18 @@ void NoclipManager::enableNoclip(Player* player) {
         player->setAbility(::AbilitiesIndex::NoClip, true);
     else {
         player->setAbility(::AbilitiesIndex::Flying, true);
-        // my_schedule::MySchedule::getSchedule().add(
-        //     [playername = player->mName.get()](int&, int&) {
-        //         auto level = ll::service::getLevel();
-        //         if (!level.has_value()) return false;
-        //         Player* pl = nullptr;
-        //         level->forEachPlayer([&pl, playername](Player& p) {
-        //             if (p.mName.get() == playername) pl = &p;
-        //             return false;
-        //         });
-        //         if (pl) pl->setAbility(::AbilitiesIndex::NoClip, true);
-        //         return false;
-        //     },
-        //     3
-        // );
         using namespace ll::chrono_literals;
-        CoralFans::getInstance().getSelf().getLogger().info(*player->mName);
-        // static std::string playername;
-        // playername = player->mName.get();
         ll::coro::keepThis([playername = player->mName.get()]() -> ll::coro::CoroTask<> {
-            co_await 150ms; // 等待0.15秒
-            CoralFans::getInstance().getSelf().getLogger().info(playername);
+            co_await 3_tick;
 
             auto level = ll::service::getLevel();
-            CoralFans::getInstance().getSelf().getLogger().info("c");
             if (level.has_value()) {
-                Player* pl = nullptr;
-                level->forEachPlayer([&pl, &playername](Player& p) {
-                    CoralFans::getInstance().getSelf().getLogger().info("d");
-                    if (*p.mName == playername) {
-                        CoralFans::getInstance().getSelf().getLogger().info("ddd");
-                        pl = &p;
-                    }
-                    CoralFans::getInstance().getSelf().getLogger().info("d");
-                    CoralFans::getInstance().getSelf().getLogger().info(*p.mName);
-                    CoralFans::getInstance().getSelf().getLogger().info("d");
-                    return false;
-                });
-                CoralFans::getInstance().getSelf().getLogger().info("d");
-                // CoralFans::getInstance().getSelf().getLogger().info(playername);
-                CoralFans::getInstance().getSelf().getLogger().info("d");
-                if (pl) {
-                    CoralFans::getInstance().getSelf().getLogger().info("e");
-                    pl->setAbility(::AbilitiesIndex::NoClip, true);
-                }
+                Player* pl = level->getPlayer(playername);
+                if (pl) pl->setAbility(::AbilitiesIndex::NoClip, true);
             }
         })
             .launch(
-                ll::thread::ServerThreadExecutor::getDefault(),
+                helper::thread::MainThreadExecutor::getDefault(),
                 [](ll::Expected<> result) {
                     if (!result) {
                         // 输出错误信息
@@ -129,9 +77,6 @@ void NoclipManager::enableNoclip(Player* player) {
                             "Coroutine failed: {}",
                             result.error().message()
                         );
-
-                    } else {
-                        CoralFans::getInstance().getSelf().getLogger().info("Coroutine completed successfully");
                     }
                 }
 

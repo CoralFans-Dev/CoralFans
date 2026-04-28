@@ -2,18 +2,24 @@
 #include "coral_fans/CoralFans.h"
 #include "ll/api/memory/Hook.h"
 #include "ll/api/service/Bedrock.h"
-#include "mc/server/ServerInstance.h"
 #include "mc/world/level/BedrockSpawner.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/biome/MobSpawnRules.h"
 #include "mc/world/level/biome/MobSpawnerData.h"
 #include "mc/world/level/biome/SpawnConditions.h"
 #include "mc/world/level/dimension/Dimension.h"
+
+
+#ifdef LL_PLAT_C
+#include "mc/server/ServerInstance.h"
+#include <thread>
+#endif
+
+
 #include <algorithm>
 #include <array>
 #include <memory>
 #include <string>
-#include <thread>
 
 
 namespace coral_fans::functions {

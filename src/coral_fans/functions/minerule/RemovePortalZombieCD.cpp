@@ -2,7 +2,6 @@
 #include "ll/api/memory/Hook.h"
 #include "ll/api/service/Bedrock.h"
 #include "mc/deps/core/math/Vec3.h"
-#include "mc/server/ServerInstance.h"
 #include "mc/world/actor/ActorDefinitionIdentifier.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/BlockSource.h"
@@ -11,6 +10,12 @@
 #include "mc/world/level/block/Block.h"
 #include "mc/world/level/block/BlockSupportType.h"
 #include "mc/world/level/block/PortalBlock.h"
+
+
+#ifdef LL_PLAT_C
+#include "mc/server/ServerInstance.h"
+#include <thread>
+#endif
 
 
 namespace coral_fans::functions {

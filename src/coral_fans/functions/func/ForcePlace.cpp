@@ -1,9 +1,13 @@
 #include "ll/api/memory/Hook.h"
-#include "ll/api/service/Bedrock.h"
 #include "mc/deps/core/math/Vec3.h"
-#include "mc/server/ServerInstance.h"
 #include "mc/world/level/BlockSource.h"
+
+
+#ifdef LL_PLAT_C
+#include "ll/api/service/Bedrock.h"
+#include "mc/server/ServerInstance.h"
 #include <thread>
+#endif
 
 
 namespace coral_fans::functions {

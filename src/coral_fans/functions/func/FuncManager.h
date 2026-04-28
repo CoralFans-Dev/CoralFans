@@ -9,8 +9,6 @@
 
 
 namespace coral_fans::functions {
-
-// void registerAutoItemListener();
 void autoItemHook(bool);
 void autoTotemHook(bool);
 void hookAutoTool(bool);
@@ -34,6 +32,7 @@ public:
     }
     static void droppernocostHook(bool);
 };
+
 
 class HopperCounterManager {
     struct HopperCounterChannel {
@@ -89,17 +88,6 @@ public:
     }
 };
 
-class MaxPtManager {
-private:
-    MaxPtManager() = default;
-
-public:
-    int                                maxpt;
-    [[nodiscard]] static MaxPtManager& getInstance() {
-        static MaxPtManager instance;
-        return instance;
-    }
-};
 
 class ContainerOpenManager {
 private:
@@ -115,7 +103,7 @@ public:
         return instance;
     }
 
-    static void hook();
+    static void hook(bool);
 
 public:
     void sendContentToPlayer(Container* container);

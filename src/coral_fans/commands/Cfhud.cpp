@@ -18,6 +18,7 @@
 namespace coral_fans::commands {
 
 void registerCfhudCommand(config::CommandConfigStruct& config) {
+    if (!config.enabled) return;
     using ll::i18n_literals::operator""_tr;
     // reg cmd
     auto& cfhudCommand = ll::command::CommandRegistrar::getInstance(false)

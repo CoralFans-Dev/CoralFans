@@ -13,13 +13,9 @@
 #include "ll/api/event/player/PlayerUseItemEvent.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/service/Bedrock.h"
-#include "ll/api/service/TargetedBedrock.h"
-#include "ll/api/thread/ServerThreadExecutor.h"
 #include "ll/api/utils/StringUtils.h"
 
 
-#include "mc/client/game/ClientInstance.h"
-#include "mc/client/player/LocalPlayer.h"
 #include "mc/deps/core/utility/MCRESULT.h"
 #include "mc/server/ServerPlayer.h"
 #include "mc/server/commands/CommandContext.h"
@@ -35,6 +31,10 @@
 
 #ifdef LL_PLAT_C
 #include "ll/api/event/input/KeyInputEvent.h"
+#include "ll/api/service/TargetedBedrock.h"
+#include "ll/api/thread/ServerThreadExecutor.h"
+#include "mc/client/game/ClientInstance.h"
+#include "mc/client/player/LocalPlayer.h"
 #endif
 
 

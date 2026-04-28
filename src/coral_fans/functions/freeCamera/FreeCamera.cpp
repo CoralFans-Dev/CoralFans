@@ -9,12 +9,16 @@
 #include "mc/network/packet/RemoveActorPacket.h"
 #include "mc/network/packet/UpdateAbilitiesPacket.h"
 #include "mc/network/packet/UpdatePlayerGameTypePacket.h"
-#include "mc/server/ServerInstance.h"
 #include "mc/server/ServerPlayer.h"
 #include "mc/world/actor/Actor.h "
 #include "mc/world/level/Level.h"
 #include "mc/world/level/Tick.h"
+
+
+#ifdef LL_PLAT_C
+#include "mc/server/ServerInstance.h"
 #include <thread>
+#endif
 
 
 PlayerSkinPacketPayload::PlayerSkinPacketPayload()                               = default;
@@ -178,7 +182,9 @@ LL_TYPE_INSTANCE_HOOK(
     float                          a2
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(a1, a2);
 #endif
     auto res = origin(a1, a2);
@@ -201,7 +207,9 @@ LL_TYPE_INSTANCE_HOOK(
     class ActorDamageSource const& a1
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(a1);
 #endif
     if (FreeCameraManager::getInstance().FreeCamList.contains(getNetworkIdentifier().mGuid.g)) {
@@ -218,7 +226,9 @@ LL_TYPE_INSTANCE_HOOK(
     void
 ) {
 #ifdef LL_PLAT_C
-    if (std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin();
 #endif
     FreeCameraManager::getInstance().FreeCamList.erase(getNetworkIdentifier().mGuid.g);

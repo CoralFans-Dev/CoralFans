@@ -14,6 +14,21 @@ void restoreAncillaryBrokenHook(bool);
 void populationCapHook(bool);
 void pistonCollisionHook(bool);
 
+
+class MaxPtManager {
+private:
+    MaxPtManager() = default;
+
+public:
+    int                                maxpt = 100;
+    [[nodiscard]] static MaxPtManager& getInstance() {
+        static MaxPtManager instance;
+        return instance;
+    }
+    static void hook(bool);
+};
+
+
 class RestoreAncillaryBrokenHelper {
 public:
     bool                        mutex  = false;
@@ -31,6 +46,7 @@ public:
         return instance;
     }
 };
+
 
 class PopulationCapManager {
 public:

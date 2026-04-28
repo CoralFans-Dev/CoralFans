@@ -1,8 +1,6 @@
 #include "MineruleManager.h"
 #include "ll/api/memory/Hook.h"
-#include "ll/api/service/Bedrock.h"
 #include "mc/scripting/modules/minecraft/events/ScriptBlockGlobalEventListener.h"
-#include "mc/server/ServerInstance.h"
 #include "mc/world/item/ItemStack.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/Explosion.h"
@@ -17,8 +15,13 @@
 #include "mc/world/level/block/components/BlockComponentDirectData.h"
 #include "mc/world/level/dimension/Dimension.h"
 #include <mc/world/level/BlockSource.h>
+
+
+#ifdef LL_PLAT_C
+#include "ll/api/service/Bedrock.h"
+#include "mc/server/ServerInstance.h"
 #include <thread>
-#include <utility>
+#endif
 
 
 namespace coral_fans::functions {

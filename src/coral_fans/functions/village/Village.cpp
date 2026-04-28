@@ -10,7 +10,6 @@
 #include "mc/deps/core/math/Vec3.h"
 #include "mc/legacy/ActorUniqueID.h"
 #include "mc/platform/UUID.h"
-#include "mc/server/ServerInstance.h"
 #include "mc/world/actor/Actor.h"
 #include "mc/world/actor/ai/village/POIInstance.h"
 #include "mc/world/actor/ai/village/Village.h"
@@ -21,7 +20,12 @@
 #include "mc/world/level/dimension/Dimension.h"
 #include "mc/world/level/levelgen/structure/BoundingBox.h"
 #include "mc/world/phys/AABB.h"
+
+
+#ifdef LL_PLAT_C
+#include "mc/server/ServerInstance.h"
 #include <thread>
+#endif
 
 #include <cstddef>
 #include <math.h>

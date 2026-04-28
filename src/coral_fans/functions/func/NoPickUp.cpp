@@ -2,10 +2,14 @@
 
 
 #include "ll/api/memory/Hook.h"
+#include "mc/world/actor/player/Player.h"
+
+
+#ifdef LL_PLAT_C
 #include "ll/api/service/Bedrock.h"
 #include "mc/server/ServerInstance.h"
-#include "mc/world/actor/player/Player.h"
 #include <thread>
+#endif
 
 
 namespace coral_fans::functions {

@@ -13,28 +13,30 @@
 
 namespace coral_fans::commands {
 void registerNoclipCommand(config::CommandConfigStruct& config) {
-    using ll::i18n_literals::operator""_tr;
+    if (config.enabled) {
+        using ll::i18n_literals::operator""_tr;
 
-    auto& cmd = ll::command::CommandRegistrar::getInstance(false)
-                    .getOrCreateCommand(config.command, "command.noclip.description"_tr(), config.permission);
-    cmd.overload().execute([&](CommandOrigin const& origin, CommandOutput& output) {
-        COMMAND_CHECK_PLAYER
-        if (player->getPlayerGameType() != GameType::Creative) return;
-        auto& abilities = player->getAbilities();
-        bool  enable    = !abilities.getAbility(AbilitiesIndex::NoClip).mValue->mBoolVal;
-        CoralFans::getInstance().getConfigDb()->set(
-            std::format("noclip.players.{}", player->getUuid().asString()),
-            enable ? "T" : "F"
-        );
-        if (enable) {
-            functions::NoclipManager::getInstance().enableNoclip(player);
-            output.success("command.noclip.enabled"_tr());
-        } else {
-            functions::NoclipManager::getInstance().disableNoclip(player);
-            output.success("command.noclip.disabled"_tr());
-        }
-    });
+        auto& cmd = ll::command::CommandRegistrar::getInstance(false)
+                        .getOrCreateCommand(config.command, "command.noclip.description"_tr(), config.permission);
+        cmd.overload().execute([&](CommandOrigin const& origin, CommandOutput& output) {
+            COMMAND_CHECK_PLAYER
+            if (player->getPlayerGameType() != GameType::Creative) return;
+            auto& abilities = player->getAbilities();
+            bool  enable    = !abilities.getAbility(AbilitiesIndex::NoClip).mValue->mBoolVal;
+            CoralFans::getInstance().getConfigDb()->set(
+                std::format("noclip.players.{}", player->getUuid().asString()),
+                enable ? "T" : "F"
+            );
+            if (enable) {
+                functions::NoclipManager::getInstance().enableNoclip(player);
+                output.success("command.noclip.enabled"_tr());
+            } else {
+                functions::NoclipManager::getInstance().disableNoclip(player);
+                output.success("command.noclip.disabled"_tr());
+            }
+        });
+    }
 
-    functions::NoclipManager::getInstance().hook(true);
+    functions::NoclipManager::getInstance().hook(config.enabled);
 }
 } // namespace coral_fans::commands
