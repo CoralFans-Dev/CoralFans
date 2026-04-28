@@ -380,5 +380,8 @@ void ShortcutsManager::clear() {
     this->uses.clear();
     this->destroys.clear();
     this->commands.clear();
+#ifdef LL_PLAT_C
+    this->keyBoards.clear();
+#endif
 }
 } // namespace coral_fans::functions

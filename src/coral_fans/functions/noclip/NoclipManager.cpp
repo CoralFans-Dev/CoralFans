@@ -81,6 +81,7 @@ void NoclipManager::clear() { this->handlingList.clear(); }
 
 void NoclipManager::enableNoclip(Player* player) {
     if (!player) return;
+    if (this->handlingList.contains(player->mName)) return;
     auto& abilities = player->getAbilities();
     if (abilities.getAbility(AbilitiesIndex::Flying).mValue->mBoolVal)
         player->setAbility(::AbilitiesIndex::NoClip, true);

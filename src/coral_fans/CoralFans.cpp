@@ -11,7 +11,6 @@
 #include "coral_fans/functions/shortcuts/Shortcuts.h"
 #include "coral_fans/functions/slime/Slime.h"
 #include "coral_fans/functions/village/Village.h"
-#include "coral_fans/helper/MainThreadExecutor.h"
 #include "ll/api/Config.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/event/command/ServerCommandRegisterEvent.h"
@@ -109,7 +108,6 @@ void CoralFans::removeRuntimeData() {
     functions::SlimeManager::getInstance().setShow(false);
     functions::CFVillageManager::getInstance().clear();
     my_schedule::MySchedule::getSchedule().clear();
-    helper::thread::MainThreadExecutor::getDefault().clear();
 }
 
 bool CoralFans::load() {

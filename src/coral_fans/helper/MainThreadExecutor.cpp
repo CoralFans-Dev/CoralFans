@@ -117,18 +117,4 @@ void MainThreadExecutor::tick() const {
     }
     impl->frame++;
 }
-
-void MainThreadExecutor::clear() const {
-    Impl::ScheduledWork work;
-    while (impl->scheduledWorks.try_pop(work)) {
-        if (work.callback) {
-            work.callback->cancel(); // 取消回调
-        }
-    }
-
-    std::function<void()> f;
-    while (impl->works.try_dequeue(impl->token, f)) {}
-
-    impl->frame.store(0);
-}
 } // namespace coral_fans::helper::thread

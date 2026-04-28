@@ -19,7 +19,5 @@ public:
     static MainThreadExecutor const& getDefault();
 
     void tick() const;
-
-    void clear() const;
 };
 } // namespace coral_fans::helper::thread
