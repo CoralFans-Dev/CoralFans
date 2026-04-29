@@ -2,7 +2,7 @@
     "format_version": 3,
     "format_uuid": "289f771f-2c9a-4d73-9f3f-8492495a924d",
     "tooth": "github.com/CoralFans-Dev/CoralFans",
-    "version": "26.10.2-rc.1",
+    "version": "26.10.2-rc.2",
     "info": {
         "name": "CoralFans",
         "description": "A tech-survival assistant mod for Bedrock Version.",
@@ -18,14 +18,14 @@
             "label": "",
             "platform": "win-x64",
             "dependencies": {
-                "github.com/LiteLDev/LeviLamina": ">=26.10.8 <26.20.0",
+                "github.com/LiteLDev/LeviLamina": ">=26.10.0 <26.20.0",
                 "github.com/OEOTYAN/BedrockServerClientInterface": "0.3.1"
             },
             "assets": [
                 {
                     "type": "zip",
                     "urls": [
-                        "https://github.com/CoralFans-Dev/CoralFans/releases/download/v${{version}}/CoralFans-server-windows-x64.zip"
+                        "https://github.com/CoralFans-Dev/CoralFans/releases/download/v{{version}}/CoralFans-server-windows-x64.zip"
                     ],
                     "placements": [
                         {
@@ -53,14 +53,14 @@
             "label": "client",
             "platform": "win-x64",
             "dependencies": {
-                "github.com/LiteLDev/LeviLamina#client": ">=26.10.8 <26.20.0",
+                "github.com/LiteLDev/LeviLamina#client": ">=26.10.9 <26.20.0",
                 "github.com/OEOTYAN/BedrockServerClientInterface#client": "0.3.1"
             },
             "assets": [
                 {
                     "type": "zip",
                     "urls": [
-                        "https://github.com/CoralFans-Dev/CoralFans/releases/download/v${{version}}/CoralFans-client-windows-x64.zip"
+                        "https://github.com/CoralFans-Dev/CoralFans/releases/download/v{{version}}/CoralFans-client-windows-x64.zip"
                     ],
                     "placements": [
                         {

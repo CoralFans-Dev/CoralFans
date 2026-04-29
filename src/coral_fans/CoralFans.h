@@ -29,7 +29,7 @@ public:
 
     void setupCommands();
 
-    // void unhook();
+    void unhook();
 
     void removeRuntimeData();
 
@@ -46,8 +46,8 @@ public:
     bool disable();
 
     // TODO: Implement this method if you need to unload the mod.
-    // /// @return True if the mod is unloaded successfully.
-    // bool unload();
+    /// @return True if the mod is unloaded successfully.
+    bool unload();
 
 private:
     ll::mod::NativeMod& mSelf;

@@ -8,6 +8,7 @@
 #include "coral_fans/functions/locate/DuplicatableManager.h"
 #include "coral_fans/functions/minerule/MineruleManager.h"
 #include "coral_fans/functions/noclip/NoclipManager.h"
+#include "coral_fans/functions/prof/Prof.h"
 #include "coral_fans/functions/shortcuts/Shortcuts.h"
 #include "coral_fans/functions/slime/Slime.h"
 #include "coral_fans/functions/village/Village.h"
@@ -69,32 +70,34 @@ void CoralFans::setupCommands() {
     functions::ShortcutsManager::getInstance().registerShortcutsCommand();
 }
 
-// void CoralFans::unhook() {
-//     functions::FreeCameraManager::freecameraHook(false);
-//     functions::autoItemHook(false);
-//     functions::autoTotemHook(false);
-//     functions::hookAutoTool(false);
-//     functions::registerContainerReader();
-//     functions::forceOpenHook(false);
-//     functions::forcePlaceHook(0);
-//     functions::safeExplodeHook(false);
-//     functions::fastDropHook(false);
-//     functions::noPickUpHook(false);
-//     functions::portalDisabledHook(false);
-//     functions::FuncDropNoCostManager::droppernocostHook(false);
-//     functions::HopperCounterManager::getInstance().setEnabled(false);
-//     functions::locate::DuplicatableManager::hook(false);
-//     functions::bedrockDropHook(false);
-//     functions::mbDropHook(false);
-//     functions::portalSandFarmHook(false);
-//     functions::portalSpawnHook(false);
-//     functions::restoreAncillaryBrokenHook(false);
-//     functions::populationCapHook(false);
-//     functions::MaxPtManager::hook(false);
-//     functions::NoclipManager::getInstance().hook(false);
-//     functions::hookTick(false);
-//     functions::CFVillageManager::hookVillage(false);
-// }
+void CoralFans::unhook() {
+    functions::FreeCameraManager::freecameraHook(false);
+    functions::autoItemHook(false);
+    functions::autoTotemHook(false);
+    functions::hookAutoTool(false);
+    functions::ContainerOpenManager::hook(false);
+    functions::forcePlaceHook(0);
+    functions::safeExplodeHook(false);
+    functions::fastDropHook(false);
+    functions::noPickUpHook(false);
+    functions::portalDisabledHook(false);
+    functions::FuncDropNoCostManager::droppernocostHook(false);
+    functions::HopperCounterManager::getInstance().setEnabled(false);
+    functions::locate::DuplicatableManager::hook(false);
+    functions::bedrockDropHook(false);
+    functions::mbDropHook(false);
+    functions::portalSandFarmHook(false);
+    functions::portalSpawnHook(false);
+    functions::restoreAncillaryBrokenHook(false);
+    functions::populationCapHook(false);
+    functions::MaxPtManager::hook(false);
+    functions::NoclipManager::getInstance().hook(false);
+    functions::hookTick(false, true);
+    functions::CFVillageManager::hookVillage(false);
+
+    // for (auto& eventListener : getEventListeners()) ll::event::EventBus::getInstance().removeListener(eventListener);
+    getEventListeners().clear();
+}
 
 void CoralFans::removeRuntimeData() {
     functions::FreeCameraManager::getInstance().FreeCamList.clear();
@@ -169,11 +172,15 @@ bool CoralFans::enable() {
 
 bool CoralFans::disable() {
     getSelf().getLogger().debug("Disabling...");
-    // unhook();
     removeRuntimeData();
     return true;
 }
 
+bool CoralFans::unload() {
+    removeRuntimeData();
+    unhook();
+    return true;
+}
 } // namespace coral_fans
 
 LL_REGISTER_MOD(coral_fans::CoralFans, coral_fans::CoralFans::getInstance());

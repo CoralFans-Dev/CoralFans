@@ -339,6 +339,7 @@ LL_TYPE_INSTANCE_HOOK(
 
 void hookTick(bool hook, bool disable) {
     if (!disable) CoralFansTickLevelTickHook::hook();
+    else CoralFansTickLevelTickHook::unhook();
     if (hook) {
         CoralFansTickLevelChunkTickHook::hook();
         CoralFansTickLevelChunkTickBlocksHook::hook();
