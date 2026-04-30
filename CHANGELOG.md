@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [26.10.1] - 2026-4-17
 
 ### Added
++ Added minerule fuck_piston_reset_velocity
++ Added keyboard shortcut (only client side)
+
+### Changed
++ move func maxpt to minerule
+
+### Fixed
++ fixed hook register wrong when rejoined world
+
+## [26.10.1] - 2026-4-17
+
+### Added
 
 + Adapted to 1.26.10 client
 

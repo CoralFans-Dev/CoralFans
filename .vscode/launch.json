@@ -13,7 +13,7 @@
             "type": "cppvsdbg",
             "request": "attach",
             "processId": "${input:launchAndGetPid_GDK}",
-            "symbolSearchPath": "D:\\project\\levilamina\\26.10.x\\CoralFans\\bin\\CoralFans.pdb"
+            "symbolSearchPath": "D:\\project\\levilamina\\26.10.x\\CoralFans\\bin\\"
         },
         {
             // Automatically starts the BDS target process and attaches the debugger after the process becomes stable.
