@@ -13,7 +13,6 @@
 #include "coral_fans/functions/slime/Slime.h"
 #include "coral_fans/functions/village/Village.h"
 #include "ll/api/Config.h"
-#include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/event/command/ServerCommandRegisterEvent.h"
 #include "ll/api/event/server/ServerStoppingEvent.h"
@@ -168,20 +167,17 @@ bool CoralFans::load() {
 bool CoralFans::enable() {
     const auto& logger = getSelf().getLogger();
     logger.debug("Enabling...");
-    if (ll::service::getLevel()) {
-#ifdef LL_PLAT_S
-        auto configDbPath = getSelf().getDataDir() / "config";
-#endif
 #ifdef LL_PLAT_C
+    if (ll::service::getLevel()) {
         auto dataPath     = getSelf().getWorldDataDir();
         auto configDbPath = dataPath.has_value() ? dataPath.value() / "config" : getSelf().getDataDir() / "config";
-#endif
-        getConfigDb() = std::make_unique<ll::data::KeyValueDB>(configDbPath);
+        getConfigDb()     = std::make_unique<ll::data::KeyValueDB>(configDbPath);
 
         // load GeometryGroup
         getGeometryGroup() = bsci::GeometryGroup::createDefault();
         setupCommands();
     }
+#endif
     return true;
 }
 
@@ -193,7 +189,6 @@ bool CoralFans::disable() {
 
 bool CoralFans::unload() {
     removeRuntimeData();
-    ll::command::CommandRegistrar::getInstance(false);
     unhook();
     return true;
 }
