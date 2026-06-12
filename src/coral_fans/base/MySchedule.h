@@ -78,6 +78,12 @@ public:
         scheduleList[slot].emplace_back(delay, times, circle_time, task);
     }
 
+    void clear() {
+        for (int i = 0; i < 128; ++i) {
+            scheduleList[i].clear();
+        }
+    }
+
     MySchedule(const MySchedule&)            = delete;
     MySchedule& operator=(const MySchedule&) = delete;
 };
