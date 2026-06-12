@@ -159,6 +159,7 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
         // minerule popcap global reset
         mineruleCommand.runtimeOverload().text("popcap").text("global").text("reset").execute(
             [](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const&) {
+                using ll::i18n_literals::operator""_tr;
                 functions::PopulationCapManager::getInstance().setGlobalMax(200);
                 output.success("command.minerule.popcap.global.reset.success"_tr());
             }
