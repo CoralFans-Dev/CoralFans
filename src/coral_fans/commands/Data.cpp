@@ -33,6 +33,7 @@ void registerDataCommand(config::CommandConfigStruct& config) {
         .text("block")
         .optional("blockPos", ll::command::ParamKind::BlockPos)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             BlockPos blockPos;
             if (self["blockPos"].has_value())
@@ -57,6 +58,7 @@ void registerDataCommand(config::CommandConfigStruct& config) {
         .text("nbt")
         .optional("path", ll::command::ParamKind::String)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             const auto& hitrst = player->traceRay(5.25f, false, true);
             if (!hitrst) return output.error("command.data.error"_tr());
@@ -74,6 +76,7 @@ void registerDataCommand(config::CommandConfigStruct& config) {
         .text("nbt")
         .optional("path", ll::command::ParamKind::String)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             const auto& hitrst = player->traceRay(5.25f, false, true);
             if (!hitrst) return output.error("command.data.error"_tr());
@@ -92,6 +95,7 @@ void registerDataCommand(config::CommandConfigStruct& config) {
         .text("nbt")
         .optional("path", ll::command::ParamKind::String)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             BlockPos blockPos = self["blockPos"].get<ll::command::ParamKind::BlockPos>().getBlockPos(
                 static_cast<int>(CurrentCmdVersion::Latest),
@@ -112,6 +116,7 @@ void registerDataCommand(config::CommandConfigStruct& config) {
         .text("nbt")
         .optional("path", ll::command::ParamKind::String)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             BlockPos blockPos = self["blockPos"].get<ll::command::ParamKind::BlockPos>().getBlockPos(
                 static_cast<int>(CurrentCmdVersion::Latest),
@@ -132,6 +137,7 @@ void registerDataCommand(config::CommandConfigStruct& config) {
         .optional("radius", ll::command::ParamKind::Int)
         .optional("time", ll::command::ParamKind::Int)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             int radius = 16;
             if (self["radius"].has_value()) radius = self["radius"].get<ll::command::ParamKind::Int>();
@@ -143,6 +149,7 @@ void registerDataCommand(config::CommandConfigStruct& config) {
     // entity
     dataCommand.runtimeOverload().text("entity").execute(
         [](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const&) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             const auto& hitrst = player->traceRay(5.25f, true, false);
             if (!hitrst) return output.error("command.data.error"_tr());
@@ -158,6 +165,7 @@ void registerDataCommand(config::CommandConfigStruct& config) {
         .text("nbt")
         .optional("path", ll::command::ParamKind::String)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             std::string path;
             if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>();
@@ -183,6 +191,7 @@ void registerDataCommand(config::CommandConfigStruct& config) {
         .required("redstoneType", ll::command::ParamKind::Enum, "redstoneType")
         .optional("blockPos", ll::command::ParamKind::BlockPos)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             BlockPos blockPos;
             if (self["blockPos"].has_value())
@@ -212,6 +221,7 @@ void registerDataCommand(config::CommandConfigStruct& config) {
         .text("nbt")
         .optional("path", ll::command::ParamKind::String)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             std::string path;
             if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>();
@@ -226,6 +236,7 @@ void registerDataCommand(config::CommandConfigStruct& config) {
         .required("player", ll::command::ParamKind::Actor)
         .text("uuid")
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             const auto actors = self["player"].get<ll::command::ParamKind::Actor>().results(origin);
             for (const auto& i : actors) {
                 if (i && i->isType(ActorType::Player)) {

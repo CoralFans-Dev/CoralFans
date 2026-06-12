@@ -35,6 +35,7 @@ void registerCounterCommand(config::CommandConfigStruct& config) {
         .text("print")
         .optional("channel", ll::command::ParamKind::Int)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             if (self["channel"].has_value()) {
                 output.success(functions::HopperCounterManager::getInstance()
                                    .getChannel(self["channel"].get<ll::command::ParamKind::Int>())
@@ -58,6 +59,7 @@ void registerCounterCommand(config::CommandConfigStruct& config) {
         .text("reset")
         .optional("channel", ll::command::ParamKind::Int)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             if (self["channel"].has_value()) {
                 functions::HopperCounterManager::getInstance()
                     .getChannel(self["channel"].get<ll::command::ParamKind::Int>())

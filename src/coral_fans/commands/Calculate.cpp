@@ -24,6 +24,7 @@ void registerCalculateCommand(config::CommandConfigStruct& config) {
     );
     calculateCommand.runtimeOverload().text("pt").execute(
         [](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const&) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             functions::calculatePt(player);
         }
@@ -31,6 +32,7 @@ void registerCalculateCommand(config::CommandConfigStruct& config) {
 
     calculateCommand.runtimeOverload().text("pt2").execute(
         [](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const&) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             functions::calculatePt2(player);
         }
