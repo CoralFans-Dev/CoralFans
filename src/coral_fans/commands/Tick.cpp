@@ -12,12 +12,14 @@
 #include "ll/api/service/Bedrock.h"
 #include "mc/network/packet/TextPacket.h"
 #include "mc/platform/UUID.h"
+#include "mc/server/ServerInstance.h"
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/server/commands/CommandRegistry.h"
 #include "mc/util/ProfilerLite.h"
 #include "mc/util/Timer.h"
 #include "mc/world/Minecraft.h"
 #include "mc/world/level/Level.h"
+#include <string>
 
 
 namespace coral_fans::commands {
@@ -79,23 +81,30 @@ void registerTickCommand(config::CommandConfigStruct& config) {
                 return;
             }
             auto player = tryGetPlayer(origin);
-            my_schedule::MySchedule::getSchedule().add(
-                [uuid = player.has_value() ? player.value()->getUuid().asString() : "", tick](int&, int& count) {
-                    if (uuid != "") {
+            if (!player.has_value()) {
+                output.error("command.tick.query.error"_tr());
+                return;
+            }
+            auto uuid = player.value() ? player.value()->getUuid().asString() : "";
+            my_schedule::MySchedule::getSchedule().add([uuid, tick](int&, int& count) {
+                if (uuid != "") {
+                    auto player = ll::service::getLevel()->getPlayer(mce::UUID(uuid));
+                    if (player)
                         TextPacket::createRawMessage(
                             "command.tick.query.output"_tr(
                                 ProfilerLite::gProfilerLiteInstance().mDebugServerTickTime->count() / 1000000.0
                             )
                         )
-                            .sendTo(*ll::service::getLevel()->getPlayer(mce::UUID(uuid)));
-                    } else
-                        CoralFans::getInstance().getSelf().getLogger().info("command.tick.query.output"_tr(
-                            ProfilerLite::gProfilerLiteInstance().mDebugServerTickTime->count() / 1000000.0
-                        ));
-                    count++;
-                    return tick > count;
-                }
-            );
+                            .sendTo(*player);
+                    else return false; // 玩家不在线了，停止任务
+                } else
+                    CoralFans::getInstance().getSelf().getLogger().info("command.tick.query.output"_tr(
+                        ProfilerLite::gProfilerLiteInstance().mDebugServerTickTime->count() / 1000000.0
+                    ));
+
+                count++;
+                return tick > count;
+            });
         });
 
     // tick step <int>
