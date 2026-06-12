@@ -299,11 +299,11 @@ void ShortcutsManager::registerShortcutsListener() {
 }
 
 void ShortcutsManager::registerShortcutsCommand() {
-    using ll::i18n_literals::operator""_tr;
     for (auto& _command : commands) {
         auto& cmd = ll::command::CommandRegistrar::getInstance(false)
                         .getOrCreateCommand(_command.command, _command.description, _command.permission);
         cmd.overload().execute([&](CommandOrigin const& origin, CommandOutput& output) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             auto mc = ll::service::getMinecraft();
             if (mc)
