@@ -29,6 +29,7 @@ void registerCfhudCommand(config::CommandConfigStruct& config) {
         .text("show")
         .required("isopen", ll::command::ParamKind::Bool)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             if (CoralFans::getInstance().getConfigDb()->set(
                     "functions.players." + player->getUuid().asString() + ".cfhud.show",
@@ -54,6 +55,7 @@ void registerCfhudCommand(config::CommandConfigStruct& config) {
         .required("action", ll::command::ParamKind::Enum, "cfhudActionType")
         .required("hud", ll::command::ParamKind::Enum, "cfhudType")
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             unsigned long hud;
             try {
@@ -79,6 +81,7 @@ void registerCfhudCommand(config::CommandConfigStruct& config) {
     cfhudCommand.runtimeOverload()
         .text("removeall")
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const&) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             if (CoralFans::getInstance().getConfigDb()->set(
                     "functions.players." + player->getUuid().asString() + ".cfhud.hud",
