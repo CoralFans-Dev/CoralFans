@@ -1,34 +1,30 @@
 #pragma once
 
 #include <functional>
+#include <list>
 
 namespace coral_fans::my_schedule {
 class MySchedule {
 private:
     int now = 0;
-    struct SchduleUnit {
+    struct ScheduleUnit {
         int                             interval;
         int                             count;
         int                             left_circle_time;
-        SchduleUnit*                    next = nullptr;
         std::function<bool(int&, int&)> task;
 
-        SchduleUnit(int delay, int times, int circle_time, std::function<bool(int& interval, int& count)> _task)
+        ScheduleUnit(int delay, int times, int circle_time, std::function<bool(int& interval, int& count)> _task)
         : interval(delay),
           count(times),
           left_circle_time(circle_time),
           task(_task) {}
-        void insert_after(SchduleUnit* unit) {
-            unit->next = this->next;
-            this->next = unit;
-        }
     };
-    SchduleUnit* schduleList[128];
+    std::list<ScheduleUnit> scheduleList[128];
 
-    MySchedule() { std::memset(schduleList, 0, sizeof(schduleList)); }
+    MySchedule() {}
 
 public:
-    [[nodiscard]] static MySchedule& getSchedule() {
+    static MySchedule& getSchedule() {
         static MySchedule instance;
         return instance;
     }
@@ -36,56 +32,53 @@ public:
     void update() {
         now++;
         now &= 0x7f;
-        while (schduleList[now] && !schduleList[now]->left_circle_time) {
-            SchduleUnit* unit = schduleList[now];
-            if (schduleList[now]->task(schduleList[now]->interval, schduleList[now]->count)) {
-                schduleList[now] = unit->next;
-                int slot         = (unit->interval + now) & 0x7f;
-                int circle_time  = unit->interval >> 7;
-                if (!schduleList[slot]) {
-                    schduleList[slot] = unit;
-                    return;
+
+        // 处理当前槽位中所有 left_circle_time == 0 的任务
+        auto it = scheduleList[now].begin();
+        while (it != scheduleList[now].end()) {
+            if (it->left_circle_time == 0) {
+                // 执行任务
+                bool shouldContinue = it->task(it->interval, it->count);
+
+                if (shouldContinue) {
+                    // 重新计算槽位
+                    int slot        = (it->interval + now) & 0x7f;
+                    int circle_time = it->interval >> 7;
+
+                    // 更新任务的 circle_time
+                    it->left_circle_time = circle_time;
+
+                    if (slot != now) {
+                        // 移动到新的槽位
+                        scheduleList[slot].splice(scheduleList[slot].end(), scheduleList[now], it);
+                        // it 现在指向新槽位，但我们需要继续处理原槽位
+                        it = scheduleList[now].begin();
+                        continue;
+                    }
+                    // 如果槽位相同，保留在当前槽位，继续处理下一个
+                    ++it;
+                } else {
+                    // 删除任务
+                    it = scheduleList[now].erase(it);
                 }
-                SchduleUnit* tem = schduleList[slot];
-                while (tem->next && tem->next->left_circle_time <= circle_time) tem = tem->next;
-                tem->insert_after(unit);
             } else {
-                schduleList[now] = unit->next;
-                delete unit;
+                ++it;
             }
         }
-        SchduleUnit* tem = schduleList[now];
-        while (tem) {
-            tem->left_circle_time -= 1;
-            tem                    = tem->next;
+
+        // 减少当前槽位所有任务的 left_circle_time
+        for (auto& unit : scheduleList[now]) {
+            unit.left_circle_time -= 1;
         }
     }
 
     void add(std::function<bool(int&, int&)> task, int delay = 1, int times = 0) {
         int slot        = (delay + now) & 0x7f;
         int circle_time = delay >> 7;
-        if (!schduleList[slot]) {
-            schduleList[slot] = new SchduleUnit(delay, times, circle_time, task);
-            return;
-        }
-        SchduleUnit* tem = schduleList[slot];
-        while (tem->next && tem->next->left_circle_time <= circle_time) tem = tem->next;
-        tem->insert_after(new SchduleUnit(delay, times, circle_time, task));
-    }
-
-    void clear() {
-        for (int i = 0; i < 128; ++i) {
-            SchduleUnit* current = schduleList[i];
-            while (current) {
-                schduleList[i] = current->next;
-                delete current;
-                current = schduleList[i];
-            }
-        }
+        scheduleList[slot].emplace_back(delay, times, circle_time, task);
     }
 
     MySchedule(const MySchedule&)            = delete;
     MySchedule& operator=(const MySchedule&) = delete;
-    ~MySchedule() { clear(); };
 };
 } // namespace coral_fans::my_schedule
