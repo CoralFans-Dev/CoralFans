@@ -48,6 +48,7 @@ void HudHelper::tick() {
         auto& configDb = CoralFans::getInstance().getConfigDb();
         if (level) [[likely]] {
             level->forEachPlayer([&configDb, &level](Player& player) {
+                using ll::i18n_literals::operator""_tr;
                 if (configDb->get("functions.players." + player.getUuid().asString() + ".cfhud.show") == "false")
                     return true;
                 unsigned long hud;
