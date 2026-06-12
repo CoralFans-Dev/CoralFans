@@ -26,6 +26,7 @@ void registerSelfCommand(config::CommandConfigStruct& config) {
         .text("autotool")
         .required("isopen", ll::command::ParamKind::Bool)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             bool       isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
             const auto global = CoralFans::getInstance().getConfigDb()->get("functions.global.autotool") == "true";
@@ -44,6 +45,7 @@ void registerSelfCommand(config::CommandConfigStruct& config) {
         .text("mindamage")
         .required("mindamage", ll::command::ParamKind::Int)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             auto minDamageString = std::to_string(self["mindamage"].get<ll::command::ParamKind::Int>());
             if (CoralFans::getInstance().getConfigDb()->set(
@@ -59,6 +61,7 @@ void registerSelfCommand(config::CommandConfigStruct& config) {
         .text("containerreader")
         .required("isopen", ll::command::ParamKind::Bool)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             bool       isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
             const auto global =
@@ -77,6 +80,7 @@ void registerSelfCommand(config::CommandConfigStruct& config) {
         .text("autototem")
         .required("isopen", ll::command::ParamKind::Bool)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             bool       isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
             const auto global = CoralFans::getInstance().getConfigDb()->get("functions.global.autototem") == "true";
@@ -94,6 +98,7 @@ void registerSelfCommand(config::CommandConfigStruct& config) {
         .text("autoitem")
         .required("isopen", ll::command::ParamKind::Bool)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             bool       isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
             const auto global = CoralFans::getInstance().getConfigDb()->get("functions.global.autoitem") == "true";
@@ -111,6 +116,7 @@ void registerSelfCommand(config::CommandConfigStruct& config) {
         .text("fastdrop")
         .required("isopen", ll::command::ParamKind::Bool)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             bool       isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
             const auto global = CoralFans::getInstance().getConfigDb()->get("functions.global.fastdrop") == "true";
@@ -128,6 +134,7 @@ void registerSelfCommand(config::CommandConfigStruct& config) {
         .text("nopickup")
         .required("isopen", ll::command::ParamKind::Bool)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             bool       isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
             const auto global = CoralFans::getInstance().getConfigDb()->get("functions.global.nopickup") == "true";
@@ -145,6 +152,7 @@ void registerSelfCommand(config::CommandConfigStruct& config) {
         .text("portaldisabled")
         .required("isopen", ll::command::ParamKind::Bool)
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             bool       isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
             const auto global =

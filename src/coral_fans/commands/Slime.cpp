@@ -27,6 +27,7 @@ void registerSlimeCommand(config::CommandConfigStruct& config) {
         .text("show")
         .optional("isopen", ll::command::ParamKind::Bool)
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             auto& slimeManager = functions::SlimeManager::getInstance();
             if (self["isopen"].has_value()) slimeManager.setShow(self["isopen"].get<ll::command::ParamKind::Bool>());
             else slimeManager.setShow(!slimeManager.getShow());
@@ -35,6 +36,7 @@ void registerSlimeCommand(config::CommandConfigStruct& config) {
 
     // slime check
     slimeCommand.overload().text("check").execute([](CommandOrigin const& origin, CommandOutput& output) {
+        using ll::i18n_literals::operator""_tr;
         COMMAND_CHECK_PLAYER
         auto         pos  = utils::blockPosToChunkPos(player->getFeetBlockPos());
         auto         seed = (pos.x * 0x1f1f1f1fu) ^ (uint32_t)(pos.z);

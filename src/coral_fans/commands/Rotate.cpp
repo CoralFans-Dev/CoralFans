@@ -23,6 +23,7 @@ void registerRotateCommand(config::CommandConfigStruct& config) {
                               .getOrCreateCommand(config.command, "command.rotate.description"_tr(), config.permission);
 
     rotateCommand.overload().execute([](CommandOrigin const& origin, CommandOutput& output) {
+        using ll::i18n_literals::operator""_tr;
         COMMAND_CHECK_PLAYER
         auto hitrst = player->traceRay(5.25f, false, true, [](BlockSource const&, Block const&, bool) { return true; });
         if (!hitrst) return;

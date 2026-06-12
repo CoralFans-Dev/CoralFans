@@ -42,6 +42,7 @@ void registerTickCommand(config::CommandConfigStruct& config) {
     tickCommand.runtimeOverload()
         .required("tickFreezeType", ll::command::ParamKind::Enum, "tickFreezeType")
         .execute([&](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             const auto val = self["tickFreezeType"].get<ll::command::ParamKind::Enum>();
             // LevelEventPacket{LevelEvent::SimTimeStep, origin.getWorldPosition(), pause}.sendToClients();
             auto mc = ll::service::getMinecraft();
@@ -60,6 +61,7 @@ void registerTickCommand(config::CommandConfigStruct& config) {
         .text("rate")
         .required("rate", ll::command::ParamKind::Float)
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             float rate = self["rate"].get<ll::command::ParamKind::Float>();
             if (rate < 0) output.error("command.tick.rate.error"_tr());
             // LevelEventPacket{LevelEvent::SimTimeScale, {rate / 20}, rate > 0}.sendToClients();
@@ -75,6 +77,7 @@ void registerTickCommand(config::CommandConfigStruct& config) {
         .text("query")
         .optional("times", ll::command::ParamKind::Int)
         .execute([&](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             int tick = self["times"].has_value() ? self["times"].get<ll::command::ParamKind::Int>() : 1;
             if (!::Command::validRange(tick, 0, INT_MAX, output)) {
                 return;
@@ -111,6 +114,7 @@ void registerTickCommand(config::CommandConfigStruct& config) {
         .text("step")
         .required("time", ll::command::ParamKind::Int)
         .execute([&](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             int tick = self["time"].get<ll::command::ParamKind::Int>();
             if (!::Command::validRange(tick, 1, INT_MAX, output)) {
                 return;

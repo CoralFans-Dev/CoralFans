@@ -31,6 +31,7 @@ void registerProfCommand(config::CommandConfigStruct& config) {
             .optional("type", ll::command::ParamKind::Enum, "profType")
             .optional("numberOfTick", ll::command::ParamKind::Int)
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
                 uint64 type         = functions::Profiler::Type::normal;
                 int    numberOfTick = 100;
                 if (self["type"].has_value()) type = self["type"].get<ll::command::ParamKind::Enum>().index;

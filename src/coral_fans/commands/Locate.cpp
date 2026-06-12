@@ -78,6 +78,7 @@ void registerLocateCommand(config::CommandConfigStruct& config) {
             .required("type", ll::command::ParamKind::Enum, "duplicatableShowType")
             .optional("enable", ll::command::ParamKind::Bool)
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
                 auto& duplicatableManager = functions::locate::DuplicatableManager::getInstance();
                 auto  showType            = functions::locate::DuplicatableManager::ShowType(0);
                 switch (self["type"].get<ll::command::ParamKind::Enum>().index) {

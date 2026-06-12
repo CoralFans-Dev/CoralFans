@@ -19,6 +19,7 @@ void registerNoclipCommand(config::CommandConfigStruct& config) {
         auto& cmd = ll::command::CommandRegistrar::getInstance(false)
                         .getOrCreateCommand(config.command, "command.noclip.description"_tr(), config.permission);
         cmd.overload().execute([&](CommandOrigin const& origin, CommandOutput& output) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             if (player->getPlayerGameType() != GameType::Creative) return;
             auto& abilities = player->getAbilities();

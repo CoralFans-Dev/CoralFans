@@ -26,6 +26,7 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
             .text("fuck_bedrock_no_drop")
             .required("isopen", ll::command::ParamKind::Bool)
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
                 bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
                 if (isopen) {
                     if (CoralFans::getInstance().getConfigDb()->set("minerule.bedrockDrop", "true")) {
@@ -44,6 +45,7 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
             .text("fuck_movingBlock_no_drop")
             .required("isopen", ll::command::ParamKind::Bool)
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
                 bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
                 if (isopen) {
                     if (CoralFans::getInstance().getConfigDb()->set("minerule.movingBlockDrop", "true")) {
@@ -62,6 +64,7 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
             .text("restore_portal_sand_farm")
             .required("isopen", ll::command::ParamKind::Bool)
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
                 bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
                 if (CoralFans::getInstance().getConfigDb()->set(
                         "minerule.restore_portal_sand_farm",
@@ -76,6 +79,7 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
             .text("remove_portal_pigzombie_cd")
             .required("isopen", ll::command::ParamKind::Bool)
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
                 bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
                 if (CoralFans::getInstance().getConfigDb()->set(
                         "minerule.remove_portal_pigzombie_cd",
@@ -90,6 +94,7 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
             .text("restore_ancillary_broken")
             .required("isopen", ll::command::ParamKind::Bool)
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
                 bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
                 if (CoralFans::getInstance().getConfigDb()->set(
                         "minerule.restore_ancillary_broken",
@@ -104,6 +109,7 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
             .text("fuck_population_cap")
             .required("isopen", ll::command::ParamKind::Bool)
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
                 bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
                 if (CoralFans::getInstance().getConfigDb()->set(
                         "minerule.fuck_population_cap",
@@ -143,6 +149,7 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
             .text("global")
             .required("count", ll::command::ParamKind::Int)
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
                 int count = self["count"].get<ll::command::ParamKind::Int>();
                 // 这里不需要处理负数，游戏默认负数不限制
                 functions::PopulationCapManager::getInstance().setGlobalMax(count);
@@ -165,6 +172,7 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
             .required("type", ll::command::ParamKind::Enum, "popcapType")
             .required("count", ll::command::ParamKind::Float)
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
                 int dimId = self["dimension"].get<ll::command::ParamKind::Dimension>().id;
                 if (dimId < 0 || dimId > 2) {
                     output.error("Invalid dimension");
@@ -200,6 +208,7 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
             .required("dimension", ll::command::ParamKind::Dimension)
             .text("reset")
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
                 int dimId = self["dimension"].get<ll::command::ParamKind::Dimension>().id;
                 if (dimId < 0 || dimId > 2) {
                     output.error("Invalid dimension");
@@ -222,6 +231,7 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
             .text("fuck_piston_reset_velocity")
             .required("isopen", ll::command::ParamKind::Bool)
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
                 bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
                 if (CoralFans::getInstance().getConfigDb()->set(
                         "minerule.fuck_piston_reset_velocity",
@@ -239,6 +249,7 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
             .text("set_max_pt_consume_per_chunk")
             .required("maxpt", ll::command::ParamKind::Int)
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
                 int maxpt = self["maxpt"].get<ll::command::ParamKind::Int>();
                 if (maxpt <= 0) output.error("command.func.maxpt.error.nonpositive"_tr());
                 if (CoralFans::getInstance().getConfigDb()->set("functions.global.maxpt", std::to_string(maxpt))) {

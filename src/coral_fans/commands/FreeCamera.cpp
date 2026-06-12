@@ -19,6 +19,7 @@ void registerFreeCameraCommand(config::CommandConfigStruct& config) {
         auto& cmd = ll::command::CommandRegistrar::getInstance(false)
                         .getOrCreateCommand(config.command, "command.freecamera.description"_tr(), config.permission);
         cmd.overload().execute([&](CommandOrigin const& origin, CommandOutput& output) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             auto guid = player->getNetworkIdentifier().mGuid.g;
             if (!coral_fans::functions::FreeCameraManager::getInstance().FreeCamList.count(guid)) {

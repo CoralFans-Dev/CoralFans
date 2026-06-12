@@ -47,6 +47,7 @@ void registerVillageCommand(config::CommandConfigStruct& config) {
             .required("type", ll::command::ParamKind::Enum, "villageShowType")
             .optional("enable", ll::command::ParamKind::Bool)
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
                 auto& villageManager = functions::CFVillageManager::getInstance();
                 bool  isopen         = false;
                 switch (self["type"].get<ll::command::ParamKind::Enum>().index) {
@@ -95,6 +96,7 @@ void registerVillageCommand(config::CommandConfigStruct& config) {
 
         // village list
         villageCommand.overload().text("list").execute([](CommandOrigin const& origin, CommandOutput& output) {
+            using ll::i18n_literals::operator""_tr;
             auto  entity         = origin.getEntity();
             auto& villageManager = functions::CFVillageManager::getInstance();
             if (entity == nullptr || !entity->isType(ActorType::Player)) {
@@ -110,6 +112,7 @@ void registerVillageCommand(config::CommandConfigStruct& config) {
 
         // village tickinglist
         villageCommand.overload().text("tickinglist").execute([](CommandOrigin const& origin, CommandOutput& output) {
+            using ll::i18n_literals::operator""_tr;
             auto res    = functions::CFVillageManager::getInstance().listTickingVillages();
             auto entity = origin.getEntity();
             if (entity == nullptr || !entity->isType(ActorType::Player)) {
@@ -124,6 +127,7 @@ void registerVillageCommand(config::CommandConfigStruct& config) {
             .text("info")
             .required("id", ll::command::ParamKind::Int)
             .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
                 auto rst = functions::CFVillageManager::getInstance().getVillageInfo(
                     self["id"].get<ll::command::ParamKind::Int>()
                 );
@@ -138,6 +142,7 @@ void registerVillageCommand(config::CommandConfigStruct& config) {
 
         // village dweller
         villageCommand.overload().text("dweller").execute([](CommandOrigin const& origin, CommandOutput& output) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             auto hitrst = player->traceRay(5.25f, true, false);
             if (!hitrst) return output.error("command.village.dweller.noactor"_tr());

@@ -28,6 +28,7 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
             .text("forceopen")
             .required("isopen", ll::command::ParamKind::Bool)
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
                 bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
                 if (CoralFans::getInstance().getConfigDb()->set(
                         "functions.global.forceopen",
@@ -52,6 +53,7 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
             .text("forceplace")
             .required("level", ll::command::ParamKind::Enum, "forceplaceLevel")
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
                 const auto val = self["level"].get<ll::command::ParamKind::Enum>();
                 if (CoralFans::getInstance().getConfigDb()->set(
                         "functions.global.forceplace",
@@ -67,6 +69,7 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
             .text("droppernocost")
             .required("isopen", ll::command::ParamKind::Bool)
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
                 bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
                 if (CoralFans::getInstance().getConfigDb()->set(
                         "functions.global.droppernocost",
@@ -82,6 +85,7 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
             .text("safeexplode")
             .required("isopen", ll::command::ParamKind::Bool)
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
                 bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
                 if (CoralFans::getInstance().getConfigDb()->set(
                         "functions.global.safeexplode",
@@ -97,6 +101,7 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
             .text("autotool")
             .required("isopen", ll::command::ParamKind::Bool)
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
                 bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
                 if (CoralFans::getInstance().getConfigDb()->set(
                         "functions.global.autotool",
@@ -112,6 +117,7 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
             .text("hoppercounter")
             .required("isopen", ll::command::ParamKind::Bool)
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
                 bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
                 if (CoralFans::getInstance().getConfigDb()->set(
                         "functions.global.hoppercounter",
@@ -127,6 +133,7 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
             .text("containerreader")
             .required("isopen", ll::command::ParamKind::Bool)
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
                 bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
                 if (CoralFans::getInstance().getConfigDb()->set(
                         "functions.global.containerreader",
@@ -142,6 +149,7 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
             .text("autototem")
             .required("isopen", ll::command::ParamKind::Bool)
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
                 bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
                 if (CoralFans::getInstance().getConfigDb()->set(
                         "functions.global.autototem",
@@ -157,6 +165,7 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
             .text("autoitem")
             .required("isopen", ll::command::ParamKind::Bool)
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
                 bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
                 if (CoralFans::getInstance().getConfigDb()->set(
                         "functions.global.autoitem",
@@ -172,6 +181,7 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
             .text("fastdrop")
             .required("isopen", ll::command::ParamKind::Bool)
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
                 bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
                 if (CoralFans::getInstance().getConfigDb()->set(
                         "functions.global.fastdrop",
@@ -187,6 +197,7 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
             .text("nopickup")
             .required("isopen", ll::command::ParamKind::Bool)
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
                 bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
                 if (CoralFans::getInstance().getConfigDb()->set(
                         "functions.global.nopickup",
@@ -202,6 +213,7 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
             .text("portaldisabled")
             .required("isopen", ll::command::ParamKind::Bool)
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
                 bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
                 if (CoralFans::getInstance().getConfigDb()->set(
                         "functions.global.portaldisabled",

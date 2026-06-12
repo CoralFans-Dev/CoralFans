@@ -29,6 +29,7 @@ void registerHsaCommand(config::CommandConfigStruct& config) {
         .text("show")
         .optional("isopen", ll::command::ParamKind::Bool)
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             auto& hsaManager = functions::HsaManager::getInstance();
             if (self["isopen"].has_value()) hsaManager.setHsaShow(self["isopen"].get<ll::command::ParamKind::Bool>());
             else hsaManager.setHsaShow(!hsaManager.getHsaShow());
@@ -41,6 +42,7 @@ void registerHsaCommand(config::CommandConfigStruct& config) {
         .text("show")
         .optional("isopen", ll::command::ParamKind::Bool)
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             auto& hsaManager = functions::HsaManager::getInstance();
             if (self["isopen"].has_value())
                 hsaManager.setStructureShow(self["isopen"].get<ll::command::ParamKind::Bool>());
@@ -51,6 +53,7 @@ void registerHsaCommand(config::CommandConfigStruct& config) {
     // hsa list
     hsaCommand.runtimeOverload().text("list").execute(
         [](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             auto hsa = functions::HsaManager::getInstance().listChunkHsa(
                 player->getDimensionBlockSource(),
@@ -67,6 +70,7 @@ void registerHsaCommand(config::CommandConfigStruct& config) {
         .text("structure")
         .text("list")
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             auto hsa = functions::HsaManager::getInstance().listChunkStructure(
                 player->getDimensionBlockSource(),

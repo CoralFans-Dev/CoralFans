@@ -37,6 +37,7 @@ void registerLogCommand(config::CommandConfigStruct& config) {
     logCommand.runtimeOverload()
         .text("levelseed")
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const&) {
+            using ll::i18n_literals::operator""_tr;
             auto level = ll::service::getLevel();
             if (!level.has_value()) return output.error("command.log.error.nulllevel"_tr());
             output.success("{}", level->getLevelSeed64().mValue);
@@ -44,6 +45,7 @@ void registerLogCommand(config::CommandConfigStruct& config) {
 
     logCommand.runtimeOverload().text("pt").execute(
         [](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const&) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             ChunkPos     chunkPos = utils::blockPosToChunkPos(player->getFeetBlockPos());
             BlockSource& region   = player->getDimensionBlockSource();
@@ -96,6 +98,7 @@ void registerLogCommand(config::CommandConfigStruct& config) {
     );
     logCommand.runtimeOverload().text("rpt").execute(
         [](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const&) {
+            using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             ChunkPos     chunkPos = utils::blockPosToChunkPos(player->getFeetBlockPos());
             BlockSource& region   = player->getDimensionBlockSource();
