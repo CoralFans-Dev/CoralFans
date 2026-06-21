@@ -234,7 +234,7 @@ struct Config {
              .command     = "fc",
              .description = "freeCamera",
              .permission  = CommandPermissionLevel::Any,
-             .actions     = {"rotate"}                                         },
+             .actions     = {"freeCamera"}                                     },
             /* fastcommand */
             {.enable      = false,
              .command     = "c",

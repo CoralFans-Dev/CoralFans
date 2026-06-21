@@ -18,7 +18,9 @@
 #include "ll/api/event/server/ServerStoppingEvent.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/mod/RegisterHelper.h"
+#ifdef LL_PLAT_C
 #include "ll/api/service/Bedrock.h"
+#endif
 #include <memory>
 
 
@@ -153,6 +155,7 @@ bool CoralFans::load() {
                                         getGeometryGroup() = bsci::GeometryGroup::createDefault();
                                         setupCommands();
                                     }));
+#ifdef LL_PLAT_C
     getEventListeners().emplace(
         ll::event::EventBus::getInstance().emplaceListener<ll::event::server::ServerStoppingEvent>([this](auto&&) {
             removeRuntimeData();
@@ -160,6 +163,7 @@ bool CoralFans::load() {
             getGeometryGroup() = nullptr;
         })
     );
+#endif
     functions::ShortcutsManager::getInstance().registerShortcutsListener();
     return true;
 }
