@@ -4,9 +4,6 @@
 #include "ll/api/service/Bedrock.h"
 #include "mc/world/level/BedrockSpawner.h"
 #include "mc/world/level/Level.h"
-#include "mc/world/level/biome/MobSpawnRules.h"
-#include "mc/world/level/biome/MobSpawnerData.h"
-#include "mc/world/level/biome/SpawnConditions.h"
 #include "mc/world/level/dimension/Dimension.h"
 
 
@@ -134,51 +131,19 @@ bool PopulationCapManager::resetDimCap(int dimId) {
     return true;
 }
 
-LL_TYPE_INSTANCE_HOOK(
-    handlePopCapHook,
-    HookPriority::Normal,
-    BedrockSpawner,
-    &BedrockSpawner::_handlePopulationCap,
-    int,
-    MobSpawnerData const*  mobType,
-    SpawnConditions const& conditions,
-    int                    inSpawnCount
-) {
+LL_TYPE_INSTANCE_HOOK(handlePopCapHook, HookPriority::Normal, BedrockSpawner, &BedrockSpawner::$tickMobCount, void) {
+    origin();
 #ifdef LL_PLAT_C
     if (auto serverInstance = ll::service::getServerInstance();
         !serverInstance
         || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(mobType, conditions, inSpawnCount);
+        return;
 #endif
-    auto& popCapManager = PopulationCapManager::getInstance();
-
-    if (!popCapManager.enabled) {
-        return origin(mobType, conditions, inSpawnCount);
+    auto& manager = PopulationCapManager::getInstance();
+    if (manager.enabled) {
+        this->mSpawnableMobTickCountPrevious =
+            std::max(this->mSpawnableMobTickCountPrevious - manager.globalMax + 200u, 0u);
     }
-
-    // global
-    int maxCount = popCapManager.globalMax;
-    if (maxCount >= 0 && this->mTotalEntityCount + inSpawnCount > maxCount) {
-        inSpawnCount = std::max(0, maxCount - this->mTotalEntityCount);
-    }
-
-    // single type (keep vanilla)
-    int populationCap =
-        conditions.isOnSurface ? mobType->mSpawnRules->mSurfaceCap : mobType->mSpawnRules->mUndergroundCap;
-    if (populationCap >= 0) {
-        auto realType    = mobType->mIdentifier->mCanonicalName.get();
-        int  isOnSurface = conditions.isOnSurface ? 1 : 0;
-
-        auto map             = this->mEntityTypeCount[isOnSurface].get();
-        auto it              = map.find(realType);
-        int  entityTypeCount = (it != map.end()) ? it->second : 0;
-
-        if (entityTypeCount + inSpawnCount > populationCap) {
-            inSpawnCount = std::max(0, populationCap - entityTypeCount);
-        }
-    }
-
-    return inSpawnCount;
 }
 
 LL_AUTO_TYPE_INSTANCE_HOOK(

@@ -47,7 +47,7 @@ private:
     // std::unordered_map<mce::UUID, std::weak_ptr<CFVillageData>> mVillageDataMap;
     std::unordered_map<mce::UUID, std::unique_ptr<CFTickingVillageData>> mTickingList;
     // std::map<int, std::pair<Village*, int>>              mVidVillageMap;
-    bsci::GeometryGroup::GeoId mParticleId;
+    // bsci::GeometryGroup::GeoId mParticleId;
 
 private:
     bool mShowBounds     = false;
@@ -95,5 +95,7 @@ public:
         return instance;
     }
     static void hookVillage(bool);
+
+    [[nodiscard]] static int getBedPOICount(Village* villagePtr);
 };
 } // namespace coral_fans::functions

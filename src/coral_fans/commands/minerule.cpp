@@ -174,7 +174,7 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
             .required("count", ll::command::ParamKind::Float)
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
                 using ll::i18n_literals::operator""_tr;
-                int dimId = self["dimension"].get<ll::command::ParamKind::Dimension>().id;
+                int dimId = self["dimension"].get<ll::command::ParamKind::Dimension>().mValue;
                 if (dimId < 0 || dimId > 2) {
                     output.error("Invalid dimension");
                     return;
@@ -210,7 +210,7 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
             .text("reset")
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
                 using ll::i18n_literals::operator""_tr;
-                int dimId = self["dimension"].get<ll::command::ParamKind::Dimension>().id;
+                int dimId = self["dimension"].get<ll::command::ParamKind::Dimension>().mValue;
                 if (dimId < 0 || dimId > 2) {
                     output.error("Invalid dimension");
                     return;

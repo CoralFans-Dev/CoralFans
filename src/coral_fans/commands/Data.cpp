@@ -235,7 +235,7 @@ void registerDataCommand(config::CommandConfigStruct& config) {
         .text("player")
         .required("player", ll::command::ParamKind::Actor)
         .text("uuid")
-        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+        .execute([](CommandOrigin const& origin, CommandOutput&, ll::command::RuntimeCommand const& self) {
             using ll::i18n_literals::operator""_tr;
             const auto actors = self["player"].get<ll::command::ParamKind::Actor>().results(origin);
             for (const auto& i : actors) {

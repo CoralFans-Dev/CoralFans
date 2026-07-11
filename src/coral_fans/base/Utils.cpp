@@ -1,5 +1,3 @@
-#pragma once
-
 #include "coral_fans/CoralFans.h"
 #include "coral_fans/base/MySchedule.h"
 
@@ -57,7 +55,7 @@ std::pair<std::string, bool> getNbtFromTag(CompoundTag& tag, std::string const& 
         if (nodes[0].useIndex) {
             if (tagVariant.is_array()) {
                 auto& list = tagVariant.get<ListTag>();
-                if (static_cast<size_t>(nodes[0].index) >= list.size())
+                if (nodes[0].index >= list.size())
                     return {"translate.data.error.geterror"_tr(), false};
                 tagVariant = std::move(list[nodes[0].index]);
             }
@@ -67,7 +65,7 @@ std::pair<std::string, bool> getNbtFromTag(CompoundTag& tag, std::string const& 
             if (nodes[i].useIndex) {
                 if (tagVariant.is_array()) {
                     auto& list = tagVariant.get<ListTag>();
-                    if (static_cast<size_t>(nodes[i].index) >= list.size())
+                    if (nodes[i].index >= list.size())
                         return {"translate.data.error.geterror"_tr(), false};
                     tagVariant = std::move(list[nodes[i].index]);
                 }

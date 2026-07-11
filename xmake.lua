@@ -13,7 +13,7 @@ end
 
 add_requires(
     "levibuildscript",
-    "bsci 0.3.1"
+    "bsci"
 )
 
 if not has_config("vs_runtime") then
@@ -21,28 +21,32 @@ if not has_config("vs_runtime") then
 end
 
 option("target_type")
-    set_default("client")
+    set_default("server")
     set_showmenu(true)
     set_values("server", "client")
 option_end()
 
 target("CoralFans") -- Change this to your mod name.
     add_rules("@levibuildscript/linkrule")
-    add_cxflags(
-        "/EHa",
-        "/utf-8",
-        "/W4",
-        "/w44265",
-        "/w44289",
-        "/w44296",
-        "/w45263",
-        "/w44738",
-        "/w45204",
-        "/Zm2000",
-        "/wd4100",
-        {force = true}
-    )
-    add_defines("NOMINMAX", "UNICODE","_AMD64_")
+    if is_plat("windows") then
+        add_defines("NOMINMAX", "UNICODE", "_AMD64_")
+        set_exceptions("none") -- To avoid conflicts with /EHa.
+        add_cxflags( "/EHa", "/utf-8", "/W4", "/w44265", "/w44289", "/w44296", "/w45263", "/w44738", "/w45204")
+        add_cxflags(
+            "/EHs",
+            "-Wno-microsoft-cast",
+            "-Wno-invalid-offsetof",
+            "-Wno-c++2b-extensions",
+            "-Wno-microsoft-include",
+            "-Wno-overloaded-virtual",
+            "-Wno-ignored-qualifiers",
+            "-Wno-missing-field-initializers",
+            "-Wno-potentially-evaluated-expression",
+            "-Wno-pragma-system-header-outside-header",
+            {tools = {"clang_cl"}}
+        )
+        set_toolchains("clang-cl")
+    end
     add_defines("COMMITID=\"$(shell git rev-parse HEAD)\"")
     add_defines("CF_VERSION=\"$(shell git describe --tags --abbrev=0 --always)\"")
     add_files("src/**.cpp")
@@ -52,7 +56,6 @@ target("CoralFans") -- Change this to your mod name.
         "bsci"
     )
     add_shflags("/DELAYLOAD:bedrock_server.dll") -- To use symbols provided by SymbolProvider.
-    set_exceptions("none") -- To avoid conflicts with /EHa.
     set_kind("shared")
     set_languages("c++20")
     set_symbols("debug")

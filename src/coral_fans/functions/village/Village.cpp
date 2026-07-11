@@ -327,6 +327,29 @@ bool CFVillageManager::getShowPoiQuery() { return this->mShowPoiQuery; }
 
 bool CFVillageManager::getShowBind() { return this->mShowBind; }
 
+int CFVillageManager::getBedPOICount(Village* villagePtr) {
+    if (!villagePtr) return 0;
+
+    int count = 0;
+    for (auto& [villagerId, poiList] : *villagePtr->mClaimedPOIs) {
+        for (auto& poi : poiList) {
+            auto poiPtr = poi.lock();
+            if (poiPtr && poiPtr->mType == POIType::Bed) {
+                count++;
+            }
+        }
+    }
+    for (auto& poiStack : *villagePtr->mUnclaimedPOIStacks) {
+        for (auto& poi : poiStack) {
+            auto poiPtr = poi.lock();
+            if (poiPtr && poiPtr->mType == POIType::Bed) {
+                count++;
+            }
+        }
+    }
+    return count;
+}
+
 std::vector<std::string> CFVillageManager::listVillages() {
     using ll::i18n_literals::operator""_tr;
     size_t                   size = this->mVillageList.size();
@@ -357,7 +380,7 @@ std::vector<std::string> CFVillageManager::listVillages() {
                 getApproximateRadius(*villagePtr->mBounds),
                 (*villagePtr->mDwellers)[0].size(), // Villager
                 (*villagePtr->mDwellers)[1].size(), // IronGolem
-                villagePtr->getBedPOICount(),
+                CFVillageManager::getBedPOICount(villagePtr),
                 villagePtr->mBounds->min.toString(),
                 villagePtr->mBounds->max.toString()
             );
@@ -394,7 +417,7 @@ std::string CFVillageManager::listTickingVillages() {
             getApproximateRadius(*villagePtr->mBounds),
             (*villagePtr->mDwellers)[0].size(), // Villager
             (*villagePtr->mDwellers)[1].size(), // IronGolem
-            villagePtr->getBedPOICount(),
+            CFVillageManager::getBedPOICount(villagePtr),
             villagePtr->mBounds->min.toString(),
             villagePtr->mBounds->max.toString()
         );

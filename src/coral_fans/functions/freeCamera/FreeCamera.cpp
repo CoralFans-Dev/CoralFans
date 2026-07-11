@@ -20,10 +20,7 @@
 #include <thread>
 #endif
 
-
-PlayerSkinPacketPayload::PlayerSkinPacketPayload()                               = default;
-PlayerSkinPacketPayload::PlayerSkinPacketPayload(PlayerSkinPacketPayload const&) = default;
-SerializedSkinRef::SerializedSkinRef(class SerializedSkinRef const&)             = default;
+PlayerSkinPacketPayload::PlayerSkinPacketPayload() = default;
 
 namespace coral_fans::functions {
 

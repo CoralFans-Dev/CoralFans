@@ -52,7 +52,7 @@ void registerHsaCommand(config::CommandConfigStruct& config) {
 
     // hsa list
     hsaCommand.runtimeOverload().text("list").execute(
-        [](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+        [](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const&) {
             using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             auto hsa = functions::HsaManager::getInstance().listChunkHsa(
@@ -69,7 +69,7 @@ void registerHsaCommand(config::CommandConfigStruct& config) {
     hsaCommand.runtimeOverload()
         .text("structure")
         .text("list")
-        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const&) {
             using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
             auto hsa = functions::HsaManager::getInstance().listChunkStructure(
