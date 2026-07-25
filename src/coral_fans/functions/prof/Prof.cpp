@@ -15,7 +15,8 @@ std::vector<std::pair<std::string, uint64>> Profiler::TypeVec = {
     {"normal", Type::normal},
     {"entity", Type::entity},
     {"chunk",  Type::chunk },
-    {"pt",     Type::pt    }
+    {"pt",     Type::pt    },
+    {"mspt",   Type::mspt  }
 };
 
 // from trapdoor-ll
@@ -129,6 +130,9 @@ void Profiler::print() const {
         break;
     case Profiler::Type::pt:
         rst = this->printPendingTicks();
+        break;
+    case Profiler::Type::mspt:
+        rst = this->printMspt();
         break;
     }
     TextPacket::createRawMessage(rst).sendToClients();
@@ -257,6 +261,26 @@ std::string Profiler::printActor() const {
     }
     retstr = "translate.profiler.actor.total"_tr(totalTime) + retstr;
     return retstr;
+}
+
+std::string Profiler::printMspt() const {
+    using ll::i18n_literals::operator""_tr;
+    if (gameSessionTicksBuffer.empty()) return "";
+    auto buf = gameSessionTicksBuffer;
+    std::ranges::sort(buf);
+    auto minMspt = buf.front();
+    auto maxMspt = buf.back();
+    size_t idx10 = buf.size() - (buf.size() * 10 + 99) / 100;
+    auto   low10 = buf[idx10];
+    size_t idx1 = buf.size() - (buf.size() + 99) / 100;
+    auto   low1 = buf[idx1];
+    return "translate.profiler.mspt"_tr(
+        totalRound,
+        micro_to_mill(minMspt),
+        micro_to_mill(maxMspt),
+        micro_to_mill(low10),
+        micro_to_mill(low1)
+    );
 }
 
 } // namespace coral_fans::functions

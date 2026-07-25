@@ -104,13 +104,15 @@ LL_TYPE_INSTANCE_HOOK(
             return ori;
         else threadData = static_cast<NetherThreadTemporaryData*>(it->second.get());
     }
-    auto chunkPos = ChunkPos(pos);
-    int  offsetX  = threadData->chunk->mPosition->x - chunkPos.x;
-    int  offsetZ  = threadData->chunk->mPosition->z - chunkPos.z;
-    if (offsetX || offsetZ) {
-        BlockPos checkPos = BlockPos(pos.x + offsetX, pos.y, pos.z + offsetZ);
-        if (ChunkPos(checkPos) != threadData->chunk->mPosition || !origin(checkPos).isAir())
-            threadData->temperaryPoses.emplace(pos);
+    if (threadData && threadData->chunk) {
+        auto chunkPos = ChunkPos(pos);
+        int  offsetX  = threadData->chunk->mPosition->x - chunkPos.x;
+        int  offsetZ  = threadData->chunk->mPosition->z - chunkPos.z;
+        if (offsetX || offsetZ) {
+            BlockPos checkPos = BlockPos(pos.x + offsetX, pos.y, pos.z + offsetZ);
+            if (ChunkPos(checkPos) != threadData->chunk->mPosition || !origin(checkPos).isAir())
+                threadData->temperaryPoses.emplace(pos);
+        }
     }
     return std::forward<decltype(ori)>(ori);
 }
@@ -210,7 +212,7 @@ LL_TYPE_INSTANCE_HOOK(
         if (it != controller.decorationThreadIds.end())
             threadData = static_cast<NetherThreadTemporaryData*>(it->second.get());
     }
-    if (threadData) {
+    if (threadData && threadData->chunk) {
         if (ChunkPos(pos) != threadData->chunk->mPosition) {
             static_cast<NetherData*>(threadData->data.get())->glowStonePosMap.emplace(pos, threadData->temperaryInt++);
             threadData->isEmpty = false;

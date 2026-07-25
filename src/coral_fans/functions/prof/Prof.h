@@ -85,7 +85,7 @@ struct EntityInfo {
 
 class Profiler {
 public:
-    enum Type : uint64 { normal, entity, chunk, pt };
+    enum Type : uint64 { normal, entity, chunk, pt, mspt };
     static std::vector<std::pair<std::string, uint64>>    TypeVec;
     uint64                                                type         = Type::normal;
     bool                                                  profiling    = false;
@@ -107,6 +107,7 @@ public:
     std::string printPendingTicks() const;
     std::string printBasics() const;
     std::string printActor() const;
+    std::string printMspt() const;
     void        reset(uint64);
     void        start(long long, uint64 = Type::normal);
     void        stop();
