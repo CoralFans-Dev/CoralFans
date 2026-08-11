@@ -139,22 +139,25 @@ bool CoralFans::load() {
     logger.debug("Loading I18n");
     if (!ll::i18n::getInstance().load(getSelf().getLangDir())) logger.error("Failed to load I18n");
 
-    getEventListeners().emplace(ll::event::EventBus::getInstance()
-                                    .emplaceListener<ll::event::command::ServerCommandRegisterEvent>([this](auto&&) {
+    getEventListeners().emplace(
+        ll::event::EventBus::getInstance().emplaceListener<ll::event::command::ServerCommandRegisterEvent>(
+            [this](auto&&) {
 #ifdef LL_PLAT_S
-                                        auto configDbPath = getSelf().getDataDir() / "config";
+                auto configDbPath = getSelf().getDataDir() / "config";
 #endif
 #ifdef LL_PLAT_C
-                                        auto dataPath     = getSelf().getWorldDataDir();
-                                        auto configDbPath = dataPath.has_value() ? dataPath.value() / "config"
-                                                                                 : getSelf().getDataDir() / "config";
+                auto dataPath = getSelf().getWorldDataDir();
+                auto configDbPath =
+                    dataPath.has_value() ? dataPath.value() / "config" : getSelf().getDataDir() / "config";
 #endif
-                                        getConfigDb() = std::make_unique<ll::data::KeyValueDB>(configDbPath);
+                getConfigDb() = std::make_unique<ll::data::KeyValueDB>(configDbPath);
 
-                                        // load GeometryGroup
-                                        getGeometryGroup() = bsci::GeometryGroup::createDefault();
-                                        setupCommands();
-                                    }));
+                // load GeometryGroup
+                getGeometryGroup() = bsci::GeometryGroup::createDefault();
+                setupCommands();
+            }
+        )
+    );
 #ifdef LL_PLAT_C
     getEventListeners().emplace(
         ll::event::EventBus::getInstance().emplaceListener<ll::event::server::ServerStoppingEvent>([this](auto&&) {

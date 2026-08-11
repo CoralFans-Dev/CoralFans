@@ -33,6 +33,7 @@ std::string getBlockData(BlockSource& blockSource, BlockPos blockPos) {
         block.buildDescriptionName(),
         block.getTypeName(),
         block.getBlockItemId(),
+        block.getRuntimeId(),
         block.mBlockType->getVariant(block),
         block.mBlockType->canInstatick(),
         block.mBlockType->mBlockEntityType != BlockActorType::Undefined,
