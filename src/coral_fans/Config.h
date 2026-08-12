@@ -79,7 +79,7 @@ struct Locate {
     struct DuplicatableOreStruct {
         bool        enable             = true;
         std::string originPosColor     = "#10E436";
-        std::string originPosTextColor = "#FFFFFF";
+        std::string originPosTextColor = "#ffffff";
         std::string arrowColor         = "#FFFFFF";
     };
 };

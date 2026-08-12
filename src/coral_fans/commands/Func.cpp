@@ -231,37 +231,63 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
     functions::ContainerOpenManager::hook(config.enabled);
 
     // func forceplace normal|entity|all
-    functions::forcePlaceHook(config.enabled && configDb->get("functions.global.forceplace")->c_str()[0] - '0');
+    functions::forcePlaceHook(
+        config.enabled && configDb->has("functions.global.forceplace")
+        && configDb->get("functions.global.forceplace")->c_str()[0] - '0'
+    );
 
     // func droppernocost <bool>
     functions::FuncDropNoCostManager::droppernocostHook(
-        config.enabled && configDb->get("functions.global.droppernocost") == "true"
+        config.enabled && configDb->has("functions.global.droppernocost")
+        && configDb->get("functions.global.droppernocost") == "true"
     );
 
     // safeexplode
-    functions::safeExplodeHook(config.enabled && configDb->get("functions.global.safeexplode") == "true");
+    functions::safeExplodeHook(
+        config.enabled && configDb->has("functions.global.safeexplode")
+        && configDb->get("functions.global.safeexplode") == "true"
+    );
 
     // autotool
-    functions::hookAutoTool(config.enabled && configDb->get("functions.global.autotool") == "true");
+    functions::hookAutoTool(
+        config.enabled && configDb->has("functions.global.autotool")
+        && configDb->get("functions.global.autotool") == "true"
+    );
 
     // hoppercounter
     functions::HopperCounterManager::getInstance().setEnabled(
-        config.enabled && configDb->get("functions.global.hoppercounter") == "true"
+        config.enabled && configDb->has("functions.global.hoppercounter")
+        && configDb->get("functions.global.hoppercounter") == "true"
     );
 
     // autototem
-    functions::autoTotemHook(config.enabled && configDb->get("functions.global.autototem") == "true");
+    functions::autoTotemHook(
+        config.enabled && configDb->has("functions.global.autototem")
+        && configDb->get("functions.global.autototem") == "true"
+    );
 
     // autoitem
-    functions::autoItemHook(config.enabled && configDb->get("functions.global.autoitem") == "true");
+    functions::autoItemHook(
+        config.enabled && configDb->has("functions.global.autoitem")
+        && configDb->get("functions.global.autoitem") == "true"
+    );
 
     // fastdrop
-    functions::fastDropHook(config.enabled && configDb->get("functions.global.fastdrop") == "true");
+    functions::fastDropHook(
+        config.enabled && configDb->has("functions.global.fastdrop")
+        && configDb->get("functions.global.fastdrop") == "true"
+    );
 
     // nopickup
-    functions::noPickUpHook(config.enabled && configDb->get("functions.global.nopickup") == "true");
+    functions::noPickUpHook(
+        config.enabled && configDb->has("functions.global.nopickup")
+        && configDb->get("functions.global.nopickup") == "true"
+    );
 
     // portaldisabled
-    functions::portalDisabledHook(config.enabled && configDb->get("functions.global.portaldisabled") == "true");
+    functions::portalDisabledHook(
+        config.enabled && configDb->has("functions.global.portaldisabled")
+        && configDb->get("functions.global.portaldisabled") == "true"
+    );
 }
 } // namespace coral_fans::commands
