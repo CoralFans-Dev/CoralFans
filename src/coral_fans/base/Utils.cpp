@@ -15,6 +15,7 @@
 #include <memory>
 #include <string>
 
+
 namespace coral_fans::utils {
 
 namespace {
@@ -29,11 +30,13 @@ bool parsePath(std::string const& path, std::vector<PathNode>& vec) {
     for (auto key : ll::string_utils::splitByPattern(path, ".")) {
         if (key.ends_with(')')) try {
                 int index = (int)key.find('(');
-                vec.emplace_back(PathNode{
-                    std::string{key.substr(0, index)},
-                    std::stoi(std::string{key.substr(index + 1, key.length() - index - 2)}),
-                    true
-                });
+                vec.emplace_back(
+                    PathNode{
+                        std::string{key.substr(0, index)},
+                        std::stoi(std::string{key.substr(index + 1, key.length() - index - 2)}),
+                        true
+                    }
+                );
             } catch (...) {
                 return false;
             }
@@ -55,7 +58,7 @@ std::pair<std::string, bool> getNbtFromTag(CompoundTag& tag, std::string const& 
         if (nodes[0].useIndex) {
             if (tagVariant.is_array()) {
                 auto& list = tagVariant.get<ListTag>();
-                if (nodes[0].index >= list.size())
+                if (nodes[0].index >= static_cast<int>(list.size()))
                     return {"translate.data.error.geterror"_tr(), false};
                 tagVariant = std::move(list[nodes[0].index]);
             }
@@ -65,7 +68,7 @@ std::pair<std::string, bool> getNbtFromTag(CompoundTag& tag, std::string const& 
             if (nodes[i].useIndex) {
                 if (tagVariant.is_array()) {
                     auto& list = tagVariant.get<ListTag>();
-                    if (nodes[i].index >= list.size())
+                    if (nodes[i].index >= static_cast<int>(list.size()))
                         return {"translate.data.error.geterror"_tr(), false};
                     tagVariant = std::move(list[nodes[i].index]);
                 }

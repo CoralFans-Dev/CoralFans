@@ -33,7 +33,7 @@ std::string getBlockData(BlockSource& blockSource, BlockPos blockPos) {
         block.buildDescriptionName(),
         block.getTypeName(),
         block.getBlockItemId(),
-        block.getRuntimeId(),
+        block.mNetworkId,
         block.mBlockType->getVariant(block),
         block.mBlockType->canInstatick(),
         block.mBlockType->mBlockEntityType != BlockActorType::Undefined,
@@ -214,12 +214,7 @@ void highlightBlockEntity(Player* player, int radius, int time) {
             mce::Color::YELLOW()
         };
         std::vector<::BlockActor*> blockActors{};
-#ifdef LL_PLAT_S
-        blockActors = player->getDimensionBlockSource().fetchBlockEntities({origin - offset, origin + offset});
-#endif
-#ifdef LL_PLAT_C
         player->getDimensionBlockSource().fetchBlockEntities({origin - offset, origin + offset}, blockActors, false);
-#endif
         for (auto blockActor : blockActors)
             if (blockActor) utils::shortHighligntBlock(dimid, blockActor->mPosition, colors[colorindex], time);
         colorindex = (colorindex + 1) % colors.size();

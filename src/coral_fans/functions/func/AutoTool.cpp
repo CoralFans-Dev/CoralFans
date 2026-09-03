@@ -10,7 +10,6 @@
 #include "mc/world/actor/player/Inventory.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/actor/player/PlayerInventory.h"
-#include "mc/world/events/BlockEventCoordinator.h"
 #include "mc/world/item/Item.h"
 #include "mc/world/item/ItemStack.h"
 #include "mc/world/level/BlockSource.h"
@@ -90,12 +89,13 @@ LL_STATIC_HOOK(
         )
         == "true") {
         int currentSlot = player.getSelectedItemSlot();
-        int minDamage =
-            std::stoi(CoralFans::getInstance()
-                          .getConfigDb()
-                          ->get(std::format("functions.players.{}.autotool.mindamage", player.getUuid().asString()))
-                          .value_or("1"));
-        const Block& block = player.getDimensionBlockSourceConst().getBlock(pos);
+        int minDamage   = std::stoi(
+            CoralFans::getInstance()
+                .getConfigDb()
+                ->get(std::format("functions.players.{}.autotool.mindamage", player.getUuid().asString()))
+                .value_or("1")
+        );
+        const Block& block = player.getDimensionBlockSource().getBlock(pos);
         int bestSlot = ::searchBestToolInInv(*player.mInventory->mInventory, currentSlot, &block, minDamage, false);
         if (bestSlot > 8) {
             utils::swapItemInContainer(&player, currentSlot, bestSlot);
@@ -127,11 +127,12 @@ LL_TYPE_INSTANCE_HOOK(
         )
         == "true") {
         int currentSlot = this->getSelectedItemSlot();
-        int minDamage =
-            std::stoi(CoralFans::getInstance()
-                          .getConfigDb()
-                          ->get(std::format("functions.players.{}.autotool.mindamage", this->getUuid().asString()))
-                          .value_or("1"));
+        int minDamage   = std::stoi(
+            CoralFans::getInstance()
+                .getConfigDb()
+                ->get(std::format("functions.players.{}.autotool.mindamage", this->getUuid().asString()))
+                .value_or("1")
+        );
         int bestSlot = ::searchBestToolInInv(*this->mInventory->mInventory, currentSlot, nullptr, minDamage, true);
         if (bestSlot > 8) {
             utils::swapItemInContainer(this, currentSlot, bestSlot);

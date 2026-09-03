@@ -3,11 +3,13 @@
 #include "ll/api/base/StdInt.h"
 #include "mc/world/level/ChunkPos.h"
 
+#include <chrono>
 #include <cstdint>
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
+
 
 namespace coral_fans::functions {
 
@@ -62,18 +64,22 @@ Level::tick
 */
 
 struct RedstoneProfileInfo {
-    long long   signalUpdate  = 0; // Dimension::tickRedstone
-    long long   pendingAdd    = 0; // PendingAdd
-    long long   pendingUpdate = 0; // PendingUpdate
-    long long   pendingRemove = 0; // pendingRemove
+    long long signalUpdate = 0; // Dimension::tickRedstone
+    // long long   pendingAdd    = 0; // PendingAdd
+    long long pendingUpdate = 0; // PendingUpdate
+    // long long   pendingRemove = 0; // pendingRemove
     inline void reset() {
-        signalUpdate  = 0;
-        pendingAdd    = 0;
+        signalUpdate = 0;
+        // pendingAdd    = 0;
         pendingUpdate = 0;
-        pendingRemove = 0;
+        // pendingRemove = 0;
     }
 
-    [[nodiscard]] inline long long sum() const { return signalUpdate + pendingAdd + pendingUpdate; }
+    [[nodiscard]] inline long long sum() const {
+        return signalUpdate
+             //  + pendingAdd
+             + pendingUpdate;
+    }
 };
 
 // normal profile
@@ -100,6 +106,10 @@ public:
     long long                                             dimensionTickTime        = 0; // chunk (un)load & village
     long long                                             entitySystemTickTime     = 0;
     std::array<std::map<ChunkPos, unsigned long long>, 3> ptCounter{};
+
+public:
+    int                                                chunkTickBlocksMutex = 0;
+    std::chrono::time_point<std::chrono::steady_clock> chunkTickBlocksBeginTime; // 随机刻
 
 public:
     void        print() const;

@@ -11,6 +11,7 @@
 #include "mc/network/packet/UpdatePlayerGameTypePacket.h"
 #include "mc/server/ServerPlayer.h"
 #include "mc/world/actor/Actor.h "
+#include "mc/world/actor/ActorHurtResult.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/Tick.h"
 
@@ -42,14 +43,12 @@ void SendFakePlayerPacket(Player* pl) {
     pl->sendNetworkPacket(pkt1);
     // Update Skin
 
-    auto skinPktPayload                  = PlayerSkinPacketPayload();
-    skinPktPayload.mUUID                 = randomUuid;
-    skinPktPayload.mSkin                 = *pl->mSkin;
-    skinPktPayload.mLocalizedNewSkinName = "";
-    skinPktPayload.mLocalizedOldSkinName = "";
-    auto pkt2                            = PlayerSkinPacket(std::move(skinPktPayload));
-
-    pkt2.sendTo(*pl);
+    auto skinPkt                  = PlayerSkinPacket();
+    skinPkt.mUUID                 = randomUuid;
+    skinPkt.mSkin                 = *pl->mSkin;
+    skinPkt.mLocalizedNewSkinName = "";
+    skinPkt.mLocalizedOldSkinName = "";
+    skinPkt.sendTo(*pl);
 
 
     // gmlib::network::GMBinaryStream bs;
@@ -144,7 +143,7 @@ LL_TYPE_INSTANCE_HOOK(
         || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(id, pkt);
 #endif
-    if (!FreeCameraManager::getInstance().FreeCamList.contains(id.mGuid.g)) {
+    if (!FreeCameraManager::getInstance().FreeCamList.contains(id.mGuid.g)) [[likely]] {
         origin(id, pkt);
     }
 }
@@ -172,25 +171,23 @@ LL_TYPE_INSTANCE_HOOK(
 LL_TYPE_INSTANCE_HOOK(
     PlayerHurtEvent,
     ll::memory::HookPriority::Normal,
-    Mob,
-    &Mob::getDamageAfterResistanceEffect,
-    float,
-    class ActorDamageSource const& a1,
-    float                          a2
+    Player,
+    &Player::$_hurt,
+    ActorHurtResult,
+    ::ActorDamageSource const& source,
+    float                      damage,
+    ::HurtParameters const&    hurtParameters
 ) {
 #ifdef LL_PLAT_C
     if (auto serverInstance = ll::service::getServerInstance();
         !serverInstance
         || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(a1, a2);
+        return origin(source, damage, hurtParameters);
 #endif
-    auto res = origin(a1, a2);
-    if (this->isType(ActorType::Player) && res != 0) {
-        auto pl = (Player*)this;
-        if ((pl->isSurvival() || pl->isAdventure())
-            && FreeCameraManager::getInstance().FreeCamList.contains(pl->getNetworkIdentifier().mGuid.g)) {
-            FreeCameraManager::DisableFreeCamera(pl);
-        }
+    auto res = origin(source, damage, hurtParameters);
+    if ((this->isSurvival() || this->isAdventure())
+        && FreeCameraManager::getInstance().FreeCamList.contains(this->getNetworkIdentifier().mGuid.g)) {
+        FreeCameraManager::DisableFreeCamera(this);
     }
     return res;
 }

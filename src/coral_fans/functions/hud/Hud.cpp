@@ -21,6 +21,7 @@
 #include "mc/world/level/biome/Biome.h"
 #include "mc/world/level/block/Block.h"
 #include "mc/world/level/block/actor/BlockActor.h"
+#include "mc/world/level/block/actor/VanillaBlockActor.h"
 #include "mc/world/level/dimension/Dimension.h"
 #include "mc/world/phys/HitResultType.h"
 #include <algorithm>
@@ -53,10 +54,12 @@ void HudHelper::tick() {
                     return true;
                 unsigned long hud;
                 try {
-                    hud = std::stoul(CoralFans::getInstance()
-                                         .getConfigDb()
-                                         ->get("functions.players." + player.getUuid().asString() + ".cfhud.hud")
-                                         .value_or("0"));
+                    hud = std::stoul(
+                        CoralFans::getInstance()
+                            .getConfigDb()
+                            ->get("functions.players." + player.getUuid().asString() + ".cfhud.hud")
+                            .value_or("0")
+                    );
                 } catch (...) {
                     return true;
                 }
@@ -91,7 +94,7 @@ void HudHelper::tick() {
                                                                                      true
                                                                                  )
                                                                                  .mValue)
-                                                                    : "-",
+                                                            : "-",
                         delta.length() * 20,
                         delta.x * 20,
                         delta.y * 20,
@@ -129,7 +132,7 @@ void HudHelper::tick() {
                         const auto& bl = blockSource.getBlock(hitrst.mBlock);
                         auto*       ba = blockSource.getBlockEntity(hitrst.mBlock);
                         if (bl.mBlockType->isContainerBlock() && ba) {
-                            auto* container = ba->getContainer();
+                            auto* container = static_cast<VanillaBlockActor*>(ba)->getContainer();
                             if (container) {
                                 std::map<std::string, int> items;
                                 for (const auto& item : container->getSlots()) {

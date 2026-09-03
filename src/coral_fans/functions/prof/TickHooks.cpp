@@ -13,7 +13,9 @@
 #include "ll/api/memory/Hook.h"
 #include "ll/api/service/Bedrock.h"
 #include "mc/profile/ProfilerLite.h"
+#include "mc/server/ServerInstance.h"
 #include "mc/world/actor/Actor.h"
+#include "mc/world/level/BedrockSpawner.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/BlockTickingQueue.h"
 #include "mc/world/level/EntitySystemsManager.h"
@@ -25,7 +27,6 @@
 
 
 #ifdef LL_PLAT_C
-#include "mc/server/ServerInstance.h"
 #include <thread>
 #endif
 
@@ -84,20 +85,45 @@ LL_TYPE_INSTANCE_HOOK(
     const auto dimid    = tickRegion.getDimensionId();
     auto&      chunkPos = this->mPosition;
     if (prof.profiling) {
+        prof.chunkTickBlocksMutex = 1;
         PROF_TIMER(chunk, { origin(tickRegion, tick, spawnerCallback); })
+        prof.chunkTickBlocksMutex     = 0;
         prof.chunkInfo.totalTickTime += time_chunk;
         prof.chunkInfo.chunk_counter[static_cast<int>(dimid)][chunkPos].push_back(time_chunk);
     } else origin(tickRegion, tick, spawnerCallback);
 }
 
-// LevelChunk tickBlocks
+// LevelChunk tickBlocks 已被内联
+// LL_TYPE_INSTANCE_HOOK(
+//     CoralFansTickLevelChunkTickBlocksHook,
+//     ll::memory::HookPriority::Normal,
+//     LevelChunk,
+//     &LevelChunk::tickBlocks,
+//     void,
+//     BlockSource& region
+// ) {
+// #ifdef LL_PLAT_C
+//     if (auto serverInstance = ll::service::getServerInstance();
+//         !serverInstance
+//         || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+//         return origin(region);
+// #endif
+//     auto& prof = functions::Profiler::getInstance();
+//     if (prof.profiling) {
+//         PROF_TIMER(chunk_block, { origin(region); })
+//         prof.chunkInfo.randomTickTime += time_chunk_block;
+//     } else origin(region);
+// }
+
 LL_TYPE_INSTANCE_HOOK(
     CoralFansTickLevelChunkTickBlocksHook,
     ll::memory::HookPriority::Normal,
-    LevelChunk,
-    &LevelChunk::tickBlocks,
+    BedrockSpawner,
+    &BedrockSpawner::$tick,
     void,
-    BlockSource& region
+    ::BlockSource&                region,
+    ::LevelChunkVolumeData const& levelChunkVolumeData,
+    ::ChunkPos const              chunkPos
 ) {
 #ifdef LL_PLAT_C
     if (auto serverInstance = ll::service::getServerInstance();
@@ -106,10 +132,10 @@ LL_TYPE_INSTANCE_HOOK(
         return origin(region);
 #endif
     auto& prof = functions::Profiler::getInstance();
-    if (prof.profiling) {
-        PROF_TIMER(chunk_block, { origin(region); })
-        prof.chunkInfo.randomTickTime += time_chunk_block;
-    } else origin(region);
+    if (prof.profiling && prof.chunkTickBlocksMutex) {
+        prof.chunkTickBlocksMutex     = 2;
+        prof.chunkTickBlocksBeginTime = std ::chrono ::high_resolution_clock ::now();
+    } else origin(region, levelChunkVolumeData, chunkPos);
 }
 
 // LevelChunk tickBlockEntities
@@ -146,14 +172,17 @@ LL_TYPE_INSTANCE_HOOK(
     int          max,
     bool         instaTick_
 ) {
-#ifdef LL_PLAT_C
     if (auto serverInstance = ll::service::getServerInstance();
         !serverInstance
         || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(region, until, max, instaTick_);
-#endif
     auto& prof = functions::Profiler::getInstance();
     if (prof.profiling) {
+        if (prof.chunkTickBlocksMutex == 2) {
+            auto e_chunk_block    = std ::chrono ::high_resolution_clock ::now() - prof.chunkTickBlocksBeginTime;
+            auto time_chunk_block = std ::chrono ::duration_cast<std ::chrono ::microseconds>(e_chunk_block).count();
+            prof.chunkInfo.randomTickTime += time_chunk_block;
+        }
         bool res;
         // from
         // https://github.com/glibcxx/figure_hack/blob/f74b0badc2a2397f811282a3cdda3725f7e13c55/src/figure_hack/Function/PendingTickVisualization.cpp#L56
@@ -241,25 +270,25 @@ LL_TYPE_INSTANCE_HOOK(
 
 // pending add
 // CircuitSceneGraph processPendingAdds
-LL_TYPE_INSTANCE_HOOK(
-    CoralFansTickCircuitSceneGraphProcessPendingAddsHook,
-    ll::memory::HookPriority::Normal,
-    CircuitSceneGraph,
-    &CircuitSceneGraph::processPendingAdds,
-    void
-) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin();
-#endif
-    auto& prof = functions::Profiler::getInstance();
-    if (prof.profiling) {
-        PROF_TIMER(pt_add, { origin(); })
-        prof.redstoneInfo.pendingAdd += time_pt_add;
-    } else origin();
-}
+// LL_TYPE_INSTANCE_HOOK(
+//     CoralFansTickCircuitSceneGraphProcessPendingAddsHook,
+//     ll::memory::HookPriority::Normal,
+//     CircuitSceneGraph,
+//     &CircuitSceneGraph::processPendingAdds,
+//     void
+// ) {
+// #ifdef LL_PLAT_C
+//     if (auto serverInstance = ll::service::getServerInstance();
+//         !serverInstance
+//         || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+//         return origin();
+// #endif
+//     auto& prof = functions::Profiler::getInstance();
+//     if (prof.profiling) {
+//         PROF_TIMER(pt_add, { origin(); })
+//         prof.redstoneInfo.pendingAdd += time_pt_add;
+//     } else origin();
+// }
 
 // pending update
 // CircuitSceneGraph processPendingUpdates
@@ -286,26 +315,26 @@ LL_TYPE_INSTANCE_HOOK(
 
 // pending remove
 // CircuitSceneGraph removeComponent
-LL_TYPE_INSTANCE_HOOK(
-    CoralFansTickCircuitSceneGraphRemoveComponentHook,
-    ll::memory::HookPriority::Normal,
-    CircuitSceneGraph,
-    &CircuitSceneGraph::removeComponent,
-    void,
-    BlockPos const& pos
-) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(pos);
-#endif
-    auto& prof = functions::Profiler::getInstance();
-    if (prof.profiling) {
-        PROF_TIMER(pt_remove, { origin(pos); })
-        prof.redstoneInfo.pendingRemove += time_pt_remove;
-    } else return origin(pos);
-}
+// LL_TYPE_INSTANCE_HOOK(
+//     CoralFansTickCircuitSceneGraphRemoveComponentHook,
+//     ll::memory::HookPriority::Normal,
+//     CircuitSceneGraph,
+//     &CircuitSceneGraph::removeComponent,
+//     void,
+//     BlockPos const& pos
+// ) {
+// #ifdef LL_PLAT_C
+//     if (auto serverInstance = ll::service::getServerInstance();
+//         !serverInstance
+//         || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+//         return origin(pos);
+// #endif
+//     auto& prof = functions::Profiler::getInstance();
+//     if (prof.profiling) {
+//         PROF_TIMER(pt_remove, { origin(pos); })
+//         prof.redstoneInfo.pendingRemove += time_pt_remove;
+//     } else return origin(pos);
+// }
 
 // redstone stuff end
 
@@ -348,9 +377,9 @@ void hookTick(bool hook, bool disable) {
         CoralFansTickDimensionTickHook::hook();
         CoralFansTickEntitySystemsTickHook::hook();
         CoralFansTickDimensionTickRedstoneHook::hook();
-        CoralFansTickCircuitSceneGraphProcessPendingAddsHook::hook();
+        // CoralFansTickCircuitSceneGraphProcessPendingAddsHook::hook();
         CoralFansTickCircuitSceneGraphProcessPendingUpdatesHook::hook();
-        CoralFansTickCircuitSceneGraphRemoveComponentHook::hook();
+        // CoralFansTickCircuitSceneGraphRemoveComponentHook::hook();
         CoralFansTickActorTickHook::hook();
     } else {
         CoralFansTickLevelChunkTickHook::unhook();
@@ -360,9 +389,9 @@ void hookTick(bool hook, bool disable) {
         CoralFansTickDimensionTickHook::unhook();
         CoralFansTickEntitySystemsTickHook::unhook();
         CoralFansTickDimensionTickRedstoneHook::unhook();
-        CoralFansTickCircuitSceneGraphProcessPendingAddsHook::unhook();
+        // CoralFansTickCircuitSceneGraphProcessPendingAddsHook::unhook();
         CoralFansTickCircuitSceneGraphProcessPendingUpdatesHook::unhook();
-        CoralFansTickCircuitSceneGraphRemoveComponentHook::unhook();
+        // CoralFansTickCircuitSceneGraphRemoveComponentHook::unhook();
         CoralFansTickActorTickHook::unhook();
     }
 }

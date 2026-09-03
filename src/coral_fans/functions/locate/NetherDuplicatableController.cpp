@@ -7,6 +7,7 @@
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/deps/core/math/Color.h"
+#include "mc/deps/core/threading/SharedLockbox.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/BlockSource.h"

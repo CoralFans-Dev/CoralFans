@@ -52,23 +52,24 @@ LL_TYPE_INSTANCE_HOOK(
     ::BlockPos const&             pos,
     ::Block const&                block,
     ::IRandom&                    random,
-    ::ResourceDropsContext const& resourceDropsContext
+    ::ResourceDropsContext const& resourceDropsContext,
+    ::Actor const*                actorContext
 ) {
 #ifdef LL_PLAT_C
     if (auto serverInstance = ll::service::getServerInstance();
         !serverInstance
         || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(region, pos, block, random, resourceDropsContext);
+        return origin(region, pos, block, random, resourceDropsContext, actorContext);
 #endif
     auto& helper = RestoreAncillaryBrokenHelper::getInstance();
     if (helper.mutex2) {
         helper.mutex2       = false;
         helper._randomize   = &random;
         helper.dropsContext = &resourceDropsContext;
-        origin(region, pos, block, random, resourceDropsContext);
+        origin(region, pos, block, random, resourceDropsContext, actorContext);
         return;
     }
-    origin(region, pos, block, random, resourceDropsContext);
+    origin(region, pos, block, random, resourceDropsContext, actorContext);
 }
 
 LL_TYPE_INSTANCE_HOOK(
@@ -98,15 +99,22 @@ LL_TYPE_INSTANCE_HOOK(
         if (hasSecondPart) {
             auto& secondPartBlock = region.getBlock(secondPartPos);
             if (block.mBlockType != secondPartBlock.mBlockType) {
-                secondPartBlock.mBlockType
-                    ->spawnResources(region, secondPartPos, secondPartBlock, *helper._randomize, *helper.dropsContext);
+                secondPartBlock.mBlockType->spawnResources(
+                    region,
+                    secondPartPos,
+                    secondPartBlock,
+                    *helper._randomize,
+                    *helper.dropsContext,
+                    nullptr
+                );
                 auto& secondPartLiquidBlock = region.getLiquidBlock(secondPartPos);
                 secondPartLiquidBlock.mBlockType->spawnResources(
                     region,
                     secondPartPos,
                     secondPartLiquidBlock,
                     *helper._randomize,
-                    *helper.dropsContext
+                    *helper.dropsContext,
+                    nullptr
                 );
                 region.removeBlock(secondPartPos, blockChangeContext);
                 size_t length = helper.pistonBlockActor->mBreakBlocks->size();

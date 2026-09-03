@@ -5,9 +5,9 @@ add_repositories("oeotyan-repo https://github.com/OEOTYAN/xmake-repo.git")
 add_repositories("coralfansdev-repo https://github.com/CoralFans-Dev/xmake-repo.git")
 
 if is_config("target_type", "server") then
-    add_requires("levilamina", {configs = {target_type = "server"}})
+    add_requires("levilamina 2bd38e02b2b57405d1258a639437d1df6539e47b", {configs = {target_type = "server"}})
 else
-    add_requires("levilamina", {configs = {target_type = "client"}})
+    add_requires("levilamina 2bd38e02b2b57405d1258a639437d1df6539e47b", {configs = {target_type = "client"}})
 end
 
 
@@ -59,15 +59,15 @@ target("CoralFans") -- Change this to your mod name.
     set_kind("shared")
     set_languages("c++20")
     set_symbols("debug")
-    if is_config("target_type", "server") then
-        add_defines("LL_PLAT_S")
-    --  add_includedirs("src-server")
-    --  add_files("src-server/**.cpp")
-    else
-        add_defines("LL_PLAT_C")
-    --  add_includedirs("src-client")
-    --  add_files("src-client/**.cpp")
-    end
+        if is_config("target_type", "server") then
+            add_defines("LL_PLAT_S")
+        --  add_includedirs("src-server")
+        --  add_files("src-server/**.cpp")
+        else
+            add_defines("LL_PLAT_C")
+        --  add_includedirs("src-client")
+        --  add_files("src-client/**.cpp")
+        end
 
     after_build(function (target)
         local mod_packer = import("scripts.after_build")

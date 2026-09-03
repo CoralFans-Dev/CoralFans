@@ -19,17 +19,22 @@ namespace coral_fans::functions::locate {
 // decorationPostProcessChunk Hook 的通用逻辑宏
 #define DUPLICATABLE_DECORATION_POST_PROCESS_CHUNK(ControllerType, ThreadDataType, DataType, neighborhood)             \
     do {                                                                                                               \
-        auto            dim            = (neighborhood).mDimension;                                                    \
+        auto            dim            = neighborhood.mDimension;                                                      \
         DBChunkStorage* dbChunkStorage = static_cast<DBChunkStorage*>(&(*(dim)->mChunkSource->mOwnedParent));          \
-        auto&           pos            = (neighborhood).mArea->mBounds.mMin;                                           \
-        ChunkPos        originChunkPos = ChunkPos((pos)->x + 1, (pos)->z + 1);                                         \
-        auto&           controller     = ControllerType::getInstance();                                                \
+        auto&           box            = neighborhood.mArea->mChunkDataBox;                                            \
+        Pos             min;                                                                                           \
+        {                                                                                                              \
+            std::shared_lock lock(box.mMutex);                                                                         \
+            min = box.mContent.mBounds.mMin;                                                                           \
+        }                                                                                                              \
+        ChunkPos originChunkPos = ChunkPos(min.x + 1, min.z + 1);                                                      \
+        auto&    controller     = ControllerType::getInstance();                                                       \
         for (int i = -1; i <= 1; i++) {                                                                                \
             for (int j = -1; j <= 1; j++) {                                                                            \
                 ChunkPos chunkPos = originChunkPos + ChunkPos(i, j);                                                   \
                 if (!dbChunkStorage->isChunkSaved(chunkPos)) {                                                         \
                     auto threadData   = std::make_unique<ThreadDataType>();                                            \
-                    threadData->chunk = (neighborhood).getExistingChunk(originChunkPos).get();                         \
+                    threadData->chunk = neighborhood.getExistingChunk(originChunkPos).get();                           \
                     threadData->data  = std::make_unique<DataType>();                                                  \
                     auto threadId     = std::this_thread::get_id();                                                    \
                     {                                                                                                  \
@@ -46,8 +51,9 @@ namespace coral_fans::functions::locate {
                             else {                                                                                     \
                                 auto [newIter, inserted] = controller.dataMap.insert_or_assign(                        \
                                     originChunkPos,                                                                    \
-                                    std::make_unique<DataType>(std::move(*static_cast<DataType*>(it->second->data.get( \
-                                    ))))                                                                               \
+                                    std::make_unique<DataType>(                                                        \
+                                        std::move(*static_cast<DataType*>(it->second->data.get()))                     \
+                                    )                                                                                  \
                                 );                                                                                     \
                                 if (!inserted) newIter->second->reload = true;                                         \
                             }                                                                                          \

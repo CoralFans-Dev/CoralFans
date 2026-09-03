@@ -90,23 +90,25 @@ LL_TYPE_INSTANCE_HOOK(
     ::BlockPos const&             pos,
     ::Block const&                block,
     ::IRandom&                    random,
-    ::ResourceDropsContext const& resourceDropsContext
+    ::ResourceDropsContext const& resourceDropsContext,
+    ::Actor const*                actorContext
 ) {
 #ifdef LL_PLAT_C
     if (auto serverInstance = ll::service::getServerInstance();
         !serverInstance
         || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(region, pos, block, random, resourceDropsContext);
+        return origin(region, pos, block, random, resourceDropsContext, actorContext);
 #endif
     if (block.getTypeName() == "minecraft:moving_block") {
         MovingBlockActor* mba = (MovingBlockActor*)region.getBlockEntity(pos);
         if (mba->mWrappedBlock->getTypeName() != "minecraft:moving_block") { // 防止mb的mb导致的无限循环
             region.setBlock(pos, *mba->mWrappedBlock, 3, mba->mWrappedBlockActor, nullptr, BlockChangeContext());
             const Block& newBlock = region.getBlock(pos);
-            return newBlock.mBlockType->spawnResources(region, pos, newBlock, random, resourceDropsContext);
+            return newBlock.mBlockType
+                ->spawnResources(region, pos, newBlock, random, resourceDropsContext, actorContext);
         }
     }
-    return origin(region, pos, block, random, resourceDropsContext);
+    return origin(region, pos, block, random, resourceDropsContext, actorContext);
 }
 
 void bedrockDropHook(bool bl) { bl ? CoralFansDropHook1::hook() : CoralFansDropHook1::unhook(); }

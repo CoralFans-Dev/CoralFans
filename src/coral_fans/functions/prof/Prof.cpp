@@ -213,9 +213,9 @@ std::string Profiler::printBasics() const {
         /*redstone*/
         mean(redstoneInfo.sum()),
         mean(redstoneInfo.signalUpdate),
-        mean(redstoneInfo.pendingAdd),
+        // mean(redstoneInfo.pendingAdd),
         mean(redstoneInfo.pendingUpdate),
-        mean(redstoneInfo.pendingRemove),
+        // mean(redstoneInfo.pendingRemove),
         /*dimension*/
         mean(dimensionTickTime),
         /*entity system*/
@@ -268,12 +268,12 @@ std::string Profiler::printMspt() const {
     if (gameSessionTicksBuffer.empty()) return "";
     auto buf = gameSessionTicksBuffer;
     std::ranges::sort(buf);
-    auto minMspt = buf.front();
-    auto maxMspt = buf.back();
-    size_t idx10 = buf.size() - (buf.size() * 10 + 99) / 100;
-    auto   low10 = buf[idx10];
-    size_t idx1 = buf.size() - (buf.size() + 99) / 100;
-    auto   low1 = buf[idx1];
+    auto   minMspt = buf.front();
+    auto   maxMspt = buf.back();
+    size_t idx10   = buf.size() - (buf.size() * 10 + 99) / 100;
+    auto   low10   = buf[idx10];
+    size_t idx1    = buf.size() - (buf.size() + 99) / 100;
+    auto   low1    = buf[idx1];
     return "translate.profiler.mspt"_tr(
         totalRound,
         micro_to_mill(minMspt),

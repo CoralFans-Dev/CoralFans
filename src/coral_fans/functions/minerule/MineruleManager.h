@@ -117,4 +117,14 @@ public:
 private:
     PopulationCapManager() = default;
 };
+
+class RemovePortalZombieCDHelper {
+public:
+    bool spawn = false;
+
+    [[nodiscard]] static RemovePortalZombieCDHelper& getInstance() {
+        static RemovePortalZombieCDHelper instance;
+        return instance;
+    }
+};
 } // namespace coral_fans::functions
