@@ -81,12 +81,8 @@ void DuplicatableManager::bsciDataRuntimeRemove() {
     if (!level) [[unlikely]]
         return;
 
-    if (auto netherDim = level->getDimension(1).lock()) {
-        netherController->bsciDataRuntimeRemoveInternal(this->showType);
-    }
-    if (auto theEndDim = level->getDimension(2).lock()) {
-        theEndController->bsciDataRuntimeRemoveInternal(this->showType);
-    }
+    netherController->bsciDataRuntimeRemoveInternal(this->showType);
+    theEndController->bsciDataRuntimeRemoveInternal(this->showType);
 }
 
 void DuplicatableManager::tick() {

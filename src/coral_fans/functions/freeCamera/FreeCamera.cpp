@@ -21,7 +21,7 @@
 #include <thread>
 #endif
 
-PlayerSkinPacketPayload::PlayerSkinPacketPayload() = default;
+PlayerInputTick::PlayerInputTick() = default;
 
 namespace coral_fans::functions {
 

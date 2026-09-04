@@ -3,7 +3,9 @@
 #include "bsci/GeometryGroup.h"
 #include "mc/legacy/ActorUniqueID.h"
 #include "mc/platform/UUID.h"
+#include "mc/world/actor/ai/village/Raid.h"
 #include "mc/world/actor/ai/village/Village.h"
+
 
 #include <memory>
 #include <unordered_map>
@@ -16,10 +18,11 @@ namespace coral_fans::functions {
 
 class CFTickingVillageData {
 public:
-    Village*                   mVillagePtr;
+    std::weak_ptr<Village>     mVillagePtr;
+    int                        mDimId = -1;
     Tick                       mLastTick;
-    AABB                       mOldBounds;
-    AABB                       mOldRaidBounds;
+    AABB                       mBounds;
+    AABB                       mRaidBounds;
     bsci::GeometryGroup::GeoId mBoundsGeoId     = {0};
     bsci::GeometryGroup::GeoId mRaidBoundsGeoId = {0};
     bsci::GeometryGroup::GeoId mIronSpawnGeoId  = {0};
@@ -28,7 +31,7 @@ public:
     bsci::GeometryGroup::GeoId mBindGeoId       = {0};
 
 public:
-    CFTickingVillageData(Village*, Tick&);
+    CFTickingVillageData(const Village&, Tick&);
 
 public:
     void showBounds();
@@ -41,13 +44,8 @@ public:
 
 class CFVillageManager {
 private:
-    // std::map<std::string, int>              mUuidVidMap;
-    // int                                     mVidCounter = 0;
-    std::vector<Village*> mVillageList;
-    // std::unordered_map<mce::UUID, std::weak_ptr<CFVillageData>> mVillageDataMap;
+    std::vector<std::optional<std::weak_ptr<Village>>>                   mVillageList;
     std::unordered_map<mce::UUID, std::unique_ptr<CFTickingVillageData>> mTickingList;
-    // std::map<int, std::pair<Village*, int>>              mVidVillageMap;
-    // bsci::GeometryGroup::GeoId mParticleId;
 
 private:
     bool mShowBounds     = false;
@@ -72,17 +70,14 @@ public:
     bool getShowBind();
 
 public:
-    void                         addVillage(Village*);
-    void                         handleVillageTick(Village*, Tick&);
-    void                         removeVillage(Village*);
+    void                         addVillage(std::shared_ptr<Village>);
+    void                         handleVillageTick(const Village&, Tick&);
     void                         tick(const Tick&);
     std::vector<std::string>     listVillages();
     std::string                  listTickingVillages();
     std::pair<std::string, bool> getVillageInfo(int);
-    int                          getVillageId(Village*);
+    int                          getVillageId(std::weak_ptr<Village>);
 
-    // void                         insertVillage(Village*, int);
-    // void                         clearParticle();
     std::pair<std::string, bool> getVillagerInfo(ActorUniqueID);
     void                         clear();
 
@@ -96,6 +91,6 @@ public:
     }
     static void hookVillage(bool);
 
-    [[nodiscard]] static int getBedPOICount(Village* villagePtr);
+    [[nodiscard]] static int getBedPOICount(std::shared_ptr<Village> villagePtr);
 };
 } // namespace coral_fans::functions
