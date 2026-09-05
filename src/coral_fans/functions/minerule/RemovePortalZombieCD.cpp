@@ -111,13 +111,13 @@ LL_TYPE_STATIC_HOOK(
     if (auto serverInstance = ll::service::getServerInstance();
         !serverInstance
         || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(region, pos, axis);
+        return origin(dimension, random);
 #endif
     RemovePortalZombieCDHelper::getInstance().spawn = origin(dimension, random);
     return false;
 }
 
-LL_TYPE_INSTANCE_HOOK(
+LL_TYPE_STATIC_HOOK(
     portalPortalZombieHook2,
     ll::memory::HookPriority::Normal,
     PortalBlock,
@@ -131,7 +131,7 @@ LL_TYPE_INSTANCE_HOOK(
     if (auto serverInstance = ll::service::getServerInstance();
         !serverInstance
         || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(region, pos, axis);
+        return origin(region, pos, random);
 #endif
     origin(region, pos, random);
     auto& helper = RemovePortalZombieCDHelper::getInstance();

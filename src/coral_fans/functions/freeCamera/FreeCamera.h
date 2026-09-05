@@ -3,6 +3,7 @@
 
 #include "mc/world/actor/player/Player.h"
 
+
 #include <unordered_set>
 namespace coral_fans::functions {
 class FreeCameraManager {

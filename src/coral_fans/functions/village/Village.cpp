@@ -541,7 +541,7 @@ LL_TYPE_INSTANCE_HOOK(
     if (auto serverInstance = ll::service::getServerInstance();
         !serverInstance
         || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(dimension, id, _origin);
+        return origin(structureSetRegistry);
 #endif
     origin(structureSetRegistry);
     // CFVillageManager::getInstance().addVillage(static_cast<Village*>(ori));

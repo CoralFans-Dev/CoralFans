@@ -4,7 +4,7 @@ add_repositories("liteldev-repo https://github.com/LiteLDev/xmake-repo.git")
 add_repositories("oeotyan-repo https://github.com/OEOTYAN/xmake-repo.git")
 add_repositories("coralfansdev-repo https://github.com/CoralFans-Dev/xmake-repo.git")
 
-add_requires("levilamina 2bd38e02b2b57405d1258a639437d1df6539e47b", {configs = {target_type = get_config("target_type")}})
+add_requires("levilamina 419250a49121a60449db328b7d2eb146a2432a9f", {configs = {target_type = get_config("target_type")}})
 
 add_requires(
     "levibuildscript",

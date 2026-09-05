@@ -78,9 +78,12 @@ void HudHelper::tick() {
                     );
                 }
                 if (hud & (1 << HudHelper::HudType::base)) {
-                    auto& delta  = player.getPosDelta();
-                    auto& biome  = blockSource.getBiome(player.getFeetBlockPos());
-                    msg         += "translate.cfhud.base"_tr(
+                    auto& delta      = player.getPosDelta();
+                    auto& biome      = blockSource.getBiome(player.getFeetBlockPos());
+                    auto  rawName    = utils::removeMinecraftPrefix(biome.mHash->c_str());
+                    auto  translated = ll::i18n::getInstance().get("translate.biome." + rawName, {});
+                    auto  biomeName  = translated.empty() ? rawName : std::string{translated};
+                    msg             += "translate.cfhud.base"_tr(
                         level->getCurrentServerTick().tickID,
                         player.getPosition().toString(),
                         player.getViewVector(1.0f).toString(),
@@ -99,7 +102,7 @@ void HudHelper::tick() {
                         delta.x * 20,
                         delta.y * 20,
                         delta.z * 20,
-                        biome.mHash->c_str()
+                        biomeName
                     );
                 }
                 if (hud & (1 << HudHelper::HudType::redstone)) {

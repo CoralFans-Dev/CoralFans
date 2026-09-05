@@ -129,7 +129,7 @@ LL_TYPE_INSTANCE_HOOK(
     if (auto serverInstance = ll::service::getServerInstance();
         !serverInstance
         || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(region);
+        return origin(region, levelChunkVolumeData, chunkPos);
 #endif
     auto& prof = functions::Profiler::getInstance();
     if (prof.profiling && prof.chunkTickBlocksMutex) {
