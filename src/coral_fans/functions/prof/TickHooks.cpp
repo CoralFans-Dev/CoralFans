@@ -172,6 +172,7 @@ LL_TYPE_INSTANCE_HOOK(
     int          max,
     bool         instaTick_
 ) {
+    // 区块加载线程同样可能存在调用
     if (auto serverInstance = ll::service::getServerInstance();
         !serverInstance
         || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
