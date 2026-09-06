@@ -88,10 +88,12 @@ void registerVillageCommand(config::CommandConfigStruct& config) {
                     isopen = villageManager.getShowBind();
                     break;
                 }
-                output.success("command.village.show.output"_tr(
-                    self["type"].get<ll::command::ParamKind::Enum>().name,
-                    isopen ? "true" : "false"
-                ));
+                output.success(
+                    "command.village.show.output"_tr(
+                        self["type"].get<ll::command::ParamKind::Enum>().name,
+                        isopen ? "true" : "false"
+                    )
+                );
             });
 
         // village list
@@ -103,6 +105,7 @@ void registerVillageCommand(config::CommandConfigStruct& config) {
                 for (auto& str : villageManager.listVillages()) {
                     output.success(str);
                 }
+                return;
             }
             auto* player = static_cast<Player*>(entity);
             for (auto& str : villageManager.listVillages()) {
@@ -117,6 +120,7 @@ void registerVillageCommand(config::CommandConfigStruct& config) {
             auto entity = origin.getEntity();
             if (entity == nullptr || !entity->isType(ActorType::Player)) {
                 output.success(res);
+                return;
             }
             TextPacket::createRawMessage(res).sendTo(*static_cast<Player*>(entity));
         });
@@ -135,6 +139,7 @@ void registerVillageCommand(config::CommandConfigStruct& config) {
                     auto entity = origin.getEntity();
                     if (entity == nullptr || !entity->isType(ActorType::Player)) {
                         output.success(rst.first);
+                        return;
                     }
                     TextPacket::createRawMessage(rst.first).sendTo(*static_cast<Player*>(entity));
                 } else return output.error(rst.first);

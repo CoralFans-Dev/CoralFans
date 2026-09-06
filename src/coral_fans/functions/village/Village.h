@@ -3,7 +3,6 @@
 #include "bsci/GeometryGroup.h"
 #include "mc/legacy/ActorUniqueID.h"
 #include "mc/platform/UUID.h"
-#include "mc/world/actor/ai/village/Raid.h"
 #include "mc/world/actor/ai/village/Village.h"
 
 
@@ -47,6 +46,10 @@ private:
     std::vector<std::optional<std::weak_ptr<Village>>>                   mVillageList;
     std::unordered_map<mce::UUID, std::unique_ptr<CFTickingVillageData>> mTickingList;
 
+public:
+    bool                     mayCreatingVillage = false;
+    std::optional<mce::UUID> newVillageId       = std::nullopt;
+
 private:
     bool mShowBounds     = false;
     bool mShowRaidBounds = false;
@@ -70,7 +73,7 @@ public:
     bool getShowBind();
 
 public:
-    void                         addVillage(std::shared_ptr<Village>);
+    void                         addVillage(std::weak_ptr<Village>);
     void                         handleVillageTick(const Village&, Tick&);
     void                         tick(const Tick&);
     std::vector<std::string>     listVillages();

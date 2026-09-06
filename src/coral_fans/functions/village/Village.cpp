@@ -152,7 +152,7 @@ int CFVillageManager::getVillageId(std::weak_ptr<Village> villagePtr) {
     return -1;
 }
 
-void CFVillageManager::addVillage(std::shared_ptr<Village> villagePtr) { mVillageList.emplace_back(villagePtr); }
+void CFVillageManager::addVillage(std::weak_ptr<Village> villagePtr) { mVillageList.emplace_back(villagePtr); }
 
 void CFVillageManager::handleVillageTick(const Village& village, Tick& tick) {
     auto [it, isInserted] = this->mTickingList.try_emplace(village.mUniqueID);
@@ -187,8 +187,15 @@ void CFVillageManager::tick(const Tick& currentTick) {
                 return true;
             }
             auto village = villageData->mVillagePtr.lock();
-            if (!village) [[unlikely]]
+            if (!village) [[unlikely]] {
+                if (mShowBounds) geoGroup->remove(villageData->mBoundsGeoId);
+                if (mShowRaidBounds) geoGroup->remove(villageData->mRaidBoundsGeoId);
+                if (mShowIronSpawn) geoGroup->remove(villageData->mIronSpawnGeoId);
+                if (mShowCenter) geoGroup->remove(villageData->mCenterGeoId);
+                if (mShowPoiQuery) geoGroup->remove(villageData->mPoiQueryGeoId);
+                if (mShowBind) geoGroup->remove(villageData->mBindGeoId);
                 return true;
+            }
             if (villageData->mBounds != village->mBounds) {
                 villageData->mBounds = village->mBounds;
                 if (mShowBounds) {
@@ -544,10 +551,58 @@ LL_TYPE_INSTANCE_HOOK(
         return origin(structureSetRegistry);
 #endif
     origin(structureSetRegistry);
-    // CFVillageManager::getInstance().addVillage(static_cast<Village*>(ori));
     for (auto& [uuid, village] : *mVillageManager->mVillages) {
         CFVillageManager::getInstance().addVillage(village);
     }
+}
+
+LL_TYPE_INSTANCE_HOOK(
+    CoralFansVillageAddHook2,
+    ll::memory::HookPriority::Normal,
+    VillageManager,
+    &VillageManager ::_tryAssignPOIOrCreateVillage,
+    void,
+    ::std::shared_ptr<::POIInstance>&& pi
+) {
+#ifdef LL_PLAT_C
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin(std::move(pi));
+#endif
+    auto& manager              = CFVillageManager::getInstance();
+    manager.newVillageId       = std::nullopt;
+    manager.mayCreatingVillage = true;
+    origin(std::move(pi));
+    manager.mayCreatingVillage = false;
+    if (manager.newVillageId) {
+        auto newVillage = getVillageByID(*manager.newVillageId);
+        if (!newVillage.expired()) {
+            manager.addVillage(newVillage);
+        }
+    }
+}
+
+LL_TYPE_INSTANCE_HOOK(
+    CoralFansVillageAddHook3,
+    ll::memory::HookPriority::Normal,
+    Village,
+    &Village::$ctor,
+    void*,
+    ::Dimension&      dimension,
+    ::mce::UUID       id,
+    ::BlockPos const& _origin
+) {
+#ifdef LL_PLAT_C
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin(dimension, id, _origin);
+#endif
+    auto  ori     = origin(dimension, id, _origin);
+    auto& manager = CFVillageManager::getInstance();
+    if (manager.mayCreatingVillage) manager.newVillageId = id;
+    return ori;
 }
 
 LL_TYPE_INSTANCE_HOOK(
@@ -572,9 +627,13 @@ LL_TYPE_INSTANCE_HOOK(
 void CFVillageManager::hookVillage(bool hook) {
     if (hook) {
         CoralFansVillageAddHook::hook();
+        CoralFansVillageAddHook2::hook();
+        CoralFansVillageAddHook3::hook();
         CoralFansVillageTickHook::hook();
     } else {
         CoralFansVillageAddHook::unhook();
+        CoralFansVillageAddHook2::unhook();
+        CoralFansVillageAddHook3::unhook();
         CoralFansVillageTickHook::unhook();
     }
 }
