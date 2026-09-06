@@ -4,7 +4,8 @@ add_repositories("liteldev-repo https://github.com/LiteLDev/xmake-repo.git")
 add_repositories("oeotyan-repo https://github.com/OEOTYAN/xmake-repo.git")
 add_repositories("coralfansdev-repo https://github.com/CoralFans-Dev/xmake-repo.git")
 
-add_requires("levilamina 419250a49121a60449db328b7d2eb146a2432a9f", {configs = {target_type = get_config("target_type")}})
+add_requires("levilamina 26.32.*", {configs = {target_type = get_config("target_type")}})
+
 
 add_requires(
     "levibuildscript",
@@ -54,15 +55,15 @@ target("CoralFans") -- Change this to your mod name.
     set_kind("shared")
     set_languages("c++20")
     set_symbols("debug")
-        if is_config("target_type", "server") then
-            add_defines("LL_PLAT_S")
-        --  add_includedirs("src-server")
-        --  add_files("src-server/**.cpp")
-        else
-            add_defines("LL_PLAT_C")
-        --  add_includedirs("src-client")
-        --  add_files("src-client/**.cpp")
-        end
+    if is_config("target_type", "server") then
+        add_defines("LL_PLAT_S")
+    --  add_includedirs("src-server")
+    --  add_files("src-server/**.cpp")
+    else
+        add_defines("LL_PLAT_C")
+    --  add_includedirs("src-client")
+    --  add_files("src-client/**.cpp")
+    end
 
     after_build(function (target)
         local mod_packer = import("scripts.after_build")

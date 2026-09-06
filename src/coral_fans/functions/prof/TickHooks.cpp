@@ -132,7 +132,7 @@ LL_TYPE_INSTANCE_HOOK(
         return origin(region, levelChunkVolumeData, chunkPos);
 #endif
     auto& prof = functions::Profiler::getInstance();
-    if (prof.profiling && prof.chunkTickBlocksMutex) {
+    if (prof.profiling && prof.chunkTickBlocksMutex == 1) {
         prof.chunkTickBlocksMutex     = 2;
         prof.chunkTickBlocksBeginTime = std ::chrono ::high_resolution_clock ::now();
     } else origin(region, levelChunkVolumeData, chunkPos);
@@ -179,7 +179,8 @@ LL_TYPE_INSTANCE_HOOK(
     auto& prof = functions::Profiler::getInstance();
     if (prof.profiling) {
         if (prof.chunkTickBlocksMutex == 2) {
-            auto e_chunk_block    = std ::chrono ::high_resolution_clock ::now() - prof.chunkTickBlocksBeginTime;
+            prof.chunkTickBlocksMutex = 0;
+            auto e_chunk_block        = std ::chrono ::high_resolution_clock ::now() - prof.chunkTickBlocksBeginTime;
             auto time_chunk_block = std ::chrono ::duration_cast<std ::chrono ::microseconds>(e_chunk_block).count();
             prof.chunkInfo.randomTickTime += time_chunk_block;
         }
