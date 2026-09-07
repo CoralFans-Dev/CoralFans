@@ -1,6 +1,7 @@
 #include "ll/api/memory/Hook.h"
 #include "mc/deps/core/math/Vec3.h"
 #include "mc/world/level/BlockSource.h"
+#include "mc/world/level/block/Block.h"
 
 
 #ifdef LL_PLAT_C
@@ -53,7 +54,9 @@ LL_TYPE_INSTANCE_HOOK(
         || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(block, pos, face, placer, val, clickPos);
 #endif
-    return true;
+    if (getBlock(pos).isAir()) return true;
+    auto stone = Block::tryGetFromRegistry("minecraft:stone");
+    return origin(stone, pos, face, placer, val, clickPos);
 }
 
 void forcePlaceHook(uint64 type) {
