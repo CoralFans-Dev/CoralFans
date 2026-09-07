@@ -1,6 +1,7 @@
 #include "coral_fans/functions/village/Village.h"
 #include "coral_fans/Config.h"
 #include "coral_fans/base/Macros.h"
+#include "coral_fans/base/Utils.h"
 
 
 #include "ll/api/command/CommandHandle.h"
@@ -9,7 +10,6 @@
 #include "ll/api/command/runtime/RuntimeCommand.h"
 #include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
-#include "mc/network/packet/TextPacket.h"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/world/actor/Actor.h"
@@ -109,7 +109,7 @@ void registerVillageCommand(config::CommandConfigStruct& config) {
             }
             auto* player = static_cast<Player*>(entity);
             for (auto& str : villageManager.listVillages()) {
-                TextPacket::createRawMessage(str).sendTo(*player);
+                utils::segmentAndSendToPlayer(str, player);
             }
         });
 
@@ -122,7 +122,7 @@ void registerVillageCommand(config::CommandConfigStruct& config) {
                 output.success(res);
                 return;
             }
-            TextPacket::createRawMessage(res).sendTo(*static_cast<Player*>(entity));
+            utils::segmentAndSendToPlayer(res, static_cast<Player*>(entity));
         });
 
 
@@ -141,7 +141,7 @@ void registerVillageCommand(config::CommandConfigStruct& config) {
                         output.success(rst.first);
                         return;
                     }
-                    TextPacket::createRawMessage(rst.first).sendTo(*static_cast<Player*>(entity));
+                    utils::segmentAndSendToPlayer(rst.first, static_cast<Player*>(entity));
                 } else return output.error(rst.first);
             });
 
@@ -157,7 +157,7 @@ void registerVillageCommand(config::CommandConfigStruct& config) {
                 auto rst = functions::CFVillageManager::getInstance().getVillagerInfo(actor->getOrCreateUniqueID());
                 if (rst.second) {
                     // return output.success(rst.first);
-                    TextPacket::createRawMessage(rst.first).sendTo(*player);
+                    utils::segmentAndSendToPlayer(rst.first, player);
                 } else return output.error(rst.first);
             }
         });

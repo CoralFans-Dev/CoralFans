@@ -1,6 +1,7 @@
 #include "coral_fans/functions/hsa/Hsa.h"
 #include "coral_fans/Config.h"
 #include "coral_fans/base/Macros.h"
+#include "coral_fans/base/Utils.h"
 
 
 #include "ll/api/command/CommandHandle.h"
@@ -9,7 +10,6 @@
 #include "ll/api/command/runtime/RuntimeCommand.h"
 #include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
-#include "mc/network/packet/TextPacket.h"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/world/level/ChunkPos.h"
@@ -60,7 +60,7 @@ void registerHsaCommand(config::CommandConfigStruct& config) {
                 ChunkPos(player->getPosition())
             );
             for (auto& pos : hsa) {
-                TextPacket::createRawMessage(std::format("[{}, {}, {}]", pos.x, pos.y, pos.z)).sendTo(*player);
+                utils::segmentAndSendToPlayer(std::format("[{}, {}, {}]", pos.x, pos.y, pos.z), player);
             }
         }
     );
@@ -77,16 +77,18 @@ void registerHsaCommand(config::CommandConfigStruct& config) {
                 ChunkPos(player->getPosition())
             );
             for (auto& aabb : hsa) {
-                TextPacket::createRawMessage(std::format(
-                                                 "[{}, {}, {}] - [{}, {}, {}]",
-                                                 aabb.min.x,
-                                                 aabb.min.y,
-                                                 aabb.min.z,
-                                                 aabb.max.x,
-                                                 aabb.max.y,
-                                                 aabb.max.z
-                                             ))
-                    .sendTo(*player);
+                utils::segmentAndSendToPlayer(
+                    std::format(
+                        "[{}, {}, {}] - [{}, {}, {}]",
+                        aabb.min.x,
+                        aabb.min.y,
+                        aabb.min.z,
+                        aabb.max.x,
+                        aabb.max.y,
+                        aabb.max.z
+                    ),
+                    player
+                );
             }
         });
 }

@@ -1,6 +1,7 @@
 #include "coral_fans/functions/data/Data.h"
 #include "coral_fans/Config.h"
 #include "coral_fans/base/Macros.h"
+#include "coral_fans/base/Utils.h"
 
 
 #include "ll/api/command/CommandHandle.h"
@@ -8,7 +9,6 @@
 #include "ll/api/command/runtime/ParamKind.h"
 #include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
-#include "mc/network/packet/TextPacket.h"
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/level/BlockPos.h"
@@ -48,8 +48,7 @@ void registerDataCommand(config::CommandConfigStruct& config) {
                 if (!hitrst) return output.error("command.data.error"_tr());
                 blockPos = hitrst.mBlock;
             }
-            TextPacket::createRawMessage(functions::getBlockData(player->getDimensionBlockSource(), blockPos))
-                .sendTo(*player);
+            utils::segmentAndSendToPlayer(functions::getBlockData(player->getDimensionBlockSource(), blockPos), player);
         });
 
     // block nbt [path]
@@ -66,7 +65,7 @@ void registerDataCommand(config::CommandConfigStruct& config) {
             std::string path;
             if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>();
             auto rst = functions::getBlockNbt(0, player->getDimensionBlockSource(), blockPos, path);
-            if (rst.second) TextPacket::createRawMessage(rst.first).sendTo(*player);
+            if (rst.second) utils::segmentAndSendToPlayer(rst.first, player);
             else output.error(rst.first);
         });
 
@@ -84,7 +83,7 @@ void registerDataCommand(config::CommandConfigStruct& config) {
             std::string path;
             if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>();
             auto rst = functions::getBlockNbt(1, player->getDimensionBlockSource(), blockPos, path);
-            if (rst.second) TextPacket::createRawMessage(rst.first).sendTo(*player);
+            if (rst.second) utils::segmentAndSendToPlayer(rst.first, player);
             else output.error(rst.first);
         });
 
@@ -105,7 +104,7 @@ void registerDataCommand(config::CommandConfigStruct& config) {
             std::string path;
             if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>();
             auto rst = functions::getBlockNbt(0, player->getDimensionBlockSource(), blockPos, path);
-            if (rst.second) TextPacket::createRawMessage(rst.first).sendTo(*player);
+            if (rst.second) utils::segmentAndSendToPlayer(rst.first, player);
             else output.error(rst.first);
         });
 
@@ -126,7 +125,7 @@ void registerDataCommand(config::CommandConfigStruct& config) {
             std::string path;
             if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>();
             auto rst = functions::getBlockNbt(1, player->getDimensionBlockSource(), blockPos, path);
-            if (rst.second) TextPacket::createRawMessage(rst.first).sendTo(*player);
+            if (rst.second) utils::segmentAndSendToPlayer(rst.first, player);
             else output.error(rst.first);
         });
 
@@ -154,7 +153,7 @@ void registerDataCommand(config::CommandConfigStruct& config) {
             const auto& hitrst = player->traceRay(5.25f, true, false);
             if (!hitrst) return output.error("command.data.error"_tr());
             auto rst = functions::getEntityData(hitrst.getEntity());
-            if (rst.second) TextPacket::createRawMessage(rst.first).sendTo(*player);
+            if (rst.second) utils::segmentAndSendToPlayer(rst.first, player);
             else output.error(rst.first);
         }
     );
@@ -172,7 +171,7 @@ void registerDataCommand(config::CommandConfigStruct& config) {
             const auto& hitrst = player->traceRay(5.25f, true, false);
             if (!hitrst) return output.error("command.data.error"_tr());
             auto rst = functions::getEntityNbt(hitrst.getEntity(), path);
-            if (rst.second) TextPacket::createRawMessage(rst.first).sendTo(*player);
+            if (rst.second) utils::segmentAndSendToPlayer(rst.first, player);
             else output.error(rst.first);
         });
 
@@ -211,7 +210,7 @@ void registerDataCommand(config::CommandConfigStruct& config) {
                 self["redstoneType"].get<ll::command::ParamKind::Enum>().index
             );
             if (rst.second) {
-                if (!rst.first.empty()) TextPacket::createRawMessage(rst.first).sendTo(*player);
+                if (!rst.first.empty()) utils::segmentAndSendToPlayer(rst.first, player);
             } else output.error(rst.first);
         });
 
@@ -226,7 +225,7 @@ void registerDataCommand(config::CommandConfigStruct& config) {
             std::string path;
             if (self["path"].has_value()) path = self["path"].get<ll::command::ParamKind::String>();
             auto rst = functions::getItemNbt(player->getSelectedItem(), path);
-            if (rst.second) TextPacket::createRawMessage(rst.first).sendTo(*player);
+            if (rst.second) utils::segmentAndSendToPlayer(rst.first, player);
             else output.error(rst.first);
         });
 
@@ -241,8 +240,7 @@ void registerDataCommand(config::CommandConfigStruct& config) {
             for (const auto& i : actors) {
                 if (i && i->isType(ActorType::Player)) {
                     Player* pl = static_cast<Player*>(i);
-                    TextPacket::createRawMessage(std::format("{} = {}", pl->getRealName(), pl->getUuid().asString()))
-                        .sendTo(*pl);
+                    utils::segmentAndSendToPlayer(std::format("{} = {}", pl->getRealName(), pl->getUuid().asString()), pl);
                 }
             }
         });

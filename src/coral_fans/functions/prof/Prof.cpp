@@ -1,7 +1,7 @@
 #include "coral_fans/functions/prof/Prof.h"
 #include "coral_fans/CoralFans.h"
+#include "coral_fans/base/Utils.h"
 #include "ll/api/i18n/I18n.h"
-#include "mc/network/packet/TextPacket.h"
 #include "mc/world/level/ChunkPos.h"
 
 #include <algorithm>
@@ -135,7 +135,7 @@ void Profiler::print() const {
         rst = this->printMspt();
         break;
     }
-    TextPacket::createRawMessage(rst).sendToClients();
+    utils::segmentAndSendToClients(rst);
     CoralFans::getInstance().getSelf().getLogger().info(rst);
 }
 

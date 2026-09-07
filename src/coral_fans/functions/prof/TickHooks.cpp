@@ -116,7 +116,7 @@ LL_TYPE_INSTANCE_HOOK(
 // }
 
 LL_TYPE_INSTANCE_HOOK(
-    CoralFansTickLevelChunkTickBlocksHook,
+    CoralFansTickLevelChunkTickBedrockSpawnerHook,
     ll::memory::HookPriority::Normal,
     BedrockSpawner,
     &BedrockSpawner::$tick,
@@ -373,7 +373,7 @@ void hookTick(bool hook, bool disable) {
     else CoralFansTickLevelTickHook::unhook();
     if (hook) {
         CoralFansTickLevelChunkTickHook::hook();
-        CoralFansTickLevelChunkTickBlocksHook::hook();
+        CoralFansTickLevelChunkTickBedrockSpawnerHook::hook();
         CoralFansTickLevelChunkTickBlockEntitiesHook::hook();
         CoralFansTickBlockTickingQueueTickPendingTicksHook::hook();
         CoralFansTickDimensionTickHook::hook();
@@ -385,7 +385,7 @@ void hookTick(bool hook, bool disable) {
         CoralFansTickActorTickHook::hook();
     } else {
         CoralFansTickLevelChunkTickHook::unhook();
-        CoralFansTickLevelChunkTickBlocksHook::unhook();
+        CoralFansTickLevelChunkTickBedrockSpawnerHook::unhook();
         CoralFansTickLevelChunkTickBlockEntitiesHook::unhook();
         CoralFansTickBlockTickingQueueTickPendingTicksHook::unhook();
         CoralFansTickDimensionTickHook::unhook();

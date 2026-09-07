@@ -1,6 +1,7 @@
 #include "Commands.h"
 #include "coral_fans/CoralFans.h"
 #include "coral_fans/base/MySchedule.h"
+#include "coral_fans/base/Utils.h"
 
 
 #include "ll/api/command/CommandHandle.h"
@@ -10,7 +11,6 @@
 #include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/service/Bedrock.h"
-#include "mc/network/packet/TextPacket.h"
 #include "mc/platform/UUID.h"
 #include "mc/profile/ProfilerLite.h"
 #include "mc/server/commands/CommandOutput.h"
@@ -92,12 +92,12 @@ void registerTickCommand(config::CommandConfigStruct& config) {
                 if (uuid != "") {
                     auto player = ll::service::getLevel()->getPlayer(mce::UUID(uuid));
                     if (player)
-                        TextPacket::createRawMessage(
+                        utils::segmentAndSendToPlayer(
                             "command.tick.query.output"_tr(
                                 ProfilerLite::gProfilerLiteInstance().mDebugServerTickTime->count() / 1000000.0
-                            )
-                        )
-                            .sendTo(*player);
+                            ),
+                            player
+                        );
                     else return false; // 玩家不在线了，停止任务
                 } else
                     CoralFans::getInstance().getSelf().getLogger().info("command.tick.query.output"_tr(
