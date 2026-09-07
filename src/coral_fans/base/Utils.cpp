@@ -5,12 +5,16 @@
 #include "ll/api/i18n/I18n.h"
 #include "mc/deps/nbt/CompoundTagVariant.h"
 #include "mc/deps/nbt/ListTag.h"
+#include "mc/network/PacketSender.h"
+#include "mc/network/packet/InventoryTransactionPacket.h"
 #include "mc/network/packet/TextPacket.h"
 #include "mc/network/packet/TextPacketPayload.h"
 #include "mc/world/Container.h"
 #include "mc/world/actor/player/Inventory.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/actor/player/PlayerInventory.h"
+#include "mc/world/inventory/transaction/ComplexInventoryTransaction.h"
+#include "mc/world/inventory/transaction/InventoryAction.h"
 #include "mc/world/item/ItemStack.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/ChunkPos.h"
@@ -112,6 +116,7 @@ void shortHighligntBlock(int dimid, BlockPos const& blockPos, mce::Color const& 
     );
 }
 
+/*
 void swapItemInContainer(Player* player, int slot1, int slot2) {
     if (player && slot1 != slot2) {
         auto& inventory = player->mInventory->mInventory;
@@ -129,6 +134,26 @@ void swapItemInContainer(Player* player, int slot1, int slot2) {
             inventory->setItem(slot2, tem);
         }
     }
+}
+*/
+
+void sendInventorySwap(Player* player, int slot1, int slot2) {
+    if (!player || slot1 == slot2) return;
+    auto transaction = ComplexInventoryTransaction::fromType(ComplexInventoryTransaction::Type::NormalTransaction);
+    if (!transaction) return;
+    auto&                 invTx = transaction->mTransaction.get();
+    InventorySource const source{
+        InventorySourceType::ContainerInventory,
+        ContainerID::Inventory,
+        InventorySource::InventorySourceFlags::NoFlag
+    };
+    const auto& inventory = player->getInventory();
+    ItemStack   item1     = inventory.getItem(slot1);
+    ItemStack   item2     = inventory.getItem(slot2);
+    invTx.addAction(InventoryAction{source, static_cast<uint>(slot1), item1, item2});
+    invTx.addAction(InventoryAction{source, static_cast<uint>(slot2), item2, item1});
+    InventoryTransactionPacket packet(InventoryTransactionPacketPayload{std::move(transaction), true});
+    player->mPacketSender.sendToServer(packet);
 }
 
 namespace {

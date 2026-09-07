@@ -30,6 +30,10 @@
                 "success": "全局设置 autotool \"{}\"",
                 "error": "全局设置 autotool 失败"
             },
+            "autoweapon": {
+                "success": "全局设置 autoweapon \"{}\"",
+                "error": "全局设置 autoweapon 失败"
+            },
             "hoppercounter": {
                 "success": "全局设置 hoppercounter \"{}\"",
                 "error": "全局设置 hoppercounter 失败"
@@ -75,6 +79,14 @@
                 "mindamage": {
                     "success": "设置 autotool mindamage \"{}\"",
                     "error": "设置 autotool mindamage 失败"
+                }
+            },
+            "autoweapon": {
+                "success": "设置 autoweapon \"{}\"",
+                "error": "设置 autoweapon 失败",
+                "mindamage": {
+                    "success": "设置 autoweapon mindamage \"{}\"",
+                    "error": "设置 autoweapon mindamage 失败"
                 }
             },
             "containerreader": {

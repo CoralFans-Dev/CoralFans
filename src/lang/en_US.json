@@ -30,6 +30,10 @@
                 "success": "globally set autotool \"{}\"",
                 "error": "failed to globally set autotool"
             },
+            "autoweapon": {
+                "success": "globally set autoweapon \"{}\"",
+                "error": "failed to globally set autoweapon"
+            },
             "hoppercounter": {
                 "success": "globally set hoppercounter \"{}\"",
                 "error": "failed to globally set hoppercounter"
@@ -75,6 +79,14 @@
                 "mindamage": {
                     "success": "set autotool mindamage \"{}\"",
                     "error": "failed to set autotool mindamage"
+                }
+            },
+            "autoweapon": {
+                "success": "set autoweapon \"{}\"",
+                "error": "failed to set autoweapon",
+                "mindamage": {
+                    "success": "set autoweapon mindamage \"{}\"",
+                    "error": "failed to set autoweapon mindamage"
                 }
             },
             "containerreader": {

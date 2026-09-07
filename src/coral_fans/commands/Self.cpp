@@ -56,6 +56,41 @@ void registerSelfCommand(config::CommandConfigStruct& config) {
             else output.error("command.self.autotool.mindamage.error"_tr());
         });
 
+    // self autoweapon <bool>
+    selfCommand.runtimeOverload()
+        .text("autoweapon")
+        .required("isopen", ll::command::ParamKind::Bool)
+        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
+            COMMAND_CHECK_PLAYER
+            bool       isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
+            const auto global = CoralFans::getInstance().getConfigDb()->get("functions.global.autoweapon") == "true";
+            if (!global) output.error("command.self.unuse"_tr());
+            else if (CoralFans::getInstance().getConfigDb()->set(
+                         std::format("functions.players.{}.autoweapon", player->getUuid().asString()),
+                         isopen ? "true" : "false"
+                     ))
+                output.success("command.self.autoweapon.success"_tr(isopen ? "true" : "false"));
+            else output.error("command.self.autoweapon.error"_tr());
+        });
+
+    // self autoweapon mindamage <int>
+    selfCommand.runtimeOverload()
+        .text("autoweapon")
+        .text("mindamage")
+        .required("mindamage", ll::command::ParamKind::Int)
+        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
+            COMMAND_CHECK_PLAYER
+            auto minDamageString = std::to_string(self["mindamage"].get<ll::command::ParamKind::Int>());
+            if (CoralFans::getInstance().getConfigDb()->set(
+                    std::format("functions.players.{}.autoweapon.mindamage", player->getUuid().asString()),
+                    minDamageString
+                ))
+                output.success("command.self.autoweapon.mindamage.success"_tr(minDamageString));
+            else output.error("command.self.autoweapon.mindamage.error"_tr());
+        });
+
     // self containerreader <bool>
     selfCommand.runtimeOverload()
         .text("containerreader")

@@ -112,6 +112,22 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
                 } else output.error("command.func.autotool.error"_tr());
             });
 
+        // autoweapon
+        funcCommand.runtimeOverload()
+            .text("autoweapon")
+            .required("isopen", ll::command::ParamKind::Bool)
+            .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
+                bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
+                if (CoralFans::getInstance().getConfigDb()->set(
+                        "functions.global.autoweapon",
+                        isopen ? "true" : "false"
+                    )) {
+                    output.success("command.func.autoweapon.success"_tr(isopen ? "true" : "false"));
+                    functions::hookAutoWeapon(isopen);
+                } else output.error("command.func.autoweapon.error"_tr());
+            });
+
         // hoppercounter
         funcCommand.runtimeOverload()
             .text("hoppercounter")
@@ -252,6 +268,12 @@ void registerFuncCommand(config::CommandConfigStruct& config) {
     functions::hookAutoTool(
         config.enabled && configDb->has("functions.global.autotool")
         && configDb->get("functions.global.autotool") == "true"
+    );
+
+    // autoweapon
+    functions::hookAutoWeapon(
+        config.enabled && configDb->has("functions.global.autoweapon")
+        && configDb->get("functions.global.autoweapon") == "true"
     );
 
     // hoppercounter

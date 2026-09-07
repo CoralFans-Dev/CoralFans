@@ -19,13 +19,9 @@ std::string removeMinecraftPrefix(std::string const& s);
 
 void shortHighligntBlock(int dimid, BlockPos const& blockPos, mce::Color const& color, int time);
 
-void swapItemInContainer(Player* player, int slot1, int slot2);
+void sendInventorySwap(Player* player, int slot1, int slot2);
 
-void segmentAndSendToPlayer(
-    std::string const& text,
-    Player*            player,
-    TextPacketType     textType = TextPacketType::Raw
-);
+void segmentAndSendToPlayer(std::string const& text, Player* player, TextPacketType textType = TextPacketType::Raw);
 
 void segmentAndSendToClients(std::string const& text, TextPacketType textType = TextPacketType::Raw);
 } // namespace coral_fans::utils

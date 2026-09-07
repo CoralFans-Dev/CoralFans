@@ -12,6 +12,7 @@ namespace coral_fans::functions {
 void autoItemHook(bool);
 void autoTotemHook(bool);
 void hookAutoTool(bool);
+void hookAutoWeapon(bool);
 void forcePlaceHook(uint64);
 void safeExplodeHook(bool);
 void fastDropHook(bool);

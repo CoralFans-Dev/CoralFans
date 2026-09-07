@@ -98,7 +98,7 @@ LL_STATIC_HOOK(
         const Block& block = player.getDimensionBlockSource().getBlock(pos);
         int bestSlot = ::searchBestToolInInv(*player.mInventory->mInventory, currentSlot, &block, minDamage, false);
         if (bestSlot > 8) {
-            utils::swapItemInContainer(&player, currentSlot, bestSlot);
+            utils::sendInventorySwap(&player, currentSlot, bestSlot);
             player.refreshInventory();
         } else if (bestSlot >= 0) {
             player.setSelectedSlot(bestSlot);
@@ -123,19 +123,19 @@ LL_TYPE_INSTANCE_HOOK(
         return origin(actor, cause);
 #endif
     if (CoralFans::getInstance().getConfigDb()->get(
-            std::format("functions.players.{}.autotool", this->getUuid().asString())
+            std::format("functions.players.{}.autoweapon", this->getUuid().asString())
         )
         == "true") {
         int currentSlot = this->getSelectedItemSlot();
         int minDamage   = std::stoi(
             CoralFans::getInstance()
                 .getConfigDb()
-                ->get(std::format("functions.players.{}.autotool.mindamage", this->getUuid().asString()))
+                ->get(std::format("functions.players.{}.autoweapon.mindamage", this->getUuid().asString()))
                 .value_or("1")
         );
         int bestSlot = ::searchBestToolInInv(*this->mInventory->mInventory, currentSlot, nullptr, minDamage, true);
         if (bestSlot > 8) {
-            utils::swapItemInContainer(this, currentSlot, bestSlot);
+            utils::sendInventorySwap(this, currentSlot, bestSlot);
             this->refreshInventory();
         } else if (bestSlot >= 0) {
             this->setSelectedSlot(bestSlot);
@@ -147,9 +147,15 @@ LL_TYPE_INSTANCE_HOOK(
 void hookAutoTool(bool hook) {
     if (hook) {
         CoralFansAutoToolHook1::hook();
-        CoralFansAutoToolHook2::hook();
     } else {
         CoralFansAutoToolHook1::unhook();
+    }
+}
+
+void hookAutoWeapon(bool hook) {
+    if (hook) {
+        CoralFansAutoToolHook2::hook();
+    } else {
         CoralFansAutoToolHook2::unhook();
     }
 }

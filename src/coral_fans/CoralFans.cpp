@@ -78,6 +78,7 @@ void CoralFans::unhook() {
     functions::autoItemHook(false);
     functions::autoTotemHook(false);
     functions::hookAutoTool(false);
+    functions::hookAutoWeapon(false);
     functions::ContainerOpenManager::hook(false);
     functions::forcePlaceHook(0);
     functions::safeExplodeHook(false);
