@@ -111,6 +111,12 @@ LL_STATIC_HOOK(
 }
 
 void handleAutoWeapon(Player& player) {
+#ifdef LL_PLAT_C
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return;
+#endif
     if (CoralFans::getInstance().getConfigDb()->get(
             std::format("functions.players.{}.autoweapon", player.getUuid().asString())
         )
