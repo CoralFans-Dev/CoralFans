@@ -302,6 +302,14 @@
                     "error": "未定义的可回溯地物类型"
                 }
             }
+        },
+        "spawn": {
+            "description": "查询刷怪统计",
+            "success": {
+                "count": {
+                    "global": "全局可刷怪生物 tick 计数: {}"
+                }
+            }
         }
     },
     "translate": {

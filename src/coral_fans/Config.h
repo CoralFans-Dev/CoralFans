@@ -31,6 +31,7 @@ struct CommandStruct {
     CommandConfigStruct freecamera = {true, CommandPermissionLevel::Any, "freecamera"};
     CommandConfigStruct noclip     = {true, CommandPermissionLevel::Any, "noclip"};
     CommandConfigStruct locate     = {true, CommandPermissionLevel::Any, "cflocate"};
+    CommandConfigStruct spawn      = {true, CommandPermissionLevel::GameDirectors, "spawn"};
 };
 
 struct Shortcut {

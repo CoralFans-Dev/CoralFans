@@ -292,6 +292,14 @@
                     "error": "undefined duplicatable feature"
                 }
             }
+        },
+        "spawn": {
+            "description": "Query spawn statistics",
+            "success": {
+                "count": {
+                    "global": "Global spawnable mob tick count: {}"
+                }
+            }
         }
     },
     "translate": {

@@ -68,6 +68,7 @@ void CoralFans::setupCommands() {
     commands::registerFreeCameraCommand(commandsConfig.freecamera);
     commands::registerNoclipCommand(commandsConfig.noclip);
     commands::registerLocateCommand(commandsConfig.locate);
+    commands::registerSpawnCommand(commandsConfig.spawn);
 
     functions::ShortcutsManager::getInstance().loadData();
     functions::ShortcutsManager::getInstance().registerShortcutsCommand();

@@ -25,6 +25,7 @@ void registerMineruleCommand(config::CommandConfigStruct&);
 void registerFreeCameraCommand(config::CommandConfigStruct&);
 void registerNoclipCommand(config::CommandConfigStruct&);
 void registerLocateCommand(config::CommandConfigStruct& permission);
+void registerSpawnCommand(config::CommandConfigStruct&);
 
 std::optional<Player*> tryGetPlayer(CommandOrigin const& origin);
 } // namespace coral_fans::commands
