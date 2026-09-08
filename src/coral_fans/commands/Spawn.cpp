@@ -1,38 +1,26 @@
+#include "coral_fans/functions/spawn/Spawn.h"
 #include "coral_fans/base/Macros.h"
 #include "coral_fans/base/Utils.h"
 #include "coral_fans/commands/Commands.h"
-#include "coral_fans/functions/minerule/MineruleManager.h"
-
 
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
 #include "ll/api/command/runtime/RuntimeCommand.h"
 #include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
-#include "ll/api/service/Bedrock.h"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
-#include "mc/world/level/BedrockSpawner.h"
-#include "mc/world/level/Level.h"
+#include "mc/world/level/BlockSource.h"
+#include "mc/world/level/Spawner.h"
+#include "mc/world/level/biome/Biome.h"
+#include "mc/world/level/biome/MobSpawnerData.h"
+#include "mc/world/level/biome/SpawnConditions.h"
 #include "mc/world/level/dimension/Dimension.h"
+#include "mc/world/phys/HitResult.h"
 
-#include <array>
+
 #include <string_view>
-
-namespace {
-constexpr size_t kSpawnSurfaceIdx     = 1;
-constexpr size_t kSpawnUndergroundIdx = 0;
-
-template <size_t N>
-auto getDimensionCaps(const float (&surfaceCaps)[N], const float (&undergroundCaps)[N]) {
-    std::array<std::array<int, N>, 2> caps;
-    for (size_t i = 0; i < N; ++i) {
-        caps[kSpawnSurfaceIdx][i]     = static_cast<int>(surfaceCaps[i]);
-        caps[kSpawnUndergroundIdx][i] = static_cast<int>(undergroundCaps[i]);
-    }
-    return caps;
-}
-} // namespace
+#include <unordered_map>
 
 namespace coral_fans::commands {
 void registerSpawnCommand(config::CommandConfigStruct& config) {
@@ -42,54 +30,45 @@ void registerSpawnCommand(config::CommandConfigStruct& config) {
                         .getOrCreateCommand(config.command, "command.spawn.description"_tr(), config.permission);
 
         // spawn count global
-        cmd.runtimeOverload().text("count").text("global").execute([&](CommandOrigin const&,
-                                                                       CommandOutput& output,
-                                                                       ll::command::RuntimeCommand const&) {
-            using ll::i18n_literals::operator""_tr;
-            const auto& spawner = static_cast<BedrockSpawner&>(ll::service::getLevel()->getSpawner());
-            const auto  cap     = functions::PopulationCapManager::getInstance().globalMax;
-            return output.success("command.spawn.success.count.global"_tr(spawner.mSpawnableMobTickCountPrevious, cap));
-        });
+        cmd.runtimeOverload().text("count").text("global").execute(
+            [&](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const&) {
+                using ll::i18n_literals::operator""_tr;
+                const auto usage = functions::getSpawnableMobTickUsage();
+                return output.success("command.spawn.success.count.global"_tr(usage.count, usage.cap));
+            }
+        );
 
         // spawn count density base
         cmd.runtimeOverload().text("count").text("density").text("base").execute(
             [&](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const&) {
                 using ll::i18n_literals::operator""_tr;
                 COMMAND_CHECK_PLAYER
-                auto& spawner = static_cast<BedrockSpawner&>(ll::service::getLevel()->getSpawner());
-                spawner._updateBaseTypeCount(
+                const auto density = functions::getBaseTypeDensity(
                     player->getDimensionBlockSource(),
                     utils::blockPosToChunkPos(player->getFeetBlockPos())
                 );
-                const auto data = spawner.mBaseTypeCount;
-                // [0] = underground, [1] = surface
-                // [7] -> {Animal, Monster, WaterAnimal, Villager, Ambient, Cat, Pillager}
-
-                const auto& dimension = player->getDimension();
-                const auto  caps = getDimensionCaps(dimension.mMobsPerChunkSurface, dimension.mMobsPerChunkUnderground);
-                // [0] = underground, [1] = surface
 
                 static constexpr std::string_view categories[7] =
                     {"animal", "monster", "water_animal", "villager", "ambient", "cat", "pillager"};
 
                 std::string result        = "command.spawn.success.count.basetype.title"_tr();
-                auto        appendSection = [&](std::string_view labelKey, size_t index) {
-                    auto label = ll::i18n::getInstance().get(
-                        "command.spawn." + std::string(labelKey),
-                        {}
-                    );
-                    result += "command.spawn.success.count.basetype.type"_tr(label);
+                auto        appendSection = [&](std::string_view                    labelKey,
+                                         const functions::MobCategoryCounts& counts,
+                                         const functions::MobCategoryCounts& caps) {
+                    auto label  = ll::i18n::getInstance().get("command.spawn." + std::string(labelKey), {});
+                    result     += "command.spawn.success.count.basetype.type"_tr(label);
                     for (size_t c = 0; c < 7; ++c) {
-                        auto categoryStr = ll::i18n::getInstance().get(
-                            "command.spawn.category." + std::string(categories[c]),
-                            {}
+                        auto categoryStr =
+                            ll::i18n::getInstance().get("command.spawn.category." + std::string(categories[c]), {});
+                        result += "command.spawn.success.count.basetype.line"_tr(
+                            categoryStr,
+                            counts.values[c],
+                            caps.values[c]
                         );
-                        result +=
-                            "command.spawn.success.count.basetype.line"_tr(categoryStr, data[index][c], caps[index][c]);
                     }
                 };
-                appendSection("surface", kSpawnSurfaceIdx);
-                appendSection("underground", kSpawnUndergroundIdx);
+                appendSection("surface", density.count.surface, density.cap.surface);
+                appendSection("underground", density.count.underground, density.cap.underground);
                 return output.success(result);
             }
         );
@@ -99,32 +78,70 @@ void registerSpawnCommand(config::CommandConfigStruct& config) {
             [&](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const&) {
                 using ll::i18n_literals::operator""_tr;
                 COMMAND_CHECK_PLAYER
-                auto& spawner = static_cast<BedrockSpawner&>(ll::service::getLevel()->getSpawner());
-                spawner._updateBaseTypeCount(
+                const auto counts = functions::getEntityTypeCounts(
                     player->getDimensionBlockSource(),
                     utils::blockPosToChunkPos(player->getFeetBlockPos())
                 );
-                const auto& data = spawner.mEntityTypeCount;
-                // [0] = underground, [1] = surface
 
                 std::string result        = "command.spawn.success.count.type.title"_tr();
-                auto        appendSection = [&](std::string_view labelKey, size_t index) {
+                auto        appendSection = [&](std::string_view                               labelKey,
+                                         const std::unordered_map<::HashedString, int>& section) {
                     bool first = true;
-                    for (const auto& [type, count] : *data[index]) {
+                    for (const auto& [type, count] : section) {
                         if (count == 0) continue;
                         if (first) {
-                            auto label = ll::i18n::getInstance().get(
-                                "command.spawn." + std::string(labelKey),
-                                {}
-                            );
+                            auto label = ll::i18n::getInstance().get("command.spawn." + std::string(labelKey), {});
                             result += "command.spawn.success.count.type.type"_tr(label);
                             first   = false;
                         }
                         result += "command.spawn.success.count.type.line"_tr(type.getString(), count);
                     }
                 };
-                appendSection("surface", kSpawnSurfaceIdx);
-                appendSection("underground", kSpawnUndergroundIdx);
+                appendSection("surface", counts.surface);
+                appendSection("underground", counts.underground);
+                return output.success(result);
+            }
+        );
+
+        // spawn prob
+        cmd.runtimeOverload().text("prob").execute(
+            [&](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const&) {
+                using ll::i18n_literals::operator""_tr;
+                COMMAND_CHECK_PLAYER
+                const auto hitrst = player->traceRay(5.25f, false, true);
+                if (hitrst.mType != HitResultType::Tile) return output.error("command.spawn.error.no_target"_tr());
+
+                auto&          region = player->getDimensionBlockSource();
+                const BlockPos pos    = hitrst.mBlock;
+
+                SpawnConditions conditions;
+                try {
+                    conditions = functions::getSpawnConditions(region, pos);
+                } catch (...) {
+                    return output.error("command.spawn.error.position"_tr());
+                }
+
+                const auto candidates = functions::getCandidateMobs(region, pos, conditions);
+
+                int totalWeight = 0;
+                for (auto* mob : candidates) totalWeight += mob->mRandomWeight;
+
+                std::string result  = "command.spawn.prob.title"_tr(pos.x, pos.y, pos.z);
+                result             += "command.spawn.prob.brightness"_tr(conditions.rawBrightness);
+                result             += "command.spawn.prob.surface"_tr(conditions.isOnSurface, conditions.isUnderground);
+                result             += "command.spawn.prob.fluid"_tr(conditions.isInWater, conditions.isInLava);
+                result             += "command.spawn.prob.biome"_tr(region.getBiome(pos).mHash.get().getString());
+
+                for (auto* mob : candidates) {
+                    const auto& identifier = *mob->mIdentifier;
+                    bool        ok = ::Spawner::isSpawnPositionOk(*mob->mSpawnRules, region, utils::up(pos, 1), false);
+                    double      prob  = totalWeight > 0 ? mob->mRandomWeight * 100.0 / totalWeight : 0.0;
+                    result           += "command.spawn.prob.line"_tr(
+                        identifier.mCanonicalName.get().getString(),
+                        prob,
+                        ok ? "command.spawn.prob.yes"_tr() : "command.spawn.prob.no"_tr()
+                    );
+                }
                 return output.success(result);
             }
         );

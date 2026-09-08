@@ -14,6 +14,8 @@ namespace coral_fans::utils {
 
 std::pair<std::string, bool> getNbtFromTag(CompoundTag&, std::string const&);
 
+BlockPos up(BlockPos const blockPos, int n = 1);
+
 ChunkPos blockPosToChunkPos(BlockPos const& blockPos);
 
 std::string removeMinecraftPrefix(std::string const& s);

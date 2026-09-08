@@ -295,6 +295,20 @@
                 "cat": "Cat",
                 "pillager": "Pillager"
             },
+            "error": {
+                "no_target": "No block targeted",
+                "position": "Failed to determine spawn position"
+            },
+            "prob": {
+                "title": "-- [{} {} {}] --",
+                "brightness": "\n - Brightness(Sky + Block): {}",
+                "surface": "\n - Surface / Underground: {} / {}",
+                "fluid": "\n - Water / Lava: {} / {}",
+                "biome": "\n - Biome: {}",
+                "line": "\n - {}: will: {:.1f}%, can: {}",
+                "yes": "Yes",
+                "no": "No"
+            },
             "success": {
                 "count": {
                     "global": "Global spawn cap usage: {}/{}",

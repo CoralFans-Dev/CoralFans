@@ -88,6 +88,8 @@ std::pair<std::string, bool> getNbtFromTag(CompoundTag& tag, std::string const& 
     }
 }
 
+BlockPos up(BlockPos const blockPos, int n = 1) { return BlockPos{blockPos.x, blockPos.y + n, blockPos.z}; }
+
 ChunkPos blockPosToChunkPos(BlockPos const& blockPos) {
     return ChunkPos{
         (blockPos.x < 0 ? blockPos.x - 15 : blockPos.x) / 16,
