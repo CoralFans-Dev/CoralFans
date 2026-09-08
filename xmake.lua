@@ -4,7 +4,7 @@ add_repositories("liteldev-repo https://github.com/LiteLDev/xmake-repo.git")
 add_repositories("oeotyan-repo https://github.com/OEOTYAN/xmake-repo.git")
 add_repositories("coralfansdev-repo https://github.com/CoralFans-Dev/xmake-repo.git")
 
-add_requires("levilamina", {configs = {target_type = get_config("target_type")}})
+add_requires("levilamina 26.32.2", {configs = {target_type = get_config("target_type")}})
 
 
 add_requires(
