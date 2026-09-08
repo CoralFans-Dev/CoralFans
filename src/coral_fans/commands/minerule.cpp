@@ -143,6 +143,10 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
         }
         );
 
+        constexpr int   kDefaultGlobalCap = 200;
+        constexpr int   kMaxGlobalCap     = INT32_MAX;
+        constexpr float kMaxDimensionCap  = 2147483583.0f;
+
         // minerule fuck_population_cap global <count>
         mineruleCommand.runtimeOverload()
             .text("fuck_population_cap")
@@ -151,19 +155,21 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
                 using ll::i18n_literals::operator""_tr;
                 int count = self["count"].get<ll::command::ParamKind::Int>();
-                // 这里不需要处理负数，游戏默认负数不限制
+                if (count < 0 || count > kMaxGlobalCap) count = kMaxGlobalCap;
                 functions::PopulationCapManager::getInstance().setGlobalMax(count);
                 output.success("command.minerule.fuck_population_cap.global.success"_tr(count));
             });
 
         // minerule fuck_population_cap global reset
-        mineruleCommand.runtimeOverload().text("fuck_population_cap").text("global").text("reset").execute(
-            [](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const&) {
+        mineruleCommand.runtimeOverload()
+            .text("fuck_population_cap")
+            .text("global")
+            .text("reset")
+            .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const&) {
                 using ll::i18n_literals::operator""_tr;
-                functions::PopulationCapManager::getInstance().setGlobalMax(200);
+                functions::PopulationCapManager::getInstance().setGlobalMax(kDefaultGlobalCap);
                 output.success("command.minerule.fuck_population_cap.global.reset.success"_tr());
-            }
-        );
+            });
 
         // minerule fuck_population_cap dim <dimension> <mobtype> <type> <count>
         mineruleCommand.runtimeOverload()
@@ -184,20 +190,21 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
                 bool  isOnSurface = self["type"].get<ll::command::ParamKind::Enum>().index == 0;
                 float count       = self["count"].get<ll::command::ParamKind::Float>();
 
-                // 如果用户输入负数，他的意思很可能是想取消这个类别的限制，所以我们把它改成非常大
-                // 由于浮点误差，最大可取值是2147483583.0f，超过这个值不刷怪
-                if (count < 0 || count > 2147483583.0f) count = 2147483583.0f;
+                if (count < 0 || count > kMaxDimensionCap) count = kMaxDimensionCap;
 
-                auto dimKey  = "translate.dimension." + std::string(dims[dimId]);
-                auto dimStr  = ll::i18n::getInstance().get(dimKey, {});
-                auto typeKey = "command.minerule.fuck_population_cap." + self["type"].get<ll::command::ParamKind::Enum>().name;
-                auto typeStr = ll::i18n::getInstance().get(typeKey, {});
-                auto categoryKey =
-                    "command.minerule.fuck_population_cap.category." + self["mobtype"].get<ll::command::ParamKind::Enum>().name;
+                auto dimKey = "translate.dimension." + std::string(dims[dimId]);
+                auto dimStr = ll::i18n::getInstance().get(dimKey, {});
+                auto typeKey =
+                    "command.minerule.fuck_population_cap." + self["type"].get<ll::command::ParamKind::Enum>().name;
+                auto typeStr     = ll::i18n::getInstance().get(typeKey, {});
+                auto categoryKey = "command.minerule.fuck_population_cap.category."
+                                 + self["mobtype"].get<ll::command::ParamKind::Enum>().name;
                 auto categoryStr = ll::i18n::getInstance().get(categoryKey, {});
 
                 if (functions::PopulationCapManager::getInstance().setDimCap(dimId, category, isOnSurface, count)) {
-                    output.success("command.minerule.fuck_population_cap.dim.success"_tr(dimStr, categoryStr, typeStr, count));
+                    output.success(
+                        "command.minerule.fuck_population_cap.dim.success"_tr(dimStr, categoryStr, typeStr, count)
+                    );
                 } else {
                     output.error("command.minerule.fuck_population_cap.dim.error"_tr(dimStr, categoryStr, typeStr));
                 }
