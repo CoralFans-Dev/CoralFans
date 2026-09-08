@@ -9,7 +9,7 @@ add_requires("levilamina 26.32.2", {configs = {target_type = get_config("target_
 
 add_requires(
     "levibuildscript",
-    "bsci"
+    "bsci 26.32.2"
 )
 
 if not has_config("vs_runtime") then
