@@ -143,8 +143,8 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
         }
         );
 
-        constexpr int   kMaxGlobalCap     = INT32_MAX;
-        constexpr float kMaxDimensionCap  = 2147483583.0f;
+        constexpr int   kMaxGlobalCap    = INT32_MAX;
+        constexpr float kMaxDimensionCap = 2147483583.0f;
 
         // minerule fuck_population_cap global <count>
         mineruleCommand.runtimeOverload()
@@ -191,13 +191,11 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
 
                 if (count < 0 || count > kMaxDimensionCap) count = kMaxDimensionCap;
 
-                auto dimKey = "translate.dimension." + std::string(dims[dimId]);
-                auto dimStr = ll::i18n::getInstance().get(dimKey, {});
-                auto typeKey =
-                    "command.minerule.fuck_population_cap." + self["type"].get<ll::command::ParamKind::Enum>().name;
+                auto dimKey      = "translate.dimension." + std::string(dims[dimId]);
+                auto dimStr      = ll::i18n::getInstance().get(dimKey, {});
+                auto typeKey     = "command.spawn." + self["type"].get<ll::command::ParamKind::Enum>().name;
                 auto typeStr     = ll::i18n::getInstance().get(typeKey, {});
-                auto categoryKey = "command.minerule.fuck_population_cap.category."
-                                 + self["mobtype"].get<ll::command::ParamKind::Enum>().name;
+                auto categoryKey = "command.spawn.category." + self["mobtype"].get<ll::command::ParamKind::Enum>().name;
                 auto categoryStr = ll::i18n::getInstance().get(categoryKey, {});
 
                 if (functions::PopulationCapManager::getInstance().setDimCap(dimId, category, isOnSurface, count)) {

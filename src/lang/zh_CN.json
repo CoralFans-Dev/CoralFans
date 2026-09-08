@@ -271,17 +271,6 @@
                         "success": "已将 {} 的刷怪上限重置为维度默认值",
                         "error": "重置 {} 刷怪上限失败，可能该维度从未加载过"
                     }
-                },
-                "surface": "地表",
-                "underground": "洞穴",
-                "category": {
-                    "animal": "动物",
-                    "monster": "怪物",
-                    "water_animal": "水生动物",
-                    "villager": "村民",
-                    "ambient": "环境生物",
-                    "cat": "猫",
-                    "pillager": "掠夺者"
                 }
             },
             "fuck_piston_reset_velocity": {
@@ -305,8 +294,16 @@
         },
         "spawn": {
             "description": "查询刷怪信息",
-            "error": {
-                "no_dimension": "无法获取当前维度"
+            "surface": "地表",
+            "underground": "洞穴",
+            "category": {
+                "animal": "动物",
+                "monster": "怪物",
+                "water_animal": "水生动物",
+                "villager": "村民",
+                "ambient": "环境生物",
+                "cat": "猫",
+                "pillager": "掠夺者"
             },
             "success": {
                 "count": {

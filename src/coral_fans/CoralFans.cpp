@@ -15,7 +15,6 @@
 #include "ll/api/Config.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/event/command/ServerCommandRegisterEvent.h"
-#include "ll/api/event/server/ServerStoppingEvent.h"
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/mod/RegisterHelper.h"
 #ifdef LL_PLAT_C

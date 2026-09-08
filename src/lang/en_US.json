@@ -261,17 +261,6 @@
                         "success": "Reset dimension {} population caps to their original values",
                         "error": "Failed to reset dimension {} population caps, possibly because the dimension was never loaded"
                     }
-                },
-                "surface": "Surface",
-                "underground": "Underground",
-                "category": {
-                    "animal": "Animal",
-                    "monster": "Monster",
-                    "water_animal": "Water Animal",
-                    "villager": "Villager",
-                    "ambient": "Ambient",
-                    "cat": "Cat",
-                    "pillager": "Pillager"
                 }
             },
             "fuck_piston_reset_velocity": {
@@ -295,8 +284,16 @@
         },
         "spawn": {
             "description": "Query spawn statistics",
-            "error": {
-                "no_dimension": "Cannot get the current dimension"
+            "surface": "Surface",
+            "underground": "Underground",
+            "category": {
+                "animal": "Animal",
+                "monster": "Monster",
+                "water_animal": "Water Animal",
+                "villager": "Villager",
+                "ambient": "Ambient",
+                "cat": "Cat",
+                "pillager": "Pillager"
             },
             "success": {
                 "count": {
