@@ -304,10 +304,23 @@
             }
         },
         "spawn": {
-            "description": "查询刷怪统计",
+            "description": "查询刷怪信息",
+            "error": {
+                "no_dimension": "无法获取当前维度"
+            },
             "success": {
                 "count": {
-                    "global": "全局可刷怪生物 tick 计数: {}"
+                    "global": "全局上限占用: {}/{}",
+                    "basetype": {
+                        "title": "按类型刷怪统计:",
+                        "type": "\n- {}:",
+                        "line": "\n  {}: {}/{}"
+                    },
+                    "type": {
+                        "title": "按实体类型刷怪统计:",
+                        "type": "\n- {}:",
+                        "line": "\n  {}: {}"
+                    }
                 }
             }
         }

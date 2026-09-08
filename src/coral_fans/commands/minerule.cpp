@@ -143,7 +143,6 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
         }
         );
 
-        constexpr int   kDefaultGlobalCap = 200;
         constexpr int   kMaxGlobalCap     = INT32_MAX;
         constexpr float kMaxDimensionCap  = 2147483583.0f;
 
@@ -167,7 +166,7 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
             .text("reset")
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const&) {
                 using ll::i18n_literals::operator""_tr;
-                functions::PopulationCapManager::getInstance().setGlobalMax(kDefaultGlobalCap);
+                functions::PopulationCapManager::getInstance().setGlobalMax(200);
                 output.success("command.minerule.fuck_population_cap.global.reset.success"_tr());
             });
 

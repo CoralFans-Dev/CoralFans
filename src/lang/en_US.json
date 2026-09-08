@@ -295,9 +295,22 @@
         },
         "spawn": {
             "description": "Query spawn statistics",
+            "error": {
+                "no_dimension": "Cannot get the current dimension"
+            },
             "success": {
                 "count": {
-                    "global": "Global spawnable mob tick count: {}"
+                    "global": "Global spawn cap usage: {}/{}",
+                    "basetype": {
+                        "title": "Spawn counts by type:",
+                        "type": "\n- {}:",
+                        "line": "\n  {}: {}/{}"
+                    },
+                    "type": {
+                        "title": "Entity spawn counts by type:",
+                        "type": "\n- {}:",
+                        "line": "\n  {}: {}"
+                    }
                 }
             }
         }
