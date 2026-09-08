@@ -247,9 +247,7 @@
             },
             "fuck_population_cap": {
                 "success": "set fuck_population_cap \"{}\"",
-                "error": "failed to set fuck_population_cap"
-            },
-            "popcap": {
+                "error": "failed to set fuck_population_cap",
                 "global": {
                     "success": "Set global population cap to {}",
                     "reset": {

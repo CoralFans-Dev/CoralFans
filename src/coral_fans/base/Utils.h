@@ -1,6 +1,7 @@
 #pragma once
 
 #include "mc/deps/nbt/CompoundTag.h"
+#include "mc/entity/systems/LevelChunkTickingSystem.h"
 #include "mc/network/packet/TextPacketType.h"
 #include "mc/world/Container.h"
 #include "mc/world/actor/player/Player.h"

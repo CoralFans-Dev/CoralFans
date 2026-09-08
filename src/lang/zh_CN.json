@@ -257,9 +257,7 @@
             },
             "fuck_population_cap": {
                 "success": "设置 fuck_population_cap \"{}\"",
-                "error": "设置 fuck_population_cap 失败"
-            },
-            "popcap": {
+                "error": "设置 fuck_population_cap 失败",
                 "global": {
                     "success": "已将全局刷怪上限设置为 {}",
                     "reset": {

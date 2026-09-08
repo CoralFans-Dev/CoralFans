@@ -2,11 +2,12 @@
 #include "coral_fans/base/Utils.h"
 
 
+#include "ll/api/event/EventBus.h"
+#include "ll/api/event/player/PlayerAttackEvent.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/network/ServerPlayerBlockUseHandler.h"
 #include "mc/server/ServerPlayer.h"
 #include "mc/world/Container.h"
-#include "mc/world/actor/ActorHurtResult.h"
 #include "mc/world/actor/player/Inventory.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/actor/player/PlayerInventory.h"
@@ -26,6 +27,8 @@
 #include <string>
 
 namespace {
+
+ll::event::ListenerPtr gAutoWeaponListener;
 
 struct ToolInfo {
     float value        = 0;
@@ -107,41 +110,26 @@ LL_STATIC_HOOK(
     return origin(player, pos, face);
 }
 
-LL_TYPE_INSTANCE_HOOK(
-    CoralFansAutoToolHook2,
-    ll::memory::HookPriority::Normal,
-    Player,
-    &Player::$attack,
-    ::ActorHurtResult,
-    ::Actor&                                       actor,
-    ::SharedTypes::Legacy::ActorDamageCause const& cause
-) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(actor, cause);
-#endif
+void handleAutoWeapon(Player& player) {
     if (CoralFans::getInstance().getConfigDb()->get(
-            std::format("functions.players.{}.autoweapon", this->getUuid().asString())
+            std::format("functions.players.{}.autoweapon", player.getUuid().asString())
         )
         == "true") {
-        int currentSlot = this->getSelectedItemSlot();
+        int currentSlot = player.getSelectedItemSlot();
         int minDamage   = std::stoi(
             CoralFans::getInstance()
                 .getConfigDb()
-                ->get(std::format("functions.players.{}.autoweapon.mindamage", this->getUuid().asString()))
+                ->get(std::format("functions.players.{}.autoweapon.mindamage", player.getUuid().asString()))
                 .value_or("1")
         );
-        int bestSlot = ::searchBestToolInInv(*this->mInventory->mInventory, currentSlot, nullptr, minDamage, true);
+        int bestSlot = ::searchBestToolInInv(*player.mInventory->mInventory, currentSlot, nullptr, minDamage, true);
         if (bestSlot > 8) {
-            utils::sendInventorySwap(this, currentSlot, bestSlot);
-            this->refreshInventory();
+            utils::sendInventorySwap(&player, currentSlot, bestSlot);
+            player.refreshInventory();
         } else if (bestSlot >= 0) {
-            this->setSelectedSlot(bestSlot);
+            player.setSelectedSlot(bestSlot);
         }
     }
-    return origin(actor, cause);
 }
 
 void hookAutoTool(bool hook) {
@@ -153,10 +141,18 @@ void hookAutoTool(bool hook) {
 }
 
 void hookAutoWeapon(bool hook) {
+    auto& bus = ll::event::EventBus::getInstance();
     if (hook) {
-        CoralFansAutoToolHook2::hook();
+        if (gAutoWeaponListener) return;
+        gAutoWeaponListener =
+            bus.emplaceListener<ll::event::player::PlayerAttackEvent>([](ll::event::player::PlayerAttackEvent& event) {
+                handleAutoWeapon(event.self());
+            });
     } else {
-        CoralFansAutoToolHook2::unhook();
+        if (gAutoWeaponListener) {
+            bus.removeListener<ll::event::player::PlayerAttackEvent>(gAutoWeaponListener);
+            gAutoWeaponListener = nullptr;
+        }
     }
 }
 

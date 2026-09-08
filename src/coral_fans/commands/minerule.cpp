@@ -122,7 +122,7 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
 
         // 注册子类型枚举 (surface, underground)
         ll::command::CommandRegistrar::getInstance(false).tryRegisterRuntimeEnum(
-            "popcapType",
+            "populationCapType",
             {
                 {"surface",     0},
                 {"underground", 1}
@@ -143,9 +143,9 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
         }
         );
 
-        // minerule popcap global <count>
+        // minerule fuck_population_cap global <count>
         mineruleCommand.runtimeOverload()
-            .text("popcap")
+            .text("fuck_population_cap")
             .text("global")
             .required("count", ll::command::ParamKind::Int)
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
@@ -153,24 +153,24 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
                 int count = self["count"].get<ll::command::ParamKind::Int>();
                 // 这里不需要处理负数，游戏默认负数不限制
                 functions::PopulationCapManager::getInstance().setGlobalMax(count);
-                output.success("command.minerule.popcap.global.success"_tr(count));
+                output.success("command.minerule.fuck_population_cap.global.success"_tr(count));
             });
 
-        // minerule popcap global reset
-        mineruleCommand.runtimeOverload().text("popcap").text("global").text("reset").execute(
+        // minerule fuck_population_cap global reset
+        mineruleCommand.runtimeOverload().text("fuck_population_cap").text("global").text("reset").execute(
             [](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const&) {
                 using ll::i18n_literals::operator""_tr;
                 functions::PopulationCapManager::getInstance().setGlobalMax(200);
-                output.success("command.minerule.popcap.global.reset.success"_tr());
+                output.success("command.minerule.fuck_population_cap.global.reset.success"_tr());
             }
         );
 
-        // minerule popcap dim <dimension> <mobtype> <type> <count>
+        // minerule fuck_population_cap dim <dimension> <mobtype> <type> <count>
         mineruleCommand.runtimeOverload()
-            .text("popcap")
+            .text("fuck_population_cap")
             .required("dimension", ll::command::ParamKind::Dimension)
             .required("mobtype", ll::command::ParamKind::Enum, "mobTypes")
-            .required("type", ll::command::ParamKind::Enum, "popcapType")
+            .required("type", ll::command::ParamKind::Enum, "populationCapType")
             .required("count", ll::command::ParamKind::Float)
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
                 using ll::i18n_literals::operator""_tr;
@@ -190,22 +190,22 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
 
                 auto dimKey  = "translate.dimension." + std::string(dims[dimId]);
                 auto dimStr  = ll::i18n::getInstance().get(dimKey, {});
-                auto typeKey = "command.minerule.popcap." + self["type"].get<ll::command::ParamKind::Enum>().name;
+                auto typeKey = "command.minerule.fuck_population_cap." + self["type"].get<ll::command::ParamKind::Enum>().name;
                 auto typeStr = ll::i18n::getInstance().get(typeKey, {});
                 auto categoryKey =
-                    "command.minerule.popcap.category." + self["mobtype"].get<ll::command::ParamKind::Enum>().name;
+                    "command.minerule.fuck_population_cap.category." + self["mobtype"].get<ll::command::ParamKind::Enum>().name;
                 auto categoryStr = ll::i18n::getInstance().get(categoryKey, {});
 
                 if (functions::PopulationCapManager::getInstance().setDimCap(dimId, category, isOnSurface, count)) {
-                    output.success("command.minerule.popcap.dim.success"_tr(dimStr, categoryStr, typeStr, count));
+                    output.success("command.minerule.fuck_population_cap.dim.success"_tr(dimStr, categoryStr, typeStr, count));
                 } else {
-                    output.error("command.minerule.popcap.dim.error"_tr(dimStr, categoryStr, typeStr));
+                    output.error("command.minerule.fuck_population_cap.dim.error"_tr(dimStr, categoryStr, typeStr));
                 }
             });
 
-        // minerule popcap dim <dimension> reset
+        // minerule fuck_population_cap dim <dimension> reset
         mineruleCommand.runtimeOverload()
-            .text("popcap")
+            .text("fuck_population_cap")
             .required("dimension", ll::command::ParamKind::Dimension)
             .text("reset")
             .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
@@ -220,9 +220,9 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
                 auto dimStr = ll::i18n::getInstance().get(dimKey, {});
 
                 if (functions::PopulationCapManager::getInstance().resetDimCap(dimId)) {
-                    output.success("command.minerule.popcap.dim.reset.success"_tr(dimStr));
+                    output.success("command.minerule.fuck_population_cap.dim.reset.success"_tr(dimStr));
                 } else {
-                    output.error("command.minerule.popcap.dim.reset.error"_tr(dimStr));
+                    output.error("command.minerule.fuck_population_cap.dim.reset.error"_tr(dimStr));
                 }
             });
 
