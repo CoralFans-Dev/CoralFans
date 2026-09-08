@@ -141,8 +141,11 @@ LL_TYPE_INSTANCE_HOOK(handlePopCapHook, HookPriority::Normal, BedrockSpawner, &B
 #endif
     auto& manager = PopulationCapManager::getInstance();
     if (manager.enabled) {
-        this->mSpawnableMobTickCountPrevious =
-            std::max(this->mSpawnableMobTickCountPrevious - manager.globalMax + 200u, 0u);
+        this->mSpawnableMobTickCountPrevious = static_cast<uint32_t>(std::clamp<int64_t>(
+            this->mSpawnableMobTickCountPrevious + 200LL - manager.globalMax,
+            0LL,
+            static_cast<int64_t>(UINT32_MAX)
+        ));
     }
 }
 
