@@ -75,12 +75,12 @@ void HudHelper::tick() {
                     );
                 }
                 if (hud & (1 << HudHelper::HudType::base)) {
-                    auto& delta      = player.getPosDelta();
-                    auto& biome      = blockSource.getBiome(player.getFeetBlockPos());
-                    auto  rawName    = utils::removeMinecraftPrefix(biome.mHash->c_str());
-                    auto  translated = ll::i18n::getInstance().get("translate.biome." + rawName, {});
-                    auto  biomeName  = translated.empty() ? rawName : std::string{translated};
-                    msg             += "translate.cfhud.base"_tr(
+                    auto& delta       = player.getPosDelta();
+                    auto& biome       = blockSource.getBiome(player.getFeetBlockPos());
+                    auto  rawName     = utils::removeMinecraftPrefix(biome.mHash->c_str());
+                    auto  translated  = ll::i18n::getInstance().get("translate.biome." + rawName, {});
+                    auto  biomeName   = translated.empty() ? rawName : std::string{translated};
+                    msg              += "translate.cfhud.base"_tr(
                         level->getCurrentServerTick().tickID,
                         player.getPosition().toString(),
                         player.getViewVector(1.0f).toString(),
@@ -90,7 +90,6 @@ void HudHelper::tick() {
                                                                                  ._getRawBrightness(
                                                                                      hitrst.mBlock + BlockPos{0, 1, 0},
                                                                                      player.getDimension().mSkyDarken,
-                                                                                     true,
                                                                                      true
                                                                                  )
                                                                                  .mValue)

@@ -15,7 +15,6 @@
 #include "mc/world/level/Level.h"
 #include "mc/world/level/Tick.h"
 
-
 #ifdef LL_PLAT_C
 #include "mc/server/ServerInstance.h"
 #include <thread>
@@ -36,10 +35,13 @@ void EnableFreeCameraPacket(Player* pl) {
 
 void SendFakePlayerPacket(Player* pl) {
     // Client Player
-    auto pkt1             = AddPlayerPacket(*pl);
-    pkt1.mEntityId->rawID = pkt1.mEntityId->rawID + 114514;
-    auto randomUuid       = mce::UUID::random();
-    pkt1.mUuid            = randomUuid;
+    auto packet = pl->tryCreateAddActorPacket();
+    if (!packet || packet->getId() != MinecraftPacketIds::AddPlayer) return;
+
+    auto& pkt1                                 = static_cast<AddPlayerPacket&>(*packet);
+    pkt1.mAbilitiesData->mTargetPlayer->rawID += 114514;
+    auto randomUuid                            = mce::UUID::random();
+    pkt1.mUuid                                 = randomUuid;
     pl->sendNetworkPacket(pkt1);
     // Update Skin
 
@@ -49,20 +51,6 @@ void SendFakePlayerPacket(Player* pl) {
     skinPkt.mLocalizedNewSkinName = "";
     skinPkt.mLocalizedOldSkinName = "";
     skinPkt.sendTo(*pl);
-
-
-    // gmlib::network::GMBinaryStream bs;
-    // bs.writePacketHeader(MinecraftPacketIds::PlayerSkin);
-    // bs.writeUuid(randomUuid);
-    // bs.writeSkin(skin);
-    // bs.writeString("");
-    // bs.writeString("");
-    // bs.writeBool(true);
-    // bs.sendTo(
-    //     *(gmlib::world::actor::GMPlayer*)pl,
-    //     NetworkPeer::Reliability::ReliableOrdered,
-    //     Compressibility::Compressible
-    // );
 }
 
 void DisableFreeCameraPacket(Player* pl) {
