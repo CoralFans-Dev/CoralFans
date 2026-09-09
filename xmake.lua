@@ -2,14 +2,12 @@ add_rules("mode.debug", "mode.release")
 
 add_repositories("liteldev-repo https://github.com/LiteLDev/xmake-repo.git")
 add_repositories("oeotyan-repo https://github.com/OEOTYAN/xmake-repo.git")
-add_repositories("coralfansdev-repo https://github.com/CoralFans-Dev/xmake-repo.git")
 
-add_requires(
-    "bsci main",
-    "levibuildscript"
-)
+add_requires("levilamina", {configs = {target_type = get_config("target_type")}})
 
-add_requires("levilamina 26.32.2", {configs = {target_type = get_config("target_type")}})
+add_requires("levibuildscript")
+
+add_requires("bsci v26.40.0", {configs = {target_type = get_config("target_type")}})
 
 if not has_config("vs_runtime") then
     set_runtimes("MD")
@@ -44,16 +42,13 @@ target("CoralFans") -- Change this to your mod name.
     end
     add_defines("COMMITID=\"$(shell git rev-parse HEAD)\"")
     add_defines("CF_VERSION=\"$(shell git describe --tags --abbrev=0 --always)\"")
-    add_files("src/**.cpp")
-    add_includedirs("src")
-    add_packages(
-        "levilamina",
-        "bsci"
-    )
-    add_shflags("/DELAYLOAD:bedrock_server.dll") -- To use symbols provided by SymbolProvider.
+    add_packages("levilamina", "bsci")
     set_kind("shared")
     set_languages("c++20")
     set_symbols("debug")
+    add_headerfiles("src/**.h")
+    add_files("src/**.cpp")
+    add_includedirs("src")
     if is_config("target_type", "server") then
         add_defines("LL_PLAT_S")
     --  add_includedirs("src-server")
@@ -63,7 +58,6 @@ target("CoralFans") -- Change this to your mod name.
     --  add_includedirs("src-client")
     --  add_files("src-client/**.cpp")
     end
-
     after_build(function (target)
         local mod_packer = import("scripts.after_build")
 
