@@ -1,14 +1,8 @@
+#include "coral_fans/base/Macros.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/deps/core/math/Vec3.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/block/Block.h"
-
-
-#ifdef LL_PLAT_C
-#include "ll/api/service/Bedrock.h"
-#include "mc/server/ServerInstance.h"
-#include <thread>
-#endif
 
 
 namespace coral_fans::functions {
@@ -26,12 +20,7 @@ LL_TYPE_INSTANCE_HOOK(
     bool,
     Vec3 clickPos
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(block, pos, face, placer, true, clickPos);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(block, pos, face, placer, true, clickPos));
     return origin(block, pos, face, placer, true, clickPos);
 }
 
@@ -48,12 +37,7 @@ LL_TYPE_INSTANCE_HOOK(
     bool            val,
     Vec3            clickPos
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(block, pos, face, placer, val, clickPos);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(block, pos, face, placer, val, clickPos));
     if (getBlock(pos).isAir()) return true;
     auto stone = Block::tryGetFromRegistry("minecraft:stone");
     return origin(stone, pos, face, placer, val, clickPos);

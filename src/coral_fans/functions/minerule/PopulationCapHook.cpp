@@ -1,16 +1,11 @@
 #include "MineruleManager.h"
 #include "coral_fans/CoralFans.h"
+#include "coral_fans/base/Macros.h"
 #include "ll/api/memory/Hook.h"
 #include "ll/api/service/Bedrock.h"
 #include "mc/world/level/BedrockSpawner.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/dimension/Dimension.h"
-
-
-#ifdef LL_PLAT_C
-#include "mc/server/ServerInstance.h"
-#include <thread>
-#endif
 
 
 #include <algorithm>
@@ -133,12 +128,7 @@ bool PopulationCapManager::resetDimCap(int dimId) {
 
 LL_TYPE_INSTANCE_HOOK(handlePopCapHook, HookPriority::Normal, BedrockSpawner, &BedrockSpawner::$tickMobCount, void) {
     origin();
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return;
-#endif
+    RETURN_VOID_IF_NOT_MAIN_THREAD;
     auto& manager = PopulationCapManager::getInstance();
     if (manager.enabled) {
         this->mSpawnableMobTickCountPrevious = static_cast<uint32_t>(std::clamp<int64_t>(
@@ -157,12 +147,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     void,
     const br::worldgen::StructureSetRegistry& structureSetRegistry
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(structureSetRegistry);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(structureSetRegistry));
     origin(structureSetRegistry);
 
     int   dimId   = this->getDimensionId();

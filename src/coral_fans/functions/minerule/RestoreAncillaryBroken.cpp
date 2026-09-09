@@ -1,16 +1,11 @@
 #include "MineruleManager.h"
+#include "coral_fans/base/Macros.h"
 #include "ll/api/memory/Hook.h"
 #include "ll/api/service/Bedrock.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/block/Block.h"
 #include "mc/world/level/block/BlockType.h"
-
-
-#ifdef LL_PLAT_C
-#include "mc/server/ServerInstance.h"
-#include <thread>
-#endif
 
 
 #include <cstddef>
@@ -26,12 +21,7 @@ LL_TYPE_INSTANCE_HOOK(
     void,
     ::BlockSource& region
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(region);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(region));
     auto& helper            = RestoreAncillaryBrokenHelper::getInstance();
     helper.mutex            = true;
     helper.mutex2           = true;
@@ -55,12 +45,7 @@ LL_TYPE_INSTANCE_HOOK(
     ::ResourceDropsContext const& resourceDropsContext,
     ::Actor const*                actorContext
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(region, pos, block, random, resourceDropsContext, actorContext);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(region, pos, block, random, resourceDropsContext, actorContext));
     auto& helper = RestoreAncillaryBrokenHelper::getInstance();
     if (helper.mutex2) {
         helper.mutex2       = false;
@@ -83,12 +68,7 @@ LL_TYPE_INSTANCE_HOOK(
     bool                        dropResources,
     const ::BlockChangeContext& blockChangeContext
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(region, pos, dropResources, blockChangeContext);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(region, pos, dropResources, blockChangeContext));
     auto& helper = RestoreAncillaryBrokenHelper::getInstance();
     if (helper.mutex) {
         helper.mutex2  = true;

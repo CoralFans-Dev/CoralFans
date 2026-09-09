@@ -1,6 +1,7 @@
 #include "coral_fans/functions/village/Village.h"
 #include "Village.h"
 #include "coral_fans/CoralFans.h"
+#include "coral_fans/base/Macros.h"
 
 
 #include "ll/api/i18n/I18n.h"
@@ -21,11 +22,6 @@
 #include "mc/world/level/levelgen/structure/BoundingBox.h"
 #include "mc/world/phys/AABB.h"
 
-
-#ifdef LL_PLAT_C
-#include "mc/server/ServerInstance.h"
-#include <thread>
-#endif
 
 #include <cstddef>
 #include <math.h>
@@ -544,12 +540,7 @@ LL_TYPE_INSTANCE_HOOK(
     void,
     ::br::worldgen::StructureSetRegistry const& structureSetRegistry
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(structureSetRegistry);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(structureSetRegistry));
     origin(structureSetRegistry);
     for (auto& [uuid, village] : *mVillageManager->mVillages) {
         CFVillageManager::getInstance().addVillage(village);
@@ -564,12 +555,7 @@ LL_TYPE_INSTANCE_HOOK(
     void,
     ::std::shared_ptr<::POIInstance>&& pi
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(std::move(pi));
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(std::move(pi)));
     auto& manager              = CFVillageManager::getInstance();
     manager.newVillageId       = std::nullopt;
     manager.mayCreatingVillage = true;
@@ -593,12 +579,7 @@ LL_TYPE_INSTANCE_HOOK(
     ::mce::UUID       id,
     ::BlockPos const& _origin
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(dimension, id, _origin);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(dimension, id, _origin));
     auto  ori     = origin(dimension, id, _origin);
     auto& manager = CFVillageManager::getInstance();
     if (manager.mayCreatingVillage) manager.newVillageId = id;
@@ -614,12 +595,7 @@ LL_TYPE_INSTANCE_HOOK(
     Tick         tick,
     BlockSource& region
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(tick, region);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(tick, region));
     CFVillageManager::getInstance().handleVillageTick(*this, tick);
     origin(tick, region);
 }

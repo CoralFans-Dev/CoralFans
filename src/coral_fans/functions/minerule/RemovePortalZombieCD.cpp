@@ -1,4 +1,5 @@
 #include "MineruleManager.h"
+#include "coral_fans/base/Macros.h"
 #include "ll/api/memory/Hook.h"
 #include "ll/api/service/Bedrock.h"
 #include "mc/deps/core/math/Vec3.h"
@@ -13,12 +14,6 @@
 #include "mc/world/level/block/BlockSupportType.h"
 #include "mc/world/level/block/PortalBlock.h"
 #include "mc/world/level/block/VanillaStates.h "
-
-
-#ifdef LL_PLAT_C
-#include "mc/server/ServerInstance.h"
-#include <thread>
-#endif
 
 
 namespace coral_fans::functions {
@@ -107,12 +102,7 @@ LL_TYPE_STATIC_HOOK(
     ::Dimension const& dimension,
     ::IRandom&         random
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(dimension, random);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(dimension, random));
     RemovePortalZombieCDHelper::getInstance().spawn = origin(dimension, random);
     return false;
 }
@@ -127,12 +117,7 @@ LL_TYPE_STATIC_HOOK(
     ::BlockPos const& pos,
     ::Random&         random
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(region, pos, random);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(region, pos, random));
     origin(region, pos, random);
     auto& helper = RemovePortalZombieCDHelper::getInstance();
     if (helper.spawn) {

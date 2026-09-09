@@ -12,12 +12,6 @@
 #include "mc/world/level/block/actor/HopperBlockActor.h"
 
 
-#ifdef LL_PLAT_C
-#include "ll/api/service/Bedrock.h"
-#include "mc/server/ServerInstance.h"
-#include <thread>
-#endif
-
 #include <format>
 #include <string>
 
@@ -122,12 +116,7 @@ LL_TYPE_INSTANCE_HOOK(
     int            attachedFace,
     bool           canPushItems
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(region, fromContainer, pos, attachedFace, canPushItems);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(region, fromContainer, pos, attachedFace, canPushItems));
     HopperCounterManager::getInstance().region = &region;
     HopperCounterManager::getInstance().pos    = pos;
     HopperCounterManager::getInstance().mutex  = true;
@@ -145,12 +134,7 @@ LL_TYPE_INSTANCE_HOOK(
     int                slot,
     ::ItemStack const& item
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(slot, item);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(slot, item));
     if (!HopperCounterManager::getInstance().mutex) {
         HOOK_HOPPER_RETURN
     }

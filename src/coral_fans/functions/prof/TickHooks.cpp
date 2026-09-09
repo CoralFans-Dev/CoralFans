@@ -26,21 +26,11 @@
 #include "mc/world/redstone/circuit/CircuitSceneGraph.h"
 
 
-#ifdef LL_PLAT_C
-#include <thread>
-#endif
-
-
 namespace coral_fans::functions {
 
 // main game tick
 LL_TYPE_INSTANCE_HOOK(CoralFansTickLevelTickHook, ll::memory::HookPriority::Normal, Level, &Level::$tick, void) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin();
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin());
     auto& prof = functions::Profiler::getInstance();
     origin();
     auto time_level = ProfilerLite::gProfilerLiteInstance().mDebugServerTickTime->count() / 1000;
@@ -75,12 +65,7 @@ LL_TYPE_INSTANCE_HOOK(
     Tick const&             tick,
     ::std::function<void()> spawnerCallback
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(tickRegion, tick, spawnerCallback);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(tickRegion, tick, spawnerCallback));
     auto&      prof     = functions::Profiler::getInstance();
     const auto dimid    = tickRegion.getDimensionId();
     auto&      chunkPos = this->mPosition;
@@ -125,12 +110,7 @@ LL_TYPE_INSTANCE_HOOK(
     ::LevelChunkVolumeData const& levelChunkVolumeData,
     ::ChunkPos const              chunkPos
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(region, levelChunkVolumeData, chunkPos);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(region, levelChunkVolumeData, chunkPos));
     auto& prof = functions::Profiler::getInstance();
     if (prof.profiling && prof.chunkTickBlocksMutex == 1) {
         prof.chunkTickBlocksMutex     = 2;
@@ -147,12 +127,7 @@ LL_TYPE_INSTANCE_HOOK(
     void,
     BlockSource& tickRegion
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(tickRegion);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(tickRegion));
     auto& prof = functions::Profiler::getInstance();
     if (prof.profiling) {
         PROF_TIMER(chunk_block_entity, { origin(tickRegion); })
@@ -173,10 +148,7 @@ LL_TYPE_INSTANCE_HOOK(
     bool         instaTick_
 ) {
     // 区块加载线程同样可能存在调用
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(region, until, max, instaTick_);
+    RETURN_IF_NOT_MAIN_THREAD(return origin(region, until, max, instaTick_));
     auto& prof = functions::Profiler::getInstance();
     if (prof.profiling) {
         if (prof.chunkTickBlocksMutex == 2) {
@@ -212,12 +184,7 @@ LL_TYPE_INSTANCE_HOOK(
     &Dimension::$tick,
     void
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin();
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin());
     auto& prof = functions::Profiler::getInstance();
     if (prof.profiling) {
         PROF_TIMER(dimension, { origin(); })
@@ -233,12 +200,7 @@ LL_TYPE_INSTANCE_HOOK(
     &EntitySystemsManager::tickEntitySystems,
     void
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin();
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin());
     auto& prof = functions::Profiler::getInstance();
     if (prof.profiling) {
         PROF_TIMER(entity, { origin(); })
@@ -257,12 +219,7 @@ LL_TYPE_INSTANCE_HOOK(
     &Dimension::$tickRedstone,
     void
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin();
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin());
     auto& prof = functions::Profiler::getInstance();
     if (prof.profiling) {
         PROF_TIMER(dimension_redstone, { origin(); })
@@ -302,12 +259,7 @@ LL_TYPE_INSTANCE_HOOK(
     void,
     BlockSource* region
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(region);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(region));
     auto& prof = functions::Profiler::getInstance();
     if (prof.profiling) {
         PROF_TIMER(pt_update, { origin(region); })
@@ -349,12 +301,7 @@ LL_TYPE_INSTANCE_HOOK(
     bool,
     BlockSource& region
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(region);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(region));
     auto& prof = functions::Profiler::getInstance();
     if (prof.profiling) {
         bool res;

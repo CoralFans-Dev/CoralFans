@@ -1,4 +1,5 @@
 #include "MineruleManager.h"
+#include "coral_fans/base/Macros.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/scripting/modules/minecraft/events/ScriptBlockGlobalEventListener.h"
 #include "mc/world/item/ItemStack.h"
@@ -17,13 +18,6 @@
 #include <mc/world/level/BlockSource.h>
 
 
-#ifdef LL_PLAT_C
-#include "ll/api/service/Bedrock.h"
-#include "mc/server/ServerInstance.h"
-#include <thread>
-#endif
-
-
 namespace coral_fans::functions {
 LL_TYPE_INSTANCE_HOOK(
     CoralFansDropHook1,
@@ -35,12 +29,9 @@ LL_TYPE_INSTANCE_HOOK(
     ::IRandom&                    random,
     ::ResourceDropsContext const& resourceDropsContext
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(block, random, std::forward<ResourceDropsContext const&>(resourceDropsContext));
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(
+        return origin(block, random, std::forward<ResourceDropsContext const&>(resourceDropsContext))
+    );
     if (block.getTypeName() == "minecraft:bedrock") {
         ItemStack itemStack;
         itemStack.reinit("bedrock", 1, 0);
@@ -64,12 +55,7 @@ LL_TYPE_STATIC_HOOK(
     ::ResourceDropsContext const&                        resourceDropsContext,
     ::std::vector<::std::pair<::ItemStack, ::BlockPos>>& itemStacks
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(region, blockPos, block, random, resourceDropsContext, itemStacks);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(region, blockPos, block, random, resourceDropsContext, itemStacks));
     if (block.getTypeName() == "minecraft:moving_block") {
         MovingBlockActor* mba = (MovingBlockActor*)region.getBlockEntity(blockPos);
         if (mba->mWrappedBlock->getTypeName() != "minecraft:moving_block") { // 防止mb的mb导致的无限循环
@@ -93,12 +79,7 @@ LL_TYPE_INSTANCE_HOOK(
     ::ResourceDropsContext const& resourceDropsContext,
     ::Actor const*                actorContext
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(region, pos, block, random, resourceDropsContext, actorContext);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(region, pos, block, random, resourceDropsContext, actorContext));
     if (block.getTypeName() == "minecraft:moving_block") {
         MovingBlockActor* mba = (MovingBlockActor*)region.getBlockEntity(pos);
         if (mba->mWrappedBlock->getTypeName() != "minecraft:moving_block") { // 防止mb的mb导致的无限循环

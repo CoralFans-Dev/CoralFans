@@ -1,13 +1,8 @@
 #include "MineruleManager.h"
+#include "coral_fans/base/Macros.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/actor/item/FallingBlockActor.h"
 
-
-#ifdef LL_PLAT_C
-#include "ll/api/service/Bedrock.h"
-#include "mc/server/ServerInstance.h"
-#include <thread>
-#endif
 
 namespace coral_fans::functions {
 
@@ -23,12 +18,7 @@ LL_TYPE_INSTANCE_HOOK(
     int           sourceEntityType,
     bool          keepVelocity
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(pos, shouldStopRiding, cause, sourceEntityType, keepVelocity);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(pos, shouldStopRiding, cause, sourceEntityType, keepVelocity));
     this->mState = State::Falling;
     return origin(pos, shouldStopRiding, cause, sourceEntityType, keepVelocity);
 }

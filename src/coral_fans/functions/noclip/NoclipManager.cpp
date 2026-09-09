@@ -1,5 +1,6 @@
 #include "NoclipManager.h"
 #include "coral_fans/CoralFans.h"
+#include "coral_fans/base/Macros.h"
 #include "coral_fans/helper/MainThreadExecutor.h"
 
 
@@ -15,12 +16,6 @@
 #include "mc/world/level/Level.h"
 
 
-#ifdef LL_PLAT_C
-#include "mc/server/ServerInstance.h"
-#include <thread>
-#endif
-
-
 namespace coral_fans::functions {
 
 LL_TYPE_INSTANCE_HOOK(
@@ -31,12 +26,7 @@ LL_TYPE_INSTANCE_HOOK(
     void,
     ::GameType gameType
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(gameType);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(gameType));
     origin(gameType);
     if (gameType == GameType::Creative
         && CoralFans::getInstance().getConfigDb()->get(std::format("noclip.players.{}", this->getUuid().asString()))
@@ -53,12 +43,7 @@ LL_TYPE_INSTANCE_HOOK(
     NetworkIdentifier const&                 identifier,
     SetLocalPlayerAsInitializedPacket const& packet
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(identifier, packet);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(identifier, packet));
     if (auto player = thisFor<NetEventCallback>()->_getServerPlayer(identifier, packet.mSenderSubId);
         player && player->getPlayerGameType() == GameType::Creative
         && CoralFans::getInstance().getConfigDb()->get(std::format("noclip.players.{}", player->getUuid().asString()))

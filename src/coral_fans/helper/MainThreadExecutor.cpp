@@ -1,18 +1,13 @@
 #include "MainThreadExecutor.h"
 
 #include "coral_fans/CoralFans.h"
+#include "coral_fans/base/Macros.h"
 #include "ll/api/base/Containers.h"
 #include "ll/api/chrono/GameChrono.h"
 #include "ll/api/memory/Hook.h"
 #include "ll/api/service/Bedrock.h"
 #include "ll/api/utils/ErrorUtils.h"
 #include "mc/world/Minecraft.h"
-
-
-#ifdef LL_PLAT_C
-#include "mc/server/ServerInstance.h"
-#include <thread>
-#endif
 
 
 #include <functional>
@@ -22,13 +17,7 @@
 
 namespace coral_fans::helper::thread {
 LL_TYPE_INSTANCE_HOOK(MainThreadExecutorHook, ll::memory::HookPriority::Normal, Minecraft, &Minecraft::update, bool) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin();
-
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin());
     auto ori = origin();
     if (ori) MainThreadExecutor::getDefault().tick();
     return ori;

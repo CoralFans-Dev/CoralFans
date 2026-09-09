@@ -1,6 +1,7 @@
 #include "coral_fans/CoralFans.h"
 
 
+#include "coral_fans/base/Macros.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/deps/nbt/CompoundTag.h"
 #include "mc/world/actor/player/Inventory.h"
@@ -8,13 +9,6 @@
 #include "mc/world/actor/player/PlayerInventory.h"
 #include "mc/world/item/ItemStack.h"
 #include "mc/world/item/SaveContextFactory.h"
-
-
-#ifdef LL_PLAT_C
-#include "ll/api/service/Bedrock.h"
-#include "mc/server/ServerInstance.h"
-#include <thread>
-#endif
 
 
 namespace coral_fans::functions {
@@ -26,12 +20,7 @@ LL_TYPE_INSTANCE_HOOK(
     &Player::$consumeTotem,
     bool
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin();
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin());
     if (CoralFans::getInstance().getConfigDb()->get("functions.players." + this->getUuid().asString() + ".autototem")
         == "true") {
         auto& inv  = *this->mInventory->mInventory;

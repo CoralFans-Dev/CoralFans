@@ -1,6 +1,7 @@
 #include "coral_fans/CoralFans.h"
 
 
+#include "coral_fans/base/Macros.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/deps/nbt/ByteTag.h"
 #include "mc/deps/nbt/CompoundTag.h"
@@ -20,14 +21,6 @@
 #include <optional>
 #include <string>
 #include <vector>
-
-
-#ifdef LL_PLAT_C
-#include "ll/api/service/Bedrock.h"
-#include "mc/server/ServerInstance.h"
-#include <thread>
-
-#endif
 
 
 namespace coral_fans::functions {
@@ -192,12 +185,7 @@ LL_TYPE_INSTANCE_HOOK(
     ::ItemUseMethod  itemUseMethod,
     bool             consumeItem
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(item, itemUseMethod, consumeItem);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(item, itemUseMethod, consumeItem));
     if ((CoralFans::getInstance().getConfigDb()->get(
              std::format("functions.players.{}.autoitem", this->getUuid().asString())
          )
@@ -237,12 +225,7 @@ LL_TYPE_INSTANCE_HOOK(
     ::BlockPos const& position,
     bool              withData
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(position, withData);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(position, withData));
     if ((CoralFans::getInstance().getConfigDb()->get(
              std::format("functions.players.{}.autoitem", this->getUuid().asString())
          )

@@ -1,5 +1,6 @@
 #include "FuncManager.h"
 #include "coral_fans/CoralFans.h"
+#include "coral_fans/base/Macros.h"
 
 
 #include "ll/api/i18n/I18n.h"
@@ -14,13 +15,6 @@
 #include "mc/world/level/block/Block.h"
 #include "mc/world/level/block/actor/ChestBlockActor.h"
 #include "mc/world/level/dimension/Dimension.h"
-
-
-#ifdef LL_PLAT_C
-#include "ll/api/service/Bedrock.h"
-#include "mc/server/ServerInstance.h"
-#include <thread>
-#endif
 
 
 #include <string>
@@ -63,12 +57,7 @@ LL_TYPE_INSTANCE_HOOK(
     Block const*    block,
     bool            isFirstEvent
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(item, blockPos, face, clickPos, block, isFirstEvent);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(item, blockPos, face, clickPos, block, isFirstEvent));
     auto& containerOpenManager  = ContainerOpenManager::getInstance();
     containerOpenManager.player = &this->mPlayer;
     auto res                    = origin(item, blockPos, face, clickPos, block, isFirstEvent);
@@ -84,12 +73,7 @@ LL_TYPE_INSTANCE_HOOK(
     bool,
     BlockSource& region
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(region);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(region));
     auto& containerOpenManager = ContainerOpenManager::getInstance();
     if (containerOpenManager.forceOpen) return true;
     auto res = origin(region);

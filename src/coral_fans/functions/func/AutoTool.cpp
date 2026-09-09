@@ -1,4 +1,5 @@
 #include "coral_fans/CoralFans.h"
+#include "coral_fans/base/Macros.h"
 #include "coral_fans/base/Utils.h"
 
 
@@ -14,13 +15,6 @@
 #include "mc/world/item/Item.h"
 #include "mc/world/item/ItemStack.h"
 #include "mc/world/level/BlockSource.h"
-
-
-#ifdef LL_PLAT_C
-#include "ll/api/service/Bedrock.h"
-#include "mc/server/ServerInstance.h"
-#include <thread>
-#endif
 
 
 #include <format>
@@ -81,12 +75,7 @@ LL_STATIC_HOOK(
     const BlockPos& pos,
     int             face
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(player, pos, face);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(player, pos, face));
     if (CoralFans::getInstance().getConfigDb()->get(
             std::format("functions.players.{}.autotool", player.getUuid().asString())
         )
@@ -111,12 +100,7 @@ LL_STATIC_HOOK(
 }
 
 void handleAutoWeapon(Player& player) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return;
-#endif
+    RETURN_VOID_IF_NOT_MAIN_THREAD;
     if (CoralFans::getInstance().getConfigDb()->get(
             std::format("functions.players.{}.autoweapon", player.getUuid().asString())
         )

@@ -1,16 +1,10 @@
 #include "FuncManager.h"
+#include "coral_fans/base/Macros.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/Container.h"
 #include "mc/world/item/FertilizerItem.h"
 #include "mc/world/item/ItemStack.h"
 #include "mc/world/level/block/actor/DispenserBlockActor.h"
-
-
-#ifdef LL_PLAT_C
-#include "ll/api/service/Bedrock.h"
-#include "mc/server/ServerInstance.h"
-#include <thread>
-#endif
 
 
 namespace coral_fans::functions {
@@ -25,12 +19,7 @@ LL_TYPE_INSTANCE_HOOK(
     int slot,
     int count
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(slot, count);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(slot, count));
     if (FuncDropNoCostManager::getInstance().mutex) {
         origin(slot, count);
         FuncDropNoCostManager::getInstance().mutex = false;
@@ -47,12 +36,7 @@ LL_TYPE_INSTANCE_HOOK(
     bool,
     ::ItemStack const& item
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(item);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(item));
     FuncDropNoCostManager::getInstance().mutex = true;
     this->removeItem(FuncDropNoCostManager::getInstance()._slot, FuncDropNoCostManager::getInstance()._count);
     return origin(item);
@@ -70,12 +54,7 @@ LL_TYPE_INSTANCE_HOOK(
     ::Vec3 const&  pos,
     uchar          face
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(region, container, slot, pos, face);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(region, container, slot, pos, face));
     FuncDropNoCostManager::getInstance().mutex2 = false;
     return origin(region, container, slot, pos, face);
 }
@@ -89,12 +68,7 @@ LL_TYPE_INSTANCE_HOOK(
     int                slot,
     ::ItemStack const& item
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(slot, item);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(slot, item));
     if (FuncDropNoCostManager::getInstance().mutex2) origin(slot, item);
     else FuncDropNoCostManager::getInstance().mutex2 = true;
 }

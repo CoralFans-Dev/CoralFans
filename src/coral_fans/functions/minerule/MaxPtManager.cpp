@@ -1,13 +1,7 @@
 #include "MineruleManager.h"
+#include "coral_fans/base/Macros.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/world/level/BlockTickingQueue.h"
-
-
-#ifdef LL_PLAT_C
-#include "ll/api/service/Bedrock.h"
-#include "mc/server/ServerInstance.h"
-#include <thread>
-#endif
 
 
 namespace coral_fans::functions {
@@ -24,12 +18,7 @@ LL_TYPE_INSTANCE_HOOK(
     int          max,
     bool         instaTick_
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(region, until, max, instaTick_);
-#endif
+    RETURN_IF_NOT_MAIN_THREAD(return origin(region, until, max, instaTick_));
     return origin(region, until, functions::MaxPtManager::getInstance().maxpt, instaTick_);
 }
 

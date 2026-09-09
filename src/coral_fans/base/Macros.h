@@ -38,3 +38,28 @@
         blockSource.setBlock(blockPos, newBlock, 3, nullptr, nullptr);                                                 \
         return;                                                                                                        \
     }
+
+#ifdef LL_PLAT_C
+#include "ll/api/service/Bedrock.h"
+#include "mc/server/ServerInstance.h"
+#include <thread>
+
+#define RETURN_IF_NOT_MAIN_THREAD(...)                                                                                 \
+    do {                                                                                                               \
+        if (auto serverInstance = ll::service::getServerInstance();                                                    \
+            !serverInstance || std::this_thread::get_id() != serverInstance->mServerInstanceThread->get_id()) {        \
+            __VA_ARGS__;                                                                                               \
+        }                                                                                                              \
+    } while (false)
+
+#define RETURN_VOID_IF_NOT_MAIN_THREAD                                                                                 \
+    do {                                                                                                               \
+        if (auto serverInstance = ll::service::getServerInstance();                                                    \
+            !serverInstance || std::this_thread::get_id() != serverInstance->mServerInstanceThread->get_id()) {        \
+            return;                                                                                                    \
+        }                                                                                                              \
+    } while (false)
+#else
+#define RETURN_IF_NOT_MAIN_THREAD(...)
+#define RETURN_VOID_IF_NOT_MAIN_THREAD
+#endif
