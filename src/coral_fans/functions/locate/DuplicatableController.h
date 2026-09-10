@@ -139,6 +139,10 @@ public:
     void tryRemoveChunkData(ChunkPos originChunkPos);
 
     // 绘制 Chunk 保存状态信息（通用逻辑）
+    // BsciChunkDataT: 调用方 Controller 的派生 BSCI 数据类型，
+    // 邻居占位对象也会创建为该类型，保证 bsciChunkData 内类型一致
+    // （定义位于 .cpp，已对相关派生类型显式实例化）
+    template <typename BsciChunkDataT>
     static void drawChunkSavedInfo(
         BlockSource&                                                      region,
         ChunkPos                                                          originChunkPos,

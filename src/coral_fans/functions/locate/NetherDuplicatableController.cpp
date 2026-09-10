@@ -627,7 +627,7 @@ void NetherDuplicatableController::draw(BlockSource& region, ChunkPos chunkPos, 
     auto [bsciIt, inserted] = this->bsciChunkData.try_emplace(chunkPos, std::make_unique<NetherBsciChunkData>());
     auto& bsciData          = *static_cast<NetherBsciChunkData*>(bsciIt->second.get());
     if (!bsciData.dataDrawed)
-        DuplicatableController::drawChunkSavedInfo(region, chunkPos, bsciData, this->bsciChunkData);
+        DuplicatableController::drawChunkSavedInfo<NetherBsciChunkData>(region, chunkPos, bsciData, this->bsciChunkData);
     else if (data.reload) {
         this->removeAllGeoIds(bsciData);
         bsciData.dataDrawed = 0;
