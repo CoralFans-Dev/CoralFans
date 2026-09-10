@@ -7,13 +7,15 @@
 #include "ll/api/i18n/I18n.h"
 #include "ll/api/memory/Hook.h"
 #include "mc/deps/core/math/Color.h"
-#include "mc/deps/core/threading/SharedLockbox.h"
+#include "mc/deps/core/math/Random.h"
+#include "mc/util/Random.h"
+#include "mc/world/Facing.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/ChunkPos.h"
+#include "mc/world/level/IBlockWorldGenAPI.h"
 #include "mc/world/level/Level.h"
-#include "mc/world/level/WorldBlockTarget.h"
 #include "mc/world/level/chunk/ChunkViewSource.h"
 #include "mc/world/level/chunk/SubChunk.h"
 #include "mc/world/level/dimension/Dimension.h"
@@ -31,11 +33,25 @@
 #include <mutex>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
 
 namespace coral_fans::functions::locate {
+
+namespace {
+
+int getIntRangeValue(::IntRange const& range, ::Core::Random& random) {
+    int min = range.rangeMin;
+    int max = range.rangeMax;
+    if (max > min) return min + random.nextInt(max - min);
+    return min;
+}
+
+::BlockPos getNeighbor(::BlockPos const& pos, uchar face) { return pos + ::Facing::DIRECTION()[face]; }
+
+} // namespace
 
 // ========== Hooks ==========
 
@@ -74,74 +90,48 @@ LL_TYPE_INSTANCE_HOOK(
             threadData = static_cast<NetherThreadTemporaryData*>(it->second.get());
     }
     if (!threadData) return origin(context);
-    threadData->worldBlockTargetShouldOperate = true;
-    auto ori                                  = origin(context);
-    threadData->worldBlockTargetShouldOperate = false;
-    if (!threadData->temperaryPoses.empty()) {
-        static_cast<NetherData*>(threadData->data.get())
-            ->netheritePosMap.emplace(context.mPos, std::move(threadData->temperaryPoses));
-        threadData->isEmpty = false;
-    }
-    return ori;
-}
 
-LL_TYPE_INSTANCE_HOOK(
-    NetherDuplicatableController::NetherHook3,
-    ll::memory::HookPriority::Normal,
-    WorldBlockTarget,
-    &WorldBlockTarget::$getBlock,
-    ::Block const&,
-    ::BlockPos const& pos
-) {
-    auto&                      ori        = origin(pos);
-    auto                       threadId   = std::this_thread::get_id();
-    auto&                      controller = NetherDuplicatableController::getInstance();
-    NetherThreadTemporaryData* threadData = nullptr;
-    {
-        std::lock_guard lock(controller.decorationThreadIdsLock);
-        auto            it = controller.decorationThreadIds.find(threadId);
-        if (it == controller.decorationThreadIds.end()
-            || !static_cast<NetherThreadTemporaryData*>(it->second.get())->worldBlockTargetShouldOperate)
-            return ori;
-        else threadData = static_cast<NetherThreadTemporaryData*>(it->second.get());
-    }
-    if (threadData && threadData->chunk) {
-        auto chunkPos = ChunkPos(pos);
-        int  offsetX  = threadData->chunk->mPosition->x - chunkPos.x;
-        int  offsetZ  = threadData->chunk->mPosition->z - chunkPos.z;
-        if (offsetX || offsetZ) {
-            BlockPos checkPos = BlockPos(pos.x + offsetX, pos.y, pos.z + offsetZ);
-            if (ChunkPos(checkPos) != threadData->chunk->mPosition || !origin(checkPos).isAir())
-                threadData->temperaryPoses.emplace(pos);
+    ::Core::Random                 randomCopy = context.mRandom.mRandom->mObject;
+    std::unordered_set<::BlockPos> traceablePoses;
+
+    if (threadData->chunk) {
+        int count = getIntRangeValue(this->mCount, randomCopy);
+        if (this->mPlaceBlock->tryGetBlock() != nullptr && count > 0) {
+            for (int index = 0, twiceIndex = 0; index != count; ++index, twiceIndex += 2) {
+                int        stepCount = (twiceIndex == 0) + twiceIndex;
+                ::BlockPos candidate = context.mPos;
+                if (index) {
+                    do {
+                        candidate = getNeighbor(candidate, static_cast<uchar>(randomCopy.nextInt(6)));
+                        --stepCount;
+                    } while (stepCount);
+                }
+
+                int dx = candidate.x - context.mPos->x;
+                int dy = candidate.y - context.mPos->y;
+                int dz = candidate.z - context.mPos->z;
+                if (dx * dx + dy * dy + dz * dz > 36) continue;
+
+                ::ChunkPos candidateChunk(candidate);
+                int        offsetX = threadData->chunk->mPosition->x - candidateChunk.x;
+                int        offsetZ = threadData->chunk->mPosition->z - candidateChunk.z;
+                if (offsetX || offsetZ) {
+                    ::BlockPos checkPos(candidate.x + offsetX, candidate.y, candidate.z + offsetZ);
+                    if (::ChunkPos(checkPos) != threadData->chunk->mPosition
+                        || !context.mTarget.getBlock(checkPos).isAir()) {
+                        traceablePoses.emplace(candidate);
+                    }
+                }
+            }
         }
     }
-    return std::forward<decltype(ori)>(ori);
-}
 
-LL_TYPE_STATIC_HOOK(
-    NetherDuplicatableController::NetherHook4,
-    ll::memory::HookPriority::Normal,
-    IFeature,
-    &IFeature::isExposedTo,
-    bool,
-    ::IBlockWorldGenAPI const& target,
-    ::BlockPos const&          candidatePos,
-    ::BlockDescriptor const&   exposedTo
-) {
-    auto                       threadId   = std::this_thread::get_id();
-    auto&                      controller = NetherDuplicatableController::getInstance();
-    NetherThreadTemporaryData* threadData = nullptr;
-    {
-        std::lock_guard lock(controller.decorationThreadIdsLock);
-        auto            it = controller.decorationThreadIds.find(threadId);
-        if (it != controller.decorationThreadIds.end()
-            && static_cast<NetherThreadTemporaryData*>(it->second.get())->worldBlockTargetShouldOperate)
-            threadData = static_cast<NetherThreadTemporaryData*>(it->second.get());
+    auto ori = origin(context);
+    if (!traceablePoses.empty()) {
+        static_cast<NetherData*>(threadData->data.get())
+            ->netheritePosMap.emplace(context.mPos, std::move(traceablePoses));
+        threadData->isEmpty = false;
     }
-    if (!threadData) return origin(target, candidatePos, exposedTo);
-    threadData->worldBlockTargetShouldOperate = false;
-    auto ori                                  = origin(target, candidatePos, exposedTo);
-    threadData->worldBlockTargetShouldOperate = true;
     return ori;
 }
 
@@ -627,7 +617,12 @@ void NetherDuplicatableController::draw(BlockSource& region, ChunkPos chunkPos, 
     auto [bsciIt, inserted] = this->bsciChunkData.try_emplace(chunkPos, std::make_unique<NetherBsciChunkData>());
     auto& bsciData          = *static_cast<NetherBsciChunkData*>(bsciIt->second.get());
     if (!bsciData.dataDrawed)
-        DuplicatableController::drawChunkSavedInfo<NetherBsciChunkData>(region, chunkPos, bsciData, this->bsciChunkData);
+        DuplicatableController::drawChunkSavedInfo<NetherBsciChunkData>(
+            region,
+            chunkPos,
+            bsciData,
+            this->bsciChunkData
+        );
     else if (data.reload) {
         this->removeAllGeoIds(bsciData);
         bsciData.dataDrawed = 0;
@@ -756,13 +751,9 @@ void NetherDuplicatableController::hook(bool enable) {
         bool  shouldHook         = false;
         if (duplicatableConfig.netherite.enable) {
             NetherHook2::hook();
-            NetherHook3::hook();
-            NetherHook4::hook();
             shouldHook = true;
         } else {
             NetherHook2::unhook();
-            NetherHook3::unhook();
-            NetherHook4::unhook();
         }
         if (duplicatableConfig.netherSpring.enable) {
             NetherHook5::hook();
@@ -792,8 +783,6 @@ void NetherDuplicatableController::hook(bool enable) {
     } else {
         NetherHook1::unhook();
         NetherHook2::unhook();
-        NetherHook3::unhook();
-        NetherHook4::unhook();
         NetherHook5::unhook();
         NetherHook6::unhook();
         NetherHook7::unhook();
