@@ -268,6 +268,20 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
             });
         functions::MaxPtManager::getInstance().maxpt =
             std::stoi(CoralFans::getInstance().getConfigDb()->get("functions.global.maxpt").value_or("100"));
+
+        mineruleCommand.runtimeOverload()
+            .text("mining_72k")
+            .required("isopen", ll::command::ParamKind::Bool)
+            .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
+                bool isopen = self["isopen"].get<ll::command::ParamKind::Bool>();
+                if (CoralFans::getInstance().getConfigDb()->set("minerule.72kmining", isopen ? "true" : "false")) {
+                    output.success("command.minerule.72kmining.success"_tr(isopen ? "true" : "false"));
+                    functions::miningHook(isopen);
+                } else {
+                    output.error("command.minerule.72kmining.error"_tr());
+                }
+            });
     }
 
     auto& configDb = CoralFans::getInstance().getConfigDb();
@@ -289,5 +303,7 @@ void registerMineruleCommand(config::CommandConfigStruct& config) {
     functions::pistonCollisionHook(config.enabled && configDb->get("minerule.fuck_piston_reset_velocity") == "true");
 
     functions::MaxPtManager::hook(config.enabled && functions::MaxPtManager::getInstance().maxpt != 100);
+
+    functions::miningHook(config.enabled && configDb->get("minerule.72kmining") == "true");
 }
 } // namespace coral_fans::commands

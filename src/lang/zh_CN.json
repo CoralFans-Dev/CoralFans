@@ -287,6 +287,10 @@
             "fuck_piston_reset_velocity": {
                 "success": "设置 fuck_piston_reset_velocity \"{}\"",
                 "error": "设置 fuck_piston_reset_velocity 失败"
+            },
+            "72kmining": {
+                "success": "设置 72k挖掘速度 \"{}\"",
+                "error": "设置 72k挖掘速度 失败"
             }
         },
         "noclip": {

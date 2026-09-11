@@ -13,6 +13,7 @@ void portalSpawnHook(bool);
 void restoreAncillaryBrokenHook(bool);
 void populationCapHook(bool);
 void pistonCollisionHook(bool);
+void miningHook(bool);
 
 
 class MaxPtManager {

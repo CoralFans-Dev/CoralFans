@@ -25,7 +25,7 @@ public:
     void hook(bool enable);
     void clear();
 
-    void enableNoclip(Player* player);
+    void enableNoclip(Player* player, bool forceDelay = false);
     void disableNoclip(Player* player);
 };
 

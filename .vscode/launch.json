@@ -13,7 +13,7 @@
             "type": "cppvsdbg",
             "request": "attach",
             "processId": "${input:launchAndGetPid_GDK}",
-            "symbolSearchPath": "D:\\project\\levilamina\\26.40.x\\CoralFans\\bin\\"
+            "symbolSearchPath": "F:\\project\\levilamina\\26.40.x\\CoralFans\\bin\\"
         },
         {
             // Automatically starts the BDS target process and attaches the debugger after the process becomes stable.
@@ -54,7 +54,7 @@
                     "-ExecutionPolicy",
                     "Bypass",
                     "-Command",
-                    "$exePath = 'D:\\mcbe\\gbk\\versions\\1.26.40.05\\Minecraft.Windows.exe';  if ([string]::IsNullOrWhiteSpace($exePath)) { throw 'MC_GDK_DEBUG_PATH is not set.' }; if (-not (Test-Path $exePath)) { throw \"exe not found: $exePath\" }; $exePath = [System.IO.Path]::GetFullPath($exePath); $workingDir = Split-Path -Parent $exePath; $getMatchingProcesses = { Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.Path -eq $exePath } }; $existing = @(& $getMatchingProcesses | Select-Object -ExpandProperty Id); Start-Process -FilePath $exePath -WorkingDirectory $workingDir | Out-Null; $stableTarget = $null; $candidateId = $null; $stableCount = 0; for ($i = 0; $i -lt 60 -and -not $stableTarget; $i++) { Start-Sleep -Milliseconds 500; $candidates = & $getMatchingProcesses | Where-Object { -not $existing -or $_.Id -notin $existing } | Sort-Object StartTime -Descending; $latest = $candidates | Select-Object -First 1; if (-not $latest) { $candidateId = $null; $stableCount = 0; continue }; if ($latest.Id -eq $candidateId) { $stableCount += 1 } else { $candidateId = $latest.Id; $stableCount = 1 }; if ($stableCount -ge 6) { $stableTarget = Get-Process -Id $candidateId -ErrorAction SilentlyContinue | Where-Object { $_.Path -eq $exePath } } }; if (-not $stableTarget) { throw 'Unable to locate a stable process within 30 seconds.' }; [Console]::Out.WriteLine([string]$stableTarget.Id)"
+                    "$exePath = 'G:\\APP\\game\\mcbe\\gdk\\versions\\1.26.40.05\\Minecraft.Windows.exe';  if ([string]::IsNullOrWhiteSpace($exePath)) { throw 'MC_GDK_DEBUG_PATH is not set.' }; if (-not (Test-Path $exePath)) { throw \"exe not found: $exePath\" }; $exePath = [System.IO.Path]::GetFullPath($exePath); $workingDir = Split-Path -Parent $exePath; $getMatchingProcesses = { Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.Path -eq $exePath } }; $existing = @(& $getMatchingProcesses | Select-Object -ExpandProperty Id); Start-Process -FilePath $exePath -WorkingDirectory $workingDir | Out-Null; $stableTarget = $null; $candidateId = $null; $stableCount = 0; for ($i = 0; $i -lt 60 -and -not $stableTarget; $i++) { Start-Sleep -Milliseconds 500; $candidates = & $getMatchingProcesses | Where-Object { -not $existing -or $_.Id -notin $existing } | Sort-Object StartTime -Descending; $latest = $candidates | Select-Object -First 1; if (-not $latest) { $candidateId = $null; $stableCount = 0; continue }; if ($latest.Id -eq $candidateId) { $stableCount += 1 } else { $candidateId = $latest.Id; $stableCount = 1 }; if ($stableCount -ge 6) { $stableTarget = Get-Process -Id $candidateId -ErrorAction SilentlyContinue | Where-Object { $_.Path -eq $exePath } } }; if (-not $stableTarget) { throw 'Unable to locate a stable process within 30 seconds.' }; [Console]::Out.WriteLine([string]$stableTarget.Id)"
                 ],
                 "cwd": "${workspaceFolder}",
                 "useFirstResult": true

@@ -40,8 +40,10 @@ LL_TYPE_INSTANCE_HOOK(
     origin(gameType);
     if (gameType == GameType::Creative
         && CoralFans::getInstance().getConfigDb()->get(std::format("noclip.players.{}", this->getUuid().asString()))
-               == "T")
+               == "T") {
         NoclipManager::getInstance().enableNoclip(this);
+        CoralFans::getInstance().getSelf().getLogger().info("PlayerJoinEventHook handled");
+    }
 }
 
 LL_TYPE_INSTANCE_HOOK(
@@ -62,8 +64,10 @@ LL_TYPE_INSTANCE_HOOK(
     if (auto player = thisFor<NetEventCallback>()->_getServerPlayer(identifier, packet.mSenderSubId);
         player && player->getPlayerGameType() == GameType::Creative
         && CoralFans::getInstance().getConfigDb()->get(std::format("noclip.players.{}", player->getUuid().asString()))
-               == "T")
+               == "T") {
+        CoralFans::getInstance().getSelf().getLogger().info("PlayerJoinEventHook handled");
         NoclipManager::getInstance().enableNoclip(player);
+    }
     origin(identifier, packet);
 }
 
@@ -79,14 +83,17 @@ void NoclipManager::hook(bool enable) {
 
 void NoclipManager::clear() { this->handlingList.clear(); }
 
-void NoclipManager::enableNoclip(Player* player) {
+void NoclipManager::enableNoclip(Player* player, bool forceDelay) {
     if (!player) return;
     if (this->handlingList.contains(player->mName)) return;
     auto& abilities = player->getAbilities();
-    if (abilities.getAbility(AbilitiesIndex::Flying).mValue->mBoolVal)
-        player->setAbility(::AbilitiesIndex::NoClip, true);
-    else {
+    if (!abilities.getAbility(AbilitiesIndex::Flying).mValue->mBoolVal) {
         player->setAbility(::AbilitiesIndex::Flying, true);
+        forceDelay = true;
+    }
+
+    if (!forceDelay) player->setAbility(::AbilitiesIndex::NoClip, true);
+    else {
         this->handlingList.emplace(player->mName);
         using namespace ll::chrono_literals;
         ll::coro::keepThis([playername = player->mName.get()]() -> ll::coro::CoroTask<> {
