@@ -118,7 +118,8 @@
             "description": "Controls or queries the tick status of the game",
             "query": {
                 "mspt": "{} per tick",
-                "targetmspt": "(Target: {:.1f}ms)"
+                "targetmspt": "(Target: {:.1f}ms)",
+                "error": "This command can only be executed by a player or the console"
             },
             "set": {
                 "freeze": "The game is frozen.",
@@ -130,6 +131,10 @@
                     "generic": "Failed to set tick rate.",
                     "outofrange": "The tick rate must be greater than {:.1f}, found {}."
                 }
+            },
+            "sync": {
+                "output": "Client timescale sync set to \"{}\"",
+                "warning": "Warning: use /tick sync to disable synchronization before leaving the world, otherwise the client speed may become abnormal"
             },
             "step": {
                 "output": "step {} tick(s)"

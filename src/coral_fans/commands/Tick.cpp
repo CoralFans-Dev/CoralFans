@@ -1,7 +1,9 @@
 #include "Commands.h"
 #include "coral_fans/CoralFans.h"
+#include "coral_fans/base/Macros.h"
 #include "coral_fans/base/MySchedule.h"
 #include "coral_fans/base/Utils.h"
+#include "coral_fans/functions/tick/TickCommandManager.h"
 
 
 #include "ll/api/command/CommandHandle.h"
@@ -17,15 +19,8 @@
 #include "mc/server/commands/CommandRegistry.h"
 #include "mc/util/Timer.h"
 #include "mc/world/Minecraft.h"
+#include "mc/world/actor/player/Player.h"
 #include "mc/world/level/Level.h"
-
-#include "coral_fans/CoralFans.h"
-#include "coral_fans/functions/tick/Tick.h"
-#include "mc/deps/shared_types/legacy/LevelEvent.h"
-#include "mc/network/packet/LevelEventPacket.h"
-#include "mc/network/packet/UpdateAbilitiesPacket.h"
-#include "mc/world/actor/player/AbilitiesIndex.h"
-#include "mc/world/actor/player/LayeredAbilities.h"
 
 
 namespace coral_fans::commands {
@@ -53,27 +48,17 @@ void registerTickCommand(config::CommandConfigStruct& config) {
             using ll::i18n_literals::operator""_tr;
             const auto val = self["tickFreezeType"].get<ll::command::ParamKind::Enum>();
             auto       mc  = ll::service::getMinecraft();
-            if (mc.has_value()) {
+            if (mc.has_value()) [[likely]] {
                 if (val.index) {
                     mc->setSimTimePause(true);
                     output.success("command.tick.set.freeze"_tr(val.name));
                 } else {
-                    LevelEventPacket pkt;
-                    pkt.mEventId = static_cast<int>(SharedTypes::Legacy::LevelEvent::SimTimeScale);
-                    pkt.mPos->x  = 1.0f;
-                    pkt.sendToClients();
-                    if (auto level = ll::service::getLevel()) {
-                        level->forEachPlayer([](Player& player) {
-                            player.getAbilities().setAbility(AbilitiesIndex::FlySpeed, 0.05f);
-                            UpdateAbilitiesPacket{player.getOrCreateUniqueID(), player.getAbilities()}.sendTo(player);
-                            return true;
-                        });
-                    }
                     mc->setSimTimePause(false);
                     mc->setSimTimeScale(1.0f);
+                    functions::TickCommandManager::getInstance().applyReset();
                     output.success("command.tick.set.reset"_tr(val.name));
                 }
-            }
+            } else return output.error("command.tick.rate.error.generic"_tr());
         });
 
     // tick rate <float>
@@ -83,27 +68,33 @@ void registerTickCommand(config::CommandConfigStruct& config) {
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             using ll::i18n_literals::operator""_tr;
             float rate = self["rate"].get<ll::command::ParamKind::Float>();
-            if (rate < 0) output.error("command.tick.rate.error.outofrange"_tr());
-            LevelEventPacket pkt;
-            pkt.mEventId = static_cast<int>(SharedTypes::Legacy::LevelEvent::SimTimeScale);
-            pkt.mPos->x  = 1.0f;
-            pkt.sendToClients();
-            pkt.mPos->x = rate / 20.0f;
-            pkt.sendToClients();
-            auto mc = ll::service::getMinecraft();
-            if (auto level = ll::service::getLevel()) {
-                level->forEachPlayer([rate](Player& player) {
-                    player.getAbilities().setAbility(AbilitiesIndex::FlySpeed, 0.05f * 20.0f / rate);
-                    UpdateAbilitiesPacket{player.getOrCreateUniqueID(), player.getAbilities()}.sendTo(player);
-                    return true;
-                });
+            if (rate < 0) {
+                output.error("command.tick.rate.error.outofrange"_tr(0.0f, rate));
+                return;
             }
+            auto mc = ll::service::getMinecraft();
+            if (!mc.has_value()) [[unlikely]]
+                return output.error("command.tick.rate.error.generic"_tr());
+
             mc->setSimTimePause(false);
-            if (mc.has_value()) {
-                mc->setSimTimePause(false);
-                mc->setSimTimeScale(rate / 20.0f);
-                output.success("command.tick.rate.success"_tr(rate));
-            } else output.error("command.tick.rate.error.generic"_tr());
+            mc->setSimTimeScale(rate / 20.0f);
+            functions::TickCommandManager::getInstance().applyRateChange(rate / 20.0f);
+            output.success("command.tick.rate.success"_tr(rate));
+        });
+
+    // tick sync [bool]
+    tickCommand.runtimeOverload()
+        .text("sync")
+        .optional("enable", ll::command::ParamKind::Bool)
+        .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+            using ll::i18n_literals::operator""_tr;
+            COMMAND_CHECK_PLAYER
+            auto& manager = functions::TickCommandManager::getInstance();
+            bool  enable  = self["enable"].has_value() ? self["enable"].get<ll::command::ParamKind::Bool>()
+                                                       : !manager.isSynced(player->getRealName());
+            manager.setSync(*player, enable);
+            output.success("command.tick.sync.output"_tr(enable ? "true" : "false"));
+            utils::segmentAndSendToPlayer("§e" + "command.tick.sync.warning"_tr(), player);
         });
 
     // tick query [int]
@@ -126,7 +117,7 @@ void registerTickCommand(config::CommandConfigStruct& config) {
                 auto message = "command.tick.query.mspt"_tr(
                     ProfilerLite::gProfilerLiteInstance().mDebugServerTickTime->count() / 1000000.0
                 );
-                if (auto mc = ll::service::getMinecraft(); mc && mc->mSimTimer.mSteppingTick <= 1e-4) {
+                if (auto mc = ll::service::getMinecraft(); mc && mc->mSimTimer.mSteppingTick > 1e-4) {
                     message += "command.tick.query.targetmspt"_tr(1000.0f / mc->mSimTimer.mTimeScale * 20);
                 }
                 if (uuid != "") {
@@ -151,10 +142,13 @@ void registerTickCommand(config::CommandConfigStruct& config) {
                 return;
             }
             auto mc = ll::service::getMinecraft();
-            if (mc.has_value()) mc->mSimTimer.mSteppingTick = (float)tick;
-            output.success("command.tick.step.output"_tr(tick));
+            if (mc.has_value()) [[likely]] {
+                mc->mSimTimer.mSteppingTick = (float)tick;
+                functions::TickCommandManager::getInstance().applyReset();
+                output.success("command.tick.step.output"_tr(tick));
+            } else return output.error("command.tick.rate.error.generic"_tr());
         });
 
-    functions::TickHook(true);
+    functions::TickCommandManager::getInstance().hook(true);
 }
 } // namespace coral_fans::commands

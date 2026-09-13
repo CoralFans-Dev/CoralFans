@@ -117,19 +117,24 @@
         "tick": {
             "description": "控制或查询游戏刻状态",
             "query": {
-                "output": "{}ms 每 tick",
-                "targetmspt": "(目标mspt: {:.1f}ms)"
+                "mspt": "{}ms 每 tick",
+                "targetmspt": "(目标mspt: {:.1f}ms)",
+                "error": "该指令只能由玩家或控制台执行"
             },
             "set": {
                 "freeze": "游戏已暂停",
                 "reset": "游戏已恢复正常运行"
             },
             "rate": {
-                "mspt": "设置 {} tick(s) 每秒",
+                "success": "设置 {} tick(s) 每秒",
                 "error": {
                     "generic": "设置tick速度失败",
                     "outofrange": "tick速度必须大于 {:.1f}, 当前为 {}."
                 }
+            },
+            "sync": {
+                "output": "客户端 timescale 同步已设置为 \"{}\"",
+                "warning": "警告：退出世界前请使用 /tick sync 取消同步，否则可能导致客户端速度异常"
             },
             "step": {
                 "output": "步进 {} tick(s)"
