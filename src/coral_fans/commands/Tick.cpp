@@ -94,7 +94,7 @@ void registerTickCommand(config::CommandConfigStruct& config) {
                                                        : !manager.isSynced(player->getRealName());
             manager.setSync(*player, enable);
             output.success("command.tick.sync.output"_tr(enable ? "true" : "false"));
-            utils::segmentAndSendToPlayer("§e" + "command.tick.sync.warning"_tr(), player);
+            if (enable) utils::segmentAndSendToPlayer("§e" + "command.tick.sync.warning"_tr(), player);
         });
 
     // tick query [int]

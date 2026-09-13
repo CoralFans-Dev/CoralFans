@@ -5,11 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [26.40.0] - 2026-9-10
+## [26.40.2] - 2026-9-13
+
+### Added
+
++ Added minerule mining_72k
++ Added tick sync
+
+## [26.40.1] - 2026-9-10
 
 ### Fixed
 
-+ fix cflocate
++ Fixed cflocate
 
 ## [26.40.0] - 2026-9-9
 
@@ -44,7 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-+ fixed time query command throwing error
++ Fixed time query command throwing error
 
 ## [26.10.2] - 2026-4-17
 

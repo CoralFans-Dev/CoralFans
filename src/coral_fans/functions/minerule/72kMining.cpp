@@ -1,6 +1,4 @@
-#include "coral_fans/CoralFans.h"
 #include "ll/api/memory/Hook.h"
-#include "mc/world/actor/player/Player.h"
 #include "mc/world/gamemode/SurvivalMode.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/block/Block.h"
