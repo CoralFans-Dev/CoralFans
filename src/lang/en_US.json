@@ -117,14 +117,19 @@
         "tick": {
             "description": "Controls or queries the tick status of the game",
             "query": {
-                "output": "{} per tick"
+                "mspt": "{} per tick",
+                "targetmspt": "(Target: {:.1f}ms)"
             },
             "set": {
-                "output": "set tick {}"
+                "freeze": "The game is frozen.",
+                "reset": "The game is running normally."
             },
             "rate": {
-                "success": "set {} tick(s) per second",
-                "error": "rate must be non negative"
+                "success": "Set the target tick rate to {} tick(s) per second.",
+                "error": {
+                    "generic": "Failed to set tick rate.",
+                    "outofrange": "The tick rate must be greater than {:.1f}, found {}."
+                }
             },
             "step": {
                 "output": "step {} tick(s)"

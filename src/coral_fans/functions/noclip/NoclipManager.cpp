@@ -65,7 +65,6 @@ LL_TYPE_INSTANCE_HOOK(
         player && player->getPlayerGameType() == GameType::Creative
         && CoralFans::getInstance().getConfigDb()->get(std::format("noclip.players.{}", player->getUuid().asString()))
                == "T") {
-        CoralFans::getInstance().getSelf().getLogger().info("PlayerJoinEventHook handled");
         NoclipManager::getInstance().enableNoclip(player);
     }
     origin(identifier, packet);

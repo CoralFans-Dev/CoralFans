@@ -19,6 +19,14 @@
 #include "mc/world/Minecraft.h"
 #include "mc/world/level/Level.h"
 
+#include "coral_fans/CoralFans.h"
+#include "coral_fans/functions/tick/Tick.h"
+#include "mc/deps/shared_types/legacy/LevelEvent.h"
+#include "mc/network/packet/LevelEventPacket.h"
+#include "mc/network/packet/UpdateAbilitiesPacket.h"
+#include "mc/world/actor/player/AbilitiesIndex.h"
+#include "mc/world/actor/player/LayeredAbilities.h"
+
 
 namespace coral_fans::commands {
 void registerTickCommand(config::CommandConfigStruct& config) {
@@ -44,16 +52,28 @@ void registerTickCommand(config::CommandConfigStruct& config) {
         .execute([&](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             using ll::i18n_literals::operator""_tr;
             const auto val = self["tickFreezeType"].get<ll::command::ParamKind::Enum>();
-            // LevelEventPacket{LevelEvent::SimTimeStep, origin.getWorldPosition(), pause}.sendToClients();
-            auto mc = ll::service::getMinecraft();
+            auto       mc  = ll::service::getMinecraft();
             if (mc.has_value()) {
-                if (val.index) mc->setSimTimePause(true);
-                else {
+                if (val.index) {
+                    mc->setSimTimePause(true);
+                    output.success("command.tick.set.freeze"_tr(val.name));
+                } else {
+                    LevelEventPacket pkt;
+                    pkt.mEventId = static_cast<int>(SharedTypes::Legacy::LevelEvent::SimTimeScale);
+                    pkt.mPos->x  = 1.0f;
+                    pkt.sendToClients();
+                    if (auto level = ll::service::getLevel()) {
+                        level->forEachPlayer([](Player& player) {
+                            player.getAbilities().setAbility(AbilitiesIndex::FlySpeed, 0.05f);
+                            UpdateAbilitiesPacket{player.getOrCreateUniqueID(), player.getAbilities()}.sendTo(player);
+                            return true;
+                        });
+                    }
                     mc->setSimTimePause(false);
                     mc->setSimTimeScale(1.0f);
+                    output.success("command.tick.set.reset"_tr(val.name));
                 }
             }
-            output.success("command.tick.set.output"_tr(val.name));
         });
 
     // tick rate <float>
@@ -63,13 +83,27 @@ void registerTickCommand(config::CommandConfigStruct& config) {
         .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             using ll::i18n_literals::operator""_tr;
             float rate = self["rate"].get<ll::command::ParamKind::Float>();
-            if (rate < 0) output.error("command.tick.rate.error"_tr());
-            // LevelEventPacket{LevelEvent::SimTimeScale, {rate / 20}, rate > 0}.sendToClients();
+            if (rate < 0) output.error("command.tick.rate.error.outofrange"_tr());
+            LevelEventPacket pkt;
+            pkt.mEventId = static_cast<int>(SharedTypes::Legacy::LevelEvent::SimTimeScale);
+            pkt.mPos->x  = 1.0f;
+            pkt.sendToClients();
+            pkt.mPos->x = rate / 20.0f;
+            pkt.sendToClients();
             auto mc = ll::service::getMinecraft();
-
+            if (auto level = ll::service::getLevel()) {
+                level->forEachPlayer([rate](Player& player) {
+                    player.getAbilities().setAbility(AbilitiesIndex::FlySpeed, 0.05f * 20.0f / rate);
+                    UpdateAbilitiesPacket{player.getOrCreateUniqueID(), player.getAbilities()}.sendTo(player);
+                    return true;
+                });
+            }
             mc->setSimTimePause(false);
-            if (mc.has_value()) mc->setSimTimeScale(rate / 20.0f);
-            output.success("command.tick.rate.success"_tr(rate));
+            if (mc.has_value()) {
+                mc->setSimTimePause(false);
+                mc->setSimTimeScale(rate / 20.0f);
+                output.success("command.tick.rate.success"_tr(rate));
+            } else output.error("command.tick.rate.error.generic"_tr());
         });
 
     // tick query [int]
@@ -89,20 +123,17 @@ void registerTickCommand(config::CommandConfigStruct& config) {
             }
             auto uuid = player.value() ? player.value()->getUuid().asString() : "";
             my_schedule::MySchedule::getSchedule().add([uuid, tick](int&, int& count) {
+                auto message = "command.tick.query.mspt"_tr(
+                    ProfilerLite::gProfilerLiteInstance().mDebugServerTickTime->count() / 1000000.0
+                );
+                if (auto mc = ll::service::getMinecraft(); mc && mc->mSimTimer.mSteppingTick <= 1e-4) {
+                    message += "command.tick.query.targetmspt"_tr(1000.0f / mc->mSimTimer.mTimeScale * 20);
+                }
                 if (uuid != "") {
                     auto player = ll::service::getLevel()->getPlayer(mce::UUID(uuid));
-                    if (player)
-                        utils::segmentAndSendToPlayer(
-                            "command.tick.query.output"_tr(
-                                ProfilerLite::gProfilerLiteInstance().mDebugServerTickTime->count() / 1000000.0
-                            ),
-                            player
-                        );
+                    if (player) utils::segmentAndSendToPlayer(message, player);
                     else return false; // 玩家不在线了，停止任务
-                } else
-                    CoralFans::getInstance().getSelf().getLogger().info("command.tick.query.output"_tr(
-                        ProfilerLite::gProfilerLiteInstance().mDebugServerTickTime->count() / 1000000.0
-                    ));
+                } else CoralFans::getInstance().getSelf().getLogger().info(message);
 
                 count++;
                 return tick > count;
@@ -123,5 +154,7 @@ void registerTickCommand(config::CommandConfigStruct& config) {
             if (mc.has_value()) mc->mSimTimer.mSteppingTick = (float)tick;
             output.success("command.tick.step.output"_tr(tick));
         });
+
+    functions::TickHook(true);
 }
 } // namespace coral_fans::commands

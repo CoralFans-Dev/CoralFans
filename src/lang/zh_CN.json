@@ -117,14 +117,19 @@
         "tick": {
             "description": "控制或查询游戏刻状态",
             "query": {
-                "output": "{}ms 每 tick"
+                "output": "{}ms 每 tick",
+                "targetmspt": "(目标mspt: {:.1f}ms)"
             },
             "set": {
-                "output": "设置 tick {}"
+                "freeze": "游戏已暂停",
+                "reset": "游戏已恢复正常运行"
             },
             "rate": {
-                "success": "设置 {} tick(s) 每秒",
-                "error": "速率必须非负"
+                "mspt": "设置 {} tick(s) 每秒",
+                "error": {
+                    "generic": "设置tick速度失败",
+                    "outofrange": "tick速度必须大于 {:.1f}, 当前为 {}."
+                }
             },
             "step": {
                 "output": "步进 {} tick(s)"

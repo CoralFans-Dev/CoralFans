@@ -11,6 +11,7 @@
 #include "coral_fans/functions/prof/Prof.h"
 #include "coral_fans/functions/shortcuts/Shortcuts.h"
 #include "coral_fans/functions/slime/Slime.h"
+#include "coral_fans/functions/tick/Tick.h"
 #include "coral_fans/functions/village/Village.h"
 #include "ll/api/Config.h"
 #include "ll/api/event/EventBus.h"
@@ -98,6 +99,8 @@ void CoralFans::unhook() {
     functions::NoclipManager::getInstance().hook(false);
     functions::hookTick(false, true);
     functions::CFVillageManager::hookVillage(false);
+    functions::miningHook(false);
+    functions::TickHook(false);
 
     // for (auto& eventListener : getEventListeners()) ll::event::EventBus::getInstance().removeListener(eventListener);
     getEventListeners().clear();
