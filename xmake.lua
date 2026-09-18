@@ -3,11 +3,11 @@ add_rules("mode.debug", "mode.release")
 add_repositories("liteldev-repo https://github.com/LiteLDev/xmake-repo.git")
 add_repositories("oeotyan-repo https://github.com/OEOTYAN/xmake-repo.git")
 
-add_requires("levilamina 2fd96ee7743267c4f6bd22c0fb742d22819d45aa", {configs = {target_type = get_config("target_type")}})
+add_requires("levilamina", {configs = {target_type = get_config("target_type")}})
 
 add_requires("levibuildscript")
 
-add_requires("bsci v26.40.0", {configs = {target_type = get_config("target_type")}})
+add_requires("bsci", {configs = {target_type = get_config("target_type")}})
 
 if not has_config("vs_runtime") then
     set_runtimes("MD")
