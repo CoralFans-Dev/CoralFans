@@ -56,22 +56,23 @@ LL_TYPE_INSTANCE_HOOK(
     GameMode,
     &GameMode::$useItemOn,
     InteractionResult,
-    ItemStack&      item,
-    BlockPos const& blockPos,
-    uchar           face,
-    Vec3 const&     clickPos,
-    Block const*    block,
-    bool            isFirstEvent
+    ::ItemStack&      item,
+    ::BlockPos const& at,
+    uchar             face,
+    ::Vec3 const&     hit,
+    ::HandSlot        handSlot,
+    ::Block const*    targetBlock,
+    bool              isFirstEvent
 ) {
 #ifdef LL_PLAT_C
     if (auto serverInstance = ll::service::getServerInstance();
         !serverInstance
         || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(item, blockPos, face, clickPos, block, isFirstEvent);
+        auto res = origin(item, at, face, hit, handSlot, targetBlock, isFirstEvent);
 #endif
     auto& containerOpenManager  = ContainerOpenManager::getInstance();
     containerOpenManager.player = &this->mPlayer;
-    auto res                    = origin(item, blockPos, face, clickPos, block, isFirstEvent);
+    auto res                    = origin(item, at, face, hit, handSlot, targetBlock, isFirstEvent);
     containerOpenManager.player = nullptr;
     return res;
 }
