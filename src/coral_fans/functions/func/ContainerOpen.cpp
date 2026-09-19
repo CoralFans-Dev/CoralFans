@@ -68,7 +68,7 @@ LL_TYPE_INSTANCE_HOOK(
     if (auto serverInstance = ll::service::getServerInstance();
         !serverInstance
         || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        auto res = origin(item, at, face, hit, handSlot, targetBlock, isFirstEvent);
+        return origin(item, at, face, hit, handSlot, targetBlock, isFirstEvent);
 #endif
     auto& containerOpenManager  = ContainerOpenManager::getInstance();
     containerOpenManager.player = &this->mPlayer;

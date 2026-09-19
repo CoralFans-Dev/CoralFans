@@ -544,15 +544,11 @@ LL_TYPE_INSTANCE_HOOK(
     void,
     ::br::worldgen::StructureSetRegistry const& structureSetRegistry
 ) {
-#ifdef LL_PLAT_C
-    if (auto serverInstance = ll::service::getServerInstance();
-        !serverInstance
-        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(structureSetRegistry);
-#endif
     origin(structureSetRegistry);
-    for (auto& [uuid, village] : *mVillageManager->mVillages) {
-        CFVillageManager::getInstance().addVillage(village);
+    if (mVillageManager) {
+        for (auto& [uuid, village] : *mVillageManager->mVillages) {
+            CFVillageManager::getInstance().addVillage(village);
+        }
     }
 }
 
