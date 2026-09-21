@@ -1,4 +1,5 @@
 #include "coral_fans/functions/spawn/Spawn.h"
+#include "coral_fans/functions/spawn/SpawnAnalyzer.h"
 #include "coral_fans/base/Macros.h"
 #include "coral_fans/base/Utils.h"
 #include "coral_fans/commands/Commands.h"
@@ -38,6 +39,16 @@ void registerSpawnCommand(config::CommandConfigStruct& config) {
                 {"chunk",   0},
                 {"all",     1},
                 {"density", 2}
+        }
+        );
+
+        registrar.tryRegisterRuntimeEnum(
+            "spawnAnalyzeAction",
+            {
+                {"start", 0},
+                {"stop",  1},
+                {"print", 2},
+                {"clear", 3}
         }
         );
 
@@ -235,6 +246,35 @@ void registerSpawnCommand(config::CommandConfigStruct& config) {
                 );
                 if (!mob) return output.error("command.spawn.forcesp.error"_tr(actorName));
                 return output.success("command.spawn.forcesp.success"_tr(actorName));
+            });
+
+        // spawn analyze <start|stop|print|clear>
+        cmd.runtimeOverload()
+            .text("analyze")
+            .required("action", ll::command::ParamKind::Enum, "spawnAnalyzeAction")
+            .execute([&](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
+                COMMAND_CHECK_PLAYER
+
+                auto&      analyzer = functions::SpawnAnalyzer::getInstance();
+                const auto action   = self["action"].get<ll::command::ParamKind::Enum>();
+                switch (action.index) {
+                case 0:
+                    if (analyzer.start(*player)) return output.success("command.spawn.analyze.success.start"_tr());
+                    return output.error("command.spawn.analyze.error.start"_tr());
+                case 1:
+                    if (analyzer.stop()) return output.success("command.spawn.analyze.success.stop"_tr());
+                    return output.error("command.spawn.analyze.error.stop"_tr());
+                case 2: {
+                    if (const auto result = analyzer.buildResult()) return output.success(*result);
+                    return output.error("command.spawn.analyze.error.print"_tr());
+                }
+                case 3:
+                    analyzer.clear();
+                    return output.success("command.spawn.analyze.success.clear"_tr());
+                default:
+                    return output.error("command.spawn.analyze.error.print"_tr());
+                }
             });
     }
 }

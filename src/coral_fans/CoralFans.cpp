@@ -11,6 +11,7 @@
 #include "coral_fans/functions/prof/Prof.h"
 #include "coral_fans/functions/shortcuts/Shortcuts.h"
 #include "coral_fans/functions/slime/Slime.h"
+#include "coral_fans/functions/spawn/SpawnAnalyzer.h"
 #include "coral_fans/functions/tick/TickCommandManager.h"
 #include "coral_fans/functions/village/Village.h"
 #include "ll/api/Config.h"
@@ -118,6 +119,7 @@ void CoralFans::removeRuntimeData() {
     functions::NoclipManager::getInstance().clear();
     functions::ShortcutsManager::getInstance().clear();
     functions::SlimeManager::getInstance().setShow(false);
+    functions::SpawnAnalyzer::getInstance().shutdown();
     functions::CFVillageManager::getInstance().clear();
     my_schedule::MySchedule::getSchedule().clear();
 }

@@ -327,6 +327,26 @@
                 "success": "已生成 {}",
                 "error": "无法生成 {}"
             },
+            "analyze": {
+                "success": {
+                    "start": "已开始刷怪分析",
+                    "stop": "已停止刷怪分析",
+                    "clear": "已清空刷怪分析数据"
+                },
+                "error": {
+                    "start": "刷怪分析已在运行",
+                    "stop": "刷怪分析未在运行",
+                    "print": "暂无刷怪分析数据"
+                },
+                "print": {
+                    "title": "共 {} gt ({:.2f}h)",
+                    "surface": "\n地表:",
+                    "underground": "\n洞穴:",
+                    "empty": "\n - 无",
+                    "line": "\n - {}: 密度: {:.2f}",
+                    "spawn": ", 生成: {}, {:.2f}/h"
+                }
+            },
             "prob": {
                 "title": "-- [{} {} {}] --",
                 "brightness": "\n - 亮度(天空+方块): {}",

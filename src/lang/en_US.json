@@ -313,6 +313,26 @@
                 "success": "Spawned {}",
                 "error": "Failed to spawn {}"
             },
+            "analyze": {
+                "success": {
+                    "start": "Spawn analysis started",
+                    "stop": "Spawn analysis stopped",
+                    "clear": "Spawn analysis data cleared"
+                },
+                "error": {
+                    "start": "Spawn analysis is already running",
+                    "stop": "Spawn analysis is not running",
+                    "print": "No spawn analysis data available"
+                },
+                "print": {
+                    "title": "Total {}gt ({:.2f}h)",
+                    "surface": "\nSurface:",
+                    "underground": "\nUnderground:",
+                    "empty": "\n - None",
+                    "line": "\n - {}: Density: {:.2f}",
+                    "spawn": ", Spawn: {}, {:.2f}/h"
+                }
+            },
             "prob": {
                 "title": "-- [{} {} {}] --",
                 "brightness": "\n - Brightness(Sky + Block): {}",
