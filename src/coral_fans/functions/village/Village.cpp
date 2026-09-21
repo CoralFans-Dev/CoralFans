@@ -540,10 +540,11 @@ LL_TYPE_INSTANCE_HOOK(
     void,
     ::br::worldgen::StructureSetRegistry const& structureSetRegistry
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(structureSetRegistry));
     origin(structureSetRegistry);
-    for (auto& [uuid, village] : *mVillageManager->mVillages) {
-        CFVillageManager::getInstance().addVillage(village);
+    if (mVillageManager) {
+        for (auto& [uuid, village] : *mVillageManager->mVillages) {
+            CFVillageManager::getInstance().addVillage(village);
+        }
     }
 }
 

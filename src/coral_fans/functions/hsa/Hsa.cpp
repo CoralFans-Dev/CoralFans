@@ -3,7 +3,6 @@
 
 
 #include "ll/api/service/Bedrock.h"
-#include "mc/_HeaderOutputPredefine.h"
 #include "mc/deps/core/math/Color.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/level/BlockPos.h"
@@ -108,11 +107,10 @@ void HsaManager::drawChunkHsa(std::vector<::BlockPos>& hsa, DimensionType dim, H
 }
 
 void HsaManager::drawChunkStructure(
-    entt::basic_storage<::br::ChunkBoundingBox, ::br::ChunkEntity, ::std::allocator<::br::ChunkBoundingBox>, void>&
-                  chunkBoundingBoxes,
-    DimensionType dim,
-    HsaChunkData& chunkData,
-    ChunkPos      chunkPos
+    ::entt::basic_storage<::br::ChunkBoundingBox, ::br::ChunkEntity>& chunkBoundingBoxes,
+    DimensionType                                                     dim,
+    HsaChunkData&                                                     chunkData,
+    ChunkPos                                                          chunkPos
 ) {
     std::vector<bsci::GeometryGroup::GeoId> geoIdList;
     auto&                                   hsaConfig = CoralFans::getInstance().getConfig().functions.hsa;

@@ -1,4 +1,6 @@
 #include "DuplicatableController.h"
+#include "NetherDuplicatableController.h"
+#include "TheEndDuplicatableController.h"
 #include "coral_fans/Config.h"
 #include "coral_fans/CoralFans.h"
 
@@ -9,6 +11,8 @@
 #include "mc/world/level/chunk/ChunkViewSource.h"
 #include "mc/world/level/dimension/Dimension.h"
 #include "mc/world/level/storage/DBChunkStorage.h"
+
+#include <type_traits>
 
 
 namespace coral_fans::functions::locate {
@@ -153,12 +157,17 @@ void DuplicatableController::bsciDataRuntimeRemoveInternal(uint showType) {
     }
 }
 
+template <typename BsciChunkDataT>
 void DuplicatableController::drawChunkSavedInfo(
     BlockSource&                                                      region,
     ChunkPos                                                          originChunkPos,
     BsciChunkDataBase&                                                originChunkData,
     std::unordered_map<ChunkPos, std::unique_ptr<BsciChunkDataBase>>& bsciChunkData
 ) {
+    static_assert(
+        std::is_base_of_v<BsciChunkDataBase, BsciChunkDataT>,
+        "BsciChunkDataT must derive from BsciChunkDataBase"
+    );
     auto& geometryGroup = CoralFans::getInstance().getGeometryGroup();
     auto* dbChunkStorage =
         reinterpret_cast<class DBChunkStorage*>(&(*region.getDimension().mChunkSource->mOwnedParent));
@@ -168,7 +177,7 @@ void DuplicatableController::drawChunkSavedInfo(
         for (int j = -1; j <= 1; j++) {
             if (!i && !j) continue;
             ChunkPos chunkPos             = originChunkPos + ChunkPos(i, j);
-            auto [neighborIter, inserted] = bsciChunkData.try_emplace(chunkPos, std::make_unique<BsciChunkDataBase>());
+            auto [neighborIter, inserted] = bsciChunkData.try_emplace(chunkPos, std::make_unique<BsciChunkDataT>());
             if (inserted) {
                 if (!dbChunkStorage->isChunkSaved(chunkPos)) {
                     neighborIter->second->chunkSaved          = false;
@@ -231,5 +240,21 @@ void DuplicatableController::clearInternal() {
         this->bsciChunkData.clear();
     }
 }
+
+// ========== 显式实例化 ==========
+
+template void DuplicatableController::drawChunkSavedInfo<NetherDuplicatableController::NetherBsciChunkData>(
+    BlockSource&,
+    ChunkPos,
+    BsciChunkDataBase&,
+    std::unordered_map<ChunkPos, std::unique_ptr<BsciChunkDataBase>>&
+);
+
+template void DuplicatableController::drawChunkSavedInfo<TheEndDuplicatableController::TheEndBsciChunkData>(
+    BlockSource&,
+    ChunkPos,
+    BsciChunkDataBase&,
+    std::unordered_map<ChunkPos, std::unique_ptr<BsciChunkDataBase>>&
+);
 
 } // namespace coral_fans::functions::locate

@@ -11,7 +11,7 @@ private:
     FreeCameraManager() = default;
 
 public:
-    std::unordered_set<unsigned long long>  FreeCamList;
+    std::unordered_set<std::string>         FreeCamList;
     [[nodiscard]] static FreeCameraManager& getInstance() {
         static FreeCameraManager instance;
         return instance;

@@ -18,7 +18,6 @@
 #include "mc/world/level/BedrockSpawner.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/BlockTickingQueue.h"
-#include "mc/world/level/EntitySystemsManager.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/TickNextTickData.h"
 #include "mc/world/level/chunk/LevelChunk.h"
@@ -196,8 +195,8 @@ LL_TYPE_INSTANCE_HOOK(
 LL_TYPE_INSTANCE_HOOK(
     CoralFansTickEntitySystemsTickHook,
     ll::memory::HookPriority::Normal,
-    EntitySystemsManager,
-    &EntitySystemsManager::tickEntitySystems,
+    Level,
+    &Level::$tickEntitySystems,
     void
 ) {
     RETURN_IF_NOT_MAIN_THREAD(return origin());

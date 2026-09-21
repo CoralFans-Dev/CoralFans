@@ -5,7 +5,6 @@
 #include "ll/api/i18n/I18n.h"
 #include "mc/deps/nbt/CompoundTagVariant.h"
 #include "mc/deps/nbt/ListTag.h"
-#include "mc/network/PacketSender.h"
 #include "mc/network/packet/InventoryTransactionPacket.h"
 #include "mc/network/packet/TextPacket.h"
 #include "mc/network/packet/TextPacketPayload.h"
@@ -15,6 +14,7 @@
 #include "mc/world/actor/player/PlayerInventory.h"
 #include "mc/world/inventory/transaction/ComplexInventoryTransaction.h"
 #include "mc/world/inventory/transaction/InventoryAction.h"
+#include "mc/world/inventory/transaction/InventoryTransactionItemGroup.h"
 #include "mc/world/item/ItemStack.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/ChunkPos.h"
@@ -141,21 +141,34 @@ void swapItemInContainer(Player* player, int slot1, int slot2) {
 
 void sendInventorySwap(Player* player, int slot1, int slot2) {
     if (!player || slot1 == slot2) return;
-    auto transaction = ComplexInventoryTransaction::fromType(ComplexInventoryTransaction::Type::NormalTransaction);
-    if (!transaction) return;
-    auto&                 invTx = transaction->mTransaction.get();
+
+    auto& inventory = player->getInventory();
+    int   size      = inventory.getContainerSize();
+    if (slot1 < 0 || slot2 < 0 || slot1 >= size || slot2 >= size) return;
+
+    ItemStack item1 = inventory.getItem(slot1);
+    ItemStack item2 = inventory.getItem(slot2);
+    if (item1 == item2) return; // 两格内容相同（含都为空）时无意义
+
+    // 1. 先构造并填充 InventoryTransaction
     InventorySource const source{
         InventorySourceType::ContainerInventory,
         ContainerID::Inventory,
         InventorySource::InventorySourceFlags::NoFlag
     };
-    const auto& inventory = player->getInventory();
-    ItemStack   item1     = inventory.getItem(slot1);
-    ItemStack   item2     = inventory.getItem(slot2);
+    InventoryTransaction invTx;
     invTx.addAction(InventoryAction{source, static_cast<uint>(slot1), item1, item2});
     invTx.addAction(InventoryAction{source, static_cast<uint>(slot2), item2, item1});
+
+    // 2. 再交给 fromType 包装成 ComplexInventoryTransaction
+    auto transaction =
+        ComplexInventoryTransaction::fromType(ComplexInventoryTransaction::Type::NormalTransaction, invTx);
+    if (!transaction) return;
+
+    // 3. 打包发送（isClientSide=true 表示按客户端发包语义处理）
     InventoryTransactionPacket packet(InventoryTransactionPacketPayload{std::move(transaction), true});
-    player->mPacketSender.sendToServer(packet);
+    packet.sendToServer();
+    // 或者保留原写法:player->mPacketSender.sendToServer(packet);
 }
 
 namespace {

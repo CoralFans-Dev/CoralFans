@@ -307,7 +307,7 @@ void TheEndDuplicatableController::draw(BlockSource& region, ChunkPos chunkPos, 
     auto [bsciIt, inserted] = this->bsciChunkData.try_emplace(chunkPos, std::make_unique<TheEndBsciChunkData>());
     auto& bsciData          = *static_cast<TheEndBsciChunkData*>(bsciIt->second.get());
     if (!bsciData.dataDrawed)
-        DuplicatableController::drawChunkSavedInfo(region, chunkPos, bsciData, this->bsciChunkData);
+        DuplicatableController::drawChunkSavedInfo<TheEndBsciChunkData>(region, chunkPos, bsciData, this->bsciChunkData);
     else if (data.reload) {
         this->removeAllGeoIds(bsciData);
         bsciData.dataDrawed = 0;

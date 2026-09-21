@@ -3,6 +3,8 @@
 #include "DuplicatableController.h"
 #include "coral_fans/Config.h"
 
+#include <unordered_set>
+
 
 namespace coral_fans::functions::locate {
 
@@ -24,9 +26,7 @@ public:
     };
 
     struct NetherThreadTemporaryData : ThreadTemporaryDataBase {
-        bool                         worldBlockTargetShouldOperate = false;
-        std::unordered_set<BlockPos> temperaryPoses;
-        int                          temperaryInt = 0;
+        int temperaryInt = 0;
     };
 
     struct NetherBsciChunkData : BsciChunkDataBase {
@@ -48,8 +48,6 @@ private:
     // Hook 声明
     struct NetherHook1; // NetherGenerator::$decorationPostProcessChunk
     struct NetherHook2; // NoSurfaceOreFeature::$place
-    struct NetherHook3; // WorldBlockTarget::$getBlock
-    struct NetherHook4; // IFeature::isExposedTo
     struct NetherHook5; // NetherSpringFeature::$place
     struct NetherHook6; // NetherFireFeature::$place
     struct NetherHook7; // GlowStoneFeature::$place

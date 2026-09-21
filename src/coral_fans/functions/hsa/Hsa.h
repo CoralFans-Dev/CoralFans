@@ -1,7 +1,6 @@
 #pragma once
 
 #include "bsci/GeometryGroup.h"
-#include "mc/_HeaderOutputPredefine.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/ChunkPos.h"
@@ -54,7 +53,7 @@ public:
 private:
     void drawChunkHsa(std::vector<::BlockPos>&, DimensionType, HsaChunkData&);
     void drawChunkStructure(
-        entt::basic_storage<::br::ChunkBoundingBox, ::br::ChunkEntity, ::std::allocator<::br::ChunkBoundingBox>, void>&,
+        ::entt::basic_storage<::br::ChunkBoundingBox, ::br::ChunkEntity>&,
         DimensionType,
         HsaChunkData&,
         ChunkPos

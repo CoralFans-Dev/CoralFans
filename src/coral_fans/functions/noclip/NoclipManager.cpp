@@ -8,8 +8,6 @@
 #include "ll/api/coro/CoroTask.h"
 #include "ll/api/memory/Hook.h"
 #include "ll/api/service/Bedrock.h"
-#include "mc/network/ServerNetworkHandler.h"
-#include "mc/network/packet/SetLocalPlayerAsInitializedPacket.h"
 #include "mc/server/ServerPlayer.h"
 #include "mc/world/actor/player/AbilitiesIndex.h"
 #include "mc/world/actor/player/LayeredAbilities.h"
@@ -28,37 +26,42 @@ LL_TYPE_INSTANCE_HOOK(
 ) {
     RETURN_IF_NOT_MAIN_THREAD(return origin(gameType));
     origin(gameType);
-    if (gameType == GameType::Creative
+    if (!isLoading() && gameType == GameType::Creative
         && CoralFans::getInstance().getConfigDb()->get(std::format("noclip.players.{}", this->getUuid().asString()))
-               == "T")
+               == "T") {
+        CoralFans::getInstance().getSelf().getLogger().info("ServerPlayer::$setPlayerGameType triggered");
         NoclipManager::getInstance().enableNoclip(this);
+    }
 }
-
 LL_TYPE_INSTANCE_HOOK(
-    PlayerJoinEventHook,
-    HookPriority::Normal,
-    ServerNetworkHandler,
-    &ServerNetworkHandler::$handle,
-    void,
-    NetworkIdentifier const&                 identifier,
-    SetLocalPlayerAsInitializedPacket const& packet
+    PlayerLoadHook2,
+    ll::memory::HookPriority::Normal,
+    ServerPlayer,
+    &ServerPlayer::$load,
+    bool,
+    ::CompoundTag const& tag,
+    ::DataLoadHelper&    dataLoadHelper
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(identifier, packet));
-    if (auto player = thisFor<NetEventCallback>()->_getServerPlayer(identifier, packet.mSenderSubId);
-        player && player->getPlayerGameType() == GameType::Creative
-        && CoralFans::getInstance().getConfigDb()->get(std::format("noclip.players.{}", player->getUuid().asString()))
-               == "T")
-        NoclipManager::getInstance().enableNoclip(player);
-    origin(identifier, packet);
+    RETURN_IF_NOT_MAIN_THREAD(return origin(tag, dataLoadHelper));
+    auto ori = origin(tag, dataLoadHelper);
+    if (ori && getPlayerGameType() == GameType::Creative
+        && CoralFans::getInstance().getConfigDb()->get(std::format("noclip.players.{}", this->getUuid().asString()))
+               == "T") {
+        CoralFans::getInstance().getSelf().getLogger().info("ServerPlayer::$load triggered");
+        auto& abilities = getAbilities();
+        abilities.setAbility(AbilitiesIndex::Flying, true);
+        abilities.setAbility(AbilitiesIndex::NoClip, true);
+    }
+    return ori;
 }
 
 void NoclipManager::hook(bool enable) {
     if (enable) {
         CoralFansNoClipHook::hook();
-        PlayerJoinEventHook::hook();
+        PlayerLoadHook2::hook();
     } else {
         CoralFansNoClipHook::unhook();
-        PlayerJoinEventHook::unhook();
+        PlayerLoadHook2::unhook();
     }
 }
 
@@ -103,6 +106,7 @@ void NoclipManager::enableNoclip(Player* player) {
             );
     }
 }
+
 
 void NoclipManager::disableNoclip(Player* player) {
     if (!player) return;
