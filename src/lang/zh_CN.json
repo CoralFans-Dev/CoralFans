@@ -323,6 +323,10 @@
                 "no_target": "未瞄准方块",
                 "position": "无法确定刷怪位置"
             },
+            "forcesp": {
+                "success": "已生成 {}",
+                "error": "无法生成 {}"
+            },
             "prob": {
                 "title": "-- [{} {} {}] --",
                 "brightness": "\n - 亮度(天空+方块): {}",

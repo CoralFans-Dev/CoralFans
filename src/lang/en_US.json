@@ -309,6 +309,10 @@
                 "no_target": "No block targeted",
                 "position": "Failed to determine spawn position"
             },
+            "forcesp": {
+                "success": "Spawned {}",
+                "error": "Failed to spawn {}"
+            },
             "prob": {
                 "title": "-- [{} {} {}] --",
                 "brightness": "\n - Brightness(Sky + Block): {}",

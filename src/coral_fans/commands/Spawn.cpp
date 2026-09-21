@@ -9,9 +9,11 @@
 #include "ll/api/command/runtime/RuntimeCommand.h"
 #include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
+#include "mc/deps/core/math/Vec3.h"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
 #include "mc/world/level/BlockSource.h"
+#include "mc/world/level/Level.h"
 #include "mc/world/level/Spawner.h"
 #include "mc/world/level/biome/Biome.h"
 #include "mc/world/level/biome/MobSpawnerData.h"
@@ -158,6 +160,47 @@ void registerSpawnCommand(config::CommandConfigStruct& config) {
                 return output.success(result);
             }
         );
+
+        // spawn forcesp <actorType> [blockPos: x y z]
+        cmd.runtimeOverload()
+            .text("forcesp")
+            .required("actorType", ll::command::ParamKind::ActorType)
+            .optional("blockPos", ll::command::ParamKind::BlockPos)
+            .execute([&](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
+                COMMAND_CHECK_PLAYER
+
+                const auto* actorType = self["actorType"].get<ll::command::ParamKind::ActorType>();
+                if (!actorType) return output.error("command.spawn.forcesp.error"_tr("unknown"));
+
+                BlockPos pos;
+                if (self["blockPos"].has_value()) {
+                    pos = self["blockPos"].get<ll::command::ParamKind::BlockPos>().getBlockPos(
+                        static_cast<int>(CurrentCmdVersion::Latest),
+                        origin,
+                        {0, 0, 0}
+                    );
+                } else {
+                    const auto hitrst = player->traceRay(5.25f, false, true);
+                    if (hitrst.mType != HitResultType::Tile) return output.error("command.spawn.error.no_target"_tr());
+                    pos = hitrst.mBlock;
+                }
+
+                Vec3 spawnPos = pos;
+                spawnPos.y   += 1.0f;
+                const auto& actorName = actorType->mCanonicalName.get().getString();
+                auto*       mob       = player->getLevel().getSpawner().spawnMob(
+                    player->getDimensionBlockSource(),
+                    *actorType,
+                    nullptr,
+                    spawnPos,
+                    true,
+                    false,
+                    false
+                );
+                if (!mob) return output.error("command.spawn.forcesp.error"_tr(actorName));
+                return output.success("command.spawn.forcesp.success"_tr(actorName));
+            });
     }
 }
 } // namespace coral_fans::commands
