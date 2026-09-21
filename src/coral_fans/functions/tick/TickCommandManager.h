@@ -47,6 +47,7 @@ private:
     // 以 multiplier 缩放玩家当前飞行速度，并同步到客户端
     static void setFlySpeedScale(Player& player, float multiplier);
 
+public:
     void onPlayerJoin(Player& player);
     void onPlayerLeave(Player& player);
 };

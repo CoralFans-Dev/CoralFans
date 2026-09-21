@@ -25,11 +25,6 @@
 #include "mc/world/redstone/circuit/CircuitSceneGraph.h"
 
 
-#ifdef LL_PLAT_C
-#include <thread>
-#endif
-
-
 namespace coral_fans::functions {
 
 // main game tick

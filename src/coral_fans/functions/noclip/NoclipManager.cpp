@@ -7,8 +7,6 @@
 #include "ll/api/coro/CoroTask.h"
 #include "ll/api/memory/Hook.h"
 #include "ll/api/service/Bedrock.h"
-#include "mc/network/ServerNetworkHandler.h"
-#include "mc/network/packet/SetLocalPlayerAsInitializedPacket.h"
 #include "mc/server/ServerPlayer.h"
 #include "mc/world/actor/player/AbilitiesIndex.h"
 #include "mc/world/actor/player/LayeredAbilities.h"
@@ -38,60 +36,60 @@ LL_TYPE_INSTANCE_HOOK(
         return origin(gameType);
 #endif
     origin(gameType);
-    if (gameType == GameType::Creative
+    if (!isLoading() && gameType == GameType::Creative
         && CoralFans::getInstance().getConfigDb()->get(std::format("noclip.players.{}", this->getUuid().asString()))
                == "T") {
-        NoclipManager::getInstance().enableNoclip(this, true);
+        CoralFans::getInstance().getSelf().getLogger().info("ServerPlayer::$setPlayerGameType triggered");
+        NoclipManager::getInstance().enableNoclip(this);
     }
 }
-
 LL_TYPE_INSTANCE_HOOK(
-    PlayerJoinEventHook,
-    HookPriority::Normal,
-    ServerNetworkHandler,
-    &ServerNetworkHandler::$handle,
-    void,
-    NetworkIdentifier const&                 identifier,
-    SetLocalPlayerAsInitializedPacket const& packet
+    PlayerLoadHook2,
+    ll::memory::HookPriority::Normal,
+    ServerPlayer,
+    &ServerPlayer::$load,
+    bool,
+    ::CompoundTag const& tag,
+    ::DataLoadHelper&    dataLoadHelper
 ) {
 #ifdef LL_PLAT_C
     if (auto serverInstance = ll::service::getServerInstance();
         !serverInstance
         || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(identifier, packet);
+        return origin(tag, dataLoadHelper);
 #endif
-    if (auto player = thisFor<NetEventCallback>()->_getServerPlayer(identifier, packet.mSenderSubId);
-        player && player->getPlayerGameType() == GameType::Creative
-        && CoralFans::getInstance().getConfigDb()->get(std::format("noclip.players.{}", player->getUuid().asString()))
+    auto ori = origin(tag, dataLoadHelper);
+    if (ori && getPlayerGameType() == GameType::Creative
+        && CoralFans::getInstance().getConfigDb()->get(std::format("noclip.players.{}", this->getUuid().asString()))
                == "T") {
-        NoclipManager::getInstance().enableNoclip(player);
+        CoralFans::getInstance().getSelf().getLogger().info("ServerPlayer::$load triggered");
+        auto& abilities = getAbilities();
+        abilities.setAbility(AbilitiesIndex::Flying, true);
+        abilities.setAbility(AbilitiesIndex::NoClip, true);
     }
-    origin(identifier, packet);
+    return ori;
 }
 
 void NoclipManager::hook(bool enable) {
     if (enable) {
         CoralFansNoClipHook::hook();
-        PlayerJoinEventHook::hook();
+        PlayerLoadHook2::hook();
     } else {
         CoralFansNoClipHook::unhook();
-        PlayerJoinEventHook::unhook();
+        PlayerLoadHook2::unhook();
     }
 }
 
 void NoclipManager::clear() { this->handlingList.clear(); }
 
-void NoclipManager::enableNoclip(Player* player, bool forceDelay) {
+void NoclipManager::enableNoclip(Player* player) {
     if (!player) return;
     if (this->handlingList.contains(player->mName)) return;
     auto& abilities = player->getAbilities();
-    if (!abilities.getAbility(AbilitiesIndex::Flying).mValue->mBoolVal) {
-        player->setAbility(::AbilitiesIndex::Flying, true);
-        forceDelay = true;
-    }
-
-    if (!forceDelay) player->setAbility(::AbilitiesIndex::NoClip, true);
+    if (abilities.getAbility(AbilitiesIndex::Flying).mValue->mBoolVal)
+        player->setAbility(::AbilitiesIndex::NoClip, true);
     else {
+        player->setAbility(::AbilitiesIndex::Flying, true);
         this->handlingList.emplace(player->mName);
         using namespace ll::chrono_literals;
         ll::coro::keepThis([playername = player->mName.get()]() -> ll::coro::CoroTask<> {
@@ -123,6 +121,7 @@ void NoclipManager::enableNoclip(Player* player, bool forceDelay) {
             );
     }
 }
+
 
 void NoclipManager::disableNoclip(Player* player) {
     if (!player) return;

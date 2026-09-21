@@ -3,7 +3,6 @@
 #include "coral_fans/CoralFans.h"
 #include "ll/api/event/EventBus.h"
 #include "ll/api/event/player/PlayerDisconnectEvent.h"
-#include "ll/api/event/player/PlayerJoinEvent.h"
 #include "ll/api/service/Bedrock.h"
 #include "mc/deps/shared_types/legacy/LevelEvent.h"
 #include "mc/network/packet/LevelEventPacket.h"
@@ -14,6 +13,14 @@
 #include "mc/world/actor/player/AbilitiesIndex.h"
 #include "mc/world/actor/player/LayeredAbilities.h"
 #include "mc/world/level/Level.h"
+
+#include "ll/api/memory/Hook.h"
+
+#ifdef LL_PLAT_C
+#include "ll/api/service/Bedrock.h"
+#include "mc/server/ServerInstance.h"
+#include <thread>
+#endif
 
 
 namespace coral_fans::functions {
@@ -89,7 +96,11 @@ void TickCommandManager::onPlayerJoin(Player& player) {
     if (isSynced(player.getRealName())) scale = currentScale();
     else scale = 1.0f;
     sendSimTimeScalePacket(player, scale);
-    if (scale > kMinScale) setFlySpeedScale(player, 1.0f / scale);
+    if (scale > kMinScale) {
+        auto& abilities = player.getAbilities();
+        abilities.setAbility(AbilitiesIndex::FlySpeed, kDefaultFlySpeed / scale);
+        abilities.setAbility(AbilitiesIndex::VerticalFlySpeed, kDefaultVerticalFlySpeed / scale);
+    }
 }
 
 void TickCommandManager::onPlayerLeave(Player& player) {
@@ -100,16 +111,37 @@ void TickCommandManager::onPlayerLeave(Player& player) {
     player.getAbilities().setAbility(AbilitiesIndex::VerticalFlySpeed, kDefaultVerticalFlySpeed);
 }
 
+LL_TYPE_INSTANCE_HOOK(
+    PlayerLoadHook,
+    ll::memory::HookPriority::Normal,
+    ServerPlayer,
+    &ServerPlayer::$load,
+    bool,
+    ::CompoundTag const& tag,
+    ::DataLoadHelper&    dataLoadHelper
+) {
+#ifdef LL_PLAT_C
+    if (auto serverInstance = ll::service::getServerInstance();
+        !serverInstance
+        || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
+        return origin(tag, dataLoadHelper);
+#endif
+    auto ori = origin(tag, dataLoadHelper);
+    if (ori) TickCommandManager::getInstance().onPlayerJoin(*this);
+    return ori;
+}
+
 void TickCommandManager::hook(bool enable) {
     auto& bus = ll::event::EventBus::getInstance();
-    if (enable && mListeners.empty()) {
-        mListeners.emplace_back(bus.emplaceListener<ll::event::player::PlayerJoinEvent>(
-            [](ll::event::player::PlayerJoinEvent& event) { getInstance().onPlayerJoin(event.self()); }
-        ));
-        mListeners.emplace_back(bus.emplaceListener<ll::event::player::PlayerDisconnectEvent>(
-            [](ll::event::player::PlayerDisconnectEvent& event) { getInstance().onPlayerLeave(event.self()); }
-        ));
+    if (enable) {
+        PlayerLoadHook::hook();
+        if (mListeners.empty()) {
+            mListeners.emplace_back(bus.emplaceListener<ll::event::player::PlayerDisconnectEvent>(
+                [](ll::event::player::PlayerDisconnectEvent& event) { getInstance().onPlayerLeave(event.self()); }
+            ));
+        }
     } else if (!enable) {
+        PlayerLoadHook::unhook();
         for (auto const& listener : mListeners) bus.removeListener(listener);
         mListeners.clear();
     }
