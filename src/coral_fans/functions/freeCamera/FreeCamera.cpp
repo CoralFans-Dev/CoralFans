@@ -5,6 +5,7 @@
 #include "mc/legacy/ActorUniqueID.h"
 #include "mc/network/ServerNetworkHandler.h"
 #include "mc/network/packet/AddPlayerPacket.h"
+#include "mc/network/packet/PlayerAuthInputPacket.h"
 #include "mc/network/packet/PlayerSkinPacket.h"
 #include "mc/network/packet/RemoveActorPacket.h"
 #include "mc/network/packet/UpdateAbilitiesPacket.h"
@@ -14,6 +15,7 @@
 #include "mc/world/actor/ActorHurtResult.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/Tick.h"
+
 
 #ifdef LL_PLAT_C
 #include "mc/server/ServerInstance.h"
@@ -94,7 +96,7 @@ void SendActorLinkPacket(Player* pl) {
 */
 
 void FreeCameraManager::EnableFreeCamera(Player* pl) {
-    FreeCameraManager::getInstance().FreeCamList.insert(pl->getNetworkIdentifier().mGuid.g);
+    FreeCameraManager::getInstance().FreeCamList.insert(pl->getUuid().asString());
     EnableFreeCameraPacket(pl);
     SendFakePlayerPacket(pl);
     // SendActorLinkPacket(pl);
@@ -104,7 +106,7 @@ void FreeCameraManager::DisableFreeCamera(Player* pl) {
     auto pos   = pl->getFeetPos();
     auto dimid = pl->getDimensionId();
     // auto links = pl->getLinks();
-    FreeCameraManager::getInstance().FreeCamList.erase(pl->getNetworkIdentifier().mGuid.g);
+    FreeCameraManager::getInstance().FreeCamList.erase(pl->getUuid().asString());
     DisableFreeCameraPacket(pl);
     pl->teleport(pos, dimid);
     // for (auto& link : links) {
@@ -122,17 +124,18 @@ LL_TYPE_INSTANCE_HOOK(
     ServerNetworkHandler,
     &ServerNetworkHandler::$handle,
     void,
-    NetworkIdentifier const&     id,
-    PlayerAuthInputPacket const& pkt
+    NetworkIdentifier const&     source,
+    PlayerAuthInputPacket const& packet
 ) {
 #ifdef LL_PLAT_C
     if (auto serverInstance = ll::service::getServerInstance();
         !serverInstance
         || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
-        return origin(id, pkt);
+        return origin(source, packet);
 #endif
-    if (!FreeCameraManager::getInstance().FreeCamList.contains(id.mGuid.g)) [[likely]] {
-        origin(id, pkt);
+    auto player = thisFor<NetEventCallback>()->_getServerPlayer(source, packet.mSenderSubId);
+    if (!FreeCameraManager::getInstance().FreeCamList.contains(player->getUuid().asString())) [[likely]] {
+        origin(source, packet);
     }
 }
 
@@ -151,7 +154,7 @@ LL_TYPE_INSTANCE_HOOK(
         return origin(gamemode);
 #endif
     origin(gamemode);
-    if (FreeCameraManager::getInstance().FreeCamList.contains(getNetworkIdentifier().mGuid.g)) {
+    if (FreeCameraManager::getInstance().FreeCamList.contains(getUuid().asString())) {
         FreeCameraManager::DisableFreeCamera(this);
     }
 }
@@ -174,7 +177,7 @@ LL_TYPE_INSTANCE_HOOK(
 #endif
     auto res = origin(source, damage, hurtParameters);
     if ((this->isSurvival() || this->isAdventure())
-        && FreeCameraManager::getInstance().FreeCamList.contains(this->getNetworkIdentifier().mGuid.g)) {
+        && FreeCameraManager::getInstance().FreeCamList.contains(getUuid().asString())) {
         FreeCameraManager::DisableFreeCamera(this);
     }
     return res;
@@ -194,7 +197,7 @@ LL_TYPE_INSTANCE_HOOK(
         || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin(a1);
 #endif
-    if (FreeCameraManager::getInstance().FreeCamList.contains(getNetworkIdentifier().mGuid.g)) {
+    if (FreeCameraManager::getInstance().FreeCamList.contains(getUuid().asString())) {
         FreeCameraManager::DisableFreeCamera(this);
     }
     return origin(a1);
@@ -213,7 +216,7 @@ LL_TYPE_INSTANCE_HOOK(
         || std::this_thread::get_id() != ll::service::getServerInstance()->mServerInstanceThread->get_id())
         return origin();
 #endif
-    FreeCameraManager::getInstance().FreeCamList.erase(getNetworkIdentifier().mGuid.g);
+    FreeCameraManager::getInstance().FreeCamList.erase(getUuid().asString());
     return origin();
 }
 
