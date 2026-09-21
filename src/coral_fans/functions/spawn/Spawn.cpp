@@ -146,7 +146,7 @@ const SpawnConditions getSpawnConditions(BlockSource& region, BlockPos const& po
         isSurface ? info1.isBubble : info1.isBubble && info2.isBubble,
         isSurface ? info1.isLava : info1.isLava && info2.isLava,
         !isSurface,
-        region.getLevel().getCurrentTick().tickID,
+        0,
         rawBrightness,
         pos
     };
@@ -166,16 +166,29 @@ getCandidateMobs(BlockSource& region, BlockPos const& pos, SpawnConditions const
     return result;
 }
 
-std::vector<std::string> spawnCluster(BlockSource& region, BlockPos const& pos) {
+std::vector<std::string> spawnCluster(BlockSource& region, BlockPos pos) {
+    // _spawnMobCluster silently does nothing when the target block is air;
+    // walk down to the next spawnable block like natural spawning does
+    if (region.getBlock(pos).isAir()
+        && !Spawner::findNextSpawnBlockUnder(region, pos, std::nullopt, SpawnBlockRequirements::None)) {
+        throw std::runtime_error("Failed to find a spawnable block under the position");
+    }
+
+    auto& spawner = getBedrockSpawner();
+    // BedrockSpawner::tick refreshes the density counters before spawning a
+    // cluster; without this the cap checks inside _spawnMobCluster read
+    // stale counts from an unrelated chunk and can silently block the spawn
+    spawner._updateBaseTypeCount(region, utils::blockPosToChunkPos(pos));
+
     auto conditions = getSpawnConditions(region, pos);
 
-    auto&                        level = region.getLevel();
+    auto&                          level = region.getLevel();
     std::unordered_set<Actor const*> before;
     for (const auto& entity : level.getEntities()) {
         if (const auto* actor = entity.tryUnwrap<Actor>().as_ptr()) before.insert(actor);
     }
 
-    getBedrockSpawner()._spawnMobCluster(region, pos, conditions);
+    spawner._spawnMobCluster(region, pos, conditions);
 
     std::vector<std::string> spawned;
     for (const auto& entity : level.getEntities()) {

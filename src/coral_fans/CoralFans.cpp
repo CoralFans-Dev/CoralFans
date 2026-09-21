@@ -138,6 +138,10 @@ bool CoralFans::load() {
                 return false;
             }
         }
+    } catch (const std::exception& e) {
+        logger.error("Failed to load config.json. Please check the file!");
+        logger.error("{}", e.what());
+        return false;
     } catch (...) {
         logger.error("Failed to load config.json. Please check the file!");
         return false;

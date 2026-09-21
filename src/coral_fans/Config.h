@@ -86,7 +86,7 @@ struct Locate {
 };
 
 struct Config {
-    int         version    = 7;
+    int         version    = 8;
     std::string locateName = "zh_CN";
 
     CommandStruct command;
