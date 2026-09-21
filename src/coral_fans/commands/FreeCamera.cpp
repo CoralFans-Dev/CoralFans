@@ -21,8 +21,9 @@ void registerFreeCameraCommand(config::CommandConfigStruct& config) {
         cmd.overload().execute([&](CommandOrigin const& origin, CommandOutput& output) {
             using ll::i18n_literals::operator""_tr;
             COMMAND_CHECK_PLAYER
-            auto guid = player->getNetworkIdentifier().mGuid.g;
-            if (!coral_fans::functions::FreeCameraManager::getInstance().FreeCamList.count(guid)) {
+            if (!coral_fans::functions::FreeCameraManager::getInstance().FreeCamList.count(
+                    player->getUuid().asString()
+                )) {
                 coral_fans::functions::FreeCameraManager::EnableFreeCamera(player);
                 return output.success("command.freecamera.enabled"_tr());
             } else {
