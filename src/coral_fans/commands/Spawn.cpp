@@ -5,6 +5,7 @@
 
 #include "ll/api/command/CommandHandle.h"
 #include "ll/api/command/CommandRegistrar.h"
+#include "ll/api/command/runtime/ParamKind.h"
 #include "ll/api/command/runtime/RuntimeCommand.h"
 #include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
@@ -103,16 +104,28 @@ void registerSpawnCommand(config::CommandConfigStruct& config) {
             }
         );
 
-        // spawn prob
-        cmd.runtimeOverload().text("prob").execute(
-            [&](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const&) {
+        // spawn prob [blockPos: x y z]
+        cmd.runtimeOverload()
+            .text("prob")
+            .optional("blockPos", ll::command::ParamKind::BlockPos)
+            .execute([&](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
                 using ll::i18n_literals::operator""_tr;
                 COMMAND_CHECK_PLAYER
-                const auto hitrst = player->traceRay(5.25f, false, true);
-                if (hitrst.mType != HitResultType::Tile) return output.error("command.spawn.error.no_target"_tr());
 
-                auto&          region = player->getDimensionBlockSource();
-                const BlockPos pos    = hitrst.mBlock;
+                BlockPos pos;
+                if (self["blockPos"].has_value()) {
+                    pos = self["blockPos"].get<ll::command::ParamKind::BlockPos>().getBlockPos(
+                        static_cast<int>(CurrentCmdVersion::Latest),
+                        origin,
+                        {0, 0, 0}
+                    );
+                } else {
+                    const auto hitrst = player->traceRay(5.25f, false, true);
+                    if (hitrst.mType != HitResultType::Tile) return output.error("command.spawn.error.no_target"_tr());
+                    pos = hitrst.mBlock;
+                }
+
+                auto& region = player->getDimensionBlockSource();
 
                 SpawnConditions conditions;
                 try {
