@@ -23,8 +23,10 @@
 #include "mc/world/phys/HitResult.h"
 
 
+#include <string>
 #include <string_view>
 #include <unordered_map>
+#include <vector>
 
 namespace coral_fans::commands {
 void registerSpawnCommand(config::CommandConfigStruct& config) {
@@ -246,6 +248,40 @@ void registerSpawnCommand(config::CommandConfigStruct& config) {
                 );
                 if (!mob) return output.error("command.spawn.forcesp.error"_tr(actorName));
                 return output.success("command.spawn.forcesp.success"_tr(actorName));
+            });
+
+        // spawn cluster [blockPos: x y z]
+        cmd.runtimeOverload()
+            .text("cluster")
+            .optional("blockPos", ll::command::ParamKind::BlockPos)
+            .execute([&](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
+                COMMAND_CHECK_PLAYER
+
+                BlockPos pos;
+                if (self["blockPos"].has_value()) {
+                    pos = self["blockPos"].get<ll::command::ParamKind::BlockPos>().getBlockPos(
+                        static_cast<int>(CurrentCmdVersion::Latest),
+                        origin,
+                        {0, 0, 0}
+                    );
+                } else {
+                    const auto hitrst = player->traceRay(5.25f, false, true);
+                    if (hitrst.mType != HitResultType::Tile) return output.error("command.spawn.error.no_target"_tr());
+                    pos = hitrst.mBlock;
+                }
+
+                std::vector<std::string> spawned;
+                try {
+                    spawned = functions::spawnCluster(player->getDimensionBlockSource(), pos);
+                } catch (...) {
+                    return output.error("command.spawn.error.position"_tr());
+                }
+                if (spawned.empty()) return output.error("command.spawn.cluster.error"_tr());
+
+                std::string result = "command.spawn.cluster.success"_tr(spawned.size());
+                for (const auto& name : spawned) result += "command.spawn.cluster.line"_tr(name);
+                return output.success(result);
             });
 
         // spawn analyze <start|stop|print|clear>

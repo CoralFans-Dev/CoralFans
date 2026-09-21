@@ -327,6 +327,11 @@
                 "success": "已生成 {}",
                 "error": "无法生成 {}"
             },
+            "cluster": {
+                "success": "已模拟一次成群生成，共生成 {} 只生物:",
+                "line": "\n - {}",
+                "error": "成群生成失败，没有生物生成"
+            },
             "analyze": {
                 "success": {
                     "start": "已开始刷怪分析",

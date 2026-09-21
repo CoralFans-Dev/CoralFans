@@ -55,4 +55,6 @@ const SpawnConditions getSpawnConditions(BlockSource& region, BlockPos const& po
 
 std::vector<MobSpawnerData*>
 getCandidateMobs(BlockSource& region, BlockPos const& pos, SpawnConditions const& conditions);
+
+std::vector<std::string> spawnCluster(BlockSource& region, BlockPos const& pos);
 } // namespace coral_fans::functions

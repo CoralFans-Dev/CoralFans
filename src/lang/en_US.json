@@ -313,6 +313,11 @@
                 "success": "Spawned {}",
                 "error": "Failed to spawn {}"
             },
+            "cluster": {
+                "success": "Simulated a cluster spawn, spawned {} mob(s):",
+                "line": "\n - {}",
+                "error": "Cluster spawn failed, no mobs were spawned"
+            },
             "analyze": {
                 "success": {
                     "start": "Spawn analysis started",

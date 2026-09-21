@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <stdexcept>
+#include <unordered_set>
 
 namespace coral_fans::functions {
 namespace {
@@ -163,5 +164,25 @@ getCandidateMobs(BlockSource& region, BlockPos const& pos, SpawnConditions const
         }
     }
     return result;
+}
+
+std::vector<std::string> spawnCluster(BlockSource& region, BlockPos const& pos) {
+    auto conditions = getSpawnConditions(region, pos);
+
+    auto&                        level = region.getLevel();
+    std::unordered_set<Actor const*> before;
+    for (const auto& entity : level.getEntities()) {
+        if (const auto* actor = entity.tryUnwrap<Actor>().as_ptr()) before.insert(actor);
+    }
+
+    getBedrockSpawner()._spawnMobCluster(region, pos, conditions);
+
+    std::vector<std::string> spawned;
+    for (const auto& entity : level.getEntities()) {
+        const auto* actor = entity.tryUnwrap<Actor>().as_ptr();
+        if (!actor || before.contains(actor)) continue;
+        spawned.push_back(actor->getTypeName());
+    }
+    return spawned;
 }
 } // namespace coral_fans::functions
