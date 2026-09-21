@@ -29,8 +29,17 @@ namespace coral_fans::commands {
 void registerSpawnCommand(config::CommandConfigStruct& config) {
     if (config.enabled) {
         using ll::i18n_literals::operator""_tr;
-        auto& cmd = ll::command::CommandRegistrar::getInstance(false)
-                        .getOrCreateCommand(config.command, "command.spawn.description"_tr(), config.permission);
+        auto& registrar = ll::command::CommandRegistrar::getInstance(false);
+        auto& cmd       = registrar.getOrCreateCommand(config.command, "command.spawn.description"_tr(), config.permission);
+
+        registrar.tryRegisterRuntimeEnum(
+            "spawnCountRange",
+            {
+                {"chunk",   0},
+                {"all",     1},
+                {"density", 2}
+        }
+        );
 
         // spawn count global
         cmd.runtimeOverload().text("count").text("global").execute(
@@ -40,6 +49,32 @@ void registerSpawnCommand(config::CommandConfigStruct& config) {
                 return output.success("command.spawn.success.count.global"_tr(usage.count, usage.cap));
             }
         );
+
+        // spawn count <chunk|all|density>
+        cmd.runtimeOverload()
+            .text("count")
+            .required("range", ll::command::ParamKind::Enum, "spawnCountRange")
+            .execute([&](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
+                COMMAND_CHECK_PLAYER
+
+                const auto range = self["range"].get<ll::command::ParamKind::Enum>();
+                auto       scope = functions::SpawnCountScope::Chunk;
+                if (range.index == 1) scope = functions::SpawnCountScope::All;
+                else if (range.index == 2) scope = functions::SpawnCountScope::Density;
+
+                const auto counts    = functions::countActors(*player, scope);
+                const auto rangeName = ll::i18n::getInstance().get(
+                    "command.spawn.success.count.range." + range.name,
+                    {}
+                );
+                std::string result = "command.spawn.success.count.actor.title"_tr(rangeName);
+                if (counts.empty()) result += "command.spawn.success.count.actor.empty"_tr();
+                for (const auto& [type, count] : counts) {
+                    result += "command.spawn.success.count.actor.line"_tr(type, count);
+                }
+                return output.success(result);
+            });
 
         // spawn count density base
         cmd.runtimeOverload().text("count").text("density").text("base").execute(

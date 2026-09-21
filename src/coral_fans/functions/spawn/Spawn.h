@@ -4,6 +4,8 @@
 
 #include <array>
 #include <cstdint>
+#include <map>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -11,6 +13,7 @@ class BlockPos;
 class BlockSource;
 class ChunkPos;
 class MobSpawnerData;
+class Player;
 class SpawnConditions;
 
 namespace coral_fans::functions {
@@ -36,7 +39,13 @@ struct EntityTypeCounts {
     std::unordered_map<::HashedString, int> underground;
 };
 
+enum class SpawnCountScope { Chunk, All, Density };
+
+using ActorTypeCounts = std::map<std::string, size_t>;
+
 CountWithCap<uint32_t> getSpawnableMobTickUsage();
+
+ActorTypeCounts countActors(Player const& player, SpawnCountScope scope);
 
 CountWithCap<SpawnDensityCounts> getBaseTypeDensity(BlockSource& region, ChunkPos const& chunkPos);
 

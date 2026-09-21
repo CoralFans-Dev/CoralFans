@@ -340,6 +340,16 @@
             "success": {
                 "count": {
                     "global": "全局上限占用: {}/{}",
+                    "range": {
+                        "chunk": "当前区块",
+                        "all": "当前维度",
+                        "density": "9×9 区块"
+                    },
+                    "actor": {
+                        "title": "实体统计（{}）:",
+                        "line": "\n - {}: {}",
+                        "empty": "\n - 无"
+                    },
                     "basetype": {
                         "title": "按类型刷怪统计:",
                         "type": "\n- {}:",

@@ -326,6 +326,16 @@
             "success": {
                 "count": {
                     "global": "Global spawn cap usage: {}/{}",
+                    "range": {
+                        "chunk": "Current chunk",
+                        "all": "Current dimension",
+                        "density": "9×9 chunks"
+                    },
+                    "actor": {
+                        "title": "Entity counts ({}):",
+                        "line": "\n - {}: {}",
+                        "empty": "\n - None"
+                    },
                     "basetype": {
                         "title": "Spawn counts by type:",
                         "type": "\n- {}:",

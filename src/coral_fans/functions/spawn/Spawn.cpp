@@ -1,8 +1,14 @@
 #include "coral_fans/functions/spawn/Spawn.h"
+
+#include "mc/deps/game_refs/GameRefs.h"
+#include "mc/deps/ecs/gamerefs_entity/GameRefsEntity.h"
+
 #include "coral_fans/base/Utils.h"
 #include "coral_fans/functions/minerule/MineruleManager.h"
 
 #include "ll/api/service/Bedrock.h"
+#include "mc/world/actor/Actor.h"
+#include "mc/world/actor/player/Player.h"
 #include "mc/world/level/BedrockSpawner.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/Level.h"
@@ -15,6 +21,7 @@
 
 
 #include <algorithm>
+#include <cstdlib>
 #include <stdexcept>
 
 namespace coral_fans::functions {
@@ -44,6 +51,31 @@ CountWithCap<uint32_t> getSpawnableMobTickUsage() {
         static_cast<uint32_t>(spawner.mSpawnableMobTickCount),
         static_cast<uint32_t>(PopulationCapManager::getInstance().globalMax)
     };
+}
+
+ActorTypeCounts countActors(Player const& player, SpawnCountScope scope) {
+    const auto centerChunk  = utils::blockPosToChunkPos(player.getFeetBlockPos());
+    const auto dimensionId  = player.getDimensionId();
+    ActorTypeCounts counts;
+
+    for (const auto& entity : player.getLevel().getEntities()) {
+        if (!entity) continue;
+        const auto* actor = entity.tryUnwrap<Actor>().as_ptr();
+        if (!actor || actor->getDimensionId() != dimensionId) continue;
+
+        if (scope != SpawnCountScope::All) {
+            const auto actorChunk = utils::blockPosToChunkPos(actor->getFeetBlockPos());
+            if (scope == SpawnCountScope::Chunk) {
+                if (actorChunk.x != centerChunk.x || actorChunk.z != centerChunk.z) continue;
+            } else if (
+                std::abs(actorChunk.x - centerChunk.x) > 4 || std::abs(actorChunk.z - centerChunk.z) > 4
+            ) {
+                continue;
+            }
+        }
+        ++counts[actor->getTypeName()];
+    }
+    return counts;
 }
 
 CountWithCap<SpawnDensityCounts> getBaseTypeDensity(BlockSource& region, ChunkPos const& chunkPos) {
