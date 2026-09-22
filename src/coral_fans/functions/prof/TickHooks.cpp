@@ -5,6 +5,7 @@
 #include "coral_fans/functions/hsa/Hsa.h"
 #include "coral_fans/functions/hud/Hud.h"
 #include "coral_fans/functions/locate/DuplicatableManager.h"
+#include "coral_fans/functions/locate/PortalManager.h"
 #include "coral_fans/functions/prof/Prof.h"
 #include "coral_fans/functions/slime/Slime.h"
 #include "coral_fans/functions/village/Village.h"
@@ -41,6 +42,7 @@ LL_TYPE_INSTANCE_HOOK(CoralFansTickLevelTickHook, ll::memory::HookPriority::Norm
         functions::HudHelper::getInstance().tick();                              // light 20
         my_schedule::MySchedule::getSchedule().update();
         functions::locate::DuplicatableManager::getInstance().tick();
+        functions::locate::PortalManager::getInstance().tick();
     })
     if (prof.profiling) {
         prof.gameSessionTickTime += time_level;

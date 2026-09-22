@@ -1,6 +1,8 @@
 #include "coral_fans/CoralFans.h"
 #include "coral_fans/base/Macros.h"
+#include "coral_fans/base/Utils.h"
 #include "coral_fans/functions/locate/DuplicatableManager.h"
+#include "coral_fans/functions/locate/PortalManager.h"
 
 
 #include "ll/api/command/CommandHandle.h"
@@ -8,6 +10,10 @@
 #include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/i18n/I18n.h"
 #include "mc/server/commands/CommandOutput.h"
+#include "mc/world/actor/player/Player.h"
+
+
+#include <algorithm>
 
 
 namespace coral_fans::commands {
@@ -134,6 +140,51 @@ void registerLocateCommand(config::CommandConfigStruct& config) {
                     self["type"].get<ll::command::ParamKind::Enum>().name,
                     isopen ? "true" : "false"
                 ));
+            });
+        // locate portal show [bool]
+        locateCommand.runtimeOverload()
+            .text("portal")
+            .text("show")
+            .optional("enable", ll::command::ParamKind::Bool)
+            .execute([](CommandOrigin const&, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
+                auto& portalManager = functions::locate::PortalManager::getInstance();
+                if (self["enable"].has_value())
+                    portalManager.setShow(self["enable"].get<ll::command::ParamKind::Bool>());
+                else portalManager.setShow(!portalManager.getShow());
+                output.success("command.locate.portal.show.output"_tr(portalManager.getShow() ? "true" : "false"));
+            });
+
+        // locate portal list [int: from] [int: to]
+        locateCommand.runtimeOverload()
+            .text("portal")
+            .text("list")
+            .optional("from", ll::command::ParamKind::Int)
+            .optional("to", ll::command::ParamKind::Int)
+            .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
+                using ll::i18n_literals::operator""_tr;
+                auto portals = functions::locate::PortalManager::getSortedPortals();
+                int  total   = static_cast<int>(portals.size());
+                if (!total) {
+                    output.success("command.locate.portal.list.empty"_tr());
+                    return;
+                }
+                int from =
+                    self["from"].has_value() ? self["from"].get<ll::command::ParamKind::Int>() : 1;
+                int to = self["to"].has_value() ? self["to"].get<ll::command::ParamKind::Int>() : total;
+                from   = std::clamp(from, 1, total);
+                to     = std::clamp(to, from, total);
+
+                std::string result = "command.locate.portal.list.head"_tr(total);
+                for (int i = from; i <= to; ++i) {
+                    auto& info = portals[i - 1];
+                    result += "\n" + "command.locate.portal.list.line"_tr(i, info.dimId, info.pos.x, info.pos.y, info.pos.z);
+                }
+
+                auto entity = origin.getEntity();
+                if (entity && entity->isType(ActorType::Player)) {
+                    utils::segmentAndSendToPlayer(result, static_cast<Player*>(entity));
+                } else output.success(result);
             });
     }
 

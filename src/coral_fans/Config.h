@@ -175,6 +175,12 @@ struct Config {
                     std::string unsavedChunk = "#FFC825";
                 } chunkSavedDebugInfo{};
             } duplicatable{};
+
+            struct {
+                int         drawInterval = 40;
+                int         radius       = 6;
+                std::string color        = "#B037FD";
+            } portal{};
         } locate{};
 
         struct {

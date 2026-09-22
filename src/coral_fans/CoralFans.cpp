@@ -6,6 +6,7 @@
 #include "coral_fans/functions/func/FuncManager.h"
 #include "coral_fans/functions/hsa/Hsa.h"
 #include "coral_fans/functions/locate/DuplicatableManager.h"
+#include "coral_fans/functions/locate/PortalManager.h"
 #include "coral_fans/functions/minerule/MineruleManager.h"
 #include "coral_fans/functions/noclip/NoclipManager.h"
 #include "coral_fans/functions/prof/Prof.h"
@@ -115,6 +116,7 @@ void CoralFans::removeRuntimeData() {
     functions::HsaManager::getInstance().setHsaShow(false);
     functions::HsaManager::getInstance().setStructureShow(false);
     functions::locate::DuplicatableManager::getInstance().clear();
+    functions::locate::PortalManager::getInstance().clear();
     functions::PopulationCapManager::getInstance().clear();
     functions::NoclipManager::getInstance().clear();
     functions::ShortcutsManager::getInstance().clear();

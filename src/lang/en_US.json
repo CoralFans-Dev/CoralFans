@@ -290,6 +290,16 @@
                     "output": "set show {}  \"{}\"",
                     "error": "undefined duplicatable feature"
                 }
+            },
+            "portal": {
+                "show": {
+                    "output": "set show portal \"{}\""
+                },
+                "list": {
+                    "head": "found {} portals in total:",
+                    "line": "{}: [dim {}] ({}, {}, {})",
+                    "empty": "no portal found"
+                }
             }
         },
         "spawn": {
