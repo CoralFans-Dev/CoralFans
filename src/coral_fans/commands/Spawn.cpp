@@ -13,6 +13,8 @@
 #include "mc/deps/core/math/Vec3.h"
 #include "mc/server/commands/CommandOrigin.h"
 #include "mc/server/commands/CommandOutput.h"
+#include "mc/world/actor/ActorSpawnRuleGroup.h"
+#include "mc/world/actor/spawn_category/SpawnCategory.h"
 #include "mc/world/level/BlockSource.h"
 #include "mc/world/level/Level.h"
 #include "mc/world/level/Spawner.h"
@@ -86,73 +88,53 @@ void registerSpawnCommand(config::CommandConfigStruct& config) {
                 for (const auto& [type, count] : counts) {
                     result += "command.spawn.success.count.actor.line"_tr(type, count);
                 }
+
+                if (scope == functions::SpawnCountScope::Density) {
+                    auto&      region   = player->getDimensionBlockSource();
+                    const auto chunkPos = utils::blockPosToChunkPos(player->getFeetBlockPos());
+
+                    const auto density = functions::getBaseTypeDensity(region, chunkPos);
+                    static constexpr std::string_view categories[7] =
+                        {"animal", "monster", "water_animal", "villager", "ambient", "cat", "pillager"};
+                    result              += "command.spawn.success.count.basetype.title"_tr();
+                    auto appendBaseSection = [&](std::string_view                    labelKey,
+                                                 const functions::MobCategoryCounts& c,
+                                                 const functions::MobCategoryCounts& caps) {
+                        auto label = ll::i18n::getInstance().get("command.spawn." + std::string(labelKey), {});
+                        result    += "command.spawn.success.count.basetype.type"_tr(label);
+                        for (size_t i = 0; i < 7; ++i) {
+                            auto categoryStr = ll::i18n::getInstance()
+                                                   .get("command.spawn.category." + std::string(categories[i]), {});
+                            result += "command.spawn.success.count.basetype.line"_tr(
+                                categoryStr,
+                                c.values[i],
+                                caps.values[i]
+                            );
+                        }
+                    };
+                    appendBaseSection("surface", density.count.surface, density.cap.surface);
+                    appendBaseSection("underground", density.count.underground, density.cap.underground);
+
+                    const auto typeCounts       = functions::getEntityTypeCounts(region, chunkPos);
+                    result                     += "command.spawn.success.count.type.title"_tr();
+                    auto appendTypeSection = [&](std::string_view                               labelKey,
+                                                 const std::unordered_map<::HashedString, int>& section) {
+                        bool first = true;
+                        for (const auto& [type, count] : section) {
+                            if (count == 0) continue;
+                            if (first) {
+                                auto label = ll::i18n::getInstance().get("command.spawn." + std::string(labelKey), {});
+                                result += "command.spawn.success.count.type.type"_tr(label);
+                                first   = false;
+                            }
+                            result += "command.spawn.success.count.type.line"_tr(type.getString(), count);
+                        }
+                    };
+                    appendTypeSection("surface", typeCounts.surface);
+                    appendTypeSection("underground", typeCounts.underground);
+                }
                 return output.success(result);
             });
-
-        // spawn count density base
-        cmd.runtimeOverload().text("count").text("density").text("base").execute(
-            [&](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const&) {
-                using ll::i18n_literals::operator""_tr;
-                COMMAND_CHECK_PLAYER
-                const auto density = functions::getBaseTypeDensity(
-                    player->getDimensionBlockSource(),
-                    utils::blockPosToChunkPos(player->getFeetBlockPos())
-                );
-
-                static constexpr std::string_view categories[7] =
-                    {"animal", "monster", "water_animal", "villager", "ambient", "cat", "pillager"};
-
-                std::string result        = "command.spawn.success.count.basetype.title"_tr();
-                auto        appendSection = [&](std::string_view                    labelKey,
-                                         const functions::MobCategoryCounts& counts,
-                                         const functions::MobCategoryCounts& caps) {
-                    auto label  = ll::i18n::getInstance().get("command.spawn." + std::string(labelKey), {});
-                    result     += "command.spawn.success.count.basetype.type"_tr(label);
-                    for (size_t c = 0; c < 7; ++c) {
-                        auto categoryStr =
-                            ll::i18n::getInstance().get("command.spawn.category." + std::string(categories[c]), {});
-                        result += "command.spawn.success.count.basetype.line"_tr(
-                            categoryStr,
-                            counts.values[c],
-                            caps.values[c]
-                        );
-                    }
-                };
-                appendSection("surface", density.count.surface, density.cap.surface);
-                appendSection("underground", density.count.underground, density.cap.underground);
-                return output.success(result);
-            }
-        );
-
-        // spawn count density type
-        cmd.runtimeOverload().text("count").text("density").text("type").execute(
-            [&](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const&) {
-                using ll::i18n_literals::operator""_tr;
-                COMMAND_CHECK_PLAYER
-                const auto counts = functions::getEntityTypeCounts(
-                    player->getDimensionBlockSource(),
-                    utils::blockPosToChunkPos(player->getFeetBlockPos())
-                );
-
-                std::string result        = "command.spawn.success.count.type.title"_tr();
-                auto        appendSection = [&](std::string_view                               labelKey,
-                                         const std::unordered_map<::HashedString, int>& section) {
-                    bool first = true;
-                    for (const auto& [type, count] : section) {
-                        if (count == 0) continue;
-                        if (first) {
-                            auto label = ll::i18n::getInstance().get("command.spawn." + std::string(labelKey), {});
-                            result += "command.spawn.success.count.type.type"_tr(label);
-                            first   = false;
-                        }
-                        result += "command.spawn.success.count.type.line"_tr(type.getString(), count);
-                    }
-                };
-                appendSection("surface", counts.surface);
-                appendSection("underground", counts.underground);
-                return output.success(result);
-            }
-        );
 
         // spawn prob [blockPos: x y z]
         cmd.runtimeOverload()
@@ -193,7 +175,11 @@ void registerSpawnCommand(config::CommandConfigStruct& config) {
                 result             += "command.spawn.prob.brightness"_tr(conditions.rawBrightness);
                 result             += "command.spawn.prob.surface"_tr(conditions.isOnSurface, conditions.isUnderground);
                 result             += "command.spawn.prob.fluid"_tr(conditions.isInWater, conditions.isInLava);
-                result             += "command.spawn.prob.biome"_tr(region.getBiome(pos).mHash.get().getString());
+                auto rawBiomeName = utils::removeMinecraftPrefix(region.getBiome(pos).mHash->c_str());
+                auto translatedBiome = ll::i18n::getInstance().get("translate.biome." + rawBiomeName, {});
+                result += "command.spawn.prob.biome"_tr(
+                    translatedBiome.empty() ? rawBiomeName : std::string{translatedBiome}
+                );
 
                 for (auto* mob : candidates) {
                     const auto& identifier = *mob->mIdentifier;
@@ -236,6 +222,17 @@ void registerSpawnCommand(config::CommandConfigStruct& config) {
 
                 Vec3 spawnPos = pos;
                 spawnPos.y   += 1.0f;
+                // since 1.21 (NATURAL_MOB_SPAWN_OFFSET_VERSION) natural spawns
+                // are shifted 0.49 towards SE from the NW corner, except truly
+                // water-spawning mobs (drowned=monster and axolotl=axolotls do shift)
+                const auto* spawnRules = player->getLevel().getSpawner().getSpawnRules();
+                const int   pool       = spawnRules ? spawnRules->getActorSpawnPool(*actorType) : -1;
+                const bool  isAquatic  = pool >= static_cast<int>(SpawnCategory::Type::UndergroundWaterCreature)
+                                && pool <= static_cast<int>(SpawnCategory::Type::WaterAmbient);
+                if (!isAquatic) {
+                    spawnPos.x += 0.49f;
+                    spawnPos.z += 0.49f;
+                }
                 const auto& actorName = actorType->mCanonicalName.get().getString();
                 auto*       mob       = player->getLevel().getSpawner().spawnMob(
                     player->getDimensionBlockSource(),

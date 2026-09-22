@@ -362,12 +362,12 @@
                         "empty": "\n - None"
                     },
                     "basetype": {
-                        "title": "Spawn counts by type:",
+                        "title": "\nSpawn counts by type:",
                         "type": "\n- {}:",
                         "line": "\n  {}: {}/{}"
                     },
                     "type": {
-                        "title": "Entity spawn counts by type:",
+                        "title": "\nEntity spawn counts by type:",
                         "type": "\n- {}:",
                         "line": "\n  {}: {}"
                     }
