@@ -29,9 +29,7 @@ LL_TYPE_INSTANCE_HOOK(
     ::IRandom&                    random,
     ::ResourceDropsContext const& resourceDropsContext
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(
-        return origin(block, random, std::forward<ResourceDropsContext const&>(resourceDropsContext))
-    );
+    RETURN_IF_NOT_MAIN_THREAD(origin(block, random, std::forward<ResourceDropsContext const&>(resourceDropsContext)));
     if (block.getTypeName() == "minecraft:bedrock") {
         ItemStack itemStack;
         itemStack.reinit("bedrock", 1, 0);
