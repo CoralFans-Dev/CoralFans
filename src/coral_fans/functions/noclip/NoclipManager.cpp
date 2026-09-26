@@ -24,7 +24,7 @@ LL_TYPE_INSTANCE_HOOK(
     void,
     ::GameType gameType
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(gameType));
+    RETURN_IF_NOT_MAIN_THREAD(origin(gameType));
     origin(gameType);
     if (!isLoading() && gameType == GameType::Creative
         && CoralFans::getInstance().getConfigDb()->get(std::format("noclip.players.{}", this->getUuid().asString()))
@@ -42,7 +42,7 @@ LL_TYPE_INSTANCE_HOOK(
     ::CompoundTag const& tag,
     ::DataLoadHelper&    dataLoadHelper
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(tag, dataLoadHelper));
+    RETURN_IF_NOT_MAIN_THREAD(origin(tag, dataLoadHelper));
     auto ori = origin(tag, dataLoadHelper);
     if (ori && getPlayerGameType() == GameType::Creative
         && CoralFans::getInstance().getConfigDb()->get(std::format("noclip.players.{}", this->getUuid().asString()))

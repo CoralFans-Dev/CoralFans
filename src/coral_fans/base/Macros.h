@@ -48,7 +48,7 @@
     do {                                                                                                               \
         if (auto serverInstance = ll::service::getServerInstance();                                                    \
             !serverInstance || std::this_thread::get_id() != serverInstance->mServerInstanceThread->get_id()) {        \
-            __VA_ARGS__;                                                                                               \
+            return __VA_ARGS__;                                                                                        \
         }                                                                                                              \
     } while (false)
 

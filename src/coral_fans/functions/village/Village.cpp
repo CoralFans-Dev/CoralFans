@@ -556,7 +556,7 @@ LL_TYPE_INSTANCE_HOOK(
     void,
     ::std::shared_ptr<::POIInstance>&& pi
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(std::move(pi)));
+    RETURN_IF_NOT_MAIN_THREAD(origin(std::move(pi)));
     auto& manager              = CFVillageManager::getInstance();
     manager.newVillageId       = std::nullopt;
     manager.mayCreatingVillage = true;
@@ -580,7 +580,7 @@ LL_TYPE_INSTANCE_HOOK(
     ::mce::UUID       id,
     ::BlockPos const& _origin
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(dimension, id, _origin));
+    RETURN_IF_NOT_MAIN_THREAD(origin(dimension, id, _origin));
     auto  ori     = origin(dimension, id, _origin);
     auto& manager = CFVillageManager::getInstance();
     if (manager.mayCreatingVillage) manager.newVillageId = id;
@@ -596,7 +596,7 @@ LL_TYPE_INSTANCE_HOOK(
     Tick         tick,
     BlockSource& region
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(tick, region));
+    RETURN_IF_NOT_MAIN_THREAD(origin(tick, region));
     CFVillageManager::getInstance().handleVillageTick(*this, tick);
     origin(tick, region);
 }

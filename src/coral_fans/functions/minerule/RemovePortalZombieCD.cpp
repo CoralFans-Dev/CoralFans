@@ -102,7 +102,7 @@ LL_TYPE_STATIC_HOOK(
     ::Dimension const& dimension,
     ::IRandom&         random
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(dimension, random));
+    RETURN_IF_NOT_MAIN_THREAD(origin(dimension, random));
     RemovePortalZombieCDHelper::getInstance().spawn = origin(dimension, random);
     return false;
 }
@@ -117,7 +117,7 @@ LL_TYPE_STATIC_HOOK(
     ::BlockPos const& pos,
     ::Random&         random
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(region, pos, random));
+    RETURN_IF_NOT_MAIN_THREAD(origin(region, pos, random));
     origin(region, pos, random);
     auto& helper = RemovePortalZombieCDHelper::getInstance();
     if (helper.spawn) {

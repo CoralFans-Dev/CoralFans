@@ -18,7 +18,7 @@ LL_TYPE_INSTANCE_HOOK(
     int          max,
     bool         instaTick_
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(region, until, max, instaTick_));
+    RETURN_IF_NOT_MAIN_THREAD(origin(region, until, max, instaTick_));
     return origin(region, until, functions::MaxPtManager::getInstance().maxpt, instaTick_);
 }
 

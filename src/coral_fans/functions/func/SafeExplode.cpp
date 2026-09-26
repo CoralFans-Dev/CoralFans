@@ -13,7 +13,7 @@ LL_TYPE_INSTANCE_HOOK(
     bool,
     ::IRandom& random
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(random));
+    RETURN_IF_NOT_MAIN_THREAD(origin(random));
     return false;
 }
 

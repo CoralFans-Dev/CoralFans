@@ -123,7 +123,7 @@ LL_TYPE_INSTANCE_HOOK(
     NetworkIdentifier const&     source,
     PlayerAuthInputPacket const& packet
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(source, packet));
+    RETURN_IF_NOT_MAIN_THREAD(origin(source, packet));
     auto player = thisFor<NetEventCallback>()->_getServerPlayer(source, packet.mSenderSubId);
     if (!FreeCameraManager::getInstance().FreeCamList.contains(player->getUuid().asString())) [[likely]] {
         origin(source, packet);
@@ -138,7 +138,7 @@ LL_TYPE_INSTANCE_HOOK(
     void,
     ::GameType gamemode
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(gamemode));
+    RETURN_IF_NOT_MAIN_THREAD(origin(gamemode));
     origin(gamemode);
     if (FreeCameraManager::getInstance().FreeCamList.contains(getUuid().asString())) {
         FreeCameraManager::DisableFreeCamera(this);
@@ -155,7 +155,7 @@ LL_TYPE_INSTANCE_HOOK(
     float                      damage,
     ::HurtParameters const&    hurtParameters
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(source, damage, hurtParameters));
+    RETURN_IF_NOT_MAIN_THREAD(origin(source, damage, hurtParameters));
     auto res = origin(source, damage, hurtParameters);
     if ((this->isSurvival() || this->isAdventure())
         && FreeCameraManager::getInstance().FreeCamList.contains(getUuid().asString())) {
@@ -172,7 +172,7 @@ LL_TYPE_INSTANCE_HOOK(
     void,
     class ActorDamageSource const& a1
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(a1));
+    RETURN_IF_NOT_MAIN_THREAD(origin(a1));
     if (FreeCameraManager::getInstance().FreeCamList.contains(getUuid().asString())) {
         FreeCameraManager::DisableFreeCamera(this);
     }
@@ -186,7 +186,7 @@ LL_TYPE_INSTANCE_HOOK(
     &ServerPlayer::disconnect,
     void
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin());
+    RETURN_IF_NOT_MAIN_THREAD(origin());
     FreeCameraManager::getInstance().FreeCamList.erase(getUuid().asString());
     return origin();
 }

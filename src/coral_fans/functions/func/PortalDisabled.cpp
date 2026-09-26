@@ -14,7 +14,7 @@ LL_TYPE_INSTANCE_HOOK(
     &ServerPlayer::$canChangeDimensionsUsingPortal,
     bool
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin());
+    RETURN_IF_NOT_MAIN_THREAD(origin());
     if (CoralFans::getInstance().getConfigDb()->get(
             std::format("functions.players.{}.portaldisabled", this->getUuid().asString())
         )

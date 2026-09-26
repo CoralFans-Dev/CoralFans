@@ -19,7 +19,7 @@ LL_TYPE_INSTANCE_HOOK(
     int slot,
     int count
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(slot, count));
+    RETURN_IF_NOT_MAIN_THREAD(origin(slot, count));
     if (FuncDropNoCostManager::getInstance().mutex) {
         origin(slot, count);
         FuncDropNoCostManager::getInstance().mutex = false;
@@ -36,7 +36,7 @@ LL_TYPE_INSTANCE_HOOK(
     bool,
     ::ItemStack const& item
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(item));
+    RETURN_IF_NOT_MAIN_THREAD(origin(item));
     FuncDropNoCostManager::getInstance().mutex = true;
     this->removeItem(FuncDropNoCostManager::getInstance()._slot, FuncDropNoCostManager::getInstance()._count);
     return origin(item);
@@ -54,7 +54,7 @@ LL_TYPE_INSTANCE_HOOK(
     ::Vec3 const&  pos,
     uchar          face
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(region, container, slot, pos, face));
+    RETURN_IF_NOT_MAIN_THREAD(origin(region, container, slot, pos, face));
     FuncDropNoCostManager::getInstance().mutex2 = false;
     return origin(region, container, slot, pos, face);
 }
@@ -68,7 +68,7 @@ LL_TYPE_INSTANCE_HOOK(
     int                slot,
     ::ItemStack const& item
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(slot, item));
+    RETURN_IF_NOT_MAIN_THREAD(origin(slot, item));
     if (FuncDropNoCostManager::getInstance().mutex2) origin(slot, item);
     else FuncDropNoCostManager::getInstance().mutex2 = true;
 }

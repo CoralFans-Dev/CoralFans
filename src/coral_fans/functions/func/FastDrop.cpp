@@ -19,7 +19,7 @@ LL_TYPE_INSTANCE_HOOK(
     ItemStack const& item,
     bool             randomly
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(item, randomly));
+    RETURN_IF_NOT_MAIN_THREAD(origin(item, randomly));
     if (CoralFans::getInstance().getConfigDb()->get(
             std::format("functions.players.{}.fastdrop", this->getUuid().asString())
         )
