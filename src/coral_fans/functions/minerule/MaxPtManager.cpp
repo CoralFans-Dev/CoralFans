@@ -13,10 +13,10 @@ LL_TYPE_INSTANCE_HOOK(
     BlockTickingQueue,
     &BlockTickingQueue::tickPendingTicks,
     bool,
-    BlockSource& region,
-    Tick const&  until,
-    int          max,
-    bool         instaTick_
+    BlockSource&         region,
+    Tick const&          until,
+    [[maybe_unused]] int max,
+    bool                 instaTick_
 ) {
     RETURN_IF_NOT_MAIN_THREAD(origin(region, until, max, instaTick_));
     return origin(region, until, functions::MaxPtManager::getInstance().maxpt, instaTick_);
