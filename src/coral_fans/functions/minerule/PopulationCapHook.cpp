@@ -147,7 +147,7 @@ LL_AUTO_TYPE_INSTANCE_HOOK(
     void,
     const br::worldgen::StructureSetRegistry& structureSetRegistry
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(structureSetRegistry));
+    RETURN_IF_NOT_MAIN_THREAD(origin(structureSetRegistry));
     origin(structureSetRegistry);
 
     int   dimId   = this->getDimensionId();

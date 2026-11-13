@@ -18,7 +18,7 @@ LL_TYPE_INSTANCE_HOOK(
     int           sourceEntityType,
     bool          keepVelocity
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(pos, shouldStopRiding, cause, sourceEntityType, keepVelocity));
+    RETURN_IF_NOT_MAIN_THREAD(origin(pos, shouldStopRiding, cause, sourceEntityType, keepVelocity));
     this->mState = State::Falling;
     return origin(pos, shouldStopRiding, cause, sourceEntityType, keepVelocity);
 }

@@ -29,9 +29,7 @@ LL_TYPE_INSTANCE_HOOK(
     ::IRandom&                    random,
     ::ResourceDropsContext const& resourceDropsContext
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(
-        return origin(block, random, std::forward<ResourceDropsContext const&>(resourceDropsContext))
-    );
+    RETURN_IF_NOT_MAIN_THREAD(origin(block, random, std::forward<ResourceDropsContext const&>(resourceDropsContext)));
     if (block.getTypeName() == "minecraft:bedrock") {
         ItemStack itemStack;
         itemStack.reinit("bedrock", 1, 0);
@@ -55,7 +53,7 @@ LL_TYPE_STATIC_HOOK(
     ::ResourceDropsContext const&                        resourceDropsContext,
     ::std::vector<::std::pair<::ItemStack, ::BlockPos>>& itemStacks
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(region, blockPos, block, random, resourceDropsContext, itemStacks));
+    RETURN_IF_NOT_MAIN_THREAD(origin(region, blockPos, block, random, resourceDropsContext, itemStacks));
     if (block.getTypeName() == "minecraft:moving_block") {
         MovingBlockActor* mba = (MovingBlockActor*)region.getBlockEntity(blockPos);
         if (mba->mWrappedBlock->getTypeName() != "minecraft:moving_block") { // 防止mb的mb导致的无限循环
@@ -79,7 +77,7 @@ LL_TYPE_INSTANCE_HOOK(
     ::ResourceDropsContext const& resourceDropsContext,
     ::Actor const*                actorContext
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(region, pos, block, random, resourceDropsContext, actorContext));
+    RETURN_IF_NOT_MAIN_THREAD(origin(region, pos, block, random, resourceDropsContext, actorContext));
     if (block.getTypeName() == "minecraft:moving_block") {
         MovingBlockActor* mba = (MovingBlockActor*)region.getBlockEntity(pos);
         if (mba->mWrappedBlock->getTypeName() != "minecraft:moving_block") { // 防止mb的mb导致的无限循环

@@ -30,7 +30,7 @@ namespace coral_fans::functions {
 
 // main game tick
 LL_TYPE_INSTANCE_HOOK(CoralFansTickLevelTickHook, ll::memory::HookPriority::Normal, Level, &Level::$tick, void) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin());
+    RETURN_IF_NOT_MAIN_THREAD(origin());
     auto& prof = functions::Profiler::getInstance();
     origin();
     auto time_level = ProfilerLite::gProfilerLiteInstance().mDebugServerTickTime->count() / 1000;
@@ -66,7 +66,7 @@ LL_TYPE_INSTANCE_HOOK(
     Tick const&             tick,
     ::std::function<void()> spawnerCallback
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(tickRegion, tick, spawnerCallback));
+    RETURN_IF_NOT_MAIN_THREAD(origin(tickRegion, tick, spawnerCallback));
     auto&      prof     = functions::Profiler::getInstance();
     const auto dimid    = tickRegion.getDimensionId();
     auto&      chunkPos = this->mPosition;
@@ -111,7 +111,7 @@ LL_TYPE_INSTANCE_HOOK(
     ::LevelChunkVolumeData const& levelChunkVolumeData,
     ::ChunkPos const              chunkPos
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(region, levelChunkVolumeData, chunkPos));
+    RETURN_IF_NOT_MAIN_THREAD(origin(region, levelChunkVolumeData, chunkPos));
     auto& prof = functions::Profiler::getInstance();
     if (prof.profiling && prof.chunkTickBlocksMutex == 1) {
         prof.chunkTickBlocksMutex     = 2;
@@ -128,7 +128,7 @@ LL_TYPE_INSTANCE_HOOK(
     void,
     BlockSource& tickRegion
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(tickRegion));
+    RETURN_IF_NOT_MAIN_THREAD(origin(tickRegion));
     auto& prof = functions::Profiler::getInstance();
     if (prof.profiling) {
         PROF_TIMER(chunk_block_entity, { origin(tickRegion); })
@@ -149,7 +149,7 @@ LL_TYPE_INSTANCE_HOOK(
     bool         instaTick_
 ) {
     // 区块加载线程同样可能存在调用
-    RETURN_IF_NOT_MAIN_THREAD(return origin(region, until, max, instaTick_));
+    RETURN_IF_NOT_MAIN_THREAD(origin(region, until, max, instaTick_));
     auto& prof = functions::Profiler::getInstance();
     if (prof.profiling) {
         if (prof.chunkTickBlocksMutex == 2) {
@@ -185,7 +185,7 @@ LL_TYPE_INSTANCE_HOOK(
     &Dimension::$tick,
     void
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin());
+    RETURN_IF_NOT_MAIN_THREAD(origin());
     auto& prof = functions::Profiler::getInstance();
     if (prof.profiling) {
         PROF_TIMER(dimension, { origin(); })
@@ -201,7 +201,7 @@ LL_TYPE_INSTANCE_HOOK(
     &Level::$tickEntitySystems,
     void
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin());
+    RETURN_IF_NOT_MAIN_THREAD(origin());
     auto& prof = functions::Profiler::getInstance();
     if (prof.profiling) {
         PROF_TIMER(entity, { origin(); })
@@ -220,7 +220,7 @@ LL_TYPE_INSTANCE_HOOK(
     &Dimension::$tickRedstone,
     void
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin());
+    RETURN_IF_NOT_MAIN_THREAD(origin());
     auto& prof = functions::Profiler::getInstance();
     if (prof.profiling) {
         PROF_TIMER(dimension_redstone, { origin(); })
@@ -260,7 +260,7 @@ LL_TYPE_INSTANCE_HOOK(
     void,
     BlockSource* region
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(region));
+    RETURN_IF_NOT_MAIN_THREAD(origin(region));
     auto& prof = functions::Profiler::getInstance();
     if (prof.profiling) {
         PROF_TIMER(pt_update, { origin(region); })
@@ -302,7 +302,7 @@ LL_TYPE_INSTANCE_HOOK(
     bool,
     BlockSource& region
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(region));
+    RETURN_IF_NOT_MAIN_THREAD(origin(region));
     auto& prof = functions::Profiler::getInstance();
     if (prof.profiling) {
         bool res;

@@ -116,7 +116,7 @@ LL_TYPE_INSTANCE_HOOK(
     int            attachedFace,
     bool           canPushItems
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(region, fromContainer, pos, attachedFace, canPushItems));
+    RETURN_IF_NOT_MAIN_THREAD(origin(region, fromContainer, pos, attachedFace, canPushItems));
     HopperCounterManager::getInstance().region = &region;
     HopperCounterManager::getInstance().pos    = pos;
     HopperCounterManager::getInstance().mutex  = true;
@@ -134,7 +134,7 @@ LL_TYPE_INSTANCE_HOOK(
     int                slot,
     ::ItemStack const& item
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(slot, item));
+    RETURN_IF_NOT_MAIN_THREAD(origin(slot, item));
     if (!HopperCounterManager::getInstance().mutex) {
         HOOK_HOPPER_RETURN
     }

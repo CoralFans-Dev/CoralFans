@@ -11,9 +11,9 @@ LL_TYPE_INSTANCE_HOOK(
     Explosion,
     &Explosion::explode,
     bool,
-    ::IRandom& random
+    [[maybe_unused]] ::IRandom& random
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(random));
+    RETURN_IF_NOT_MAIN_THREAD(origin(random));
     return false;
 }
 

@@ -80,7 +80,7 @@ LL_TYPE_INSTANCE_HOOK(
     ::Vec3 const&     playerPos,
     bool&             hasDestroyedBlock
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(pos, face, playerPos, hasDestroyedBlock));
+    RETURN_IF_NOT_MAIN_THREAD(origin(pos, face, playerPos, hasDestroyedBlock));
     if (CoralFans::getInstance().getConfigDb()->get(
             std::format("functions.players.{}.autotool", mPlayer.getUuid().asString())
         )

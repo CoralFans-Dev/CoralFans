@@ -17,7 +17,7 @@
 
 namespace coral_fans::helper::thread {
 LL_TYPE_INSTANCE_HOOK(MainThreadExecutorHook, ll::memory::HookPriority::Normal, Minecraft, &Minecraft::update, bool) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin());
+    RETURN_IF_NOT_MAIN_THREAD(origin());
     auto ori = origin();
     if (ori) MainThreadExecutor::getDefault().tick();
     return ori;

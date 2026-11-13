@@ -58,7 +58,7 @@ LL_TYPE_INSTANCE_HOOK(
     ::Block const*    targetBlock,
     bool              isFirstEvent
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(item, at, face, hit, handSlot, targetBlock, isFirstEvent));
+    RETURN_IF_NOT_MAIN_THREAD(origin(item, at, face, hit, handSlot, targetBlock, isFirstEvent));
     auto& containerOpenManager  = ContainerOpenManager::getInstance();
     containerOpenManager.player = &this->mPlayer;
     auto res                    = origin(item, at, face, hit, handSlot, targetBlock, isFirstEvent);
@@ -74,7 +74,7 @@ LL_TYPE_INSTANCE_HOOK(
     bool,
     BlockSource& region
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(region));
+    RETURN_IF_NOT_MAIN_THREAD(origin(region));
     auto& containerOpenManager = ContainerOpenManager::getInstance();
     if (containerOpenManager.forceOpen) return true;
     auto res = origin(region);

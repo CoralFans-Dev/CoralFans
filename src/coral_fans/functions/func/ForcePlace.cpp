@@ -20,7 +20,7 @@ LL_TYPE_INSTANCE_HOOK(
     bool,
     Vec3 clickPos
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(block, pos, face, placer, true, clickPos));
+    RETURN_IF_NOT_MAIN_THREAD(origin(block, pos, face, placer, true, clickPos));
     return origin(block, pos, face, placer, true, clickPos);
 }
 
@@ -30,14 +30,14 @@ LL_TYPE_INSTANCE_HOOK(
     BlockSource,
     &BlockSource::$mayPlace,
     bool,
-    Block const&    block,
-    BlockPos const& pos,
-    uchar           face,
-    Actor*          placer,
-    bool            val,
-    Vec3            clickPos
+    [[maybe_unused]] Block const& block,
+    BlockPos const&               pos,
+    uchar                         face,
+    Actor*                        placer,
+    bool                          val,
+    Vec3                          clickPos
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(block, pos, face, placer, val, clickPos));
+    RETURN_IF_NOT_MAIN_THREAD(origin(block, pos, face, placer, val, clickPos));
     if (getBlock(pos).isAir()) return true;
     auto stone = Block::tryGetFromRegistry("minecraft:stone");
     return origin(stone, pos, face, placer, val, clickPos);

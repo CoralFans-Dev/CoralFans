@@ -185,7 +185,7 @@ LL_TYPE_INSTANCE_HOOK(
     ::ItemUseMethod  itemUseMethod,
     bool             consumeItem
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(item, itemUseMethod, consumeItem));
+    RETURN_IF_NOT_MAIN_THREAD(origin(item, itemUseMethod, consumeItem));
     if ((CoralFans::getInstance().getConfigDb()->get(
              std::format("functions.players.{}.autoitem", this->getUuid().asString())
          )
@@ -225,7 +225,7 @@ LL_TYPE_INSTANCE_HOOK(
     ::BlockPos const& position,
     bool              withData
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(position, withData));
+    RETURN_IF_NOT_MAIN_THREAD(origin(position, withData));
     if ((CoralFans::getInstance().getConfigDb()->get(
              std::format("functions.players.{}.autoitem", this->getUuid().asString())
          )

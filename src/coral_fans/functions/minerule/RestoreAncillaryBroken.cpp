@@ -21,7 +21,7 @@ LL_TYPE_INSTANCE_HOOK(
     void,
     ::BlockSource& region
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(region));
+    RETURN_IF_NOT_MAIN_THREAD(origin(region));
     auto& helper            = RestoreAncillaryBrokenHelper::getInstance();
     helper.mutex            = true;
     helper.mutex2           = true;
@@ -45,7 +45,7 @@ LL_TYPE_INSTANCE_HOOK(
     ::ResourceDropsContext const& resourceDropsContext,
     ::Actor const*                actorContext
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(region, pos, block, random, resourceDropsContext, actorContext));
+    RETURN_IF_NOT_MAIN_THREAD(origin(region, pos, block, random, resourceDropsContext, actorContext));
     auto& helper = RestoreAncillaryBrokenHelper::getInstance();
     if (helper.mutex2) {
         helper.mutex2       = false;
@@ -68,7 +68,7 @@ LL_TYPE_INSTANCE_HOOK(
     bool                        dropResources,
     const ::BlockChangeContext& blockChangeContext
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(region, pos, dropResources, blockChangeContext));
+    RETURN_IF_NOT_MAIN_THREAD(origin(region, pos, dropResources, blockChangeContext));
     auto& helper = RestoreAncillaryBrokenHelper::getInstance();
     if (helper.mutex) {
         helper.mutex2  = true;

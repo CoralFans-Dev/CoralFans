@@ -18,7 +18,7 @@ LL_TYPE_INSTANCE_HOOK(
     int    orgCount,
     int    favoredSlot
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(return origin(itemActor, orgCount, favoredSlot));
+    RETURN_IF_NOT_MAIN_THREAD(origin(itemActor, orgCount, favoredSlot));
     if (itemActor.hasCategory(ActorCategory::Item)
         && CoralFans::getInstance().getConfigDb()->get(
                std::format("functions.players.{}.nopickup", this->getUuid().asString())
