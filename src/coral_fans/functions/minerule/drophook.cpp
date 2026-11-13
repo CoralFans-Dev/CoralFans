@@ -1,7 +1,6 @@
 #include "MineruleManager.h"
 #include "coral_fans/base/Macros.h"
 #include "ll/api/memory/Hook.h"
-#include "mc/scripting/modules/minecraft/events/ScriptBlockGlobalEventListener.h"
 #include "mc/world/item/ItemStack.h"
 #include "mc/world/level/BlockPos.h"
 #include "mc/world/level/Explosion.h"
