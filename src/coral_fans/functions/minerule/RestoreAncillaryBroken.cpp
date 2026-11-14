@@ -66,7 +66,8 @@ LL_TYPE_INSTANCE_HOOK(
     ::BlockSource&              region,
     ::BlockPos const&           pos,
     bool                        dropResources,
-    const ::BlockChangeContext& blockChangeContext
+    ::BlockChangeContext const& changeSourceContext,
+    ::BlockDestroySound         destroySound
 ) {
     RETURN_IF_NOT_MAIN_THREAD(origin(region, pos, dropResources, blockChangeContext));
     auto& helper = RestoreAncillaryBrokenHelper::getInstance();
@@ -75,7 +76,7 @@ LL_TYPE_INSTANCE_HOOK(
         auto&    block = region.getBlock(pos);
         BlockPos secondPartPos;
         bool     hasSecondPart = block.mBlockType->getSecondPart(region, pos, secondPartPos);
-        auto     ori           = origin(region, pos, dropResources, blockChangeContext);
+        auto     ori           = origin(region, pos, dropResources, changeSourceContext, destroySound);
         if (hasSecondPart) {
             auto& secondPartBlock = region.getBlock(secondPartPos);
             if (block.mBlockType != secondPartBlock.mBlockType) {
@@ -96,7 +97,7 @@ LL_TYPE_INSTANCE_HOOK(
                     *helper.dropsContext,
                     nullptr
                 );
-                region.removeBlock(secondPartPos, blockChangeContext);
+                region.removeBlock(secondPartPos, changeSourceContext);
                 size_t length = helper.pistonBlockActor->mBreakBlocks->size();
                 for (size_t i = 0; i < length; i++) {
                     if ((*helper.pistonBlockActor->mBreakBlocks)[i] == secondPartPos) {
@@ -109,7 +110,7 @@ LL_TYPE_INSTANCE_HOOK(
         }
         return ori;
     }
-    return origin(region, pos, dropResources, blockChangeContext);
+    return origin(region, pos, dropResources, changeSourceContext, destroySound);
 }
 
 void restoreAncillaryBrokenHook(bool bl) {

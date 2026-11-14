@@ -37,13 +37,15 @@ void registerCounterCommand(config::CommandConfigStruct& config) {
         .execute([](CommandOrigin const& origin, CommandOutput& output, ll::command::RuntimeCommand const& self) {
             using ll::i18n_literals::operator""_tr;
             if (self["channel"].has_value()) {
-                output.success(functions::HopperCounterManager::getInstance()
-                                   .getChannel(self["channel"].get<ll::command::ParamKind::Int>())
-                                   .info());
+                output.success(
+                    functions::HopperCounterManager::getInstance()
+                        .getChannel(self["channel"].get<ll::command::ParamKind::Int>())
+                        .info()
+                );
             } else {
                 COMMAND_CHECK_PLAYER
                 auto hitrst = player->traceRay(5.25f, false, true, [](BlockSource const&, Block const& block, bool) {
-                    if (block.mBlockType->mMaterial.mLiquid) return false;
+                    if (block.mBlockType->mMaterial->mLiquid) return false;
                     return true;
                 });
                 if (!hitrst) return output.error("command.counter.print.error"_tr());
@@ -68,7 +70,7 @@ void registerCounterCommand(config::CommandConfigStruct& config) {
             } else {
                 COMMAND_CHECK_PLAYER
                 auto hitrst = player->traceRay(5.25f, false, true, [](BlockSource const&, Block const& block, bool) {
-                    if (block.mBlockType->mMaterial.mLiquid) return false;
+                    if (block.mBlockType->mMaterial->mLiquid) return false;
                     return true;
                 });
                 if (!hitrst) return output.error("command.counter.print.error"_tr());
