@@ -1,0 +1,43 @@
+format = 4
+id = "github.com/CoralFans-Dev/CoralFans"
+version = "26.60.0"
+
+[info]
+name = "CoralFans"
+description = "A tech-survival assistant mod for Bedrock Version."
+tags = [
+    "platform:levilamina",
+    "type:mod"
+]
+logo = "https://raw.githubusercontent.com/CoralFans-Dev/CoralFans-doc/refs/heads/main/docs/icon.png"
+
+# The default variant has an entry for each side: the server build for servers and the client
+# build for clients, so the mod is installed as "<id>" on either side.
+
+[[variants.""]]
+side = "server"
+platform = "win-x64"
+
+[variants."".deps]
+"github.com/LiteLDev/LeviLamina" = "26.60.*"
+"github.com/OEOTYAN/BedrockServerClientInterface": "26.60.*"
+
+[[variants."".assets]]
+type = "zip"
+urls = ["https://github.com/CoralFans-Dev/CoralFans/releases/download/v{{version}}/CoralFans-server-windows-x64.zip"]
+place = [{ src = "CoralFans/", dest = "mods/CoralFans/" }]
+
+[[variants.""]]
+side = "client"
+platform = "win-x64"
+
+[variants."".deps]
+# The bare id, not "#client": a lip.toml dependency is never rewritten, and lip.toml releases of
+# LeviLamina have no "client" variant. The range starts above 26.60.6, the last tooth.json release,
+# because the "" variant of a tooth.json release is the server build.
+"github.com/LiteLDev/LeviLamina" = ">26.60.6 <26.61.0"
+
+[[variants."".assets]]
+type = "zip"
+urls = ["https://github.com/CoralFans-Dev/CoralFans/releases/download/v{{version}}/CoralFans-client-windows-x64.zip"]
+place = [{ src = "CoralFans/", dest = "mods/CoralFans/" }]
