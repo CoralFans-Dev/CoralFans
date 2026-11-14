@@ -69,7 +69,7 @@ LL_TYPE_INSTANCE_HOOK(
     ::BlockChangeContext const& changeSourceContext,
     ::BlockDestroySound         destroySound
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(origin(region, pos, dropResources, blockChangeContext));
+    RETURN_IF_NOT_MAIN_THREAD(origin(region, pos, dropResources, changeSourceContext, destroySound));
     auto& helper = RestoreAncillaryBrokenHelper::getInstance();
     if (helper.mutex) {
         helper.mutex2  = true;

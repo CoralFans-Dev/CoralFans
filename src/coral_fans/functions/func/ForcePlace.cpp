@@ -30,14 +30,14 @@ LL_TYPE_INSTANCE_HOOK(
     BlockSource,
     &BlockSource::$mayPlace,
     bool,
-    ::Block const& /* block*/,
+    ::Block const&    block,
     ::BlockPos const& pos,
     uchar             face,
     ::Actor const*    placer,
     bool              ignoreEntities,
     ::Vec3            clickPos
 ) {
-    RETURN_IF_NOT_MAIN_THREAD(origin(block, pos, face, placer, val, clickPos));
+    RETURN_IF_NOT_MAIN_THREAD(origin(block, pos, face, placer, ignoreEntities, clickPos));
     if (getBlock(pos).isAir()) return true;
     auto stone = Block::tryGetFromRegistry("minecraft:stone");
     return origin(stone, pos, face, placer, ignoreEntities, clickPos);
