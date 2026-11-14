@@ -30,7 +30,11 @@ LL_TYPE_INSTANCE_HOOK(
     BlockSource,
     &BlockSource::$mayPlace,
     bool,
+<<<<<<< HEAD
     ::Block const&    block,
+=======
+    ::Block const& /* block*/,
+>>>>>>> tem
     ::BlockPos const& pos,
     uchar             face,
     ::Actor const*    placer,
